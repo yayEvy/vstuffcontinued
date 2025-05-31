@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff;
+package yay.evy.everest.vstuff.ropes;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;

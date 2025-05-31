@@ -3,7 +3,7 @@ package yay.evy.everest.vstuff.network;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 import org.joml.Vector3d;
-import yay.evy.everest.vstuff.ClientConstraintTracker;
+import yay.evy.everest.vstuff.ropes.ClientConstraintTracker;
 
 import java.util.function.Supplier;
 

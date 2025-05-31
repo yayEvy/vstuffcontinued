@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff;
+package yay.evy.everest.vstuff.ropes;
 
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;

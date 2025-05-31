@@ -1,10 +1,8 @@
-package yay.evy.everest.vstuff;
+package yay.evy.everest.vstuff.ropes;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderLevelStageEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;

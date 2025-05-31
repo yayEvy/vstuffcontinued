@@ -5,8 +5,8 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import yay.evy.everest.vstuff.LeadBreakItem;
-import yay.evy.everest.vstuff.LeadConstraintItem;
+import yay.evy.everest.vstuff.ropes.LeadBreakItem;
+import yay.evy.everest.vstuff.ropes.LeadConstraintItem;
 
 public class ModItems {
     public static final DeferredRegister<Item> ITEMS =

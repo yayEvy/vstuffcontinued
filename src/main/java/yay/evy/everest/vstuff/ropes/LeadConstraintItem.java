@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff;
+package yay.evy.everest.vstuff.ropes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -13,11 +13,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.api.ships.ShipForcesInducer;
-import org.valkyrienskies.core.impl.game.ships.ShipObjectClient;
-import org.valkyrienskies.core.impl.game.ships.ShipObjectServer;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import yay.evy.everest.vstuff.ConstraintTracker;
 import org.valkyrienskies.core.apigame.constraints.VSRopeConstraint;
 
 public class LeadConstraintItem extends Item {
