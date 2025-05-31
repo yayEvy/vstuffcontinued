@@ -1,0 +1,11 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "north": "vstuff:block/magnet_north",
+    "south": "vstuff:block/magnet_side",
+    "east": "vstuff:block/magnet_side",
+    "west": "vstuff:block/magnet_side",
+    "up": "vstuff:block/magnet_side",
+    "down": "vstuff:block/magnet_side"
+  }
+}

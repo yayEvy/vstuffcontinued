@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SLS",
+    "LCL",
+    "SLS"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:string"
+    },
+    "L": {
+      "item": "minecraft:lead"
+    },
+    "C": {
+      "item": "minecraft:lead"
+    }
+  },
+  "result": {
+    "item": "vstuff:lead_constraint_item",
+    "count": 1
+  }
+}

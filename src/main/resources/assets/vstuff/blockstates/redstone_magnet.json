@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=down":  { "model": "vstuff:block/redstone_magnet", "x": 180, "y": 0 },
+    "facing=up":    { "model": "vstuff:block/redstone_magnet", "x": 0, "y": 0 },
+    "facing=north": { "model": "vstuff:block/redstone_magnet", "x": 90, "y": 180 },
+    "facing=south": { "model": "vstuff:block/redstone_magnet", "x": 90, "y": 0 },
+    "facing=west":  { "model": "vstuff:block/redstone_magnet", "x": 90, "y": 90 },
+    "facing=east":  { "model": "vstuff:block/redstone_magnet", "x": 90, "y": 270 }
+  }
+}

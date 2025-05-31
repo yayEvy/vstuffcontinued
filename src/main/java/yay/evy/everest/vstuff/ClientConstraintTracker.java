@@ -1,0 +1,99 @@
+package yay.evy.everest.vstuff;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import org.joml.Vector3d;
+import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+public class ClientConstraintTracker {
+
+    private static final Map<Integer, ClientRopeData> clientConstraints = new HashMap<>();
+
+    public static class ClientRopeData {
+        public final Long shipA;
+        public final Long shipB;
+        public final Vector3d localPosA;
+        public final Vector3d localPosB;
+        public final double maxLength;
+
+        public ClientRopeData(Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB, double maxLength) {
+            this.shipA = shipA;
+            this.shipB = shipB;
+            this.localPosA = new Vector3d(localPosA);
+            this.localPosB = new Vector3d(localPosB);
+            this.maxLength = maxLength;
+        }
+
+        public Vector3d getWorldPosA(Level level, float partialTick) {
+            try {
+                Minecraft mc = Minecraft.getInstance();
+                if (mc.level == null) return new Vector3d(localPosA);
+
+                if (shipA == null || shipA == 0L) {
+                    return new Vector3d(localPosA);
+                } else {
+                    Ship shipObject = VSGameUtilsKt.getShipObjectWorld(mc.level).getAllShips().getById(shipA);
+                    if (shipObject != null) {
+                        Vector3d worldPos = new Vector3d();
+                        shipObject.getTransform().getShipToWorld().transformPosition(localPosA, worldPos);
+                        return worldPos;
+                    }
+                }
+                return new Vector3d(localPosA);
+            } catch (Exception e) {
+                return new Vector3d(localPosA);
+            }
+        }
+
+        public Vector3d getWorldPosB(Level level, float partialTick) {
+            try {
+                Minecraft mc = Minecraft.getInstance();
+                if (mc.level == null) return new Vector3d(localPosB);
+
+                if (shipB == null || shipB == 0L) {
+                    return new Vector3d(localPosB);
+                } else {
+                    Ship shipObject = VSGameUtilsKt.getShipObjectWorld(mc.level).getAllShips().getById(shipB);
+                    if (shipObject != null) {
+                        Vector3d worldPos = new Vector3d();
+                        shipObject.getTransform().getShipToWorld().transformPosition(localPosB, worldPos);
+                        return worldPos;
+                    }
+                }
+                return new Vector3d(localPosB);
+            } catch (Exception e) {
+                return new Vector3d(localPosB);
+            }
+        }
+    }
+
+        public static void addClientConstraint(Integer constraintId, Long shipA, Long shipB,
+                                           Vector3d localPosA, Vector3d localPosB, double maxLength) {
+        clientConstraints.put(constraintId, new ClientRopeData(shipA, shipB, localPosA, localPosB, maxLength));
+        System.out.println("Added client constraint: " + constraintId);
+    }
+
+    public static void removeClientConstraint(Integer constraintId) {
+        clientConstraints.remove(constraintId);
+        System.out.println("Removed client constraint: " + constraintId);
+    }
+
+    public static Map<Integer, ClientRopeData> getClientConstraints() {
+        return new HashMap<>(clientConstraints);
+    }
+
+    public static void clearAllClientConstraints() {
+        clientConstraints.clear();
+        System.out.println("Cleared all client constraints");
+    }
+}
+

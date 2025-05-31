@@ -41,7 +41,12 @@ apply plugin: "org.jetbrains.kotlin.jvm"
 
 
 String gitRevision = "git rev-parse HEAD".execute().text.trim()
-version = mod_version + '+' + gitRevision.substring(0, 10)
+if (gitRevision.length() >= 10) {
+    version = mod_version + '+' + gitRevision.substring(0, 10)
+} else {
+    version = mod_version + '+unknown'
+}
+
 
 publishing {
     publications {
@@ -112,11 +117,15 @@ minecraft {
         client {
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             property 'forge.enabledGameTestNamespaces', mod_id
+            jvmArgs '-Dforge.logging.markers=REGISTRIES'
+
         }
 
         server {
             property 'forge.enabledGameTestNamespaces', mod_id
             args '--nogui'
+            jvmArgs '-Dforge.logging.markers=REGISTRIES'
+
         }
 
         // This run config launches GameTestServer and runs all registered gametests, then exits.
@@ -181,35 +190,45 @@ repositories {
     }
 
 
+    flatDir {
+        dir 'libs'
+    }
 
+    mavenLocal()
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
-    implementation         ("org.valkyrienskies.core:api:${vs_core_version}")
-    implementation         ("org.valkyrienskies.core:impl:${vs_core_version}")
-    implementation         ("org.valkyrienskies.core:api-game:${vs_core_version}")
-    implementation         ("org.valkyrienskies.core:util:${vs_core_version}")
+    implementation("org.valkyrienskies.core:api:${vs_core_version}")
+    implementation("org.valkyrienskies.core:impl:${vs_core_version}")
+    implementation("org.valkyrienskies.core:api-game:${vs_core_version}")
+    implementation("org.valkyrienskies.core:util:${vs_core_version}")
     implementation fg.deobf("org.valkyrienskies:valkyrienskies-120-forge:${vs2_version}")
 
     implementation "org.joml:joml:1.10.5"
     implementation "com.fasterxml.jackson.core:jackson-annotations:2.13.3"
     implementation 'thedarkcolour:kotlinforforge:4.10.0'
 
-    implementation fg.deobf("maven.modrinth:create-clockwork:1.20.1-0.1.16")
+    // These will be available at compile time but not bundled with your mod
+    runtimeOnly fg.deobf("maven.modrinth:create-clockwork:1.20.1-0.1.16")
     implementation fg.deobf("maven.modrinth:architectury-api:9.2.14+forge")
-    implementation fg.deobf("maven.modrinth:forgified-fabric-api:0.92.2+1.11.12+1.20.1")
+    runtimeOnly fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_forge_version}:slim") { transitive = false }
+    runtimeOnly fg.deobf("com.tterrag.registrate:Registrate:${registrate_forge_version}")
+    runtimeOnly fg.deobf("com.jozufozu.flywheel:flywheel-forge-${flywheel_forge_minecraft_version}:${flywheel_forge_version}")
 
 
-    // Add Create dependencies here
-    implementation fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_forge_version}:slim") { transitive = false }
-    implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_forge_version}")
-    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${flywheel_forge_minecraft_version}:${flywheel_forge_version}")
+
+    compileOnly fg.deobf("maven.modrinth:vmod:lK0oLDaV")
+
 
 
 
 }
+
+
+
+
 
 configurations {
     shade
