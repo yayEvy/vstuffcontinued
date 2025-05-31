@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -15,16 +16,59 @@ import net.minecraftforge.fml.common.Mod;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class RopeRendererAdvanced {
     private static final ResourceLocation ROPE_TEXTURE = new ResourceLocation("vstuff", "textures/entity/rope.png");
-
-    private static final float BASE_ROPE_WIDTH = 0.08f; // Slightly thinner
+    private static final float BASE_ROPE_WIDTH = 0.08f;
     private static final int BASE_ROPE_SEGMENTS = 48;
     private static final float ROPE_SAG_FACTOR = 0.25f;
     private static final double MAX_RENDER_DISTANCE = 300.0;
     private static final float WIND_STRENGTH = 0.02f;
+
+    private static final Map<Integer, RopePositionCache> positionCache = new ConcurrentHashMap<>();
+
+    private static class RopePositionCache {
+        Vector3d lastStartPos = new Vector3d();
+        Vector3d lastEndPos = new Vector3d();
+        Vector3d smoothStartPos = new Vector3d();
+        Vector3d smoothEndPos = new Vector3d();
+        Vector3d startVelocity = new Vector3d();
+        Vector3d endVelocity = new Vector3d();
+        long lastUpdateTime = 0;
+
+        public void updatePositions(Vector3d newStart, Vector3d newEnd, float partialTick) {
+            long currentTime = System.currentTimeMillis();
+            float deltaTime = Math.min((currentTime - lastUpdateTime) / 1000.0f, 0.1f);
+
+            if (lastUpdateTime == 0) {
+                smoothStartPos.set(newStart);
+                smoothEndPos.set(newEnd);
+                startVelocity.set(0, 0, 0);
+                endVelocity.set(0, 0, 0);
+            } else {
+                if (deltaTime > 0) {
+                    Vector3d newStartVel = new Vector3d(newStart).sub(lastStartPos).div(deltaTime);
+                    Vector3d newEndVel = new Vector3d(newEnd).sub(lastEndPos).div(deltaTime);
+
+                    startVelocity.lerp(newStartVel, 0.3f);
+                    endVelocity.lerp(newEndVel, 0.3f);
+                }
+
+                Vector3d predictedStart = new Vector3d(newStart).add(new Vector3d(startVelocity).mul(partialTick * 0.05f));
+                Vector3d predictedEnd = new Vector3d(newEnd).add(new Vector3d(endVelocity).mul(partialTick * 0.05f));
+
+                float responsiveness = 0.3f; // Higher = more responsive, lower = more stable
+                smoothStartPos.lerp(predictedStart, responsiveness);
+                smoothEndPos.lerp(predictedEnd, responsiveness);
+            }
+
+            lastStartPos.set(newStart);
+            lastEndPos.set(newEnd);
+            lastUpdateTime = currentTime;
+        }
+    }
 
     @SubscribeEvent
     public static void onRenderLevel(RenderLevelStageEvent event) {
@@ -50,7 +94,7 @@ public class RopeRendererAdvanced {
             if (constraints.isEmpty()) {
                 for (Map.Entry<Integer, ConstraintTracker.RopeConstraintData> entry : serverConstraints.entrySet()) {
                     try {
-                        renderServerRope(poseStack, bufferSource, entry.getValue(), level, cameraPos, partialTick);
+                        renderServerRope(poseStack, bufferSource, entry.getKey(), entry.getValue(), level, cameraPos, partialTick);
                         renderedAny = true;
                     } catch (Exception e) {
                         System.err.println("Error rendering server rope: " + e.getMessage());
@@ -59,7 +103,7 @@ public class RopeRendererAdvanced {
             } else {
                 for (Map.Entry<Integer, ClientConstraintTracker.ClientRopeData> entry : constraints.entrySet()) {
                     try {
-                        renderClientRope(poseStack, bufferSource, entry.getValue(), level, cameraPos, partialTick);
+                        renderClientRope(poseStack, bufferSource, entry.getKey(), entry.getValue(), level, cameraPos, partialTick);
                         renderedAny = true;
                     } catch (Exception e) {
                         System.err.println("Error rendering client rope: " + e.getMessage());
@@ -72,34 +116,54 @@ public class RopeRendererAdvanced {
             }
         } catch (Exception e) {
             System.err.println("Error in rope rendering: " + e.getMessage());
-            e.printStackTrace();
         }
     }
+
 
     private static void renderClientRope(PoseStack poseStack, MultiBufferSource bufferSource,
-                                         ClientConstraintTracker.ClientRopeData ropeData, Level level,
-                                         Vec3 cameraPos, float partialTick) {
-        Vector3d startPos = ropeData.getWorldPosA(level, partialTick);
-        Vector3d endPos = ropeData.getWorldPosB(level, partialTick);
+                                         Integer constraintId, ClientConstraintTracker.ClientRopeData ropeData,
+                                         Level level, Vec3 cameraPos, float partialTick) {
+        // Check if we're actually on client side and handle appropriately
+        Vector3d startPos = null;
+        Vector3d endPos = null;
+
+        if (level.isClientSide) {
+            // For client-side rendering, use the client-safe methods
+            startPos = ropeData.getWorldPosA(level, partialTick);
+            endPos = ropeData.getWorldPosB(level, partialTick);
+        } else {
+            // Fallback - this shouldn't happen in client rendering, but just in case
+            System.err.println("Warning: Client renderer called on server side!");
+            return;
+        }
 
         if (startPos != null && endPos != null) {
-            renderAdvancedRope(poseStack, bufferSource, startPos, endPos, ropeData.maxLength, cameraPos, partialTick);
+            RopePositionCache cache = positionCache.computeIfAbsent(constraintId, k -> new RopePositionCache());
+            cache.updatePositions(startPos, endPos, partialTick);
+
+            renderAdvancedRope(poseStack, bufferSource, cache.smoothStartPos, cache.smoothEndPos,
+                    ropeData.maxLength, cameraPos, partialTick);
         }
     }
 
+
     private static void renderServerRope(PoseStack poseStack, MultiBufferSource bufferSource,
-                                         ConstraintTracker.RopeConstraintData ropeData, Level level,
-                                         Vec3 cameraPos, float partialTick) {
+                                         Integer constraintId, ConstraintTracker.RopeConstraintData ropeData,
+                                         Level level, Vec3 cameraPos, float partialTick) {
         try {
-            Vector3d startPos = new Vector3d(ropeData.localPosA);
-            Vector3d endPos = new Vector3d(ropeData.localPosB);
+            // For server ropes, try to get actual world positions if possible
+            Vector3d startPos = ropeData.getWorldPosA((ServerLevel) level, partialTick);
+            Vector3d endPos = ropeData.getWorldPosB((ServerLevel) level, partialTick);
 
             if (startPos != null && endPos != null) {
-                renderAdvancedRope(poseStack, bufferSource, startPos, endPos, ropeData.maxLength, cameraPos, partialTick);
+                RopePositionCache cache = positionCache.computeIfAbsent(constraintId, k -> new RopePositionCache());
+                cache.updatePositions(startPos, endPos, partialTick);
+
+                renderAdvancedRope(poseStack, bufferSource, cache.smoothStartPos, cache.smoothEndPos,
+                        ropeData.maxLength, cameraPos, partialTick);
             }
         } catch (Exception e) {
             System.err.println("Error in renderServerRope: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
@@ -119,14 +183,14 @@ public class RopeRendererAdvanced {
             return;
         }
 
-        int baseSegments = Math.max(16, (int) (ropeLength * 8)); // More segments for longer ropes
+        // SMOOTHING: More segments for smoother curves, but optimize based on distance
+        int baseSegments = Math.max(32, (int) (ropeLength * 12)); // Increased base segments
         int segments = Math.max(baseSegments, (int) (BASE_ROPE_SEGMENTS * (1.0 - distanceToCamera / MAX_RENDER_DISTANCE)));
-        segments = Math.min(segments, 64); // Cap at 64 for performance
+        segments = Math.min(segments, 96); // Increased max segments for smoothness
 
         float ropeWidth = BASE_ROPE_WIDTH * 3.0f;
 
         poseStack.pushPose();
-
         RenderType renderType = RenderType.entityCutout(ROPE_TEXTURE);
         VertexConsumer vertexConsumer = bufferSource.getBuffer(renderType);
 
@@ -136,35 +200,38 @@ public class RopeRendererAdvanced {
     }
 
 
+
     private static void renderRopeWithPhysics(PoseStack poseStack, VertexConsumer vertexConsumer,
                                               Vec3 start, Vec3 end, double maxLength,
                                               int segments, float ropeWidth, float partialTick) {
         if (segments <= 0 || ropeWidth <= 0) return;
 
         Matrix4f matrix = poseStack.last().pose();
-
         Vec3 direction = end.subtract(start);
         double actualLength = direction.length();
         if (actualLength < 0.01) return;
 
         direction = direction.normalize();
-
         double tension = Math.min(actualLength / Math.max(maxLength, 1.0), 1.0);
         double sagAmount = ROPE_SAG_FACTOR * (1.0 - tension * 0.5) * actualLength * 0.4;
-        float windOffset = (float) (Math.sin(partialTick * 0.05) * WIND_STRENGTH);
+
+        // SMOOTHING: Smoother wind animation
+        float gameTime = (float) (System.currentTimeMillis() % 100000) / 1000.0f;
+        float windOffset = (float) (Math.sin(gameTime * 0.8) * 0.3 + Math.sin(gameTime * 1.3) * 0.2) * WIND_STRENGTH;
 
         Minecraft mc = Minecraft.getInstance();
         org.joml.Vector3f lookVector = mc.gameRenderer.getMainCamera().getLookVector();
         Vec3 cameraLook = new Vec3(lookVector.x(), lookVector.y(), lookVector.z());
 
-        int actualSegments = Math.max(segments, 24); // Minimum 24 segments for smoothness
+        // SMOOTHING: Higher minimum segments for smoother curves
+        int actualSegments = Math.max(segments, 48); // Increased minimum
 
         for (int i = 0; i < actualSegments; i++) {
             float t1 = (float) i / actualSegments;
             float t2 = (float) (i + 1) / actualSegments;
 
-            Vec3 pos1 = calculateCatenaryPosition(start, end, t1, sagAmount, windOffset);
-            Vec3 pos2 = calculateCatenaryPosition(start, end, t2, sagAmount, windOffset);
+            Vec3 pos1 = calculateSmoothCatenaryPosition(start, end, t1, sagAmount, windOffset, gameTime);
+            Vec3 pos2 = calculateSmoothCatenaryPosition(start, end, t2, sagAmount, windOffset, gameTime);
 
             Vec3 segmentDir = pos2.subtract(pos1).normalize();
             Vec3 right = segmentDir.cross(cameraLook).normalize();
@@ -176,7 +243,8 @@ public class RopeRendererAdvanced {
                 }
             }
 
-            int layers = 8;
+            // SMOOTHING: More layers for rounder rope
+            int layers = 12; // Increased from 8
             for (int layer = 0; layer < layers; layer++) {
                 float angle = (float) (layer * Math.PI * 2.0 / layers);
                 Vec3 rotatedRight = rotateVectorAroundAxis(right, segmentDir, angle);
@@ -193,13 +261,11 @@ public class RopeRendererAdvanced {
                 float vCoord2 = (float) (layer + 1) / layers;
 
                 int light = calculateDynamicLighting(pos1, pos2);
-
                 Vec3 normal = calculateSegmentNormal(segmentDir, rotatedRight);
 
                 addRopeVertex(vertexConsumer, matrix, vert1, u1, vCoord1, light, normal);
                 addRopeVertex(vertexConsumer, matrix, vert2, u1, vCoord2, light, normal);
                 addRopeVertex(vertexConsumer, matrix, vert3, u2, vCoord2, light, normal);
-
                 addRopeVertex(vertexConsumer, matrix, vert1, u1, vCoord1, light, normal);
                 addRopeVertex(vertexConsumer, matrix, vert3, u2, vCoord2, light, normal);
                 addRopeVertex(vertexConsumer, matrix, vert4, u2, vCoord1, light, normal);
@@ -207,6 +273,28 @@ public class RopeRendererAdvanced {
         }
     }
 
+    private static Vec3 calculateSmoothCatenaryPosition(Vec3 start, Vec3 end, float t,
+                                                        double sagAmount, float windOffset, float gameTime) {
+        Vec3 linearPos = start.lerp(end, t);
+
+        // Smoother sag curve using a combination of sine functions
+        double sagCurve = Math.sin(t * Math.PI) * sagAmount * 3.0;
+        sagCurve += Math.sin(t * Math.PI * 2) * sagAmount * 0.3; // Add secondary curve for realism
+
+        // Smoother wind with multiple frequencies
+        double windSway = (Math.sin((gameTime + t * 2) * 1.2) * 0.6 +
+                Math.sin((gameTime + t * 3) * 0.8) * 0.4) * windOffset * sagAmount * 0.5;
+
+        Vec3 basePos = linearPos.add(windSway, -Math.abs(sagCurve), windSway * 0.3);
+
+        // Simplified collision detection for better performance
+        return basePos;
+    }
+
+    public static void cleanupCache() {
+        Map<Integer, ClientConstraintTracker.ClientRopeData> activeConstraints = ClientConstraintTracker.getClientConstraints();
+        positionCache.keySet().retainAll(activeConstraints.keySet());
+    }
 
 
     private static Vec3 calculateSegmentNormal(Vec3 segmentDir, Vec3 right) {
