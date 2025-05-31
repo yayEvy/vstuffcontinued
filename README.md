@@ -3,11 +3,25 @@ adds stuff to vs2 that i wanted to do because yea
 features as of v0.1:
 
 ropes (world to world, ship to ship, ship to world)
+
 ship lead item, crafted with a lead surrounded by string, is consumed if in survival
+
 ship lead cutter item, crafted with a lead and one red dye, shapeless, makes 4, breaks the lead you're looking at
+
 constraints persist between restarts ig
-known issues
+
+-- known issues --
+
 if a ship to world constraint is set, and the ship is really really heavy, and you fling it, it can stretch the constraint which it shouldnt lol (why would you have a ship this heavy in survival tho? :clueless:)
+
 ropes dont collide with stuff, so theyre not like vmod phys ropes, but i hope these will still be cool for people to use
+
 idk nothing else really besides rendering being a bit funky lmao
+
+
+
+
+
 thats all lol
+
+
