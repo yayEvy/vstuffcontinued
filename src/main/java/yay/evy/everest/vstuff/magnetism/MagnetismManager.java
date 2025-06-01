@@ -27,6 +27,8 @@ import java.util.HashSet;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import org.valkyrienskies.core.impl.game.ships.ShipObjectServerWorld;
+
 
 
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -45,6 +47,7 @@ public class MagnetismManager {
     private static final Map<String, Boolean> worldStartupScanned = new HashMap<>();
     private static final Gson gson = new Gson();
     private static final Set<String> savedMagnetPositions = new HashSet<>();
+    private static final Set<Long> registeredShips = ConcurrentHashMap.newKeySet();
 
 
     private static final Set<MagnetInfo> activeMagnets = new HashSet<>();
@@ -117,6 +120,32 @@ public class MagnetismManager {
             }
         } catch (Exception e) {
             System.err.println("Failed to load magnet positions: " + e.getMessage());
+        }
+    }
+
+    // Add a method to properly register force inducers with the physics system
+    // Update the registerForceInducerWithPhysics method:
+    private static void registerForceInducerWithPhysics(ServerLevel level, Long shipId, MagneticForceInducer inducer) {
+        try {
+            var shipObjectWorld = VSGameUtilsKt.getShipObjectWorld(level);
+
+            // Get the physics ship
+            var physShip = shipObjectWorld.getAllShips().getById(shipId);
+            if (physShip != null) {
+                // Check if our inducer is already registered
+                MagneticForceInducer existingInducer = physShip.getAttachment(MagneticForceInducer.class);
+
+                if (existingInducer == null) {
+                    // Register the inducer directly with the physics ship
+                    physShip.saveAttachment(MagneticForceInducer.class, inducer);
+                    System.out.println("Registered force inducer with physics system for ship " + shipId);
+                } else {
+                    System.out.println("Force inducer already registered with physics system for ship " + shipId);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error registering force inducer with physics: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -214,19 +243,21 @@ public class MagnetismManager {
     }
 
     private static void scanForNearbyMagnets(ServerLevel level) {
-        if (!activeMagnets.isEmpty()) {
-            return;
-        }
-
         Set<MagnetInfo> foundMagnets = new HashSet<>();
 
+        // Always scan around players
         for (var player : level.players()) {
             Vector3d playerPos = new Vector3d(player.getX(), player.getY(), player.getZ());
-            var nearbyMagnets = findMagnetsInArea(level, playerPos, 50.0); // Reduced from MAGNET_RANGE
+            var nearbyMagnets = findMagnetsInArea(level, playerPos, 50.0);
             foundMagnets.addAll(nearbyMagnets);
+        }
 
-            if (foundMagnets.size() > 20) {
-                break;
+        // Also scan around existing active magnets to find nearby ones
+        for (MagnetInfo existingMagnet : new HashSet<>(activeMagnets)) {
+            Vector3d magnetPos = getMagnetWorldPosition(level, existingMagnet);
+            if (magnetPos != null) {
+                var nearbyMagnets = findMagnetsInArea(level, magnetPos, MAGNET_RANGE * 2);
+                foundMagnets.addAll(nearbyMagnets);
             }
         }
 
@@ -235,56 +266,74 @@ public class MagnetismManager {
         int afterSize = activeMagnets.size();
 
         if (beforeSize != afterSize) {
-            System.out.println("Lightweight scan found " + (afterSize - beforeSize) + " new magnets");
+            System.out.println("Scan found " + (afterSize - beforeSize) + " new magnets, total: " + afterSize);
         }
     }
+
 
 
     // Update the onServerTick method in your MagnetismManager class
-    public static void onServerTick(ServerLevel level) {
-        tickCounter++;
+    public static void onServerTick(ServerLevel level, int dimensionTickCounter) {
         try {
-            // Handle delayed activations first
             processDelayedActivations(level);
-
             String levelKey = level.dimension().location().toString();
-            boolean hasScannedThisWorld = worldStartupScanned.getOrDefault(levelKey, false);
-            boolean isStartupPeriod = tickCounter < 600; // First 30 seconds
-            boolean shouldScanAggressively = !hasScannedThisWorld || (isStartupPeriod && tickCounter % 20 == 0);
 
-            // ALWAYS scan if we have no active magnets, regardless of timing
-            if (activeMagnets.isEmpty()) {
-                if (shouldScanAggressively) {
-                    System.out.println("Startup scan for magnets at tick " + tickCounter);
+            // Ensure force inducers exist early in EACH dimension's lifecycle
+            if (dimensionTickCounter == 100) { // After 5 seconds for THIS dimension
+                ensureAllForceInducersExist(level);
+                System.out.println("Ensured force inducers exist for dimension: " + levelKey);
+            }
+
+            // Also re-ensure force inducers periodically in case something goes wrong
+            if (dimensionTickCounter % 1200 == 0) { // Every minute
+                ensureAllForceInducersExist(level);
+                System.out.println("Periodic force inducer check for dimension: " + levelKey);
+            }
+
+            // Check if this dimension is in startup period (first 10 seconds)
+            boolean isStartupPeriod = dimensionTickCounter <= 200;
+            boolean isScanned = worldStartupScanned.getOrDefault(levelKey, false);
+
+            if (isStartupPeriod || !isScanned) {
+                // Scan every 20 ticks (1 second) during startup
+                if (dimensionTickCounter % 20 == 0) {
+                    System.out.println("Startup scan at tick " + dimensionTickCounter + " for dimension " + levelKey);
                     scanForNearbyMagnets(level);
-                    if (tickCounter > 100) { // Mark as scanned after 5 seconds
-                        worldStartupScanned.put(levelKey, true);
-                    }
-                } else if (tickCounter % 200 == 0) {
-                    scanForNearbyMagnets(level);
+                    loadMagnetPositions(level); // Try to reload saved positions
                 }
             } else {
-                // We found magnets, mark this world as properly scanned
-                worldStartupScanned.put(levelKey, true);
+                // After startup, scan every 5 seconds
+                if (dimensionTickCounter % 100 == 0) {
+                    scanForNearbyMagnets(level);
+                }
+            }
 
-                // Process magnets EVERY tick
+            // Mark as scanned after startup period
+            if (dimensionTickCounter > 200) {
+                worldStartupScanned.put(levelKey, true);
+            }
+
+            // Always process active magnets if we have any
+            if (!activeMagnets.isEmpty()) {
                 processActiveMagnetsLimited(level);
             }
 
-            // Scan more frequently for ship-world interactions
-            if (tickCounter % 60 == 0) { // Every 3 seconds
+            // Regular maintenance (use dimension tick counter for consistency)
+            if (dimensionTickCounter % 60 == 0) {
                 scanForShipWorldMagnetInteractions(level);
             }
 
-            // Cleanup very rarely
-            if (tickCounter % 1000 == 0) { // Every 50 seconds
+            if (dimensionTickCounter % 1000 == 0) {
                 cleanupInactiveMagnets(level);
             }
+
         } catch (Exception e) {
-            System.err.println("Error in magnetism tick: " + e.getMessage());
+            System.err.println("Error in magnetism tick for " + level.dimension().location() + ": " + e.getMessage());
             e.printStackTrace();
         }
     }
+
+
     private static void processDelayedActivations(ServerLevel level) {
         String levelKey = level.dimension().location().toString();
         Iterator<Map.Entry<String, Integer>> iterator = delayedActivations.entrySet().iterator();
@@ -778,8 +827,16 @@ public class MagnetismManager {
 
 
 
+
+
+
+
+
+
+
+
     private static void applyForceToMagnet(ServerLevel level, MagnetInfo magnet, Vector3d force) {
-        if (magnet.shipId == null) return; // Can't move the world :CLUELESS:
+        if (magnet.shipId == null) return; // Can't move the world
 
         try {
             double maxForce = 1000000.0;
@@ -788,35 +845,39 @@ public class MagnetismManager {
             }
 
             var shipObjectWorld = VSGameUtilsKt.getShipObjectWorld(level);
-
             var serverShip = shipObjectWorld.getQueryableShipData().getById(magnet.shipId);
+
             if (serverShip != null) {
-                MagneticForceInducer inducer = serverShip.getAttachment(MagneticForceInducer.class);
-                if (inducer == null) {
-                    // Create new inducer
-                    inducer = new MagneticForceInducer();
+                // Get or create the force inducer
+                MagneticForceInducer inducer = MagneticForceInducer.getOrCreate(serverShip);
+
+                // Check if the queue is getting too large
+                if (inducer.getQueueSize() > 50) {
+                    System.err.println("WARNING: Force queue for ship " + magnet.shipId + " is very large (" +
+                            inducer.getQueueSize() + "). This suggests applyForces isn't being called!");
+
+                    inducer.clearQueue();
+
+                    // Try to re-save the attachment
                     serverShip.saveAttachment(MagneticForceInducer.class, inducer);
-                  //  System.out.println("Created new force inducer for ship " + magnet.shipId);
-                } else {
-                    serverShip.saveAttachment(MagneticForceInducer.class, inducer);
-                 //   System.out.println("Re-registered existing force inducer for ship " + magnet.shipId);
+                    System.out.println("Re-saved attachment for ship " + magnet.shipId);
+                    System.out.println("Available methods on shipObjectWorld: " + Arrays.toString(shipObjectWorld.getClass().getMethods()));
+
                 }
 
                 // Add the force
                 inducer.addForce(force);
-               // System.out.println("Added force " + force + " to ship " + magnet.shipId + " inducer (queue size: " + inducer.getQueueSize() + ")");
 
+                System.out.println("Applied force " + force + " to ship " + magnet.shipId +
+                        " (queue size: " + inducer.getQueueSize() + ")");
             } else {
-              //  System.out.println("Could not find server ship with ID: " + magnet.shipId);
+                System.out.println("Could not find server ship with ID: " + magnet.shipId);
             }
         } catch (Exception e) {
-           // System.err.println("Error applying force to ship: " + e.getMessage());
+            System.err.println("Error applying force to ship: " + e.getMessage());
             e.printStackTrace();
         }
     }
-
-
-
 
 
 
@@ -1031,10 +1092,9 @@ public class MagnetismManager {
         String posStr = positionToString(pos, level.dimension().location().toString());
         savedMagnetPositions.remove(posStr);
         saveMagnetPositions(level);
+
         int beforeSize = activeMagnets.size();
-
         activeMagnets.removeIf(magnet -> magnet.pos.equals(pos));
-
         stuckPairs.removeIf(pair ->
                 pair.magnet1.pos.equals(pos) || pair.magnet2.pos.equals(pos));
 
@@ -1044,17 +1104,22 @@ public class MagnetismManager {
 
 
 
+
+
     public static void onMagnetActivated(ServerLevel level, BlockPos pos) {
         try {
             System.out.println("Redstone Magnet at " + pos + " is now ACTIVE - searching for targets...");
             Ship managingShip = VSGameUtilsKt.getShipManagingPos(level, pos);
             Long shipId = managingShip != null ? managingShip.getId() : null;
 
+            // Always ensure force inducer exists for ship magnets immediately
             if (managingShip != null) {
-                System.out.println("Magnet is on ship " + shipId + ", checking ship state...");
+                System.out.println("Magnet is on ship " + shipId + ", ensuring force inducer exists...");
+                ensureForceInducerExists(level, shipId);
+
                 if (!isShipFullyLoaded(managingShip)) {
                     System.out.println("Ship not fully loaded, scheduling delayed activation...");
-                    scheduleDelayedMagnetActivation(level, pos, 20); // 1 second delay
+                    scheduleDelayedMagnetActivation(level, pos, 20);
                     return;
                 }
             }
@@ -1062,72 +1127,122 @@ public class MagnetismManager {
             BlockState state = level.getBlockState(pos);
             Direction attractSide = RedstoneMagnetBlock.getAttractSide(state);
             Direction repelSide = RedstoneMagnetBlock.getRepelSide(state);
-
             MagnetInfo magnetInfo = new MagnetInfo(pos, shipId, attractSide, repelSide);
 
             String posStr = positionToString(pos, level.dimension().location().toString());
             savedMagnetPositions.add(posStr);
             saveMagnetPositions(level);
 
+            // Remove any existing magnet at this position first
             activeMagnets.removeIf(m -> m.pos.equals(pos) && Objects.equals(m.shipId, shipId));
-
             activeMagnets.add(magnetInfo);
+
             System.out.println("Added magnet to active list. Total active: " + activeMagnets.size());
 
-            performExtendedMagnetSearch(level, magnetInfo);
+            // Force an immediate scan to find nearby magnets
+            performImmediateMagnetScan(level, magnetInfo);
 
             System.out.println("Magnet activation complete. Total active magnets: " + activeMagnets.size());
-
         } catch (Exception e) {
             System.err.println("Error processing magnet activation: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private static void performExtendedMagnetSearch(ServerLevel level, MagnetInfo newMagnet) {
+    // Add this new method to ensure force inducers exist
+    // Update the ensureForceInducerExists method:
+    private static void ensureForceInducerExists(ServerLevel level, Long shipId) {
         try {
-            Vector3d searchCenter;
-            Ship managingShip = null;
+            var shipObjectWorld = VSGameUtilsKt.getShipObjectWorld(level);
+            var serverShip = shipObjectWorld.getQueryableShipData().getById(shipId);
 
-            if (newMagnet.shipId != null) {
-                managingShip = VSGameUtilsKt.getShipObjectWorld(level).getLoadedShips().getById(newMagnet.shipId);
-            }
-
-            if (managingShip != null) {
-                Vector3d shipLocalPos = new Vector3d(newMagnet.pos.getX() + 0.5, newMagnet.pos.getY() + 0.5, newMagnet.pos.getZ() + 0.5);
-                searchCenter = new Vector3d();
-                managingShip.getTransform().getShipToWorld().transformPosition(shipLocalPos, searchCenter);
-                System.out.println("Ship magnet world position: " + searchCenter);
-            } else {
-                searchCenter = new Vector3d(newMagnet.pos.getX() + 0.5, newMagnet.pos.getY() + 0.5, newMagnet.pos.getZ() + 0.5);
-                System.out.println("World magnet position: " + searchCenter);
-            }
-
-            List<MagnetInfo> nearbyMagnets = findMagnetsInArea(level, searchCenter, MAGNET_RANGE * 1.5);
-            System.out.println("Extended search found " + nearbyMagnets.size() + " nearby magnets");
-
-            for (MagnetInfo otherMagnet : nearbyMagnets) {
-                if (!otherMagnet.equals(newMagnet)) {
-                    System.out.println("Processing interaction between " + newMagnet.pos + " (ship: " + newMagnet.shipId + ") and " + otherMagnet.pos + " (ship: " + otherMagnet.shipId + ")");
-                    processMagnetPair(level, newMagnet, otherMagnet);
+            if (serverShip != null) {
+                MagneticForceInducer inducer = serverShip.getAttachment(MagneticForceInducer.class);
+                if (inducer == null) {
+                    inducer = new MagneticForceInducer();
+                    serverShip.saveAttachment(MagneticForceInducer.class, inducer);
+                    System.out.println("Created force inducer for ship " + shipId);
                 }
             }
-
-            for (MagnetInfo nearbyMagnet : nearbyMagnets) {
-                boolean alreadyActive = activeMagnets.stream()
-                        .anyMatch(m -> m.pos.equals(nearbyMagnet.pos) && Objects.equals(m.shipId, nearbyMagnet.shipId));
-                if (!alreadyActive) {
-                    activeMagnets.add(nearbyMagnet);
-                    System.out.println("Added discovered magnet at " + nearbyMagnet.pos + " (ship: " + nearbyMagnet.shipId + ") to active list");
-                }
-            }
-
         } catch (Exception e) {
-            System.err.println("Error in extended magnet search: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Error ensuring force inducer exists: " + e.getMessage());
         }
     }
 
+    public static void ensureAllForceInducersExist(ServerLevel level) {
+        try {
+            System.out.println("Ensuring all force inducers exist for dimension: " + level.dimension().location());
+
+            Set<Long> shipsWithMagnets = new HashSet<>();
+            for (MagnetInfo magnet : activeMagnets) {
+                if (magnet.shipId != null) {
+                    shipsWithMagnets.add(magnet.shipId);
+                }
+            }
+
+            int ensured = 0;
+            for (Long shipId : shipsWithMagnets) {
+                try {
+                    var shipObjectWorld = VSGameUtilsKt.getShipObjectWorld(level);
+                    var serverShip = shipObjectWorld.getQueryableShipData().getById(shipId);
+                    if (serverShip != null) {
+                        MagneticForceInducer.getOrCreate(serverShip);
+                        ensured++;
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error ensuring force inducer for ship " + shipId + ": " + e.getMessage());
+                }
+            }
+
+            System.out.println("Ensured force inducers exist for " + ensured + " ships in dimension " + level.dimension().location());
+        } catch (Exception e) {
+            System.err.println("Error ensuring force inducers exist: " + e.getMessage());
+        }
+    }
+
+
+
+    private static void performImmediateMagnetScan(ServerLevel level, MagnetInfo newMagnet) {
+        try {
+            Vector3d searchCenter = getMagnetWorldPosition(level, newMagnet);
+            if (searchCenter == null) {
+                System.err.println("Could not get world position for new magnet");
+                return;
+            }
+
+            System.out.println("Scanning for magnets around " + searchCenter);
+
+            // Force a comprehensive scan around this magnet
+            List<MagnetInfo> nearbyMagnets = findMagnetsInArea(level, searchCenter, MAGNET_RANGE * 2);
+            System.out.println("Immediate scan found " + nearbyMagnets.size() + " nearby magnets");
+
+            // Add all discovered magnets to active list
+            for (MagnetInfo discoveredMagnet : nearbyMagnets) {
+                boolean alreadyActive = activeMagnets.stream()
+                        .anyMatch(m -> m.pos.equals(discoveredMagnet.pos) && Objects.equals(m.shipId, discoveredMagnet.shipId));
+                if (!alreadyActive) {
+                    activeMagnets.add(discoveredMagnet);
+                    System.out.println("Added discovered magnet at " + discoveredMagnet.pos + " to active list");
+
+                    // Ensure force inducer exists for ship magnets
+                    if (discoveredMagnet.shipId != null) {
+                        ensureForceInducerExists(level, discoveredMagnet.shipId);
+                    }
+                }
+            }
+
+            // Immediately process interactions with the new magnet
+            for (MagnetInfo otherMagnet : nearbyMagnets) {
+                if (!otherMagnet.equals(newMagnet)) {
+                    System.out.println("Processing immediate interaction between " + newMagnet.pos + " and " + otherMagnet.pos);
+                    processMagnetPair(level, newMagnet, otherMagnet);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error in immediate magnet scan: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
     private static boolean isShipFullyLoaded(Ship ship) {
         try {
             return ship.getTransform() != null &&

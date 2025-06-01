@@ -42,6 +42,32 @@ public class RedstoneMagnetBlock extends Block {
         Direction facing = context.getNearestLookingDirection().getOpposite();
         boolean powered = context.getLevel().hasNeighborSignal(context.getClickedPos());
         System.out.println("Placing magnet at " + context.getClickedPos() + " with power: " + powered);
+
+        if (!context.getLevel().isClientSide) {
+            ServerLevel serverLevel = (ServerLevel) context.getLevel();
+            var shipObjectWorld = VSGameUtilsKt.getShipObjectWorld(serverLevel);
+
+            boolean isOnShip = shipObjectWorld.isBlockInShipyard(
+                    context.getClickedPos().getX(),
+                    context.getClickedPos().getY(),
+                    context.getClickedPos().getZ(),
+                    serverLevel.dimension().location().toString()
+            );
+
+            if (isOnShip) {
+                System.out.println("Placing magnet on a ship");
+                // Try to find which ship
+                for (var ship : shipObjectWorld.getQueryableShipData()) {
+                    if (ship.getChunkClaim().contains(context.getClickedPos().getX() >> 4, context.getClickedPos().getZ() >> 4)) {
+                        System.out.println("Placing magnet on ship: " + ship.getId());
+                        break;
+                    }
+                }
+            } else {
+                System.out.println("Placing magnet in world (not on ship)");
+            }
+        }
+
         return this.defaultBlockState()
                 .setValue(FACING, facing)
                 .setValue(POWERED, powered);
@@ -52,7 +78,6 @@ public class RedstoneMagnetBlock extends Block {
         if (!level.isClientSide) {
             boolean wasPowered = isPowered(state);
             boolean isPowered = level.hasNeighborSignal(pos);
-
             System.out.println("Magnet at " + pos + " neighbor changed. Was powered: " + wasPowered + ", Is powered: " + isPowered);
 
             if (isPowered != wasPowered) {
@@ -75,6 +100,27 @@ public class RedstoneMagnetBlock extends Block {
     public void tick(BlockState state, ServerLevel level, BlockPos pos, net.minecraft.util.RandomSource random) {
         if (isPowered(state)) {
             System.out.println("Scheduled tick: Activating magnet at " + pos);
+
+            // Add ship detection here too
+            var shipObjectWorld = VSGameUtilsKt.getShipObjectWorld(level);
+            boolean isOnShip = shipObjectWorld.isBlockInShipyard(
+                    pos.getX(), pos.getY(), pos.getZ(),
+                    level.dimension().location().toString()
+            );
+
+            if (isOnShip) {
+                System.out.println("Activating magnet on a ship");
+                // Try to find which ship
+                for (var ship : shipObjectWorld.getQueryableShipData()) {
+                    if (ship.getChunkClaim().contains(pos.getX() >> 4, pos.getZ() >> 4)) {
+                        System.out.println("Activating magnet on ship: " + ship.getId());
+                        break;
+                    }
+                }
+            } else {
+                System.out.println("Activating magnet in world (not on ship)");
+            }
+
             MagnetismManager.onMagnetActivated(level, pos);
         }
     }
@@ -82,9 +128,10 @@ public class RedstoneMagnetBlock extends Block {
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
-
         if (!level.isClientSide) {
             System.out.println("Magnet placed at " + pos + " with powered state: " + isPowered(state));
+
+            MagnetismManager.onMagnetActivated((ServerLevel) level, pos);
 
             if (isPowered(state)) {
                 System.out.println("Magnet placed already powered - scheduling activation");
@@ -95,8 +142,8 @@ public class RedstoneMagnetBlock extends Block {
 
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!level.isClientSide && isPowered(state) && !newState.is(this)) {
-            System.out.println("Powered magnet removed at " + pos);
+        if (!level.isClientSide && !newState.is(this)) {
+            System.out.println("Magnet removed at " + pos);
             MagnetismManager.onMagnetDeactivated((ServerLevel) level, pos);
         }
         super.onRemove(state, level, pos, newState, isMoving);
