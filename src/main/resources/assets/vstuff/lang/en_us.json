@@ -2,5 +2,8 @@
   "item.vstuff.lead_constraint_item": "Ship Lead",
   "item.vstuff.lead_constraint_item.tooltip": "Creates rope constraints between ships and world",
   "item.vstuff.lead_break_item": "Lead Cutter",
-  "item.vstuff.lead_break_item.tooltip": "Look at a lead and right-click to cut it"
+  "item.vstuff.lead_break_item.tooltip": "Look at a lead and right-click to cut it",
+  "block.vstuff.redstone_magnet": "Redstone Magnet",
+  "item.vstuff.redstone_magnet": "Redstone Magnet",
+  "creativetab.vstuff_tab": "VStuff"
 }

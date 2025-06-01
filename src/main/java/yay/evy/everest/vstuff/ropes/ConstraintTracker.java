@@ -149,4 +149,118 @@ public class ConstraintTracker {
             System.out.println("Synced " + activeConstraints.size() + " constraints to player " + player.getName().getString());
         }
     }
+
+    // clean up constraints that aren't on valid blocks anymore, i think this might get rid of that dumb bug idk
+    public static void validateAndCleanupConstraints(ServerLevel level) {
+        //System.out.println("Validating " + activeConstraints.size() + " active constraints...");
+
+        java.util.List<Integer> constraintsToRemove = new java.util.ArrayList<>();
+        Long groundBodyId = VSGameUtilsKt.getShipObjectWorld(level)
+                .getDimensionToGroundBodyIdImmutable()
+                .get(VSGameUtilsKt.getDimensionId(level));
+
+        for (Map.Entry<Integer, RopeConstraintData> entry : activeConstraints.entrySet()) {
+            Integer constraintId = entry.getKey();
+            RopeConstraintData data = entry.getValue();
+
+            try {
+                // Check if ships still exist
+                boolean shipAExists = data.shipA.equals(groundBodyId) ||
+                        VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(data.shipA) != null;
+                boolean shipBExists = data.shipB.equals(groundBodyId) ||
+                        VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(data.shipB) != null;
+
+                if (!shipAExists || !shipBExists) {
+                    System.out.println("Constraint " + constraintId + " references missing ships - marking for removal");
+                    constraintsToRemove.add(constraintId);
+                    continue;
+                }
+
+                // Get world positions to check if blocks still exist
+                Vector3d worldPosA = data.getWorldPosA(level, 1.0f);
+                Vector3d worldPosB = data.getWorldPosB(level, 1.0f);
+
+                // Convert to block positions
+                net.minecraft.core.BlockPos blockPosA = new net.minecraft.core.BlockPos(
+                        (int) Math.floor(worldPosA.x),
+                        (int) Math.floor(worldPosA.y),
+                        (int) Math.floor(worldPosA.z)
+                );
+                net.minecraft.core.BlockPos blockPosB = new net.minecraft.core.BlockPos(
+                        (int) Math.floor(worldPosB.x),
+                        (int) Math.floor(worldPosB.y),
+                        (int) Math.floor(worldPosB.z)
+                );
+
+                // Check if chunks are loaded and blocks exist
+                boolean validA = isValidAttachmentPoint(level, blockPosA, data.shipA, groundBodyId);
+                boolean validB = isValidAttachmentPoint(level, blockPosB, data.shipB, groundBodyId);
+
+                if (!validA || !validB) {
+                    System.out.println("Constraint " + constraintId + " has invalid attachment points (A:" + validA + ", B:" + validB + ") - marking for removal");
+                    constraintsToRemove.add(constraintId);
+                }
+
+            } catch (Exception e) {
+                System.err.println("Error validating constraint " + constraintId + ": " + e.getMessage());
+                constraintsToRemove.add(constraintId);
+            }
+        }
+
+        // Remove invalid constraints
+        for (Integer constraintId : constraintsToRemove) {
+            try {
+                // Remove from VS physics
+                VSGameUtilsKt.getShipObjectWorld(level).removeConstraint(constraintId);
+                // Remove from our tracking
+                removeConstraintWithPersistence(level, constraintId);
+                //System.out.println("Cleaned up invalid constraint: " + constraintId);
+            } catch (Exception e) {
+                System.err.println("Error removing invalid constraint " + constraintId + ": " + e.getMessage());
+            }
+        }
+
+        //System.out.println("Constraint validation complete. Removed " + constraintsToRemove.size() + " invalid constraints.");
+    }
+
+    private static boolean isValidAttachmentPoint(ServerLevel level, net.minecraft.core.BlockPos pos, Long shipId, Long groundBodyId) {
+        try {
+            // For ground/world attachments, check if chunk is loaded and block exists
+            if (shipId.equals(groundBodyId)) {
+                if (!level.isLoaded(pos)) {
+                    return false; // Chunk not loaded, assume invalid for now
+                }
+                net.minecraft.world.level.block.state.BlockState state = level.getBlockState(pos);
+                return !state.isAir(); // Valid if not air
+            } else {
+                // For ship attachments, check if ship exists and chunk is loaded
+                org.valkyrienskies.core.api.ships.Ship ship = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
+                if (ship == null) {
+                    return false; // Ship doesn't exist
+                }
+
+                // Convert world pos back to ship local coordinates to check the block
+                Vector3d worldPos = new Vector3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+                Vector3d localPos = new Vector3d();
+                ship.getTransform().getWorldToShip().transformPosition(worldPos, localPos);
+
+                net.minecraft.core.BlockPos shipBlockPos = new net.minecraft.core.BlockPos(
+                        (int) Math.floor(localPos.x),
+                        (int) Math.floor(localPos.y),
+                        (int) Math.floor(localPos.z)
+                );
+
+                if (!level.isLoaded(shipBlockPos)) {
+                    return false; // Ship chunk not loaded
+                }
+
+                net.minecraft.world.level.block.state.BlockState state = level.getBlockState(shipBlockPos);
+                return !state.isAir(); // Valid if not air
+            }
+        } catch (Exception e) {
+            System.err.println("Error checking attachment point validity: " + e.getMessage());
+            return false;
+        }
+    }
+
 }

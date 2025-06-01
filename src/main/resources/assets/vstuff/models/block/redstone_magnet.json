@@ -1,11 +1,12 @@
 {
   "parent": "block/cube",
   "textures": {
-    "north": "vstuff:block/magnet_north",
-    "south": "vstuff:block/magnet_south",
-    "east":  "vstuff:block/magnet_side",
-    "west":  "vstuff:block/magnet_side",
-    "up":    "vstuff:block/magnet_side",
-    "down":  "vstuff:block/magnet_side"
+    "particle": "vstuff:block/redstone_magnet_side",
+    "down": "vstuff:block/redstone_magnet_side_rotated",
+    "up": "vstuff:block/redstone_magnet_side_rotated",
+    "north": "vstuff:block/redstone_magnet_front",
+    "south": "vstuff:block/redstone_magnet_back",
+    "west": "vstuff:block/redstone_magnet_side",
+    "east": "vstuff:block/redstone_magnet_side"
   }
 }

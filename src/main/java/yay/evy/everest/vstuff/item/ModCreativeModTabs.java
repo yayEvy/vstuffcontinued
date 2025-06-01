@@ -16,6 +16,16 @@ public class ModCreativeModTabs {
 
     public static final RegistryObject<CreativeModeTab> VSTUFF_TAB = CREATIVE_MODE_TABS.register("vstuff_tab",
             () -> CreativeModeTab.builder()
+                    .icon(() -> new ItemStack(ModBlocks.REDSTONE_MAGNET.get()))
+                    .title(Component.translatable("creativetab.vstuff_tab"))
+                    .displayItems((pParameters, pOutput) -> {
+                        // Blocks
+                        pOutput.accept(ModBlocks.REDSTONE_MAGNET.get());
+
+                        // Items
+                        pOutput.accept(ModItems.LEAD_CONSTRAINT_ITEM.get());
+                        pOutput.accept(ModItems.LEAD_BREAK_ITEM.get());
+                    })
                     .build());
 
     public static void register(IEventBus eventBus) {

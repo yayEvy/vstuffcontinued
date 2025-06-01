@@ -29,6 +29,10 @@ public class vstuff {
 
         MinecraftForge.EVENT_BUS.register(this);
 
+        ModCreativeModTabs.register(modEventBus);
+
+
+
         NetworkHandler.registerPackets();
 
         LOGGER.info("VStuff mod initialized");
