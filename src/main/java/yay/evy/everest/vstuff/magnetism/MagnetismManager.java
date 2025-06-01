@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -239,16 +240,19 @@ public class MagnetismManager {
     }
 
 
+    // Update the onServerTick method in your MagnetismManager class
     public static void onServerTick(ServerLevel level) {
         tickCounter++;
-
         try {
+            // Handle delayed activations first
+            processDelayedActivations(level);
+
             String levelKey = level.dimension().location().toString();
             boolean hasScannedThisWorld = worldStartupScanned.getOrDefault(levelKey, false);
-
             boolean isStartupPeriod = tickCounter < 600; // First 30 seconds
             boolean shouldScanAggressively = !hasScannedThisWorld || (isStartupPeriod && tickCounter % 20 == 0);
 
+            // ALWAYS scan if we have no active magnets, regardless of timing
             if (activeMagnets.isEmpty()) {
                 if (shouldScanAggressively) {
                     System.out.println("Startup scan for magnets at tick " + tickCounter);
@@ -262,10 +266,14 @@ public class MagnetismManager {
             } else {
                 // We found magnets, mark this world as properly scanned
                 worldStartupScanned.put(levelKey, true);
+
+                // Process magnets EVERY tick
+                processActiveMagnetsLimited(level);
             }
 
-            if (!activeMagnets.isEmpty()) {
-                processActiveMagnetsLimited(level);
+            // Scan more frequently for ship-world interactions
+            if (tickCounter % 60 == 0) { // Every 3 seconds
+                scanForShipWorldMagnetInteractions(level);
             }
 
             // Cleanup very rarely
@@ -275,6 +283,66 @@ public class MagnetismManager {
         } catch (Exception e) {
             System.err.println("Error in magnetism tick: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+    private static void processDelayedActivations(ServerLevel level) {
+        String levelKey = level.dimension().location().toString();
+        Iterator<Map.Entry<String, Integer>> iterator = delayedActivations.entrySet().iterator();
+
+        while (iterator.hasNext()) {
+            Map.Entry<String, Integer> entry = iterator.next();
+            String key = entry.getKey();
+            int remainingTicks = entry.getValue() - 1;
+
+            if (key.endsWith("_" + levelKey)) {
+                if (remainingTicks <= 0) {
+                    // Time to activate
+                    String posStr = key.substring(0, key.lastIndexOf("_"));
+                    BlockPos pos = parseBlockPosFromString(posStr);
+                    if (pos != null) {
+                        BlockState state = level.getBlockState(pos);
+                        if (state.getBlock() instanceof RedstoneMagnetBlock && RedstoneMagnetBlock.isPowered(state)) {
+                            System.out.println("Executing delayed activation for magnet at " + pos);
+                            onMagnetActivated(level, pos);
+                        }
+                    }
+                    iterator.remove();
+                } else {
+                    entry.setValue(remainingTicks);
+                }
+            }
+        }
+    }
+
+    private static void scanForShipWorldMagnetInteractions(ServerLevel level) {
+        try {
+            // Look for cases where we have ship magnets and world magnets that should interact
+            Set<Long> shipIds = activeMagnets.stream()
+                    .filter(m -> m.shipId != null)
+                    .map(m -> m.shipId)
+                    .collect(Collectors.toSet());
+
+            boolean hasWorldMagnets = activeMagnets.stream().anyMatch(m -> m.shipId == null);
+
+            if (!shipIds.isEmpty() && hasWorldMagnets) {
+                System.out.println("Detected ship-world magnet scenario, performing extended scan...");
+                // Do a more thorough scan when we have both ship and world magnets
+                scanForNearbyMagnets(level);
+            }
+        } catch (Exception e) {
+            System.err.println("Error scanning for ship-world interactions: " + e.getMessage());
+        }
+    }
+
+    private static BlockPos parseBlockPosFromString(String posStr) {
+        try {
+            // Parse "[x, y, z]" format
+            posStr = posStr.replace("[", "").replace("]", "");
+            String[] parts = posStr.split(", ");
+            return new BlockPos(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+        } catch (Exception e) {
+            System.err.println("Error parsing BlockPos from string: " + posStr);
+            return null;
         }
     }
 
@@ -930,7 +998,6 @@ public class MagnetismManager {
                         if (state.is(ModBlocks.REDSTONE_MAGNET.get()) &&
                                 RedstoneMagnetBlock.isPowered(state)) {
 
-                            // Transform ship-local position to world position
                             Vector3d shipLocalPos = new Vector3d(x + 0.5, y + 0.5, z + 0.5);
                             Vector3d worldPos = new Vector3d();
                             ship.getTransform().getShipToWorld().transformPosition(shipLocalPos, worldPos);
@@ -977,15 +1044,20 @@ public class MagnetismManager {
 
 
 
-
-
-
     public static void onMagnetActivated(ServerLevel level, BlockPos pos) {
         try {
             System.out.println("Redstone Magnet at " + pos + " is now ACTIVE - searching for targets...");
-
             Ship managingShip = VSGameUtilsKt.getShipManagingPos(level, pos);
             Long shipId = managingShip != null ? managingShip.getId() : null;
+
+            if (managingShip != null) {
+                System.out.println("Magnet is on ship " + shipId + ", checking ship state...");
+                if (!isShipFullyLoaded(managingShip)) {
+                    System.out.println("Ship not fully loaded, scheduling delayed activation...");
+                    scheduleDelayedMagnetActivation(level, pos, 20); // 1 second delay
+                    return;
+                }
+            }
 
             BlockState state = level.getBlockState(pos);
             Direction attractSide = RedstoneMagnetBlock.getAttractSide(state);
@@ -997,47 +1069,83 @@ public class MagnetismManager {
             savedMagnetPositions.add(posStr);
             saveMagnetPositions(level);
 
-            boolean alreadyActive = activeMagnets.stream()
-                    .anyMatch(m -> m.pos.equals(pos) && Objects.equals(m.shipId, shipId));
+            activeMagnets.removeIf(m -> m.pos.equals(pos) && Objects.equals(m.shipId, shipId));
 
-            if (!alreadyActive) {
-                activeMagnets.add(magnetInfo);
-               // System.out.println("Added magnet to active list. Total active: " + activeMagnets.size());
-            }
+            activeMagnets.add(magnetInfo);
+            System.out.println("Added magnet to active list. Total active: " + activeMagnets.size());
 
-            Vector3d searchCenter;
-            if (managingShip != null) {
-                Vector3d shipLocalPos = new Vector3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
-                searchCenter = new Vector3d();
-                managingShip.getTransform().getShipToWorld().transformPosition(shipLocalPos, searchCenter);
-              //  System.out.println("Ship magnet at " + pos + " transformed to world pos: " + searchCenter);
-            } else {
-                // World magnet - use position directly
-                searchCenter = new Vector3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
-              //  System.out.println("World magnet at " + pos + " using world pos: " + searchCenter);
-            }
+            performExtendedMagnetSearch(level, magnetInfo);
 
-            List<MagnetInfo> nearbyMagnets = findMagnetsInArea(level, searchCenter, MAGNET_RANGE);
-           // System.out.println("Found " + nearbyMagnets.size() + " nearby magnets");
+            System.out.println("Magnet activation complete. Total active magnets: " + activeMagnets.size());
 
-            if (!nearbyMagnets.isEmpty()) {
-                MagnetInfo thisMagnet = new MagnetInfo(pos, shipId, attractSide, repelSide);
-
-                for (MagnetInfo otherMagnet : nearbyMagnets) {
-                    if (!otherMagnet.pos.equals(pos) || !Objects.equals(otherMagnet.shipId, shipId)) {
-                        // Don't interact with self (same position AND same ship)
-                       // System.out.println("Processing interaction between " + pos + " and " + otherMagnet.pos);
-                        processMagnetPair(level, thisMagnet, otherMagnet);
-                    }
-                }
-            }
         } catch (Exception e) {
             System.err.println("Error processing magnet activation: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
+    private static void performExtendedMagnetSearch(ServerLevel level, MagnetInfo newMagnet) {
+        try {
+            Vector3d searchCenter;
+            Ship managingShip = null;
+
+            if (newMagnet.shipId != null) {
+                managingShip = VSGameUtilsKt.getShipObjectWorld(level).getLoadedShips().getById(newMagnet.shipId);
+            }
+
+            if (managingShip != null) {
+                Vector3d shipLocalPos = new Vector3d(newMagnet.pos.getX() + 0.5, newMagnet.pos.getY() + 0.5, newMagnet.pos.getZ() + 0.5);
+                searchCenter = new Vector3d();
+                managingShip.getTransform().getShipToWorld().transformPosition(shipLocalPos, searchCenter);
+                System.out.println("Ship magnet world position: " + searchCenter);
+            } else {
+                searchCenter = new Vector3d(newMagnet.pos.getX() + 0.5, newMagnet.pos.getY() + 0.5, newMagnet.pos.getZ() + 0.5);
+                System.out.println("World magnet position: " + searchCenter);
+            }
+
+            List<MagnetInfo> nearbyMagnets = findMagnetsInArea(level, searchCenter, MAGNET_RANGE * 1.5);
+            System.out.println("Extended search found " + nearbyMagnets.size() + " nearby magnets");
+
+            for (MagnetInfo otherMagnet : nearbyMagnets) {
+                if (!otherMagnet.equals(newMagnet)) {
+                    System.out.println("Processing interaction between " + newMagnet.pos + " (ship: " + newMagnet.shipId + ") and " + otherMagnet.pos + " (ship: " + otherMagnet.shipId + ")");
+                    processMagnetPair(level, newMagnet, otherMagnet);
+                }
+            }
+
+            for (MagnetInfo nearbyMagnet : nearbyMagnets) {
+                boolean alreadyActive = activeMagnets.stream()
+                        .anyMatch(m -> m.pos.equals(nearbyMagnet.pos) && Objects.equals(m.shipId, nearbyMagnet.shipId));
+                if (!alreadyActive) {
+                    activeMagnets.add(nearbyMagnet);
+                    System.out.println("Added discovered magnet at " + nearbyMagnet.pos + " (ship: " + nearbyMagnet.shipId + ") to active list");
+                }
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error in extended magnet search: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private static boolean isShipFullyLoaded(Ship ship) {
+        try {
+            return ship.getTransform() != null &&
+                    ship.getTransform().getShipToWorld() != null &&
+                    ship.getChunkClaim() != null;
+        } catch (Exception e) {
+            System.err.println("Error checking ship load state: " + e.getMessage());
+            return false;
+        }
+    }
 
 
+    private static final Map<String, Integer> delayedActivations = new HashMap<>();
+
+    private static void scheduleDelayedMagnetActivation(ServerLevel level, BlockPos pos, int delayTicks) {
+        String key = pos.toString() + "_" + level.dimension().location().toString();
+        delayedActivations.put(key, delayTicks);
+        System.out.println("Scheduled delayed activation for magnet at " + pos + " in " + delayTicks + " ticks");
+    }
 
 }

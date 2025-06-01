@@ -41,7 +41,7 @@ public class RedstoneMagnetBlock extends Block {
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction facing = context.getNearestLookingDirection().getOpposite();
         boolean powered = context.getLevel().hasNeighborSignal(context.getClickedPos());
-
+        System.out.println("Placing magnet at " + context.getClickedPos() + " with power: " + powered);
         return this.defaultBlockState()
                 .setValue(FACING, facing)
                 .setValue(POWERED, powered);
@@ -53,15 +53,17 @@ public class RedstoneMagnetBlock extends Block {
             boolean wasPowered = isPowered(state);
             boolean isPowered = level.hasNeighborSignal(pos);
 
+            System.out.println("Magnet at " + pos + " neighbor changed. Was powered: " + wasPowered + ", Is powered: " + isPowered);
+
             if (isPowered != wasPowered) {
                 BlockState newState = state.setValue(POWERED, isPowered);
                 level.setBlock(pos, newState, 3);
 
                 if (isPowered) {
-                    // Magnet just got powered - activate it
-                    MagnetismManager.onMagnetActivated((ServerLevel) level, pos);
+                    System.out.println("Magnet at " + pos + " just got powered - activating");
+                    level.scheduleTick(pos, this, 1);
                 } else {
-                    // Magnet just lost power - deactivate it
+                    System.out.println("Magnet at " + pos + " just lost power - deactivating");
                     MagnetismManager.onMagnetDeactivated((ServerLevel) level, pos);
                 }
             }
@@ -69,18 +71,11 @@ public class RedstoneMagnetBlock extends Block {
         super.neighborChanged(state, level, pos, block, fromPos, isMoving);
     }
 
-
-    private void onPowerChanged(ServerLevel level, BlockPos pos, BlockState state, boolean powered) {
-        if (powered) {
-            System.out.println("Redstone Magnet at " + pos + " is now ACTIVE - searching for targets...");
-
-            // Find nearby magnets when this one activates
-            Vector3d magnetPos = new Vector3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
-            var nearbyMagnets = MagnetismManager.findMagnetsInArea(level, magnetPos, 64.0);
-
-            System.out.println("Found " + nearbyMagnets.size() + " nearby magnets");
-        } else {
-            System.out.println("Redstone Magnet at " + pos + " is now INACTIVE");
+    @Override
+    public void tick(BlockState state, ServerLevel level, BlockPos pos, net.minecraft.util.RandomSource random) {
+        if (isPowered(state)) {
+            System.out.println("Scheduled tick: Activating magnet at " + pos);
+            MagnetismManager.onMagnetActivated(level, pos);
         }
     }
 
@@ -88,15 +83,21 @@ public class RedstoneMagnetBlock extends Block {
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
 
-        if (!level.isClientSide && isPowered(state)) {
-            this.onPowerChanged((ServerLevel) level, pos, state, true);
+        if (!level.isClientSide) {
+            System.out.println("Magnet placed at " + pos + " with powered state: " + isPowered(state));
+
+            if (isPowered(state)) {
+                System.out.println("Magnet placed already powered - scheduling activation");
+                level.scheduleTick(pos, this, 2);
+            }
         }
     }
 
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!level.isClientSide && isPowered(state)) {
+        if (!level.isClientSide && isPowered(state) && !newState.is(this)) {
             System.out.println("Powered magnet removed at " + pos);
+            MagnetismManager.onMagnetDeactivated((ServerLevel) level, pos);
         }
         super.onRemove(state, level, pos, newState, isMoving);
     }
@@ -121,7 +122,6 @@ public class RedstoneMagnetBlock extends Block {
         return 0;
     }
 
-    // Helper methods for magnet functionality
     public static Direction getFacing(BlockState state) {
         return state.getValue(FACING);
     }

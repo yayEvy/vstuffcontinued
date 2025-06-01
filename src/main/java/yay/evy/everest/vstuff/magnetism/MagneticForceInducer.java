@@ -38,7 +38,7 @@ public class MagneticForceInducer implements ShipForcesInducer {
         if (!netForce.equals(new Vector3d(0, 0, 0))) {
             Vector3d currentPos = new Vector3d(physShip.getTransform().getPositionInWorld());
 
-            Vector3d amplifiedForce = new Vector3d(netForce).mul(1.5); // Multiply force by 1.5
+            Vector3d amplifiedForce = new Vector3d(netForce).mul(1.3); // Multiply force by 1.3
             physShip.applyInvariantForce(amplifiedForce);
 
             System.out.println("Applied " + forceCount + " forces totaling: " + amplifiedForce + " to ship " + physShip.getId());
