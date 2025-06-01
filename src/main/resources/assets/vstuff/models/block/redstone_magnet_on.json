@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "vstuff:block/redstone_magnet_side_on",
+    "down": "vstuff:block/redstone_magnet_side_on_rotated",
+    "up": "vstuff:block/redstone_magnet_side_on_rotated",
+    "north": "vstuff:block/redstone_magnet_front",
+    "south": "vstuff:block/redstone_magnet_back",
+    "west": "vstuff:block/redstone_magnet_side_on",
+    "east": "vstuff:block/redstone_magnet_side_on"
+  }
+}
