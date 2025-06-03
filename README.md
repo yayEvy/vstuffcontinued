@@ -23,7 +23,7 @@ if a ship to world constraint is set, and the ship is really really heavy, and y
 
 ropes dont collide with stuff, so theyre not like vmod phys ropes, but i hope these will still be cool for people to use
 
-if you make a world magnet, then a ship magnet, then activate them, they wont apply any forces until relogging
+magnets dont apply forces until relog 
 
 idk nothing else really besides rope rendering being a bit funky lmao
 
