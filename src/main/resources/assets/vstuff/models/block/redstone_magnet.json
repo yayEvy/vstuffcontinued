@@ -2,11 +2,23 @@
   "parent": "block/cube",
   "textures": {
     "particle": "vstuff:block/redstone_magnet_side",
-    "down": "vstuff:block/redstone_magnet_side_rotated",
-    "up": "vstuff:block/redstone_magnet_side_rotated",
+    "side_normal": "vstuff:block/redstone_magnet_side",
+    "side_rotated": "vstuff:block/redstone_magnet_side_rotated",
     "north": "vstuff:block/redstone_magnet_front",
-    "south": "vstuff:block/redstone_magnet_back",
-    "west": "vstuff:block/redstone_magnet_side",
-    "east": "vstuff:block/redstone_magnet_side"
-  }
+    "south": "vstuff:block/redstone_magnet_back"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "down":  { "texture": "#side_rotated", "rotation": 180 },
+        "up":    { "texture": "#side_rotated" },
+        "north": { "texture": "#north" },
+        "south": { "texture": "#south" },
+        "west":  { "texture": "#side_normal" },
+        "east":  { "texture": "#side_normal", "rotation": 180 }
+      }
+    }
+  ]
 }

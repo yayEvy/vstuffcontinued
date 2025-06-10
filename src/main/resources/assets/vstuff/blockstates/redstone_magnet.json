@@ -1,50 +1,10 @@
 {
   "variants": {
-    "facing=down,powered=false": {
-      "model": "vstuff:block/redstone_magnet",
-      "x": 90
-    },
-    "facing=down,powered=true": {
-      "model": "vstuff:block/redstone_magnet_on",
-      "x": 90
-    },
-    "facing=up,powered=false": {
-      "model": "vstuff:block/redstone_magnet",
-      "x": 270
-    },
-    "facing=up,powered=true": {
-      "model": "vstuff:block/redstone_magnet_on",
-      "x": 270
-    },
-    "facing=north,powered=false": {
-      "model": "vstuff:block/redstone_magnet"
-    },
-    "facing=north,powered=true": {
-      "model": "vstuff:block/redstone_magnet_on"
-    },
-    "facing=south,powered=false": {
-      "model": "vstuff:block/redstone_magnet",
-      "y": 180
-    },
-    "facing=south,powered=true": {
-      "model": "vstuff:block/redstone_magnet_on",
-      "y": 180
-    },
-    "facing=west,powered=false": {
-      "model": "vstuff:block/redstone_magnet",
-      "y": 270
-    },
-    "facing=west,powered=true": {
-      "model": "vstuff:block/redstone_magnet_on",
-      "y": 270
-    },
-    "facing=east,powered=false": {
-      "model": "vstuff:block/redstone_magnet",
-      "y": 90
-    },
-    "facing=east,powered=true": {
-      "model": "vstuff:block/redstone_magnet_on",
-      "y": 90
-    }
+    "facing=north": { "model": "vstuff:block/redstone_magnet", "y": 180 },
+    "facing=south": { "model": "vstuff:block/redstone_magnet", "y": 0 },
+    "facing=west":  { "model": "vstuff:block/redstone_magnet", "y": 90 },
+    "facing=east":  { "model": "vstuff:block/redstone_magnet", "y": 270 },
+    "facing=up":    { "model": "vstuff:block/redstone_magnet", "x": 270 },
+    "facing=down":  { "model": "vstuff:block/redstone_magnet", "x": 90 }
   }
 }

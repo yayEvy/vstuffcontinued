@@ -11,6 +11,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import yay.evy.everest.vstuff.vstuff;
 import yay.evy.everest.vstuff.item.ModItems;
+import yay.evy.everest.vstuff.ropes.RopePulleyBlock;
 import java.util.function.Supplier;
 
 public class ModBlocks {
@@ -21,6 +22,12 @@ public class ModBlocks {
             () -> new RedstoneMagnetBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
                     .strength(3.0f, 6.0f)
                     .requiresCorrectToolForDrops()));
+
+    public static final RegistryObject<Block> ROPE_PULLEY = registerBlock("rope_pulley",
+            () -> new RopePulleyBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
+                    .strength(3.0f, 6.0f)
+                    .requiresCorrectToolForDrops()
+                    .noOcclusion()));
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         RegistryObject<T> toReturn = BLOCKS.register(name, block);

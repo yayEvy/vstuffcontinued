@@ -21,6 +21,9 @@ public class ModCreativeModTabs {
                     .displayItems((pParameters, pOutput) -> {
                         // Blocks
                         pOutput.accept(ModBlocks.REDSTONE_MAGNET.get());
+                        pOutput.accept(ModBlocks.ROPE_PULLEY.get());
+
+
 
                         // Items
                         pOutput.accept(ModItems.LEAD_CONSTRAINT_ITEM.get());

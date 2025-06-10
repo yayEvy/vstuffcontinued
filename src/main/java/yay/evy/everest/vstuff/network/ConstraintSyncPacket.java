@@ -104,7 +104,7 @@ public class ConstraintSyncPacket {
                 buf.writeInt(constraintId);
                 break;
             case CLEAR_ALL:
-                // No additional data needed
+                // No
                 break;
         }
     }

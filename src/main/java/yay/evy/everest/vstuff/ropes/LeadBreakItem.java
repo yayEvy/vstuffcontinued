@@ -13,6 +13,7 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.item.ModItems;
+import yay.evy.everest.vstuff.network.NetworkHandler;
 
 import java.util.List;
 import java.util.Map;
@@ -20,50 +21,35 @@ import java.util.Map;
 public class LeadBreakItem extends Item {
 
     public LeadBreakItem() {
-        super(new Properties().stacksTo(1));
+        super(new Properties().stacksTo(64));
     }
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
-
         if (level instanceof ServerLevel serverLevel) {
             Integer targetConstraintId = findTargetedLead(serverLevel, player);
-
             if (targetConstraintId != null) {
-
                 try {
                     boolean removed = VSGameUtilsKt.getShipObjectWorld(serverLevel).removeConstraint(targetConstraintId);
                     if (removed) {
-                        ConstraintTracker.removeConstraint(targetConstraintId);
-                        player.sendSystemMessage(Component.literal("§aLead cut!"));
+                        ConstraintTracker.removeConstraintWithPersistence(serverLevel, targetConstraintId);
 
                         player.drop(new ItemStack(ModItems.LEAD_CONSTRAINT_ITEM.get()), false);
-
                         if (!player.getAbilities().instabuild) {
                             itemStack.shrink(1);
                         }
-
-                        System.out.println("Cut constraint: " + targetConstraintId);
                         return InteractionResultHolder.success(itemStack);
-                    } else {
-                        player.sendSystemMessage(Component.literal("§cFailed to cut lead!"));
-                        return InteractionResultHolder.fail(itemStack);
                     }
                 } catch (Exception e) {
-                    System.err.println("Error cutting constraint " + targetConstraintId + ": " + e.getMessage());
-                    player.sendSystemMessage(Component.literal("§cError cutting lead: " + e.getMessage()));
                     return InteractionResultHolder.fail(itemStack);
                 }
-
-            } else {
-                player.sendSystemMessage(Component.literal("§cNo lead found in your crosshair! Look directly at a lead to cut it."));
-                return InteractionResultHolder.fail(itemStack);
             }
         }
-
         return InteractionResultHolder.pass(itemStack);
     }
+
+
 
     private Integer findTargetedLead(ServerLevel level, Player player) {
         Vec3 eyePos = player.getEyePosition();

@@ -4,7 +4,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import yay.evy.everest.vstuff.magnetism.MagnetismManager;
+import org.joml.Vector3d;;
 import yay.evy.everest.vstuff.ropes.ConstraintTracker;
 
 import java.util.HashMap;
@@ -26,7 +26,8 @@ public class ServerTickHandler {
                 int dimensionTicks = dimensionTickCounters.getOrDefault(dimensionKey, 0) + 1;
                 dimensionTickCounters.put(dimensionKey, dimensionTicks);
 
-                MagnetismManager.onServerTick(level, dimensionTicks);
+
+
 
             }
 

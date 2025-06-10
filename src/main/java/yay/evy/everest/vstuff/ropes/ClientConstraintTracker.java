@@ -77,12 +77,12 @@ public class ClientConstraintTracker {
         public static void addClientConstraint(Integer constraintId, Long shipA, Long shipB,
                                            Vector3d localPosA, Vector3d localPosB, double maxLength) {
         clientConstraints.put(constraintId, new ClientRopeData(shipA, shipB, localPosA, localPosB, maxLength));
-        System.out.println("Added client constraint: " + constraintId);
+     //   System.out.println("Added client constraint: " + constraintId);
     }
 
     public static void removeClientConstraint(Integer constraintId) {
         clientConstraints.remove(constraintId);
-        System.out.println("Removed client constraint: " + constraintId);
+   //     System.out.println("Removed client constraint: " + constraintId);
     }
 
     public static Map<Integer, ClientRopeData> getClientConstraints() {
@@ -91,7 +91,7 @@ public class ClientConstraintTracker {
 
     public static void clearAllClientConstraints() {
         clientConstraints.clear();
-        System.out.println("Cleared all client constraints");
+      //  System.out.println("Cleared all client constraints");
     }
 }
 

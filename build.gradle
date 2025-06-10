@@ -210,12 +210,14 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-annotations:2.13.3"
     implementation 'thedarkcolour:kotlinforforge:4.10.0'
 
-    // These will be available at compile time but not bundled with your mod
     runtimeOnly fg.deobf("maven.modrinth:create-clockwork:1.20.1-0.1.16")
     implementation fg.deobf("maven.modrinth:architectury-api:9.2.14+forge")
-    runtimeOnly fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_forge_version}:slim") { transitive = false }
-    runtimeOnly fg.deobf("com.tterrag.registrate:Registrate:${registrate_forge_version}")
-    runtimeOnly fg.deobf("com.jozufozu.flywheel:flywheel-forge-${flywheel_forge_minecraft_version}:${flywheel_forge_version}")
+    implementation fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_forge_version}:slim") { transitive = false }
+    implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_forge_version}")
+    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${flywheel_forge_minecraft_version}:${flywheel_forge_version}")
+
+    //runtimeOnly "maven.modrinth:vs-tournament:1.1.0_beta-5.3+af35b3821f"
+
 
 
 

@@ -23,7 +23,7 @@ public class LeadConstraintItem extends Item {
     private Integer activeConstraintId;
 
     public LeadConstraintItem() {
-        super(new Properties().stacksTo(1));
+        super(new Properties().stacksTo(64));
     }
 
     @Override
@@ -43,22 +43,13 @@ public class LeadConstraintItem extends Item {
             Long shipId = getShipIdAtPos(serverLevel, blockPos);
 
             if (firstClickedPos == null && firstEntity == null) {
-                // First click - store position
                 firstClickedPos = blockPos;
-                firstShipId = shipId; // This can be null for world blocks
-                if (player != null) {
-                    String locationDesc = shipId != null ? "ship block" : "world block";
-                    player.sendSystemMessage(Component.literal("First anchor point set on " + locationDesc + ". Click another block or entity to create lead."));
-                }
+                firstShipId = shipId;
                 return InteractionResult.SUCCESS;
             } else {
                 if (firstClickedPos != null && firstClickedPos.equals(blockPos)) {
-                    if (player != null) {
-                        player.sendSystemMessage(Component.literal("§cCannot connect a lead to the same block!"));
-                    }
                     return InteractionResult.FAIL;
                 }
-
                 createLeadConstraint(serverLevel, blockPos, shipId, player);
                 resetState();
                 return InteractionResult.SUCCESS;
@@ -75,16 +66,13 @@ public class LeadConstraintItem extends Item {
 
             if (firstClickedPos == null && firstEntity == null) {
                 firstEntity = entity;
-                firstShipId = shipId; // This can be null for entities in world
-                String locationDesc = shipId != null ? "ship entity" : "world entity";
-                player.sendSystemMessage(Component.literal("Entity selected on " + locationDesc + ". Click a block or another entity to create lead."));
+                firstShipId = shipId;
                 return InteractionResult.SUCCESS;
             } else {
                 if (firstEntity != null && firstEntity.equals(entity)) {
                     player.sendSystemMessage(Component.literal("§cCannot connect a lead to the same entity!"));
                     return InteractionResult.FAIL;
                 }
-
                 createLeadConstraintToEntity(serverLevel, entity, shipId, player);
                 resetState();
                 return InteractionResult.SUCCESS;
@@ -144,7 +132,6 @@ public class LeadConstraintItem extends Item {
     private void createConstraintConsistent(ServerLevel level, Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
                                             Vector3d worldPosA, Vector3d worldPosB, Player player) {
         Long groundBodyId = getGroundBodyId(level);
-
         Long finalShipA, finalShipB;
         Vector3d finalLocalPosA, finalLocalPosB;
         Vector3d finalWorldPosA, finalWorldPosB;
@@ -173,25 +160,18 @@ public class LeadConstraintItem extends Item {
 
         double massA = getMassForShip(level, finalShipA);
         double massB = getMassForShip(level, finalShipB);
-
-
         double effectiveMass = Math.min(massA, massB);
         if (effectiveMass < 100.0) effectiveMass = 100.0;
 
-        double compliance = 1e-10 / effectiveMass;
-
-
+        double compliance = 1e-12 / effectiveMass;
         double massRatio = Math.max(massA, massB) / Math.min(massA, massB);
-        double baseMaxForce = 150000.0; // Higher base force
-        double maxForce = baseMaxForce * Math.min(massRatio, 10.0);
+        double baseMaxForce = 50000000000000.0;
+        double maxForce = baseMaxForce * Math.min(massRatio, 20.0);
 
         if (shipAIsWorld || shipBIsWorld) {
-            maxForce *= 5.0;
-            compliance *= 0.1;
+            maxForce *= 10.0;
+            compliance *= 0.05;
         }
-
-        System.out.println("Creating constraint with massA: " + massA + ", massB: " + massB +
-                ", compliance: " + compliance + ", maxForce: " + maxForce + ", maxLength: " + maxLength);
 
         VSRopeConstraint ropeConstraint = new VSRopeConstraint(
                 finalShipA, finalShipB,
@@ -201,19 +181,13 @@ public class LeadConstraintItem extends Item {
                 maxLength
         );
 
-
         try {
             Integer constraintId = VSGameUtilsKt.getShipObjectWorld(level).createNewConstraint(ropeConstraint);
             if (constraintId != null) {
                 activeConstraintId = constraintId;
-
                 ConstraintTracker.addConstraintWithPersistence(level, constraintId, finalShipA, finalShipB,
                         finalLocalPosA, finalLocalPosB, maxLength,
                         compliance, maxForce);
-
-                System.out.println("SAVING CONSTRAINT - shipA: " + finalShipA + " (isGround: " + finalShipA.equals(groundBodyId) +
-                        "), shipB: " + finalShipB + " (isGround: " + finalShipB.equals(groundBodyId) + ")");
-                System.out.println("Ground body ID: " + groundBodyId);
 
                 if (player != null) {
                     if (!player.getAbilities().instabuild) {
@@ -225,29 +199,16 @@ public class LeadConstraintItem extends Item {
                             }
                         }
                     }
-                    String shipADesc = finalShipA.equals(getGroundBodyId(level)) ? "world" : "ship";
-                    String shipBDesc = finalShipB.equals(getGroundBodyId(level)) ? "world" : "ship";
-                    player.sendSystemMessage(Component.literal("Rigid lead created between " + shipADesc + " and " + shipBDesc +
-                            "! Max length: " + String.format("%.1f", maxLength) + " blocks"));
-                }
-                System.out.println("Created RIGID rope constraint with ID: " + constraintId + ", maxLength: " + maxLength +
-                        ", shipA: " + finalShipA + ", shipB: " + finalShipB);
-            } else {
-                if (player != null) {
-                    player.sendSystemMessage(Component.literal("Failed to create lead constraint!"));
                 }
             }
         } catch (Exception e) {
             System.err.println("Error creating rope constraint: " + e.getMessage());
             e.printStackTrace();
-            if (player != null) {
-                player.sendSystemMessage(Component.literal("Error creating lead: " + e.getMessage()));
-            }
         }
     }
+
     private double getMassForShip(ServerLevel level, Long shipId) {
         Long groundBodyId = getGroundBodyId(level);
-
         if (shipId.equals(groundBodyId)) {
             return 1e12;
         }
@@ -255,8 +216,7 @@ public class LeadConstraintItem extends Item {
         Ship shipObject = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
         if (shipObject != null) {
             try {
-                double mass = 1000.0; // Default
-
+                double mass = 1000.0;
                 var bounds = shipObject.getShipAABB();
                 if (bounds != null) {
                     double volume = (bounds.maxX() - bounds.minX()) *
@@ -264,13 +224,11 @@ public class LeadConstraintItem extends Item {
                             (bounds.maxZ() - bounds.minZ());
                     mass = Math.max(volume * 10.0, 1000.0);
                 }
-
                 return Math.min(mass, 1e9);
             } catch (Exception e) {
                 return 1000.0;
             }
         }
-
         return 1000.0;
     }
 
@@ -301,7 +259,7 @@ public class LeadConstraintItem extends Item {
         Vector3d blockPos = new Vector3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
 
         if (clickedShipId != null && clickedShipId.equals(targetShipId)) {
-            return blockPos; // Already in ship-local coordinates
+            return blockPos;
         }
 
         if (targetShipId.equals(getGroundBodyId(level))) {
@@ -313,7 +271,7 @@ public class LeadConstraintItem extends Item {
                     return worldPos;
                 }
             }
-            return blockPos; // Already world coordinates
+            return blockPos;
         }
 
         Ship targetShip = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(targetShipId);
@@ -330,7 +288,6 @@ public class LeadConstraintItem extends Item {
             targetShip.getTransform().getWorldToShip().transformPosition(worldPos, localPos);
             return localPos;
         }
-
         return blockPos;
     }
 
@@ -372,7 +329,6 @@ public class LeadConstraintItem extends Item {
             player.sendSystemMessage(Component.literal("No active lead to break!"));
         }
     }
-
 
     public boolean hasActiveLead() {
         return activeConstraintId != null;

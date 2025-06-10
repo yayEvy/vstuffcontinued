@@ -6,7 +6,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
@@ -15,18 +14,19 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
+import yay.evy.everest.vstuff.rendering.RopeRendererType;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class RopeRendererAdvanced {
     private static final ResourceLocation ROPE_TEXTURE = new ResourceLocation("vstuff", "textures/entity/rope.png");
-    private static final float BASE_ROPE_WIDTH = 0.08f;
-    private static final int BASE_ROPE_SEGMENTS = 48;
-    private static final float ROPE_SAG_FACTOR = 0.25f;
+    private static final float ROPE_WIDTH = 0.28f;
+    private static final int ROPE_CURVE_SEGMENTS = 32; // For calculating the curve
+    private static final float ROPE_SAG_FACTOR = 1.02f;
     private static final double MAX_RENDER_DISTANCE = 300.0;
     private static final float WIND_STRENGTH = 0.02f;
-
     private static final Map<Integer, RopePositionCache> positionCache = new ConcurrentHashMap<>();
 
     private static class RopePositionCache {
@@ -51,15 +51,12 @@ public class RopeRendererAdvanced {
                 if (deltaTime > 0) {
                     Vector3d newStartVel = new Vector3d(newStart).sub(lastStartPos).div(deltaTime);
                     Vector3d newEndVel = new Vector3d(newEnd).sub(lastEndPos).div(deltaTime);
-
                     startVelocity.lerp(newStartVel, 0.3f);
                     endVelocity.lerp(newEndVel, 0.3f);
                 }
-
                 Vector3d predictedStart = new Vector3d(newStart).add(new Vector3d(startVelocity).mul(partialTick * 0.05f));
                 Vector3d predictedEnd = new Vector3d(newEnd).add(new Vector3d(endVelocity).mul(partialTick * 0.05f));
-
-                float responsiveness = 0.3f; // Higher = more responsive, lower = more stable
+                float responsiveness = 0.3f;
                 smoothStartPos.lerp(predictedStart, responsiveness);
                 smoothEndPos.lerp(predictedEnd, responsiveness);
             }
@@ -85,6 +82,8 @@ public class RopeRendererAdvanced {
             MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
             Vec3 cameraPos = event.getCamera().getPosition();
             float partialTick = event.getPartialTick();
+
+            RenderType renderType = RopeRendererType.ropeRenderer(ROPE_TEXTURE);
 
             Map<Integer, ClientConstraintTracker.ClientRopeData> constraints = ClientConstraintTracker.getClientConstraints();
             Map<Integer, ConstraintTracker.RopeConstraintData> serverConstraints = ConstraintTracker.getActiveConstraints();
@@ -112,64 +111,59 @@ public class RopeRendererAdvanced {
             }
 
             if (renderedAny) {
-                bufferSource.endBatch(RenderType.entityCutoutNoCull(ROPE_TEXTURE));
+                bufferSource.endBatch(renderType);
             }
         } catch (Exception e) {
             System.err.println("Error in rope rendering: " + e.getMessage());
         }
     }
 
-
     private static void renderClientRope(PoseStack poseStack, MultiBufferSource bufferSource,
                                          Integer constraintId, ClientConstraintTracker.ClientRopeData ropeData,
                                          Level level, Vec3 cameraPos, float partialTick) {
-        // Check if we're actually on client side and handle appropriately
-        Vector3d startPos = null;
-        Vector3d endPos = null;
-
-        if (level.isClientSide) {
-            // For client-side rendering, use the client-safe methods
-            startPos = ropeData.getWorldPosA(level, partialTick);
-            endPos = ropeData.getWorldPosB(level, partialTick);
-        } else {
-            // Fallback - this shouldn't happen in client rendering, but just in case
+        if (!level.isClientSide) {
             System.err.println("Warning: Client renderer called on server side!");
             return;
         }
-
+        Vector3d startPos = ropeData.getWorldPosA(level, partialTick);
+        Vector3d endPos = ropeData.getWorldPosB(level, partialTick);
         if (startPos != null && endPos != null) {
             RopePositionCache cache = positionCache.computeIfAbsent(constraintId, k -> new RopePositionCache());
             cache.updatePositions(startPos, endPos, partialTick);
 
-            renderAdvancedRope(poseStack, bufferSource, cache.smoothStartPos, cache.smoothEndPos,
-                    ropeData.maxLength, cameraPos, partialTick);
+            // Calculate actual current rope length for texture mapping
+            double actualRopeLength = cache.smoothStartPos.distance(cache.smoothEndPos);
+
+            renderRope(poseStack, bufferSource, cache.smoothStartPos, cache.smoothEndPos,
+                    actualRopeLength, cameraPos, partialTick); // Use actual length, not maxLength
         }
     }
-
 
     private static void renderServerRope(PoseStack poseStack, MultiBufferSource bufferSource,
                                          Integer constraintId, ConstraintTracker.RopeConstraintData ropeData,
                                          Level level, Vec3 cameraPos, float partialTick) {
         try {
-            // For server ropes, try to get actual world positions if possible
             Vector3d startPos = ropeData.getWorldPosA((ServerLevel) level, partialTick);
             Vector3d endPos = ropeData.getWorldPosB((ServerLevel) level, partialTick);
-
             if (startPos != null && endPos != null) {
                 RopePositionCache cache = positionCache.computeIfAbsent(constraintId, k -> new RopePositionCache());
                 cache.updatePositions(startPos, endPos, partialTick);
 
-                renderAdvancedRope(poseStack, bufferSource, cache.smoothStartPos, cache.smoothEndPos,
-                        ropeData.maxLength, cameraPos, partialTick);
+                // Calculate actual current rope length for texture mapping
+                double actualRopeLength = cache.smoothStartPos.distance(cache.smoothEndPos);
+
+                renderRope(poseStack, bufferSource, cache.smoothStartPos, cache.smoothEndPos,
+                        actualRopeLength, cameraPos, partialTick); // Use actual length, not maxLength
             }
         } catch (Exception e) {
             System.err.println("Error in renderServerRope: " + e.getMessage());
         }
     }
 
-    private static void renderAdvancedRope(PoseStack poseStack, MultiBufferSource bufferSource,
-                                           Vector3d startPos, Vector3d endPos, double maxLength,
-                                           Vec3 cameraPos, float partialTick) {
+
+    private static void renderRope(PoseStack poseStack, MultiBufferSource bufferSource,
+                                   Vector3d startPos, Vector3d endPos, double actualRopeLength,
+                                   Vec3 cameraPos, float partialTick) {
         Vec3 start = new Vec3(startPos.x - cameraPos.x, startPos.y - cameraPos.y, startPos.z - cameraPos.z);
         Vec3 end = new Vec3(endPos.x - cameraPos.x, endPos.y - cameraPos.y, endPos.z - cameraPos.z);
 
@@ -178,275 +172,318 @@ public class RopeRendererAdvanced {
             return;
         }
 
-        double ropeLength = start.distanceTo(end);
-        if (ropeLength < 0.1) {
+        double currentDistance = start.distanceTo(end);
+        if (currentDistance < 0.1) {
             return;
         }
 
-        // SMOOTHING: More segments for smoother curves, but optimize based on distance
-        int baseSegments = Math.max(32, (int) (ropeLength * 12)); // Increased base segments
-        int segments = Math.max(baseSegments, (int) (BASE_ROPE_SEGMENTS * (1.0 - distanceToCamera / MAX_RENDER_DISTANCE)));
-        segments = Math.min(segments, 96); // Increased max segments for smoothness
-
-        float ropeWidth = BASE_ROPE_WIDTH * 3.0f;
-
         poseStack.pushPose();
-        RenderType renderType = RenderType.entityCutout(ROPE_TEXTURE);
+
+        RenderType renderType = RopeRendererType.ropeRenderer(ROPE_TEXTURE);
         VertexConsumer vertexConsumer = bufferSource.getBuffer(renderType);
 
-        renderRopeWithPhysics(poseStack, vertexConsumer, start, end, maxLength, segments, ropeWidth, partialTick);
+        renderSingleRopeSegment(poseStack, vertexConsumer, start, end, actualRopeLength, partialTick);
 
         poseStack.popPose();
     }
 
 
+    private static void renderRopeFace(VertexConsumer vertexConsumer, Matrix4f matrix,
+                                       Vec3[] strip1, Vec3[] strip2, Vec3 normal) {
+        // Calculate actual curve distances for proper UV mapping
+        double totalCurveLength = 0;
+        double[] segmentLengths = new double[ROPE_CURVE_SEGMENTS];
 
-    private static void renderRopeWithPhysics(PoseStack poseStack, VertexConsumer vertexConsumer,
-                                              Vec3 start, Vec3 end, double maxLength,
-                                              int segments, float ropeWidth, float partialTick) {
-        if (segments <= 0 || ropeWidth <= 0) return;
+        // Calculate the actual 3D distance along the curve
+        for (int i = 0; i < ROPE_CURVE_SEGMENTS; i++) {
+            double strip1Length = strip1[i].distanceTo(strip1[i + 1]);
+            double strip2Length = strip2[i].distanceTo(strip2[i + 1]);
+            segmentLengths[i] = (strip1Length + strip2Length) / 2.0;
+            totalCurveLength += segmentLengths[i];
+        }
 
-        Matrix4f matrix = poseStack.last().pose();
-        Vec3 direction = end.subtract(start);
-        double actualLength = direction.length();
-        if (actualLength < 0.01) return;
+        // Fix: Use consistent texture scaling
+        double textureScale = 0.5 / ROPE_WIDTH;
+        double currentLength = 0;
 
-        direction = direction.normalize();
-        double tension = Math.min(actualLength / Math.max(maxLength, 1.0), 1.0);
-        double sagAmount = ROPE_SAG_FACTOR * (1.0 - tension * 0.5) * actualLength * 0.4;
+        for (int i = 0; i < ROPE_CURVE_SEGMENTS; i++) {
+            // Calculate V coordinates based on actual distance traveled
+            float vStart = (float)(currentLength * textureScale);
+            float vEnd = (float)((currentLength + segmentLengths[i]) * textureScale);
 
-        // SMOOTHING: Smoother wind animation
-        float gameTime = (float) (System.currentTimeMillis() % 100000) / 1000.0f;
-        float windOffset = (float) (Math.sin(gameTime * 0.8) * 0.3 + Math.sin(gameTime * 1.3) * 0.2) * WIND_STRENGTH;
+            Vec3 p1 = strip1[i];
+            Vec3 p2 = strip2[i];
+            Vec3 p3 = strip2[i + 1];
+            Vec3 p4 = strip1[i + 1];
 
-        Minecraft mc = Minecraft.getInstance();
-        org.joml.Vector3f lookVector = mc.gameRenderer.getMainCamera().getLookVector();
-        Vec3 cameraLook = new Vec3(lookVector.x(), lookVector.y(), lookVector.z());
+            int light = calculateDynamicLighting(p1, p2);
 
-        // SMOOTHING: Higher minimum segments for smoother curves
-        int actualSegments = Math.max(segments, 48); // Increased minimum
+            // Render two triangles with consistent winding
+            addRopeVertex(vertexConsumer, matrix, p1, 0.0f, vStart, light, normal);
+            addRopeVertex(vertexConsumer, matrix, p2, 1.0f, vStart, light, normal);
+            addRopeVertex(vertexConsumer, matrix, p3, 1.0f, vEnd, light, normal);
 
-        for (int i = 0; i < actualSegments; i++) {
-            float t1 = (float) i / actualSegments;
-            float t2 = (float) (i + 1) / actualSegments;
+            addRopeVertex(vertexConsumer, matrix, p1, 0.0f, vStart, light, normal);
+            addRopeVertex(vertexConsumer, matrix, p3, 1.0f, vEnd, light, normal);
+            addRopeVertex(vertexConsumer, matrix, p4, 0.0f, vEnd, light, normal);
 
-            Vec3 pos1 = calculateSmoothCatenaryPosition(start, end, t1, sagAmount, windOffset, gameTime);
-            Vec3 pos2 = calculateSmoothCatenaryPosition(start, end, t2, sagAmount, windOffset, gameTime);
-
-            Vec3 segmentDir = pos2.subtract(pos1).normalize();
-            Vec3 right = segmentDir.cross(cameraLook).normalize();
-
-            if (right.length() < 0.1) {
-                right = segmentDir.cross(new Vec3(0, 1, 0)).normalize();
-                if (right.length() < 0.1) {
-                    right = new Vec3(1, 0, 0);
-                }
-            }
-
-            // SMOOTHING: More layers for rounder rope
-            int layers = 12; // Increased from 8
-            for (int layer = 0; layer < layers; layer++) {
-                float angle = (float) (layer * Math.PI * 2.0 / layers);
-                Vec3 rotatedRight = rotateVectorAroundAxis(right, segmentDir, angle);
-                Vec3 offset = rotatedRight.scale(ropeWidth * 0.5);
-
-                Vec3 vert1 = pos1.subtract(offset);
-                Vec3 vert2 = pos1.add(offset);
-                Vec3 vert3 = pos2.add(offset);
-                Vec3 vert4 = pos2.subtract(offset);
-
-                float u1 = t1 * 3.0f;
-                float u2 = t2 * 3.0f;
-                float vCoord1 = (float) layer / layers;
-                float vCoord2 = (float) (layer + 1) / layers;
-
-                int light = calculateDynamicLighting(pos1, pos2);
-                Vec3 normal = calculateSegmentNormal(segmentDir, rotatedRight);
-
-                addRopeVertex(vertexConsumer, matrix, vert1, u1, vCoord1, light, normal);
-                addRopeVertex(vertexConsumer, matrix, vert2, u1, vCoord2, light, normal);
-                addRopeVertex(vertexConsumer, matrix, vert3, u2, vCoord2, light, normal);
-                addRopeVertex(vertexConsumer, matrix, vert1, u1, vCoord1, light, normal);
-                addRopeVertex(vertexConsumer, matrix, vert3, u2, vCoord2, light, normal);
-                addRopeVertex(vertexConsumer, matrix, vert4, u2, vCoord1, light, normal);
-            }
+            currentLength += segmentLengths[i];
         }
     }
 
-    private static Vec3 calculateSmoothCatenaryPosition(Vec3 start, Vec3 end, float t,
-                                                        double sagAmount, float windOffset, float gameTime) {
+    private static void renderSingleRopeSegment(PoseStack poseStack, VertexConsumer vertexConsumer,
+                                                Vec3 start, Vec3 end, double actualRopeLength, float partialTick) {
+        Matrix4f matrix = poseStack.last().pose();
+        Vec3 direction = end.subtract(start);
+        double currentDistance = direction.length();
+        if (currentDistance < 0.01) return;
+
+        // Improved tension calculation for more realistic sag
+        double tension = Math.min(currentDistance / Math.max(actualRopeLength, currentDistance), 1.0);
+        double sagAmount = ROPE_SAG_FACTOR * (1.0 - tension * 0.6) * currentDistance * 0.35;
+
+        float gameTime = (float) (System.currentTimeMillis() % 100000) / 1000.0f;
+        float windOffset = (float) (Math.sin(gameTime * 0.8) * 0.3 + Math.sin(gameTime * 1.3) * 0.2) * WIND_STRENGTH;
+
+        // Calculate curve points
+        Vec3[] curvePoints = new Vec3[ROPE_CURVE_SEGMENTS + 1];
+        for (int i = 0; i <= ROPE_CURVE_SEGMENTS; i++) {
+            float t = (float) i / ROPE_CURVE_SEGMENTS;
+            curvePoints[i] = calculateCatenaryPosition(start, end, t, sagAmount, windOffset, gameTime);
+        }
+
+        // Calculate the ACTUAL curve length by measuring the curve points
+        double totalCurveLength = 0;
+        for (int i = 0; i < ROPE_CURVE_SEGMENTS; i++) {
+            totalCurveLength += curvePoints[i].distanceTo(curvePoints[i + 1]);
+        }
+
+        Vec3 overallDirection = end.subtract(start).normalize();
+        Vec3 worldUp = new Vec3(0, 1, 0);
+        Vec3 right;
+        if (Math.abs(overallDirection.dot(worldUp)) > 0.9) {
+            right = new Vec3(1, 0, 0);
+        } else {
+            right = overallDirection.cross(worldUp).normalize();
+        }
+        Vec3 up = right.cross(overallDirection).normalize();
+
+        // Create the 4 corner strips with overlapping geometry
+        Vec3[] topRightStrip = new Vec3[ROPE_CURVE_SEGMENTS + 1];
+        Vec3[] topLeftStrip = new Vec3[ROPE_CURVE_SEGMENTS + 1];
+        Vec3[] bottomLeftStrip = new Vec3[ROPE_CURVE_SEGMENTS + 1];
+        Vec3[] bottomRightStrip = new Vec3[ROPE_CURVE_SEGMENTS + 1];
+
+        float halfWidth = ROPE_WIDTH * 0.6f;
+        for (int i = 0; i <= ROPE_CURVE_SEGMENTS; i++) {
+            Vec3 center = curvePoints[i];
+            topRightStrip[i] = center.add(right.scale(halfWidth)).add(up.scale(halfWidth));
+            topLeftStrip[i] = center.add(right.scale(-halfWidth)).add(up.scale(halfWidth));
+            bottomLeftStrip[i] = center.add(right.scale(-halfWidth)).add(up.scale(-halfWidth));
+            bottomRightStrip[i] = center.add(right.scale(halfWidth)).add(up.scale(-halfWidth));
+        }
+
+        // Render all faces with the SAME curve points and total curve length for consistent UV mapping
+        renderRopeFaceWithGapFilling(vertexConsumer, matrix, topLeftStrip, topRightStrip, up, curvePoints, totalCurveLength);
+        renderRopeFaceWithGapFilling(vertexConsumer, matrix, topRightStrip, bottomRightStrip, right, curvePoints, totalCurveLength);
+        renderRopeFaceWithGapFilling(vertexConsumer, matrix, bottomRightStrip, bottomLeftStrip, up.scale(-1), curvePoints, totalCurveLength);
+        renderRopeFaceWithGapFilling(vertexConsumer, matrix, bottomLeftStrip, topLeftStrip, right.scale(-1), curvePoints, totalCurveLength);
+
+        // Add diagonal faces to fill corner gaps - IMPORTANT: Use the same curvePoints and totalCurveLength
+        renderRopeFaceWithGapFilling(vertexConsumer, matrix, topLeftStrip, bottomRightStrip, right.add(up).normalize(), curvePoints, totalCurveLength);
+        renderRopeFaceWithGapFilling(vertexConsumer, matrix, topRightStrip, bottomLeftStrip, right.subtract(up).normalize(), curvePoints, totalCurveLength);
+    }
+
+    private static void renderRopeFaceWithGapFilling(VertexConsumer vertexConsumer, Matrix4f matrix,
+                                                     Vec3[] strip1, Vec3[] strip2, Vec3 normal,
+                                                     Vec3[] curvePoints, double totalCurveLength) {
+        // Use the SAME curve points that were passed in - don't recalculate!
+        double[] cumulativeDistances = new double[ROPE_CURVE_SEGMENTS + 1];
+        cumulativeDistances[0] = 0;
+        for (int i = 0; i < ROPE_CURVE_SEGMENTS; i++) {
+            // Use the curve points distance that was already calculated
+            double segmentLength = curvePoints[i].distanceTo(curvePoints[i + 1]);
+            cumulativeDistances[i + 1] = cumulativeDistances[i] + segmentLength;
+        }
+
+        // Use consistent texture scaling for the entire rope
+        double textureScale = 0.5 / ROPE_WIDTH;
+
+        for (int i = 0; i < ROPE_CURVE_SEGMENTS; i++) {
+            // Use the cumulative distances from the SAME curve calculation
+            float vStart = (float) (cumulativeDistances[i] * textureScale);
+            float vEnd = (float) (cumulativeDistances[i + 1] * textureScale);
+
+            Vec3 p1 = strip1[i];
+            Vec3 p2 = strip2[i];
+            Vec3 p3 = strip2[i + 1];
+            Vec3 p4 = strip1[i + 1];
+
+            int light = calculateDynamicLighting(p1, p2);
+
+            // Main triangles
+            addRopeVertex(vertexConsumer, matrix, p1, 0.0f, vStart, light, normal);
+            addRopeVertex(vertexConsumer, matrix, p2, 1.0f, vStart, light, normal);
+            addRopeVertex(vertexConsumer, matrix, p4, 0.0f, vEnd, light, normal);
+
+            addRopeVertex(vertexConsumer, matrix, p2, 1.0f, vStart, light, normal);
+            addRopeVertex(vertexConsumer, matrix, p3, 1.0f, vEnd, light, normal);
+            addRopeVertex(vertexConsumer, matrix, p4, 0.0f, vEnd, light, normal);
+
+            // Reduced overlap triangles
+            Vec3 center1 = p1.add(p2).scale(0.5);
+            Vec3 center2 = p3.add(p4).scale(0.5);
+
+            addRopeVertexWithAlpha(vertexConsumer, matrix, center1, 0.5f, vStart, light, normal, 128);
+            addRopeVertexWithAlpha(vertexConsumer, matrix, p2, 1.0f, vStart, light, normal, 128);
+            addRopeVertexWithAlpha(vertexConsumer, matrix, center2, 0.5f, vEnd, light, normal, 128);
+
+            addRopeVertexWithAlpha(vertexConsumer, matrix, p1, 0.0f, vStart, light, normal, 128);
+            addRopeVertexWithAlpha(vertexConsumer, matrix, center1, 0.5f, vStart, light, normal, 128);
+            addRopeVertexWithAlpha(vertexConsumer, matrix, center2, 0.5f, vEnd, light, normal, 128);
+        }
+    }
+
+
+
+    private static void renderRopeFaceClean(VertexConsumer vertexConsumer, Matrix4f matrix,
+                                            Vec3[] strip1, Vec3[] strip2, Vec3 normal, double totalCurveLength, float uvOffset) {
+        // Fix: Use consistent texture scaling
+        double textureScale = 0.5 / ROPE_WIDTH;
+
+        // Calculate cumulative distances
+        double[] cumulativeDistances = new double[ROPE_CURVE_SEGMENTS + 1];
+        cumulativeDistances[0] = 0;
+        for (int i = 0; i < ROPE_CURVE_SEGMENTS; i++) {
+            double segmentLength = strip1[i].distanceTo(strip1[i + 1]);
+            cumulativeDistances[i + 1] = cumulativeDistances[i] + segmentLength;
+        }
+
+        for (int i = 0; i < ROPE_CURVE_SEGMENTS; i++) {
+            float vStart = ((float) (cumulativeDistances[i] * textureScale)) + uvOffset;
+            float vEnd = ((float) (cumulativeDistances[i + 1] * textureScale)) + uvOffset;
+
+            Vec3 p1 = strip1[i];
+            Vec3 p2 = strip2[i];
+            Vec3 p3 = strip2[i + 1];
+            Vec3 p4 = strip1[i + 1];
+
+            int light = calculateDynamicLighting(p1, p2);
+
+            addRopeVertex(vertexConsumer, matrix, p1, 0.0f, vStart, light, normal);
+            addRopeVertex(vertexConsumer, matrix, p2, 1.0f, vStart, light, normal);
+            addRopeVertex(vertexConsumer, matrix, p4, 0.0f, vEnd, light, normal);
+
+            addRopeVertex(vertexConsumer, matrix, p2, 1.0f, vStart, light, normal);
+            addRopeVertex(vertexConsumer, matrix, p3, 1.0f, vEnd, light, normal);
+            addRopeVertex(vertexConsumer, matrix, p4, 0.0f, vEnd, light, normal);
+        }
+    }
+
+
+    private static void addRopeVertex(VertexConsumer consumer, Matrix4f matrix, Vec3 pos,
+                                      float u, float v, int light, Vec3 normal) {
+        float clampedU = Math.max(0.0f, Math.min(1.0f, u));
+        consumer.vertex(matrix, (float) pos.x, (float) pos.y, (float) pos.z)
+                .color(255, 255, 255, 255) // Ensure full white color - no tinting
+                .uv(clampedU, v)
+                .overlayCoords(0) // Make sure overlay is 0 to avoid red tinting
+                .uv2(light)
+                .normal((float) normal.x, (float) normal.y, (float) normal.z)
+                .endVertex();
+    }
+
+    private static void addRopeVertexWithAlpha(VertexConsumer consumer, Matrix4f matrix, Vec3 pos,
+                                               float u, float v, int light, Vec3 normal, int alpha) {
+        float clampedU = Math.max(0.0f, Math.min(1.0f, u));
+        consumer.vertex(matrix, (float) pos.x, (float) pos.y, (float) pos.z)
+                .color(255, 255, 255, alpha) // Keep white color
+                .uv(clampedU, v)
+                .overlayCoords(0) // Ensure no overlay tinting
+                .uv2(light)
+                .normal((float) normal.x, (float) normal.y, (float) normal.z)
+                .endVertex();
+    }
+
+
+
+
+
+    private static void renderRopeLayer(VertexConsumer vertexConsumer, Matrix4f matrix, Vec3[] curvePoints,
+                                        Vec3 right, Vec3 up, float halfWidth, double totalCurveLength, float uvOffset) {
+        // Create 6 strips for good coverage without too much overlap (hexagonal cross-section)
+        Vec3[][] strips = new Vec3[6][ROPE_CURVE_SEGMENTS + 1];
+
+        for (int i = 0; i <= ROPE_CURVE_SEGMENTS; i++) {
+            Vec3 center = curvePoints[i];
+
+            // Create 6 points around the rope center (hexagonal cross-section)
+            for (int side = 0; side < 6; side++) {
+                double angle = (side * Math.PI * 2.0) / 6.0;
+                Vec3 offset = right.scale(Math.cos(angle) * halfWidth).add(up.scale(Math.sin(angle) * halfWidth));
+                strips[side][i] = center.add(offset);
+            }
+        }
+
+        // Render faces between adjacent strips
+        for (int side = 0; side < 6; side++) {
+            int nextSide = (side + 1) % 6;
+            Vec3 normal = calculateNormal(strips[side], strips[nextSide]);
+            renderRopeFaceClean(vertexConsumer, matrix, strips[side], strips[nextSide], normal, totalCurveLength, uvOffset);
+        }
+    }
+
+
+
+
+    private static Vec3 calculateNormal(Vec3[] strip1, Vec3[] strip2) {
+        // Calculate normal from the middle of the strips
+        int midPoint = strip1.length / 2;
+        Vec3 v1 = strip1[midPoint + 1].subtract(strip1[midPoint]);
+        Vec3 v2 = strip2[midPoint].subtract(strip1[midPoint]);
+        return v1.cross(v2).normalize();
+    }
+
+
+
+
+
+
+
+
+
+    private static Vec3 calculateCatenaryPosition(Vec3 start, Vec3 end, float t,
+                                                  double sagAmount, float windOffset, float gameTime) {
+        // Smooth interpolation between start and end
         Vec3 linearPos = start.lerp(end, t);
 
-        // Smoother sag curve using a combination of sine functions
-        double sagCurve = Math.sin(t * Math.PI) * sagAmount * 3.0;
-        sagCurve += Math.sin(t * Math.PI * 2) * sagAmount * 0.3; // Add secondary curve for realism
+        // Simple single catenary sag curve - only one sag point in the middle
+        double sagCurve = Math.sin(t * Math.PI) * sagAmount;
 
-        // Smoother wind with multiple frequencies
-        double windSway = (Math.sin((gameTime + t * 2) * 1.2) * 0.6 +
-                Math.sin((gameTime + t * 3) * 0.8) * 0.4) * windOffset * sagAmount * 0.5;
+        // Remove the secondary wave that was causing multiple sag points
+        // Keep only subtle wind effects
+        double windSway = Math.sin((gameTime * 0.7 + t * 2)) * windOffset * sagAmount * 0.3; // Reduced frequency
+        double windSwayZ = Math.cos((gameTime * 0.5 + t * 1.5)) * windOffset * sagAmount * 0.15; // Reduced frequency
 
-        Vec3 basePos = linearPos.add(windSway, -Math.abs(sagCurve), windSway * 0.3);
+        // Apply effects - single smooth sag
+        return linearPos.add(windSway, -sagCurve, windSwayZ);
+    }
 
-        // Simplified collision detection for better performance
-        return basePos;
+
+
+
+
+
+
+
+    private static int calculateDynamicLighting(Vec3 pos1, Vec3 pos2) {
+        // Temporarily return full bright lighting to test
+        return (15 << 20) | (15 << 4);
     }
 
     public static void cleanupCache() {
         Map<Integer, ClientConstraintTracker.ClientRopeData> activeConstraints = ClientConstraintTracker.getClientConstraints();
         positionCache.keySet().retainAll(activeConstraints.keySet());
-    }
-
-
-    private static Vec3 calculateSegmentNormal(Vec3 segmentDir, Vec3 right) {
-        Vec3 up = segmentDir.cross(right).normalize();
-        return right.cross(up).normalize();
-    }
-
-    private static void addRopeVertex(VertexConsumer consumer, Matrix4f matrix, Vec3 pos,
-                                      float u, float v, int light, Vec3 normal) {
-        consumer.vertex(matrix, (float) pos.x, (float) pos.y, (float) pos.z)
-                .color(200, 180, 140, 255)
-                .uv(u, v)
-                .overlayCoords(0)
-                .uv2(light)
-                .normal((float) normal.x, (float) normal.y, (float) normal.z)
-                .endVertex();
-    }
-
-    private static Vec3 rotateVectorAroundAxis(Vec3 vector, Vec3 axis, float angle) {
-        Vec3 k = axis.normalize();
-        double cosAngle = Math.cos(angle);
-        double sinAngle = Math.sin(angle);
-        Vec3 vCrossK = vector.cross(k);
-        double vDotK = vector.dot(k);
-
-        return vector.scale(cosAngle)
-                .add(vCrossK.scale(sinAngle))
-                .add(k.scale(vDotK * (1 - cosAngle)));
-    }
-
-    private static Vec3 calculateCatenaryPosition(Vec3 start, Vec3 end, float t, double sagAmount, float windOffset) {
-        Vec3 linearPos = start.lerp(end, t);
-        double sagCurve = Math.sin(t * Math.PI) * sagAmount * 3.0;
-        double windSway = Math.sin(t * Math.PI * 3) * windOffset * sagAmount * 0.5;
-
-        Vec3 basePos = linearPos.add(windSway, -Math.abs(sagCurve), windSway * 0.3);
-
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.level != null) {
-            Vec3 cameraPos = mc.gameRenderer.getMainCamera().getPosition();
-            Vec3 worldPos = basePos.add(cameraPos);
-            net.minecraft.core.BlockPos blockPos = new net.minecraft.core.BlockPos((int)worldPos.x, (int)worldPos.y, (int)worldPos.z);
-
-            if (!mc.level.getBlockState(blockPos).isAir()) {
-                Vec3[] offsets = {
-                        new Vec3(0, 1.0, 0),
-                        new Vec3(0.5, 0.5, 0),
-                        new Vec3(-0.5, 0.5, 0),
-                        new Vec3(0, 0, 0.5),
-                        new Vec3(0, 0, -0.5)
-                };
-
-                for (Vec3 offset : offsets) {
-                    Vec3 testPos = worldPos.add(offset);
-                    net.minecraft.core.BlockPos testBlockPos = new net.minecraft.core.BlockPos((int)testPos.x, (int)testPos.y, (int)testPos.z);
-                    if (mc.level.getBlockState(testBlockPos).isAir()) {
-                        return basePos.add(offset);
-                    }
-                }
-            }
-        }
-
-        return basePos;
-    }
-
-    private static int calculateDynamicLighting(Vec3 pos1, Vec3 pos2) {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.level != null) {
-            Vec3 cameraPos = mc.gameRenderer.getMainCamera().getPosition();
-            Vec3 worldPos = pos1.add(cameraPos);
-            net.minecraft.core.BlockPos blockPos = new net.minecraft.core.BlockPos((int)worldPos.x, (int)worldPos.y, (int)worldPos.z);
-
-            int blockLight = mc.level.getBrightness(net.minecraft.world.level.LightLayer.BLOCK, blockPos);
-            int skyLight = mc.level.getBrightness(net.minecraft.world.level.LightLayer.SKY, blockPos);
-
-            blockLight = Math.min(blockLight, 8);
-            skyLight = Math.min(skyLight, 10);
-
-            return (skyLight << 20) | (blockLight << 4);
-        }
-        return (8 << 20) | (6 << 4);
-    }
-
-    private static void addTexturedVertexWithNormal(VertexConsumer consumer, Matrix4f matrix, Vec3 pos,
-                                                    float u, float v, int light, Vec3 normal) {
-        consumer.vertex(matrix, (float) pos.x, (float) pos.y, (float) pos.z)
-                .color(255, 255, 255, 255)
-                .uv(u, v)
-                .overlayCoords(0)
-                .uv2(light)
-                .normal((float) normal.x, (float) normal.y, (float) normal.z)
-                .endVertex();
-    }
-
-    private static void addTexturedVertex(VertexConsumer consumer, Matrix4f matrix, Vec3 pos,
-                                          float u, float v, int light) {
-        consumer.vertex(matrix, (float) pos.x, (float) pos.y, (float) pos.z)
-                .color(255, 255, 255, 255)
-                .uv(u, v)
-                .overlayCoords(0)
-                .uv2(light)
-                .normal(0, 1, 0)
-                .endVertex();
-    }
-
-    private static Vec3 calculateCollisionAwarePosition(Vec3 start, Vec3 end, float t, double sagAmount,
-                                                        float windOffset, Level level, Vec3 cameraPos) {
-        Vec3 basePos = calculateCatenaryPosition(start, end, t, sagAmount, windOffset);
-        Vec3 worldPos = basePos.add(cameraPos);
-
-        if (level != null) {
-            try {
-                net.minecraft.core.BlockPos blockPos = new net.minecraft.core.BlockPos((int)worldPos.x, (int)worldPos.y, (int)worldPos.z);
-                if (!level.getBlockState(blockPos).isAir()) {
-                    return basePos.add(0, 1.0, 0);
-                }
-            } catch (Exception e) {
-            }
-        }
-        return basePos;
-    }
-
-    private static Vec3 calculatePhysicsRopePosition(Vec3 start, Vec3 end, float t, double sagAmount, float windOffset) {
-        Vec3 linearPos = start.lerp(end, t);
-        double sagCurve = Math.sin(t * Math.PI) * sagAmount;
-        double windSway = Math.sin(t * Math.PI * 2) * windOffset * sagAmount;
-        return linearPos.add(windSway, -sagCurve, 0);
-    }
-
-    private static int calculateAlpha(Vec3 pos1, Vec3 pos2, double tension) {
-        double avgDistance = (pos1.length() + pos2.length()) * 0.5;
-        double distanceAlpha = Math.max(0.4, 1.0 - (avgDistance / MAX_RENDER_DISTANCE));
-        double tensionAlpha = 0.7 + (tension * 0.3);
-        return (int) Mth.clamp(255 * distanceAlpha * tensionAlpha, 100, 255);
-    }
-
-    private static void addAdvancedVertex(VertexConsumer consumer, Matrix4f matrix, Vec3 pos,
-                                          float u, float v, int light, int alpha) {
-        try {
-            consumer.vertex(matrix, (float) pos.x, (float) pos.y, (float) pos.z)
-                    .color(255, 255, 255, alpha)
-                    .uv(u, v)
-                    .overlayCoords(0, 10)
-                    .uv2(light)
-                    .normal(0, 1, 0)
-                    .endVertex();
-        } catch (Exception e) {
-            consumer.vertex(matrix, (float) pos.x, (float) pos.y, (float) pos.z)
-                    .color(255, 255, 255, 255)
-                    .uv(u, v)
-                    .endVertex();
-        }
     }
 }
 
