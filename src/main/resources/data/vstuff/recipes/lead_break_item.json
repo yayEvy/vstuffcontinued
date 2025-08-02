@@ -1,15 +1,23 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "ingredients": [
-    {
-      "item": "minecraft:lead"
-    },
-    {
-      "item": "minecraft:red_dye"
-    }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " I ",
+    " S ",
+    " W "
   ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    },
+    "W": {
+      "item": "minecraft:string"
+    }
+  },
   "result": {
     "item": "vstuff:lead_break_item",
-    "count": 8
+    "count": 1
   }
 }

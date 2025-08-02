@@ -211,15 +211,17 @@ dependencies {
     implementation 'thedarkcolour:kotlinforforge:4.10.0'
 
     runtimeOnly fg.deobf("maven.modrinth:create-clockwork:1.20.1-0.1.16")
+    compileOnly fg.deobf("maven.modrinth:create-stuff-additions:2.0.8")
+
     implementation fg.deobf("maven.modrinth:architectury-api:9.2.14+forge")
     implementation fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_forge_version}:slim") { transitive = false }
     implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_forge_version}")
     implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${flywheel_forge_minecraft_version}:${flywheel_forge_version}")
 
-    //runtimeOnly "maven.modrinth:vs-tournament:1.1.0_beta-5.3+af35b3821f"
 
-
-
+  //  compileOnly fg.deobf(files("libs/create-stuff-additions1.20.1_v2.0.8.jar"))
+    //implementation fg.deobf("maven.modrinth:vlib:1.20.1-0.0.11-alpha+forge")
+   // implementation fg.deobf("maven.modrinth:forgified-fabric-api:0.92.2+1.11.12+1.20.1")
 
     compileOnly fg.deobf("maven.modrinth:vmod:lK0oLDaV")
 

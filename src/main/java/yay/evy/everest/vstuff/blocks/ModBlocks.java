@@ -1,33 +1,26 @@
-package yay.evy.everest.vstuff.block;
+package yay.evy.everest.vstuff.blocks;
 
+import com.tterrag.registrate.util.entry.BlockEntry;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import yay.evy.everest.vstuff.vstuff;
 import yay.evy.everest.vstuff.item.ModItems;
-import yay.evy.everest.vstuff.ropes.RopePulleyBlock;
+//import yay.evy.everest.vstuff.ropes.RopePulleyBlock;
 import java.util.function.Supplier;
 
 public class ModBlocks {
     public static final DeferredRegister<Block> BLOCKS =
             DeferredRegister.create(ForgeRegistries.BLOCKS, vstuff.MOD_ID);
 
-    public static final RegistryObject<Block> REDSTONE_MAGNET = registerBlock("redstone_magnet",
-            () -> new RedstoneMagnetBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
-                    .strength(3.0f, 6.0f)
-                    .requiresCorrectToolForDrops()));
-
-    public static final RegistryObject<Block> ROPE_PULLEY = registerBlock("rope_pulley",
-            () -> new RopePulleyBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
-                    .strength(3.0f, 6.0f)
-                    .requiresCorrectToolForDrops()
-                    .noOcclusion()));
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         RegistryObject<T> toReturn = BLOCKS.register(name, block);

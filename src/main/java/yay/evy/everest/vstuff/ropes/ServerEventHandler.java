@@ -20,9 +20,8 @@ public class ServerEventHandler {
         System.out.println("VStuff: Server started, resetting constraint system...");
 
 
-        // Don't reset restoration state here - let each dimension handle it
         restorationScheduled = true;
-        ticksUntilRestore = 500; // 25 seconds to ensure ships are loaded
+        ticksUntilRestore = 500;
         serverInstance = event.getServer();
     }
 
@@ -32,7 +31,6 @@ public class ServerEventHandler {
             return;
         }
 
-        // Handle restoration scheduling
         if (restorationScheduled && serverInstance != null) {
             ticksUntilRestore--;
             if (ticksUntilRestore <= 0) {
@@ -58,14 +56,12 @@ public class ServerEventHandler {
             }
         }
 
-        // Handle cleanup ticks for all dimensions
         if (serverInstance != null) {
             for (ServerLevel level : serverInstance.getAllLevels()) {
                 try {
                     ConstraintPersistence persistence = ConstraintPersistence.get(level);
                     persistence.tickCleanup();
                 } catch (Exception e) {
-                    // Ignore errors during cleanup ticking
                 }
             }
         }
@@ -73,23 +69,19 @@ public class ServerEventHandler {
 
     private static void scheduleConstraintRestoration(net.minecraft.server.MinecraftServer server, int attempt) {
         final int maxAttempts = 3;
-        final int delayTicks = 100; // 5 seconds at 20 TPS
+        final int delayTicks = 100;
 
         server.execute(() -> {
-            // Wait before attempting
-            server.getTickCount(); // Ensure we're in a valid tick context
+            server.getTickCount();
 
-            // Schedule the actual restoration after delay
             scheduleDelayedRestoration(server, attempt, maxAttempts);
         });
     }
 
     private static void scheduleDelayedRestoration(net.minecraft.server.MinecraftServer server, int attempt, int maxAttempts) {
-        // Use the server's scheduler instead of Thread.sleep
         server.execute(() -> {
             try {
-                // Wait a bit longer for ships to load
-                Thread.sleep(1 + (attempt * 1)); // 10s + 2s per attempt
+                Thread.sleep(1 + (attempt * 1));
 
                 boolean allDimensionsReady = true;
                 int totalShipsFound = 0;
@@ -114,7 +106,6 @@ public class ServerEventHandler {
                         " - Found " + totalShipsFound + " total ships, all dimensions ready: " + allDimensionsReady);
 
                 if (allDimensionsReady) {
-                    // Proceed with restoration
                     restoreConstraintsForAllDimensions(server);
                 } else if (attempt < maxAttempts - 1) {
                     System.out.println("VStuff: Not all dimensions ready, retrying in a moment...");

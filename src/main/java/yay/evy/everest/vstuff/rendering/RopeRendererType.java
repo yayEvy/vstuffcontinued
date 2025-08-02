@@ -7,29 +7,30 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 
 public class RopeRendererType extends RenderType {
-    private RopeRendererType(String name, VertexFormat fmt, VertexFormat.Mode mode, int bufSize, boolean affectsCrumbling, boolean sortOnUpload, Runnable setup, Runnable clear) {
-        super(name, fmt, mode, bufSize, affectsCrumbling, sortOnUpload, setup, clear);
+
+    public RopeRendererType(String name, VertexFormat format, VertexFormat.Mode mode, int bufferSize,
+                            boolean affectsCrumbling, boolean sortOnUpload, Runnable setupState, Runnable clearState) {
+        super(name, format, mode, bufferSize, affectsCrumbling, sortOnUpload, setupState, clearState);
     }
 
     public static RenderType ropeRenderer(ResourceLocation texture) {
-        return create(
-                "rope_renderer",
+        return create("rope_renderer",
                 DefaultVertexFormat.NEW_ENTITY,
                 VertexFormat.Mode.TRIANGLES,
                 256,
                 false,
-                false,
-                CompositeState.builder()
-                        .setShaderState(RenderStateShard.RENDERTYPE_ENTITY_TRANSLUCENT_CULL_SHADER)
-                        .setTextureState(new TextureStateShard(texture, false, false))
+                true,
+                RenderType.CompositeState.builder()
+                        .setShaderState(RENDERTYPE_ENTITY_SOLID_SHADER)
+                        .setTextureState(new RenderStateShard.TextureStateShard(texture, false, false))
                         .setTransparencyState(NO_TRANSPARENCY)
                         .setCullState(NO_CULL)
                         .setLightmapState(LIGHTMAP)
-                        .setOverlayState(OVERLAY)
-                        .setOutputState(MAIN_TARGET)
+                        .setOverlayState(NO_OVERLAY)
                         .setDepthTestState(LEQUAL_DEPTH_TEST)
                         .setWriteMaskState(COLOR_DEPTH_WRITE)
-                        .createCompositeState(false)
-        );
+                        .createCompositeState(true));
     }
+
+
 }

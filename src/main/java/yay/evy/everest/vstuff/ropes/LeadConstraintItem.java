@@ -3,6 +3,7 @@ package yay.evy.everest.vstuff.ropes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -26,37 +27,49 @@ public class LeadConstraintItem extends Item {
         super(new Properties().stacksTo(64));
     }
 
-    @Override
-    public void appendHoverText(ItemStack stack, Level level, java.util.List<Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
-        tooltip.add(Component.literal("§7Right-click two blocks or entities to create a rope constraint"));
-        tooltip.add(Component.literal("§7Works between ships and the world"));
-        super.appendHoverText(stack, level, tooltip, flag);
-    }
-
-    @Override
     public InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
         BlockPos blockPos = context.getClickedPos().immutable();
         Player player = context.getPlayer();
 
         if (level instanceof ServerLevel serverLevel) {
-            Long shipId = getShipIdAtPos(serverLevel, blockPos);
+            System.out.println("LeadConstraintItem.useOn - BlockPos: " + blockPos + ", Block: " + level.getBlockState(blockPos).getBlock());
 
+            Long shipId = getShipIdAtPos(serverLevel, blockPos);
             if (firstClickedPos == null && firstEntity == null) {
                 firstClickedPos = blockPos;
                 firstShipId = shipId;
                 return InteractionResult.SUCCESS;
             } else {
                 if (firstClickedPos != null && firstClickedPos.equals(blockPos)) {
+                    resetState();
                     return InteractionResult.FAIL;
                 }
                 createLeadConstraint(serverLevel, blockPos, shipId, player);
+                // Add sync after creating constraint
+                if (player instanceof ServerPlayer serverPlayer) {
+                    ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);
+                }
                 resetState();
                 return InteractionResult.SUCCESS;
             }
         }
         return InteractionResult.PASS;
     }
+
+
+
+
+    @Override
+    public void appendHoverText(ItemStack stack, Level level, java.util.List<Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
+        tooltip.add(Component.literal("§7Right-click two blocks to create rope constraint"));
+        tooltip.add(Component.literal("§7Persists between world/server restarts"));
+        tooltip.add(Component.literal("§7Works between ships and the world"));
+        super.appendHoverText(stack, level, tooltip, flag);
+    }
+
+
+
 
     @Override
     public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity, net.minecraft.world.InteractionHand hand) {
@@ -70,7 +83,7 @@ public class LeadConstraintItem extends Item {
                 return InteractionResult.SUCCESS;
             } else {
                 if (firstEntity != null && firstEntity.equals(entity)) {
-                    player.sendSystemMessage(Component.literal("§cCannot connect a lead to the same entity!"));
+                    //  player.sendSystemMessage(Component.literal("§cCannot connect a lead to the same entity!"));
                     return InteractionResult.FAIL;
                 }
                 createLeadConstraintToEntity(serverLevel, entity, shipId, player);
@@ -81,8 +94,26 @@ public class LeadConstraintItem extends Item {
         return InteractionResult.PASS;
     }
 
+
     private void createLeadConstraint(ServerLevel level, BlockPos secondPos, Long secondShipId, Player player) {
         if (firstClickedPos == null && firstEntity == null) return;
+
+        /*
+        // Double-check that neither position is a pulley block
+        if (level.getBlockState(secondPos).getBlock() instanceof RopePulleyBlock) {
+            player.sendSystemMessage(Component.literal("§cCannot create rope constraint to pulley block!"));
+            return;
+        }
+
+         */
+
+        /*
+        if (firstClickedPos != null && level.getBlockState(firstClickedPos).getBlock() instanceof RopePulleyBlock) {
+            player.sendSystemMessage(Component.literal("§cCannot create rope constraint from pulley block!"));
+            return;
+        }
+
+         */
 
         Vector3d firstWorldPos;
         Vector3d firstLocalPos;
@@ -107,6 +138,15 @@ public class LeadConstraintItem extends Item {
 
     private void createLeadConstraintToEntity(ServerLevel level, Entity secondEntity, Long secondShipId, Player player) {
         if (firstClickedPos == null && firstEntity == null) return;
+
+        /*
+        // Check if first position was a pulley block
+        if (firstClickedPos != null && level.getBlockState(firstClickedPos).getBlock() instanceof RopePulleyBlock) {
+            player.sendSystemMessage(Component.literal("§cCannot create rope constraint from pulley block!"));
+            return;
+        }
+
+         */
 
         Vector3d firstWorldPos;
         Vector3d firstLocalPos;
@@ -157,12 +197,10 @@ public class LeadConstraintItem extends Item {
 
         double distance = finalWorldPosA.distance(finalWorldPosB);
         double maxLength = distance + 0.5;
-
         double massA = getMassForShip(level, finalShipA);
         double massB = getMassForShip(level, finalShipB);
         double effectiveMass = Math.min(massA, massB);
         if (effectiveMass < 100.0) effectiveMass = 100.0;
-
         double compliance = 1e-12 / effectiveMass;
         double massRatio = Math.max(massA, massB) / Math.min(massA, massB);
         double baseMaxForce = 50000000000000.0;
@@ -189,6 +227,8 @@ public class LeadConstraintItem extends Item {
                         finalLocalPosA, finalLocalPosB, maxLength,
                         compliance, maxForce);
 
+                //  player.sendSystemMessage(Component.literal("§aRope constraint created! Length: " + String.format("%.1f", maxLength)));
+
                 if (player != null) {
                     if (!player.getAbilities().instabuild) {
                         for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
@@ -200,13 +240,15 @@ public class LeadConstraintItem extends Item {
                         }
                     }
                 }
+            } else {
+                //   player.sendSystemMessage(Component.literal("§cFailed to create rope constraint!"));
             }
         } catch (Exception e) {
             System.err.println("Error creating rope constraint: " + e.getMessage());
+            //   player.sendSystemMessage(Component.literal("§cError creating rope constraint: " + e.getMessage()));
             e.printStackTrace();
         }
     }
-
     private double getMassForShip(ServerLevel level, Long shipId) {
         Long groundBodyId = getGroundBodyId(level);
         if (shipId.equals(groundBodyId)) {
@@ -303,11 +345,14 @@ public class LeadConstraintItem extends Item {
         return new Vector3d(worldPos);
     }
 
+    // Make sure resetState is properly implemented
     private void resetState() {
         firstClickedPos = null;
         firstShipId = null;
         firstEntity = null;
+        System.out.println("LeadConstraintItem state reset");
     }
+
 
     public void breakLead(Player player) {
         if (activeConstraintId != null && player.level() instanceof ServerLevel serverLevel) {
@@ -330,7 +375,5 @@ public class LeadConstraintItem extends Item {
         }
     }
 
-    public boolean hasActiveLead() {
-        return activeConstraintId != null;
-    }
+
 }

@@ -1,14 +1,12 @@
-package yay.evy.everest.vstuff.network;
+package yay.evy.everest.vstuff.client;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 import org.joml.Vector3d;
-import yay.evy.everest.vstuff.ropes.ClientConstraintTracker;
 
 import java.util.function.Supplier;
 
 public class ConstraintSyncPacket {
-
     public enum Action {
         ADD, REMOVE, CLEAR_ALL
     }
@@ -27,9 +25,19 @@ public class ConstraintSyncPacket {
         this.constraintId = constraintId;
         this.shipA = shipA;
         this.shipB = shipB;
-        this.localPosA = new Vector3d(localPosA);
-        this.localPosB = new Vector3d(localPosB);
+        this.localPosA = localPosA != null ? new Vector3d(localPosA) : new Vector3d();
+        this.localPosB = localPosB != null ? new Vector3d(localPosB) : new Vector3d();
         this.maxLength = maxLength;
+    }
+    // Add this constructor
+    public ConstraintSyncPacket() {
+        this.action = Action.CLEAR_ALL;
+        this.constraintId = null;
+        this.shipA = null;
+        this.shipB = null;
+        this.localPosA = null;
+        this.localPosB = null;
+        this.maxLength = 0;
     }
 
     public ConstraintSyncPacket(Integer constraintId) {
@@ -42,24 +50,17 @@ public class ConstraintSyncPacket {
         this.maxLength = 0;
     }
 
-    public ConstraintSyncPacket() {
-        this.action = Action.CLEAR_ALL;
-        this.constraintId = null;
-        this.shipA = null;
-        this.shipB = null;
-        this.localPosA = null;
-        this.localPosB = null;
-        this.maxLength = 0;
-    }
-
     public ConstraintSyncPacket(FriendlyByteBuf buf) {
         this.action = buf.readEnum(Action.class);
-
         switch (action) {
             case ADD:
                 this.constraintId = buf.readInt();
-                this.shipA = buf.readLong();
-                this.shipB = buf.readLong();
+                // Read ship IDs with null handling
+                boolean hasShipA = buf.readBoolean();
+                this.shipA = hasShipA ? buf.readLong() : null;
+                boolean hasShipB = buf.readBoolean();
+                this.shipB = hasShipB ? buf.readLong() : null;
+                // Read positions
                 this.localPosA = new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
                 this.localPosB = new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
                 this.maxLength = buf.readDouble();
@@ -86,12 +87,27 @@ public class ConstraintSyncPacket {
 
     public void encode(FriendlyByteBuf buf) {
         buf.writeEnum(action);
-
         switch (action) {
             case ADD:
+                if (constraintId == null) {
+                    throw new IllegalStateException("Cannot encode ADD packet with null constraintId");
+                }
                 buf.writeInt(constraintId);
-                buf.writeLong(shipA);
-                buf.writeLong(shipB);
+
+                // Write ship IDs with null handling
+                buf.writeBoolean(shipA != null);
+                if (shipA != null) {
+                    buf.writeLong(shipA);
+                }
+                buf.writeBoolean(shipB != null);
+                if (shipB != null) {
+                    buf.writeLong(shipB);
+                }
+
+                // Write positions (should not be null for ADD action)
+                if (localPosA == null || localPosB == null) {
+                    throw new IllegalStateException("Cannot encode ADD packet with null positions");
+                }
                 buf.writeDouble(localPosA.x);
                 buf.writeDouble(localPosA.y);
                 buf.writeDouble(localPosA.z);
@@ -101,10 +117,12 @@ public class ConstraintSyncPacket {
                 buf.writeDouble(maxLength);
                 break;
             case REMOVE:
+                if (constraintId == null) {
+                    throw new IllegalStateException("Cannot encode REMOVE packet with null constraintId");
+                }
                 buf.writeInt(constraintId);
                 break;
             case CLEAR_ALL:
-                // No
                 break;
         }
     }
@@ -112,16 +130,21 @@ public class ConstraintSyncPacket {
     public void handle(Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
-            switch (action) {
-                case ADD:
-                    ClientConstraintTracker.addClientConstraint(constraintId, shipA, shipB, localPosA, localPosB, maxLength);
-                    break;
-                case REMOVE:
-                    ClientConstraintTracker.removeClientConstraint(constraintId);
-                    break;
-                case CLEAR_ALL:
-                    ClientConstraintTracker.clearAllClientConstraints();
-                    break;
+            try {
+                switch (action) {
+                    case ADD:
+                        ClientConstraintTracker.addClientConstraint(constraintId, shipA, shipB, localPosA, localPosB, maxLength);
+                        break;
+                    case REMOVE:
+                        ClientConstraintTracker.removeClientConstraint(constraintId);
+                        break;
+                    case CLEAR_ALL:
+                        ClientConstraintTracker.clearAllClientConstraints();
+                        break;
+                }
+            } catch (Exception e) {
+                System.err.println("Error handling constraint sync packet: " + e.getMessage());
+                e.printStackTrace();
             }
         });
         context.setPacketHandled(true);

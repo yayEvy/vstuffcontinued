@@ -8,17 +8,19 @@ import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import yay.evy.everest.vstuff.network.NetworkHandler;
+import yay.evy.everest.vstuff.client.NetworkHandler;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ConstraintTracker {
 
-    private static final Map<Integer, RopeConstraintData> activeConstraints = new ConcurrentHashMap<>();
+    public static final Map<Integer, RopeConstraintData> activeConstraints = new ConcurrentHashMap<>();
     private static final Map<Integer, String> constraintToPersistenceId = new ConcurrentHashMap<>();
+
 
     public static class RopeConstraintData {
         public final Long shipA;
@@ -29,11 +31,12 @@ public class ConstraintTracker {
         public final double compliance;
         public final double maxForce;
         public final ConstraintType constraintType;
-        public final net.minecraft.core.BlockPos sourceBlockPos; // Track the source block
+        public final net.minecraft.core.BlockPos sourceBlockPos;
+
 
         public enum ConstraintType {
-            ROPE_PULLEY,    // From rope pulley blocks
-            GENERIC         // Other constraint types
+            ROPE_PULLEY,
+            GENERIC
         }
 
         public RopeConstraintData(Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
@@ -45,11 +48,11 @@ public class ConstraintTracker {
             this.maxLength = maxLength;
             this.compliance = compliance;
             this.maxForce = maxForce;
-            this.constraintType = ConstraintType.GENERIC; // Default to generic
-            this.sourceBlockPos = null; // No source block for generic constraints
+            this.constraintType = ConstraintType.GENERIC;
+            this.sourceBlockPos = null;
         }
 
-        // ADDED: Extended constructor with constraint type and source block
+
         public RopeConstraintData(Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
                                   double maxLength, double compliance, double maxForce,
                                   ConstraintType constraintType, net.minecraft.core.BlockPos sourceBlockPos) {
@@ -109,65 +112,116 @@ public class ConstraintTracker {
 
     public static void addConstraintWithPersistence(ServerLevel level, Integer constraintId, Long shipA, Long shipB,
                                                     Vector3d localPosA, Vector3d localPosB, double maxLength,
+                                                    double compliance, double maxForce,
+                                                    RopeConstraintData.ConstraintType constraintType,
+                                                    net.minecraft.core.BlockPos sourceBlockPos) {
+
+        // ADD THIS: Check for existing constraints for the same source block
+        if (constraintType == RopeConstraintData.ConstraintType.ROPE_PULLEY && sourceBlockPos != null) {
+            boolean existingConstraintFound = activeConstraints.values().stream()
+                    .anyMatch(existing -> existing.constraintType == RopeConstraintData.ConstraintType.ROPE_PULLEY
+                            && existing.sourceBlockPos != null
+                            && existing.sourceBlockPos.equals(sourceBlockPos));
+
+            if (existingConstraintFound) {
+                System.out.println("Constraint already exists for rope pulley at " + sourceBlockPos + ", not creating duplicate");
+                return;
+            }
+        }
+
+        RopeConstraintData data = new RopeConstraintData(shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, constraintType, sourceBlockPos);
+        activeConstraints.put(constraintId, data);
+
+        ConstraintPersistence persistence = ConstraintPersistence.get(level);
+        String persistenceId = java.util.UUID.randomUUID().toString();
+
+        // Map the persistence ID BEFORE adding to persistence to avoid race conditions
+        constraintToPersistenceId.put(constraintId, persistenceId);
+
+        persistence.addConstraint(persistenceId, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, level, constraintType, sourceBlockPos);
+        NetworkHandler.sendConstraintAdd(constraintId, shipA, shipB, localPosA, localPosB, maxLength);
+        System.out.println("Added " + constraintType + " constraint " + constraintId + " with source block " + sourceBlockPos);
+    }
+
+
+    // Keep the old method for backward compatibility
+    public static void addConstraintWithPersistence(ServerLevel level, Integer constraintId, Long shipA, Long shipB,
+                                                    Vector3d localPosA, Vector3d localPosB, double maxLength,
                                                     double compliance, double maxForce) {
-        // Use the original constructor - it now sets GENERIC type and null sourceBlockPos by default
-        RopeConstraintData data = new RopeConstraintData(shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce);
-        activeConstraints.put(constraintId, data);
-
-        ConstraintPersistence persistence = ConstraintPersistence.get(level);
-        String persistenceId = java.util.UUID.randomUUID().toString();
-        constraintToPersistenceId.put(constraintId, persistenceId);
-        persistence.addConstraint(persistenceId, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, level);
-        NetworkHandler.sendConstraintAdd(constraintId, shipA, shipB, localPosA, localPosB, maxLength);
+        addConstraintWithPersistence(level, constraintId, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce,
+                RopeConstraintData.ConstraintType.GENERIC, null);
     }
 
-    public static void addRopePulleyConstraint(net.minecraft.server.level.ServerLevel level, Integer constraintId,
-                                               Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
-                                               double maxLength, double compliance, double maxForce,
-                                               net.minecraft.core.BlockPos pulleyBlockPos) {
-        // Use the extended constructor with rope pulley type and source block position
-        RopeConstraintData data = new RopeConstraintData(shipA, shipB, localPosA, localPosB, maxLength,
-                compliance, maxForce,
-                RopeConstraintData.ConstraintType.ROPE_PULLEY,
-                pulleyBlockPos);
-        activeConstraints.put(constraintId, data);
 
-        ConstraintPersistence persistence = ConstraintPersistence.get(level);
-        String persistenceId = java.util.UUID.randomUUID().toString();
-        constraintToPersistenceId.put(constraintId, persistenceId);
-        persistence.addConstraint(persistenceId, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, level);
-        NetworkHandler.sendConstraintAdd(constraintId, shipA, shipB, localPosA, localPosB, maxLength);
-
-        System.out.println("Added rope pulley constraint " + constraintId + " from block at " + pulleyBlockPos);
+    private static boolean isRopePulleyBlock(net.minecraft.world.level.block.state.BlockState state) {
+        // Replace this with your actual rope pulley block check
+        // For example: return state.getBlock() instanceof RopePulleyBlock;
+        return state.getBlock().toString().contains("rope_pulley"); // Temporary implementation
     }
 
-    public static void removeConstraint(Integer constraintId) {
-        if (activeConstraints.remove(constraintId) != null) {
-            NetworkHandler.sendConstraintRemove(constraintId);
-           // System.out.println("Removed constraint " + constraintId + " from tracker and synced to clients");
+    public static boolean constraintExists(ServerLevel level, Integer constraintId) {
+        if (constraintId == null) return false;
+
+        try {
+            // Check if constraint exists in the physics world
+            var shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
+            // You'll need to implement this check based on your constraint tracking system
+            // This is a placeholder - implement according to your ConstraintTracker design
+            return getActiveConstraints().containsKey(constraintId);
+        } catch (Exception e) {
+            return false;
         }
     }
 
     public static void removeConstraintWithPersistence(ServerLevel level, Integer constraintId) {
-        if (activeConstraints.remove(constraintId) != null) {
-            ConstraintPersistence persistence = ConstraintPersistence.get(level);
+        RopeConstraintData data = activeConstraints.remove(constraintId);
+        if (data != null) {
+            VSGameUtilsKt.getShipObjectWorld(level).removeConstraint(constraintId);
 
-            // Use the ACTUAL persistence ID that was stored
-            String persistenceId = constraintToPersistenceId.get(constraintId);
+            ConstraintPersistence persistence = ConstraintPersistence.get(level);
+            String persistenceId = constraintToPersistenceId.remove(constraintId);
             if (persistenceId != null) {
-                // Mark as removed using the correct ID
                 persistence.markConstraintAsRemoved(persistenceId);
-                // Clean up mapping
-                constraintToPersistenceId.remove(constraintId);
-             //   System.out.println("Removed constraint " + constraintId + " from tracker, marked as removed in persistence (ID: " + persistenceId + "), and synced to clients");
-            } else {
-            //    System.err.println("Warning: No persistence ID found for constraint " + constraintId + " - this constraint may not have been properly persisted");
-                // Still remove it from the tracker and sync to clients
+                persistence.setDirty();
+            }
+
+            if (level.getServer() != null) {
+                for (ServerPlayer player : level.getServer().getPlayerList().getPlayers()) {
+                    NetworkHandler.sendConstraintRemoveToPlayer(player, constraintId);
+                    level.getServer().tell(new net.minecraft.server.TickTask(0, () -> {
+                        NetworkHandler.sendConstraintRemoveToPlayer(player, constraintId);
+                    }));
+                }
             }
 
             NetworkHandler.sendConstraintRemove(constraintId);
+
+            if (data.constraintType == RopeConstraintData.ConstraintType.ROPE_PULLEY && data.sourceBlockPos != null) {
+                cleanupOrphanedConstraints(level, data.sourceBlockPos);
+            }
         }
     }
+
+
+    public static void syncAllConstraintsToPlayer(ServerPlayer player) {
+        // First clear their client state
+        NetworkHandler.sendClearAllConstraintsToPlayer(player);
+
+        // Then send all active constraints
+        for (Map.Entry<Integer, RopeConstraintData> entry : activeConstraints.entrySet()) {
+            RopeConstraintData data = entry.getValue();
+            NetworkHandler.sendConstraintAddToPlayer(
+                    player,
+                    entry.getKey(),
+                    data.shipA,
+                    data.shipB,
+                    data.localPosA,
+                    data.localPosB,
+                    data.maxLength
+            );
+        }
+    }
+
 
 
     public static void mapConstraintToPersistenceId(Integer constraintId, String persistenceId) {
@@ -179,74 +233,42 @@ public class ConstraintTracker {
         return new HashMap<>(activeConstraints);
     }
 
-    public static void clearAllConstraints() {
-        activeConstraints.clear();
-        NetworkHandler.sendConstraintClearAll();
-    //    System.out.println("Cleared all constraints and synced to clients");
-    }
+
     public static void addConstraintToTracker(Integer constraintId, Long shipA, Long shipB,
                                               Vector3d localPosA, Vector3d localPosB, double maxLength,
-                                              double compliance, double maxForce) {
+                                              double compliance, double maxForce,
+                                              RopeConstraintData.ConstraintType constraintType,
+                                              net.minecraft.core.BlockPos sourceBlockPos) {
         // Check if constraint already exists
         if (activeConstraints.containsKey(constraintId)) {
-      //      System.out.println("Constraint " + constraintId + " already exists in tracker, skipping");
+            System.out.println("Constraint " + constraintId + " already exists in tracker, skipping");
             return;
         }
 
-        RopeConstraintData data = new RopeConstraintData(shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce);
+        RopeConstraintData data = new RopeConstraintData(shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, constraintType, sourceBlockPos);
         activeConstraints.put(constraintId, data);
 
-        // DON'T create a persistence mapping here - it should be done separately via mapConstraintToPersistenceId
-        // The persistence ID should come from the restoration process, not be generated here
-
         NetworkHandler.sendConstraintAdd(constraintId, shipA, shipB, localPosA, localPosB, maxLength);
-  //      System.out.println("Added constraint " + constraintId + " to tracker (restoration) and synced to clients");
+        //System.out.println("Added " + constraintType + " constraint " + constraintId + " to tracker (restoration) with source block " + sourceBlockPos);
     }
 
-    public static void clearAllConstraintsAndMappings() {
-        activeConstraints.clear();
-        constraintToPersistenceId.clear(); // Clear the mappings too
-        NetworkHandler.sendConstraintClearAll();
-       // System.out.println("Cleared all constraints, mappings, and synced to clients");
+    // Keep the old method for backward compatibility
+    public static void addConstraintToTracker(Integer constraintId, Long shipA, Long shipB,
+                                              Vector3d localPosA, Vector3d localPosB, double maxLength,
+                                              double compliance, double maxForce) {
+        addConstraintToTracker(constraintId, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce,
+                RopeConstraintData.ConstraintType.GENERIC, null);
     }
 
-    // Add a method to get the persistence ID for debugging
-    public static String getPersistenceId(Integer constraintId) {
-        return constraintToPersistenceId.get(constraintId);
-    }
 
-    // Add a method to check if a constraint has a valid persistence mapping
-    public static boolean hasValidPersistenceMapping(Integer constraintId) {
-        return constraintToPersistenceId.containsKey(constraintId);
-    }
-    private static void validateSingleConstraint(ServerLevel level, Integer constraintId) {
-        RopeConstraintData data = activeConstraints.get(constraintId);
-        if (data == null) return;
 
-        try {
-            Long groundBodyId = VSGameUtilsKt.getShipObjectWorld(level)
-                    .getDimensionToGroundBodyIdImmutable()
-                    .get(VSGameUtilsKt.getDimensionId(level));
 
-            boolean shipAExists = isShipValid(level, data.shipA, groundBodyId);
-            boolean shipBExists = isShipValid(level, data.shipB, groundBodyId);
 
-            if (!shipAExists || !shipBExists) {
-                System.out.println("Delayed validation: Constraint " + constraintId + " still references missing ships - removing");
-                VSGameUtilsKt.getShipObjectWorld(level).removeConstraint(constraintId);
-                removeConstraintWithPersistence(level, constraintId);
-            } else {
-                System.out.println("Delayed validation: Constraint " + constraintId + " is now valid");
-            }
-        } catch (Exception e) {
-            System.err.println("Error in delayed validation for constraint " + constraintId + ": " + e.getMessage());
-        }
-    }
     private static boolean isShipValid(ServerLevel level, Long shipId, Long groundBodyId) {
         if (shipId == null) return false;
 
         if (shipId.equals(groundBodyId)) {
-            return true; // Ground is always valid
+            return true;
         }
 
         try {
@@ -255,10 +277,10 @@ public class ConstraintTracker {
             boolean exists = ship != null;
 
             if (!exists) {
-                System.out.println("Ship " + shipId + " not found in ship world");
+              //  System.out.println("Ship " + shipId + " not found in ship world");
                 // Try alternative lookup methods
                 var allShips = shipWorld.getAllShips();
-                System.out.println("Available ships: " + allShips.stream().map(s -> s.getId()).toList());
+                //System.out.println("Available ships: " + allShips.stream().map(s -> s.getId()).toList());
             }
 
             return exists;
@@ -268,34 +290,14 @@ public class ConstraintTracker {
         }
     }
 
-    // Add delayed validation mechanism
     private static final Map<Integer, Long> delayedValidations = new ConcurrentHashMap<>();
 
     private static void scheduleDelayedValidation(ServerLevel level, Integer constraintId, long delayMs) {
         delayedValidations.put(constraintId, System.currentTimeMillis() + delayMs);
-        System.out.println("Scheduled delayed validation for constraint " + constraintId + " in " + (delayMs/1000) + " seconds");
+      //  System.out.println("Scheduled delayed validation for constraint " + constraintId + " in " + (delayMs/1000) + " seconds");
     }
 
-    // Call this method periodically (e.g., from a tick event)
-    public static void processDelayedValidations(ServerLevel level) {
-        long currentTime = System.currentTimeMillis();
-        java.util.List<Integer> toValidate = new java.util.ArrayList<>();
 
-        delayedValidations.entrySet().removeIf(entry -> {
-            if (currentTime >= entry.getValue()) {
-                toValidate.add(entry.getKey());
-                return true;
-            }
-            return false;
-        });
-
-        for (Integer constraintId : toValidate) {
-            if (activeConstraints.containsKey(constraintId)) {
-                System.out.println("Processing delayed validation for constraint " + constraintId);
-                validateSingleConstraint(level, constraintId);
-            }
-        }
-    }
 
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
@@ -307,81 +309,113 @@ public class ConstraintTracker {
                 NetworkHandler.sendConstraintAddToPlayer(player, constraintId, data.shipA, data.shipB,
                         data.localPosA, data.localPosB, data.maxLength);
             }
-            System.out.println("Synced " + activeConstraints.size() + " constraints to player " + player.getName().getString());
+           // System.out.println("Synced " + activeConstraints.size() + " constraints to player " + player.getName().getString());
         }
     }
-
     public static void validateAndCleanupConstraints(ServerLevel level) {
-        System.out.println("=== CONSTRAINT VALIDATION START ===");
-        System.out.println("Validating " + activeConstraints.size() + " active constraints...");
-
+      //  System.out.println("=== CONSTRAINT VALIDATION START ===");
+      //  System.out.println("Validating " + activeConstraints.size() + " active constraints...");
         java.util.List<Integer> constraintsToRemove = new java.util.ArrayList<>();
+
         Long groundBodyId = null;
         try {
             groundBodyId = VSGameUtilsKt.getShipObjectWorld(level)
                     .getDimensionToGroundBodyIdImmutable()
                     .get(VSGameUtilsKt.getDimensionId(level));
-            System.out.println("Ground body ID: " + groundBodyId);
+         //   System.out.println("Ground body ID: " + groundBodyId);
         } catch (Exception e) {
-            System.err.println("Failed to get ground body ID, skipping validation: " + e.getMessage());
+           // System.err.println("Failed to get ground body ID, skipping validation: " + e.getMessage());
             return;
         }
 
         if (groundBodyId == null) {
-            System.err.println("Ground body ID is null, skipping validation");
+           // System.err.println("Ground body ID is null, skipping validation");
             return;
+        }
+
+        // Process delayed validations first
+        long currentTime = System.currentTimeMillis();
+        java.util.List<Integer> delayedToProcess = new java.util.ArrayList<>();
+        for (Map.Entry<Integer, Long> entry : delayedValidations.entrySet()) {
+            if (currentTime >= entry.getValue()) {
+                delayedToProcess.add(entry.getKey());
+            }
+        }
+
+        for (Integer constraintId : delayedToProcess) {
+            delayedValidations.remove(constraintId);
+            if (activeConstraints.containsKey(constraintId)) {
+             //   System.out.println("Processing delayed validation for constraint " + constraintId);
+                RopeConstraintData data = activeConstraints.get(constraintId);
+                boolean shipAExists = isShipValid(level, data.shipA, groundBodyId);
+                boolean shipBExists = isShipValid(level, data.shipB, groundBodyId);
+
+                if (!shipAExists || !shipBExists) {
+                //    System.out.println("Delayed validation failed - removing constraint " + constraintId);
+                    constraintsToRemove.add(constraintId);
+                }
+            }
         }
 
         for (Map.Entry<Integer, RopeConstraintData> entry : activeConstraints.entrySet()) {
             Integer constraintId = entry.getKey();
             RopeConstraintData data = entry.getValue();
-            System.out.println("--- Validating constraint " + constraintId + " (Type: " + data.constraintType + ") ---");
+
+            // Skip if already scheduled for delayed validation
+            if (delayedValidations.containsKey(constraintId)) {
+                continue;
+            }
 
             try {
-                // Check ship existence first
                 boolean shipAExists = isShipValid(level, data.shipA, groundBodyId);
                 boolean shipBExists = isShipValid(level, data.shipB, groundBodyId);
-                System.out.println("Ship existence - A: " + shipAExists + ", B: " + shipBExists);
 
                 if (!shipAExists || !shipBExists) {
-                    System.out.println("Constraint " + constraintId + " references missing ships");
+                //    System.out.println("Constraint " + constraintId + " references missing ships - scheduling delayed validation");
                     scheduleDelayedValidation(level, constraintId, 5000);
                     continue;
                 }
 
-                // Different validation logic based on constraint type
-                boolean isValid = false;
+                // For rope pulleys, validate the source block instead of attachment points
                 if (data.constraintType == RopeConstraintData.ConstraintType.ROPE_PULLEY) {
-                    // For rope pulleys, validate the source pulley block exists
-                    isValid = validateRopePulleyConstraint(level, data);
-                    System.out.println("Rope pulley constraint validation: " + isValid);
+                    if (data.sourceBlockPos != null) {
+                        if (!level.isLoaded(data.sourceBlockPos)) {
+                            System.out.println("Rope pulley constraint " + constraintId + " source block chunk not loaded - skipping validation");
+                            continue;
+                        }
 
-                    // Give rope pulleys more chances before removing
-                    if (!isValid) {
-                        System.out.println("Rope pulley constraint " + constraintId + " failed validation - scheduling delayed recheck");
-                        scheduleDelayedValidation(level, constraintId, 10000);
-                        continue; // Don't mark for immediate removal
+                        net.minecraft.world.level.block.state.BlockState sourceState = level.getBlockState(data.sourceBlockPos);
+                        // Check if it's still a rope pulley block (you'll need to replace this with your actual pulley block check)
+                        if (sourceState.isAir() || !isRopePulleyBlock(sourceState)) {
+                        //    System.out.println("Rope pulley constraint " + constraintId + " source block is no longer valid - marking for removal");
+                            constraintsToRemove.add(constraintId);
+                        }
+                    } else {
+                    //    System.out.println("Rope pulley constraint " + constraintId + " has no source block position - marking for removal");
+                        constraintsToRemove.add(constraintId);
                     }
-                } else {
-                    // For generic constraints, use the old validation logic
-                    boolean validA = isValidAttachmentPoint(level, data.localPosA, data.shipA, groundBodyId);
-                    boolean validB = isValidAttachmentPoint(level, data.localPosB, data.shipB, groundBodyId);
-                    isValid = validA && validB;
-                    System.out.println("Generic constraint validation - A: " + validA + ", B: " + validB);
+                    continue;
                 }
+
+                // For generic constraints, check if chunks are loaded before validating attachment points
+                if (!areAttachmentChunksLoaded(level, data, groundBodyId)) {
+               //     System.out.println("Constraint " + constraintId + " has attachment points in unloaded chunks - skipping validation");
+                    continue;
+                }
+
+                boolean validA = isValidAttachmentPoint(level, data.localPosA, data.shipA, groundBodyId);
+                boolean validB = isValidAttachmentPoint(level, data.localPosB, data.shipB, groundBodyId);
+                boolean isValid = validA && validB;
 
                 if (!isValid) {
-                    System.out.println("Constraint " + constraintId + " is invalid - marking for removal");
+                //    System.out.println("Generic constraint " + constraintId + " is invalid - marking for removal");
                     constraintsToRemove.add(constraintId);
-                } else {
-                    System.out.println("Constraint " + constraintId + " is valid");
                 }
             } catch (Exception e) {
-                System.err.println("Error validating constraint " + constraintId + ": " + e.getMessage());
-                // For rope pulleys, be more lenient with errors
+             //   System.err.println("Error validating constraint " + constraintId + ": " + e.getMessage());
                 if (data.constraintType == RopeConstraintData.ConstraintType.ROPE_PULLEY) {
-                    System.out.println("Rope pulley constraint error - scheduling delayed validation instead of removal");
-                    scheduleDelayedValidation(level, constraintId, 15000);
+                    // For rope pulleys, schedule delayed validation instead of immediate removal
+                    scheduleDelayedValidation(level, constraintId, 5000);
                 } else {
                     scheduleDelayedValidation(level, constraintId, 5000);
                 }
@@ -392,62 +426,73 @@ public class ConstraintTracker {
             try {
                 VSGameUtilsKt.getShipObjectWorld(level).removeConstraint(constraintId);
                 removeConstraintWithPersistence(level, constraintId);
-                System.out.println("Cleaned up invalid constraint: " + constraintId);
             } catch (Exception e) {
-                System.err.println("Error removing invalid constraint " + constraintId + ": " + e.getMessage());
+        //        System.err.println("Error removing invalid constraint " + constraintId + ": " + e.getMessage());
             }
         }
 
-        System.out.println("=== CONSTRAINT VALIDATION END ===");
-        System.out.println("Constraint validation complete. Removed " + constraintsToRemove.size() + " invalid constraints.");
+       // System.out.println("=== CONSTRAINT VALIDATION END ===");
+      //  System.out.println("Constraint validation complete. Removed " + constraintsToRemove.size() + " invalid constraints.");
+    }
+
+    // Add this method to the ConstraintTracker class
+    public static void cleanupOrphanedConstraints(ServerLevel level, net.minecraft.core.BlockPos sourceBlockPos) {
+       // System.out.println("Cleaning up orphaned constraints for block at " + sourceBlockPos);
+
+        java.util.List<Integer> constraintsToRemove = new java.util.ArrayList<>();
+
+        for (Map.Entry<Integer, RopeConstraintData> entry : activeConstraints.entrySet()) {
+            Integer constraintId = entry.getKey();
+            RopeConstraintData data = entry.getValue();
+
+            // Check if this constraint is associated with the given block position
+            if (data.constraintType == RopeConstraintData.ConstraintType.ROPE_PULLEY &&
+                    data.sourceBlockPos != null &&
+                    data.sourceBlockPos.equals(sourceBlockPos)) {
+
+             //   System.out.println("Found orphaned constraint " + constraintId + " for block " + sourceBlockPos);
+                constraintsToRemove.add(constraintId);
+            }
+        }
+
+        // Remove the orphaned constraints
+        for (Integer constraintId : constraintsToRemove) {
+            try {
+                VSGameUtilsKt.getShipObjectWorld(level).removeConstraint(constraintId);
+                removeConstraintWithPersistence(level, constraintId);
+             //   System.out.println("Cleaned up orphaned constraint " + constraintId);
+            } catch (Exception e) {
+             //   System.err.println("Error cleaning up orphaned constraint " + constraintId + ": " + e.getMessage());
+            }
+        }
     }
 
 
-    private static boolean validateRopePulleyConstraint(ServerLevel level, RopeConstraintData data) {
+    private static boolean areAttachmentChunksLoaded(ServerLevel level, RopeConstraintData data, Long groundBodyId) {
         try {
-            if (data.sourceBlockPos != null) {
-                if (!level.isLoaded(data.sourceBlockPos)) {
-                    System.out.println("Rope pulley block at " + data.sourceBlockPos + " is not loaded - keeping constraint");
-                    return true;
-                }
+            // Check chunk loading for attachment point A
+            Vector3d worldPosA = data.getWorldPosA(level, 0.0f);
+            net.minecraft.core.BlockPos blockPosA = new net.minecraft.core.BlockPos(
+                    (int) Math.floor(worldPosA.x),
+                    (int) Math.floor(worldPosA.y),
+                    (int) Math.floor(worldPosA.z)
+            );
 
-                var blockEntity = level.getBlockEntity(data.sourceBlockPos);
-                if (blockEntity instanceof RopePulleyBlockEntity) {
-                    RopePulleyBlockEntity pulley = (RopePulleyBlockEntity) blockEntity;
-                    System.out.println("Found valid rope pulley block entity at " + data.sourceBlockPos);
-                    return true;
-                }
+            // Check chunk loading for attachment point B
+            Vector3d worldPosB = data.getWorldPosB(level, 0.0f);
+            net.minecraft.core.BlockPos blockPosB = new net.minecraft.core.BlockPos(
+                    (int) Math.floor(worldPosB.x),
+                    (int) Math.floor(worldPosB.y),
+                    (int) Math.floor(worldPosB.z)
+            );
 
-                net.minecraft.world.level.block.state.BlockState state = level.getBlockState(data.sourceBlockPos);
-                if (state.isAir()) {
-                    System.out.println("Block at " + data.sourceBlockPos + " is air - rope pulley was removed");
-                    return false;
-                }
+            boolean chunkALoaded = level.isLoaded(blockPosA);
+            boolean chunkBLoaded = level.isLoaded(blockPosB);
 
-                String blockClassName = state.getBlock().getClass().getSimpleName();
-                String blockRegistryName = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(state.getBlock()).toString();
-
-                if (blockClassName.toLowerCase().contains("rope") && blockClassName.toLowerCase().contains("pulley")) {
-                    System.out.println("Found rope pulley block by class name: " + blockClassName);
-                    return true;
-                }
-
-                if (blockRegistryName.contains("rope_pulley")) {
-                    System.out.println("Found rope pulley block by registry name: " + blockRegistryName);
-                    return true;
-                }
-
-                System.out.println("Block at " + data.sourceBlockPos + " is not a rope pulley: " + blockClassName + " (" + blockRegistryName + ")");
-                return false;
-
-            } else {
-                System.out.println("No source block position stored for rope pulley constraint - assuming valid (legacy)");
-                return true;
-            }
+            return chunkALoaded && chunkBLoaded;
         } catch (Exception e) {
-            System.err.println("Error validating rope pulley constraint: " + e.getMessage());
-            e.printStackTrace();
-            return true;
+            System.err.println("Error checking chunk loading status: " + e.getMessage());
+            return false; // Assume not loaded if we can't check
         }
     }
 
@@ -462,32 +507,26 @@ public class ConstraintTracker {
                         (int) Math.floor(localPos.z)
                 );
 
+                // Critical fix: Don't validate if chunk isn't loaded
                 if (!level.isLoaded(blockPos)) {
-               //     System.out.println("World block at " + blockPos + " is not loaded");
-                    return false;
+                    System.out.println("World block at " + blockPos + " is not loaded - skipping validation");
+                    return true; // Assume valid if chunk not loaded, don't remove constraint
                 }
+
                 net.minecraft.world.level.block.state.BlockState state = level.getBlockState(blockPos);
                 boolean valid = !state.isAir();
-              //  System.out.println("World validation - localPos: " + localPos + " -> blockPos: " + blockPos + " -> " + (valid ? "valid" : "air"));
                 return valid;
             } else {
-                boolean looksLikeWorldCoords = Math.abs(localPos.x) > 1000000 || Math.abs(localPos.z) > 1000000;
-
                 org.valkyrienskies.core.api.ships.Ship ship = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
                 if (ship == null) {
-                   // System.out.println("Ship " + shipId + " no longer exists");
                     return false;
                 }
+
+                boolean looksLikeWorldCoords = Math.abs(localPos.x) > 1000000 || Math.abs(localPos.z) > 1000000;
 
                 if (looksLikeWorldCoords) {
                     Vector3d actualShipLocal = new Vector3d();
                     ship.getTransform().getWorldToShip().transformPosition(localPos, actualShipLocal);
-
-                    net.minecraft.core.BlockPos shipLocalBlockPos = new net.minecraft.core.BlockPos(
-                            (int) Math.floor(actualShipLocal.x),
-                            (int) Math.floor(actualShipLocal.y),
-                            (int) Math.floor(actualShipLocal.z)
-                    );
 
                     Vector3d worldPos = new Vector3d();
                     ship.getTransform().getShipToWorld().transformPosition(actualShipLocal, worldPos);
@@ -497,21 +536,16 @@ public class ConstraintTracker {
                             (int) Math.floor(worldPos.z)
                     );
 
+                    // Critical fix: Don't validate if chunk isn't loaded
                     if (!level.isLoaded(worldBlockPos)) {
-                        return false;
+                        System.out.println("Ship block world position " + worldBlockPos + " is not loaded - skipping validation");
+                        return true; // Assume valid if chunk not loaded, don't remove constraint
                     }
 
                     net.minecraft.world.level.block.state.BlockState state = level.getBlockState(worldBlockPos);
                     boolean valid = !state.isAir();
-               //     System.out.println("Ship validation (corrected) - worldPos: " + localPos + " -> shipLocal: " + actualShipLocal + " -> worldBlock: " + worldBlockPos + " -> " + (valid ? "valid" : "air"));
                     return valid;
                 } else {
-                    net.minecraft.core.BlockPos shipLocalBlockPos = new net.minecraft.core.BlockPos(
-                            (int) Math.floor(localPos.x),
-                            (int) Math.floor(localPos.y),
-                            (int) Math.floor(localPos.z)
-                    );
-
                     Vector3d worldPos = new Vector3d();
                     ship.getTransform().getShipToWorld().transformPosition(localPos, worldPos);
                     net.minecraft.core.BlockPos worldBlockPos = new net.minecraft.core.BlockPos(
@@ -520,23 +554,24 @@ public class ConstraintTracker {
                             (int) Math.floor(worldPos.z)
                     );
 
+                    // Critical fix: Don't validate if chunk isn't loaded
                     if (!level.isLoaded(worldBlockPos)) {
-                      //  System.out.println("Ship block world position " + worldBlockPos + " is not loaded");
-                        return false;
+                    //    System.out.println("Ship block world position " + worldBlockPos + " is not loaded - skipping validation");
+                        return true; // Assume valid if chunk not loaded, don't remove constraint
                     }
 
                     net.minecraft.world.level.block.state.BlockState state = level.getBlockState(worldBlockPos);
                     boolean valid = !state.isAir();
-                //    System.out.println("Ship validation - shipLocal: " + localPos + " -> worldBlock: " + worldBlockPos + " -> " + (valid ? "valid" : "air"));
                     return valid;
                 }
             }
         } catch (Exception e) {
-          //  System.err.println("Error checking attachment point validity for shipId " + shipId + ", localPos " + localPos + ": " + e.getMessage());
-            e.printStackTrace();
-            return false;
+            //System.err.println("Error checking attachment point validity for shipId " + shipId + ", localPos " + localPos + ": " + e.getMessage());
+            return true; // Assume valid on error to prevent accidental removal
         }
     }
+
+
 
 
 

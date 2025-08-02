@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.ropes;
+package yay.evy.everest.vstuff.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
@@ -13,7 +13,6 @@ import java.util.Map;
 
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientConstraintTracker {
-
     private static final Map<Integer, ClientRopeData> clientConstraints = new HashMap<>();
 
     public static class ClientRopeData {
@@ -42,7 +41,14 @@ public class ClientConstraintTracker {
                     Ship shipObject = VSGameUtilsKt.getShipObjectWorld(mc.level).getAllShips().getById(shipA);
                     if (shipObject != null) {
                         Vector3d worldPos = new Vector3d();
-                        shipObject.getTransform().getShipToWorld().transformPosition(localPosA, worldPos);
+
+
+                        try {
+                            ((org.valkyrienskies.core.api.ships.ClientShip) shipObject).getRenderTransform().getShipToWorld().transformPosition(localPosA, worldPos);
+                        } catch (Exception e) {
+                            shipObject.getTransform().getShipToWorld().transformPosition(localPosA, worldPos);
+                        }
+
                         return worldPos;
                     }
                 }
@@ -63,6 +69,56 @@ public class ClientConstraintTracker {
                     Ship shipObject = VSGameUtilsKt.getShipObjectWorld(mc.level).getAllShips().getById(shipB);
                     if (shipObject != null) {
                         Vector3d worldPos = new Vector3d();
+
+                        try {
+                            ((org.valkyrienskies.core.api.ships.ClientShip) shipObject).getRenderTransform().getShipToWorld().transformPosition(localPosB, worldPos);
+                        } catch (Exception e) {
+                            shipObject.getTransform().getShipToWorld().transformPosition(localPosB, worldPos);
+                        }
+
+                        return worldPos;
+                    }
+                }
+                return new Vector3d(localPosB);
+            } catch (Exception e) {
+                return new Vector3d(localPosB);
+            }
+        }
+
+        public Vector3d getRawWorldPosA(Level level) {
+            try {
+                Minecraft mc = Minecraft.getInstance();
+                if (mc.level == null) return new Vector3d(localPosA);
+
+                if (shipA == null || shipA == 0L) {
+                    return new Vector3d(localPosA);
+                } else {
+                    Ship shipObject = VSGameUtilsKt.getShipObjectWorld(mc.level).getAllShips().getById(shipA);
+                    if (shipObject != null) {
+                        Vector3d worldPos = new Vector3d();
+                        // Use the current (non-interpolated) transform for cache updates
+                        shipObject.getTransform().getShipToWorld().transformPosition(localPosA, worldPos);
+                        return worldPos;
+                    }
+                }
+                return new Vector3d(localPosA);
+            } catch (Exception e) {
+                return new Vector3d(localPosA);
+            }
+        }
+
+        public Vector3d getRawWorldPosB(Level level) {
+            try {
+                Minecraft mc = Minecraft.getInstance();
+                if (mc.level == null) return new Vector3d(localPosB);
+
+                if (shipB == null || shipB == 0L) {
+                    return new Vector3d(localPosB);
+                } else {
+                    Ship shipObject = VSGameUtilsKt.getShipObjectWorld(mc.level).getAllShips().getById(shipB);
+                    if (shipObject != null) {
+                        Vector3d worldPos = new Vector3d();
+                        // Use the current (non-interpolated) transform for cache updates
                         shipObject.getTransform().getShipToWorld().transformPosition(localPosB, worldPos);
                         return worldPos;
                     }
@@ -74,15 +130,13 @@ public class ClientConstraintTracker {
         }
     }
 
-        public static void addClientConstraint(Integer constraintId, Long shipA, Long shipB,
+    public static void addClientConstraint(Integer constraintId, Long shipA, Long shipB,
                                            Vector3d localPosA, Vector3d localPosB, double maxLength) {
         clientConstraints.put(constraintId, new ClientRopeData(shipA, shipB, localPosA, localPosB, maxLength));
-     //   System.out.println("Added client constraint: " + constraintId);
     }
 
     public static void removeClientConstraint(Integer constraintId) {
         clientConstraints.remove(constraintId);
-   //     System.out.println("Removed client constraint: " + constraintId);
     }
 
     public static Map<Integer, ClientRopeData> getClientConstraints() {
@@ -91,7 +145,5 @@ public class ClientConstraintTracker {
 
     public static void clearAllClientConstraints() {
         clientConstraints.clear();
-      //  System.out.println("Cleared all client constraints");
     }
 }
-

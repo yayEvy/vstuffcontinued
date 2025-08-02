@@ -7,7 +7,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
-import yay.evy.everest.vstuff.block.ModBlocks;
+import yay.evy.everest.vstuff.blocks.ModBlocks;
 import yay.evy.everest.vstuff.vstuff;
 
 public class ModCreativeModTabs {
@@ -16,12 +16,10 @@ public class ModCreativeModTabs {
 
     public static final RegistryObject<CreativeModeTab> VSTUFF_TAB = CREATIVE_MODE_TABS.register("vstuff_tab",
             () -> CreativeModeTab.builder()
-                    .icon(() -> new ItemStack(ModBlocks.REDSTONE_MAGNET.get()))
+                    .icon(() -> new ItemStack(ModItems.LEAD_CONSTRAINT_ITEM.get()))
                     .title(Component.translatable("creativetab.vstuff_tab"))
                     .displayItems((pParameters, pOutput) -> {
                         // Blocks
-                        pOutput.accept(ModBlocks.REDSTONE_MAGNET.get());
-                        pOutput.accept(ModBlocks.ROPE_PULLEY.get());
 
 
 
