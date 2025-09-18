@@ -3,6 +3,8 @@ package yay.evy.everest.vstuff.ropes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -11,10 +13,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.network.PacketDistributor;
 import org.joml.Vector3d;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.item.ModItems;
+import yay.evy.everest.vstuff.network.RopeSoundPacket;
+import yay.evy.everest.vstuff.sound.ModSounds;
+import yay.evy.everest.vstuff.sound.RopeSoundHandler;
 
 import java.util.List;
 import java.util.Map;
@@ -24,36 +30,52 @@ public class LeadBreakItem extends Item {
         super(new Properties().stacksTo(1).durability(64));
     }
 
+    @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
         if (level instanceof ServerLevel serverLevel) {
             Integer targetConstraintId = findTargetedLead(serverLevel, player);
             if (targetConstraintId != null) {
                 try {
-                    // Log the constraint ID being removed
                     System.out.println("Attempting to remove constraint: " + targetConstraintId);
 
-                    // Remove from physics world
                     VSGameUtilsKt.getShipObjectWorld(serverLevel).removeConstraint(targetConstraintId);
-
-                    // Get constraint data before removal
                     ConstraintTracker.RopeConstraintData data = ConstraintTracker.getActiveConstraints().get(targetConstraintId);
-
-                    // Remove from tracking and persistence
                     ConstraintTracker.removeConstraintWithPersistence(serverLevel, targetConstraintId);
-
-                    // Log the removal
-                    System.out.println("Removed constraint: " + targetConstraintId);
-
-                    // Notify clients
                     NetworkHandler.sendConstraintRemove(targetConstraintId);
+                    forceRemoveConstraint(serverLevel, targetConstraintId);
+                    if (RopeSoundHandler.isEnabled()) {
+                        serverLevel.playSound(
+                                null,
+                                player.blockPosition(),
+                                SoundEvents.LEASH_KNOT_BREAK,
+                                SoundSource.PLAYERS,
+                                1.0F,
+                                1.0F
+                        );
+                    }
 
-                    // Additional cleanup if necessary
+
+
+
                     if (data != null && data.sourceBlockPos != null) {
                         ConstraintTracker.cleanupOrphanedConstraints(serverLevel, data.sourceBlockPos);
                     }
 
-                    // Handle item durability and dropping
+                    System.out.println("Removed constraint (1st attempt): " + targetConstraintId);
+
+                    if (ConstraintTracker.getActiveConstraints().containsKey(targetConstraintId)) {
+                        System.out.println("Constraint " + targetConstraintId + " still present, retrying...");
+
+                        VSGameUtilsKt.getShipObjectWorld(serverLevel).removeConstraint(targetConstraintId);
+                        ConstraintTracker.removeConstraintWithPersistence(serverLevel, targetConstraintId);
+                        NetworkHandler.sendConstraintRemove(targetConstraintId);
+                        forceRemoveConstraint(serverLevel, targetConstraintId);
+
+
+                        System.out.println("Removed constraint (2nd attempt): " + targetConstraintId);
+                    }
+
                     player.drop(new ItemStack(ModItems.LEAD_CONSTRAINT_ITEM.get()), false);
                     if (!player.getAbilities().instabuild) {
                         itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
@@ -69,8 +91,27 @@ public class LeadBreakItem extends Item {
         return InteractionResultHolder.pass(itemStack);
     }
 
+    private void forceRemoveConstraint(ServerLevel level, int id) {
+        ConstraintTracker.RopeConstraintData data = ConstraintTracker.getActiveConstraints().get(id);
 
+        try {
+            VSGameUtilsKt.getShipObjectWorld(level).removeConstraint(id);
+        } catch (Exception ignored) {}
 
+        ConstraintTracker.removeConstraintWithPersistence(level, id);
+        ConstraintTracker.getActiveConstraints().remove(id);
+        NetworkHandler.sendConstraintRemove(id);
+
+        if (data != null) {
+            if (data.anchorBlockPosA != null) {
+                ConstraintTracker.cleanupOrphanedConstraints(level, data.anchorBlockPosA);
+            }
+            if (data.anchorBlockPosB != null) {
+                ConstraintTracker.cleanupOrphanedConstraints(level, data.anchorBlockPosB);
+            }
+        }
+
+    }
 
 
     private Integer findTargetedLead(ServerLevel level, Player player) {

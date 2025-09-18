@@ -1,5 +1,6 @@
 package yay.evy.everest.vstuff.ropes;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -88,9 +89,8 @@ public class ConstraintPersistence extends SavedData {
     public static ConstraintPersistence load(CompoundTag tag) {
         ConstraintPersistence data = new ConstraintPersistence();
         ListTag constraintsList = tag.getList("constraints", Tag.TAG_COMPOUND);
-        ListTag removedList = tag.getList("removedConstraints", Tag.TAG_STRING); // ✅ now matches save()
+        ListTag removedList = tag.getList("removedConstraints", Tag.TAG_STRING);
 
-        // Load removed constraints first
         for (int i = 0; i < removedList.size(); i++) {
             data.removedConstraints.add(removedList.getString(i));
         }
@@ -99,7 +99,6 @@ public class ConstraintPersistence extends SavedData {
             CompoundTag constraintTag = constraintsList.getCompound(i);
             String id = constraintTag.getString("id");
 
-            // Skip loading removed constraints entirely
             if (data.removedConstraints.contains(id)) {
                 System.out.println("Skipping removed constraint during load: " + id);
                 continue;
@@ -128,7 +127,6 @@ public class ConstraintPersistence extends SavedData {
             double compliance = constraintTag.getDouble("compliance");
             double maxForce = constraintTag.getDouble("maxForce");
 
-            // Load constraint type (default to GENERIC for backward compatibility)
             ConstraintTracker.RopeConstraintData.ConstraintType constraintType =
                     ConstraintTracker.RopeConstraintData.ConstraintType.GENERIC;
             if (constraintTag.contains("constraintType")) {
@@ -140,7 +138,6 @@ public class ConstraintPersistence extends SavedData {
                 }
             }
 
-            // Load source block position if present
             net.minecraft.core.BlockPos sourceBlockPos = null;
             if (constraintTag.contains("sourceBlockPos_x")) {
                 sourceBlockPos = new net.minecraft.core.BlockPos(
@@ -180,7 +177,6 @@ public class ConstraintPersistence extends SavedData {
         for (Map.Entry<String, PersistedConstraintData> entry : persistedConstraints.entrySet()) {
             String constraintId = entry.getKey();
 
-            // Double-check: don't save constraints that are marked as removed
             if (removedConstraints.contains(constraintId)) {
                 System.out.println("Skipping removed constraint during save: " + constraintId);
                 continue;
@@ -206,10 +202,8 @@ public class ConstraintPersistence extends SavedData {
             constraintTag.putDouble("compliance", data.compliance);
             constraintTag.putDouble("maxForce", data.maxForce);
 
-            // Save constraint type
             constraintTag.putString("constraintType", data.constraintType.name());
 
-            // Save source block position if present
             if (data.sourceBlockPos != null) {
                 constraintTag.putInt("sourceBlockPos_x", data.sourceBlockPos.getX());
                 constraintTag.putInt("sourceBlockPos_y", data.sourceBlockPos.getY());
@@ -284,27 +278,23 @@ public class ConstraintPersistence extends SavedData {
             String persistenceId = entry.getKey();
             PersistedConstraintData data = entry.getValue();
 
-            // Skip removed constraints
             if (removedConstraints.contains(persistenceId)) {
                 skipCount++;
                 continue;
             }
 
-            // Skip already restored constraints
             if (restoredConstraints.contains(persistenceId)) {
                 skipCount++;
                 continue;
             }
 
-            // Check if constraint is in loaded chunks
             if (!isConstraintInLoadedChunks(level, data, currentGroundBodyId)) {
                 System.out.println("Constraint " + persistenceId + " is not in loaded chunks, will restore when chunks load");
                 skipCount++;
                 continue;
             }
 
-            // Rest of the restoration logic remains the same...
-            // [Keep the existing restoration code from the original method]
+
         }
 
         System.out.println("Initial constraint restoration complete: " + successCount + " success, " +
@@ -313,13 +303,11 @@ public class ConstraintPersistence extends SavedData {
 
     private boolean isConstraintInLoadedChunks(ServerLevel level, PersistedConstraintData data, Long groundBodyId) {
         try {
-            // For rope pulleys, check if source block chunk is loaded
             if (data.constraintType == ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY
                     && data.sourceBlockPos != null) {
                 return level.isLoaded(data.sourceBlockPos);
             }
 
-            // For generic constraints, check if either attachment point chunk is loaded
             boolean pointALoaded = isPositionChunkLoaded(level, data.localPosA, data.shipA, data.shipAIsGround, groundBodyId);
             boolean pointBLoaded = isPositionChunkLoaded(level, data.localPosB, data.shipB, data.shipBIsGround, groundBodyId);
 
@@ -357,6 +345,18 @@ public class ConstraintPersistence extends SavedData {
             return false;
         }
     }
+
+
+    public static Integer getConstraintIdForBlock(ServerLevel level, BlockPos blockPos) {
+        for (Map.Entry<Integer, ConstraintTracker.RopeConstraintData> entry : ConstraintTracker.getActiveConstraints().entrySet()) {
+            ConstraintTracker.RopeConstraintData data = entry.getValue();
+            if (data.sourceBlockPos != null && data.sourceBlockPos.equals(blockPos)) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
 
 
     public static void restoreConstraints(ServerLevel level) {
@@ -424,71 +424,7 @@ public class ConstraintPersistence extends SavedData {
 
 
 
-    private Long resolveShipId(ServerLevel level, PersistedConstraintData data, boolean isShipA, Long currentGroundBodyId) {
-        boolean isGround = isShipA ? data.shipAIsGround : data.shipBIsGround;
-        Long originalShipId = isShipA ? data.shipA : data.shipB;
 
-        if (isGround) {
-            return currentGroundBodyId;
-        }
-
-        if (originalShipId == null) {
-            return null;
-        }
-
-        // First try the original ship ID
-        if (VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(originalShipId) != null) {
-            return originalShipId;
-        }
-
-        // If original ship ID doesn't work, try to find ship by position
-        // This is a fallback for when ship IDs change between sessions
-        Vector3d searchPos = isShipA ? data.localPosA : data.localPosB;
-
-        // For rope pulleys, we can use the source block position to find the right ship
-        if (data.constraintType == ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY && data.sourceBlockPos != null) {
-            try {
-                // Check if the source block is on a ship
-                org.valkyrienskies.core.api.ships.Ship shipAtBlock = VSGameUtilsKt.getShipManagingPos(level, data.sourceBlockPos);
-                if (shipAtBlock != null) {
-                    Long shipId = shipAtBlock.getId();
-                    System.out.println("Resolved ship ID for rope pulley from " + originalShipId + " to " + shipId + " using source block position");
-                    return shipId;
-                }
-            } catch (Exception e) {
-                System.err.println("Error resolving ship ID by source block position: " + e.getMessage());
-            }
-        }
-
-        System.err.println("Could not resolve ship ID " + originalShipId + " - ship may no longer exist");
-        return null;
-    }
-    private static boolean isRopePulleyBlock(net.minecraft.world.level.block.state.BlockState state) {
-        // Replace this with your actual rope pulley block check
-        return state.getBlock().toString().contains("rope_pulley");
-    }
-
-
-    private void scheduleDeadConstraintCleanup(ServerLevel level, int delayTicks) {
-        cleanupScheduled = true;
-        ticksUntilCleanup = delayTicks;
-        cleanupLevel = level;
-        System.out.println("Scheduled constraint cleanup in " + (delayTicks / 20) + " seconds");
-    }
-
-    public void tickCleanup() {
-        if (!cleanupScheduled || cleanupLevel == null) {
-            return;
-        }
-
-        ticksUntilCleanup--;
-
-        if (ticksUntilCleanup <= 0) {
-            cleanupScheduled = false;
-            cleanupDeadConstraints(cleanupLevel);
-            cleanupLevel = null;
-        }
-    }
 
     private void cleanupDeadConstraints(ServerLevel level) {
       //  System.out.println("Starting cleanup of dead constraints...");
@@ -586,14 +522,12 @@ public class ConstraintPersistence extends SavedData {
             String persistenceId = entry.getKey();
             PersistedConstraintData data = entry.getValue();
 
-            // Enhanced validation checks
             if (removedConstraints.contains(persistenceId) ||
                     restoredConstraints.contains(persistenceId) ||
                     !isConstraintInChunk(level, data, chunkPos, currentGroundBodyId)) {
                 continue;
             }
 
-            // Validate ships and create constraint
             Long actualShipA = data.shipAIsGround ? currentGroundBodyId : data.shipA;
             Long actualShipB = data.shipBIsGround ? currentGroundBodyId : data.shipB;
 
@@ -650,14 +584,12 @@ public class ConstraintPersistence extends SavedData {
 
     private boolean isConstraintInChunk(ServerLevel level, PersistedConstraintData data, ChunkPos chunkPos, Long groundBodyId) {
         try {
-            // For rope pulleys, check if the source block is in this chunk
             if (data.constraintType == ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY
                     && data.sourceBlockPos != null) {
                 ChunkPos sourceChunk = new ChunkPos(data.sourceBlockPos);
                 return sourceChunk.equals(chunkPos);
             }
 
-            // For generic constraints, check if either attachment point is in this chunk
             boolean pointAInChunk = isPositionInChunk(level, data.localPosA, data.shipA, data.shipAIsGround, chunkPos, groundBodyId);
             boolean pointBInChunk = isPositionInChunk(level, data.localPosB, data.shipB, data.shipBIsGround, chunkPos, groundBodyId);
 

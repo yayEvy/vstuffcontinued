@@ -56,7 +56,7 @@ public class RopeRendererClient {
 
             if (startJump > TELEPORT_THRESHOLD || endJump > TELEPORT_THRESHOLD) {
                 prevStartPos.set(newStart);
-                prevEndPos.set(newStart);
+                prevEndPos.set(newEnd);
                 currentStartPos.set(newStart);
                 currentEndPos.set(newEnd);
             } else {
@@ -196,7 +196,6 @@ public class RopeRendererClient {
 
 
 
-    // Update the renderRope method to pass level parameter
     private static void renderRope(PoseStack poseStack, MultiBufferSource bufferSource,
                                    Vector3d startPos, Vector3d endPos, double actualRopeLength,
                                    double maxRopeLength, Vec3 cameraPos, float partialTick, Level level) {
@@ -221,7 +220,6 @@ public class RopeRendererClient {
     }
 
 
-    // Update the renderSingleRopeSegment method to pass level parameter
     private static void renderSingleRopeSegment(PoseStack poseStack, VertexConsumer vertexConsumer,
                                                 Vec3 start, Vec3 end, double actualRopeLength,
                                                 double maxRopeLength, float partialTick, Level level, Vec3 cameraPos) {
@@ -281,7 +279,6 @@ public class RopeRendererClient {
     }
 
 
-    // Update the renderRopeFaceWithGapFilling method to accept level parameter
     private static void renderRopeFaceWithGapFilling(VertexConsumer vertexConsumer, Matrix4f matrix,
                                                      Vec3[] strip1, Vec3[] strip2, Vec3 normal,
                                                      Vec3[] curvePoints, double totalCurveLength, Level level, Vec3 cameraPos) {
@@ -304,7 +301,6 @@ public class RopeRendererClient {
 
             int light = calculateDynamicLighting(level, p1, p2, cameraPos);
 
-            // Rest of the method remains the same...
             addRopeVertex(vertexConsumer, matrix, p1, 0.0f, vStart, light, normal);
             addRopeVertex(vertexConsumer, matrix, p2, 1.0f, vStart, light, normal);
             addRopeVertex(vertexConsumer, matrix, p4, 0.0f, vEnd, light, normal);
@@ -384,7 +380,6 @@ public class RopeRendererClient {
 
 
     private static int calculateDynamicLighting(Level level, Vec3 pos1, Vec3 pos2, Vec3 cameraPos) {
-        // Convert camera-relative positions back to world positions
         Vec3 worldPos1 = pos1.add(cameraPos);
         Vec3 worldPos2 = pos2.add(cameraPos);
         Vec3 midPoint = worldPos1.add(worldPos2).scale(0.5);
@@ -392,19 +387,15 @@ public class RopeRendererClient {
         BlockPos blockPos = new BlockPos((int)midPoint.x, (int)midPoint.y, (int)midPoint.z);
 
         try {
-            // Get actual light levels from the world
             int blockLight = level.getBrightness(LightLayer.BLOCK, blockPos);
             int skyLight = level.getBrightness(LightLayer.SKY, blockPos);
 
-            // Ensure minimum lighting so ropes aren't completely black
             blockLight = Math.max(2, Math.min(15, blockLight));
             skyLight = Math.max(2, Math.min(15, skyLight));
 
-            // Pack the light values (sky light in upper bits, block light in lower bits)
             return (skyLight << 20) | (blockLight << 4);
         } catch (Exception e) {
-            // Fallback to reasonable lighting if there's an error
-            return (8 << 20) | (8 << 4); // Medium lighting
+            return (8 << 20) | (8 << 4);
         }
     }
 

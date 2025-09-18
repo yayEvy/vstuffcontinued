@@ -29,7 +29,7 @@ public class ConstraintSyncPacket {
         this.localPosB = localPosB != null ? new Vector3d(localPosB) : new Vector3d();
         this.maxLength = maxLength;
     }
-    // Add this constructor
+
     public ConstraintSyncPacket() {
         this.action = Action.CLEAR_ALL;
         this.constraintId = null;
@@ -55,12 +55,10 @@ public class ConstraintSyncPacket {
         switch (action) {
             case ADD:
                 this.constraintId = buf.readInt();
-                // Read ship IDs with null handling
                 boolean hasShipA = buf.readBoolean();
                 this.shipA = hasShipA ? buf.readLong() : null;
                 boolean hasShipB = buf.readBoolean();
                 this.shipB = hasShipB ? buf.readLong() : null;
-                // Read positions
                 this.localPosA = new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
                 this.localPosB = new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
                 this.maxLength = buf.readDouble();
@@ -94,7 +92,6 @@ public class ConstraintSyncPacket {
                 }
                 buf.writeInt(constraintId);
 
-                // Write ship IDs with null handling
                 buf.writeBoolean(shipA != null);
                 if (shipA != null) {
                     buf.writeLong(shipA);
@@ -104,7 +101,6 @@ public class ConstraintSyncPacket {
                     buf.writeLong(shipB);
                 }
 
-                // Write positions (should not be null for ADD action)
                 if (localPosA == null || localPosB == null) {
                     throw new IllegalStateException("Cannot encode ADD packet with null positions");
                 }

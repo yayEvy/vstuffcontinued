@@ -7,6 +7,9 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import yay.evy.everest.vstuff.ropes.LeadBreakItem;
 import yay.evy.everest.vstuff.ropes.LeadConstraintItem;
+import yay.evy.everest.vstuff.blocks.ModBlocks;
+
+
 
 public class ModItems {
     public static final DeferredRegister<Item> ITEMS =

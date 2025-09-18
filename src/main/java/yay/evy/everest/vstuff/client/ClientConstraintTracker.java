@@ -96,7 +96,6 @@ public class ClientConstraintTracker {
                     Ship shipObject = VSGameUtilsKt.getShipObjectWorld(mc.level).getAllShips().getById(shipA);
                     if (shipObject != null) {
                         Vector3d worldPos = new Vector3d();
-                        // Use the current (non-interpolated) transform for cache updates
                         shipObject.getTransform().getShipToWorld().transformPosition(localPosA, worldPos);
                         return worldPos;
                     }
@@ -118,7 +117,6 @@ public class ClientConstraintTracker {
                     Ship shipObject = VSGameUtilsKt.getShipObjectWorld(mc.level).getAllShips().getById(shipB);
                     if (shipObject != null) {
                         Vector3d worldPos = new Vector3d();
-                        // Use the current (non-interpolated) transform for cache updates
                         shipObject.getTransform().getShipToWorld().transformPosition(localPosB, worldPos);
                         return worldPos;
                     }

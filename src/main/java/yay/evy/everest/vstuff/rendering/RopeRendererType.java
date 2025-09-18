@@ -5,6 +5,8 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.world.entity.Display;
 
 public class RopeRendererType extends RenderType {
 
@@ -13,24 +15,43 @@ public class RopeRendererType extends RenderType {
         super(name, format, mode, bufferSize, affectsCrumbling, sortOnUpload, setupState, clearState);
     }
 
+
     public static RenderType ropeRenderer(ResourceLocation texture) {
         return create("rope_renderer",
+                DefaultVertexFormat.NEW_ENTITY,
+                VertexFormat.Mode.TRIANGLES,
+                256,
+                true,
+                true,
+                RenderType.CompositeState.builder()
+                        .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
+                        .setTextureState(new RenderStateShard.TextureStateShard(texture, false, false))
+                        .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                        .setCullState(CULL)
+                        .setLightmapState(LIGHTMAP)
+                        .setOverlayState(NO_OVERLAY)
+                        .setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
+                        .setWriteMaskState(COLOR_DEPTH_WRITE)
+                        .createCompositeState(true));
+    }
+
+
+    public static RenderType ropeRendererWithTransparency(ResourceLocation texture) {
+        return create("rope_renderer_translucent",
                 DefaultVertexFormat.NEW_ENTITY,
                 VertexFormat.Mode.TRIANGLES,
                 256,
                 false,
                 true,
                 RenderType.CompositeState.builder()
-                        .setShaderState(RENDERTYPE_ENTITY_SOLID_SHADER)
+                        .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
                         .setTextureState(new RenderStateShard.TextureStateShard(texture, false, false))
-                        .setTransparencyState(NO_TRANSPARENCY)
-                        .setCullState(NO_CULL)
+                        .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
+                        .setCullState(CULL)
                         .setLightmapState(LIGHTMAP)
                         .setOverlayState(NO_OVERLAY)
                         .setDepthTestState(LEQUAL_DEPTH_TEST)
-                        .setWriteMaskState(COLOR_DEPTH_WRITE)
+                        .setWriteMaskState(RenderStateShard.COLOR_WRITE)
                         .createCompositeState(true));
     }
-
-
 }

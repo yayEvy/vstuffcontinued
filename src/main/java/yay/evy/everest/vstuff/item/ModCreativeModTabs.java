@@ -19,15 +19,15 @@ public class ModCreativeModTabs {
                     .icon(() -> new ItemStack(ModItems.LEAD_CONSTRAINT_ITEM.get()))
                     .title(Component.translatable("creativetab.vstuff_tab"))
                     .displayItems((pParameters, pOutput) -> {
-                        // Blocks
 
 
-
-                        // Items
                         pOutput.accept(ModItems.LEAD_CONSTRAINT_ITEM.get());
                         pOutput.accept(ModItems.LEAD_BREAK_ITEM.get());
+
+
                     })
                     .build());
+
 
     public static void register(IEventBus eventBus) {
         CREATIVE_MODE_TABS.register(eventBus);

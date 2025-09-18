@@ -6,6 +6,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import org.joml.Vector3d;
+import yay.evy.everest.vstuff.network.RopeSoundPacket;
 
 public class NetworkHandler {
 
@@ -25,7 +26,14 @@ public class NetworkHandler {
                 .encoder(ConstraintSyncPacket::encode)
                 .consumerMainThread(ConstraintSyncPacket::handle)
                 .add();
+
+        INSTANCE.messageBuilder(RopeSoundPacket.class, packetId++)
+                .encoder(RopeSoundPacket::encode)
+                .decoder(RopeSoundPacket::decode)
+                .consumerMainThread(RopeSoundPacket::handle)
+                .add();
     }
+
 
     public static void sendConstraintAdd(Integer constraintId, Long shipA, Long shipB,
                                          Vector3d localPosA, Vector3d localPosB, double maxLength) {
@@ -50,7 +58,7 @@ public class NetworkHandler {
         INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);
     }
     public static void sendClearAllConstraints() {
-        ConstraintSyncPacket packet = new ConstraintSyncPacket();  // Will default to CLEAR_ALL
+        ConstraintSyncPacket packet = new ConstraintSyncPacket();
         INSTANCE.send(PacketDistributor.ALL.noArg(), packet);
     }
 

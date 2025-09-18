@@ -1,0 +1,18 @@
+{
+  "rope_create": {
+    "sounds": [
+      {
+        "name": "vstuff:rope_create",
+        "stream": false
+      }
+    ]
+  },
+  "rope_break": {
+    "sounds": [
+      {
+        "name": "vstuff:rope_break",
+        "stream": false
+      }
+    ]
+  }
+}

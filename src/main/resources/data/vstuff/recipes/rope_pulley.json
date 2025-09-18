@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " S ",
+    "ARA",
+    " C "
+  ],
+  "key": {
+    "S": { "item": "create:shaft" },
+    "A": { "item": "create:brass_casing" },
+    "R": { "item": "vstuff:lead_constraint_item" },
+    "C": { "item": "create:cogwheel" }
+  },
+  "result": {
+    "item": "vstuff:rope_pulley",
+    "count": 1
+  }
+}
