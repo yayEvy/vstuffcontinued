@@ -1,6 +1,6 @@
 adds stuff to vs2 that i wanted to do because yea
 
-features as of v0.0.3:
+features as of v0.1.8
 
 ropes (world to world, ship to ship, ship to world)
 
@@ -14,18 +14,10 @@ recipes
 
 survival compat
 
-redstone magnets!
 
 
--- known issues --
 
-if a ship to world constraint is set, and the ship is really really heavy, and you fling it, it can stretch the constraint which it shouldnt lol (why would you have a ship this heavy in survival tho? :clueless:)
 
-ropes dont collide with stuff, so theyre not like vmod phys ropes, but i hope these will still be cool for people to use
-
-magnets dont apply forces until relog 
-
-idk nothing else really besides rope rendering being a bit funky lmao
 
 
 
