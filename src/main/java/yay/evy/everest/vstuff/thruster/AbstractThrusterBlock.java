@@ -71,8 +71,10 @@ public abstract class AbstractThrusterBlock extends KineticBlock implements Enti
 
     @Override
     public boolean hasShaftTowards(LevelReader world, BlockPos pos, BlockState state, Direction face) {
-        return face.getAxis() == state.getValue(FACING).getAxis();
+        Direction facing = state.getValue(FACING);
+        return face.getAxis() != facing.getAxis();
     }
+
     @Nullable
     @Override
     public abstract BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state);

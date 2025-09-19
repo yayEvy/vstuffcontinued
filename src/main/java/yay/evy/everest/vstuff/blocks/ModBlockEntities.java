@@ -6,11 +6,13 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 //import yay.evy.everest.vstuff.ropes.RopePulleyBlockEntity;
-import yay.evy.everest.vstuff.vstuff;
+import yay.evy.everest.vstuff.VStuff;
 
 public class ModBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
-            DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, vstuff.MOD_ID);
+            DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, VStuff.MOD_ID);
+
+
 
     public static final RegistryObject<BlockEntityType<RotationalThrusterBlockEntity>> ROTATIONAL_THRUSTER_BE =
             BLOCK_ENTITIES.register("rotational_thruster",

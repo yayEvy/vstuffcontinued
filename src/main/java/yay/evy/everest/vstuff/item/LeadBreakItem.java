@@ -1,8 +1,7 @@
-package yay.evy.everest.vstuff.ropes;
+package yay.evy.everest.vstuff.item;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -13,20 +12,18 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.PacketDistributor;
 import org.joml.Vector3d;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.client.NetworkHandler;
-import yay.evy.everest.vstuff.item.ModItems;
-import yay.evy.everest.vstuff.network.RopeSoundPacket;
-import yay.evy.everest.vstuff.sound.ModSounds;
+import yay.evy.everest.vstuff.index.VStuffItems;
+import yay.evy.everest.vstuff.ropes.ConstraintTracker;
 import yay.evy.everest.vstuff.sound.RopeSoundHandler;
 
 import java.util.List;
 import java.util.Map;
 
 public class LeadBreakItem extends Item {
-    public LeadBreakItem() {
+    public LeadBreakItem(Properties pProperties) {
         super(new Properties().stacksTo(1).durability(64));
     }
 
@@ -76,7 +73,7 @@ public class LeadBreakItem extends Item {
                         System.out.println("Removed constraint (2nd attempt): " + targetConstraintId);
                     }
 
-                    player.drop(new ItemStack(ModItems.LEAD_CONSTRAINT_ITEM.get()), false);
+                    player.drop(new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get()), false);
                     if (!player.getAbilities().instabuild) {
                         itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
                     }
