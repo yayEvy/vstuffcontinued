@@ -1,0 +1,20 @@
+{
+  "textures": [
+    "vstuff:plume/plume1",
+    "vstuff:plume/plume2",
+    "vstuff:plume/plume3",
+    "vstuff:plume/plume4",
+    "vstuff:plume/plume5",
+    "vstuff:plume/plume6",
+    "vstuff:smoke/big_smoke_2",
+    "vstuff:smoke/big_smoke_3",
+    "vstuff:smoke/big_smoke_4",
+    "vstuff:smoke/big_smoke_5",
+    "vstuff:smoke/big_smoke_6",
+    "vstuff:smoke/big_smoke_7",
+    "vstuff:smoke/big_smoke_8",
+    "vstuff:smoke/big_smoke_9",
+    "vstuff:smoke/big_smoke_10",
+    "vstuff:smoke/big_smoke_11"
+  ]
+}

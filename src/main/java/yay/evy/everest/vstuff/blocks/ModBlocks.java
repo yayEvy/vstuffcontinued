@@ -1,5 +1,6 @@
 package yay.evy.everest.vstuff.blocks;
 
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -28,7 +29,8 @@ public class ModBlocks {
         return toReturn;
     }
 
-
+    public static final RegistryObject<Block> ROTATIONAL_THRUSTER = registerBlock("rotational_thruster",
+            () -> new RotationalThrusterBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
 
     private static <T extends Block> RegistryObject<Item> registerBlockItem(String name, RegistryObject<T> block) {
         if ("rope_pulley".equals(name)) {
@@ -39,5 +41,5 @@ public class ModBlocks {
 
     public static void register(IEventBus eventBus) {
         BLOCKS.register(eventBus);
-    }
+        }
 }

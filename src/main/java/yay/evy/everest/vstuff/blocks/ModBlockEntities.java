@@ -12,7 +12,10 @@ public class ModBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
             DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, vstuff.MOD_ID);
 
-
+    public static final RegistryObject<BlockEntityType<RotationalThrusterBlockEntity>> ROTATIONAL_THRUSTER_BE =
+            BLOCK_ENTITIES.register("rotational_thruster",
+                    () -> BlockEntityType.Builder.of((pos, state) -> new RotationalThrusterBlockEntity(ModBlockEntities.ROTATIONAL_THRUSTER_BE.get(), pos, state),
+                            ModBlocks.ROTATIONAL_THRUSTER.get()).build(null));
 
 
     public static void register(IEventBus eventBus) {
