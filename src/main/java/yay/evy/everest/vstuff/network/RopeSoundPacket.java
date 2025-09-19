@@ -5,10 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
-import yay.evy.everest.vstuff.sound.ModSounds;
 import yay.evy.everest.vstuff.sound.RopeSoundHandler;
 
 import java.util.function.Supplier;

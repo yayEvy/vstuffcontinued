@@ -10,33 +10,30 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
-import yay.evy.everest.vstuff.blocks.ModBlockEntities;
-import yay.evy.everest.vstuff.blocks.ModBlocks;
-import yay.evy.everest.vstuff.item.ModCreativeModTabs;
-import yay.evy.everest.vstuff.item.ModItems;
+import yay.evy.everest.vstuff.index.VStuffBlockEntities;
+import yay.evy.everest.vstuff.index.VStuffBlocks;
+import yay.evy.everest.vstuff.index.VStuffCreativeModeTabs;
+import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.client.NetworkHandler;
-import yay.evy.everest.vstuff.sound.ModSounds;
+import yay.evy.everest.vstuff.index.VStuffSounds;
 
-@Mod(vstuff.MOD_ID)
-public class vstuff {
+@Mod(VStuff.MOD_ID)
+public class VStuff {
     public static final String MOD_ID = "vstuff";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    private static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MOD_ID);
+    public static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MOD_ID);
 
-    public vstuff() {
+    public VStuff() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
+        VStuffCreativeModeTabs.register(modEventBus);
 
-        ModBlocks.register(modEventBus);
+        VStuffBlocks.register();
+        VStuffItems.register();
+        VStuffBlockEntities.register();
 
-        ModItems.register(modEventBus);
-        ModBlockEntities.register(modEventBus);
-
-        ModCreativeModTabs.register(modEventBus);
-        ModSounds.SOUND_EVENTS.register(FMLJavaModLoadingContext.get().getModEventBus());
-
-
+        VStuffSounds.register(modEventBus);
 
         REGISTRATE.registerEventListeners(modEventBus);
 

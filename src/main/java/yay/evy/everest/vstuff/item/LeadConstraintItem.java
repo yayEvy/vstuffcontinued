@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.ropes;
+package yay.evy.everest.vstuff.item;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -8,7 +8,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -21,13 +20,9 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.core.apigame.constraints.VSRopeConstraint;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.network.RopeSoundPacket;
-import yay.evy.everest.vstuff.sound.ModSounds;
+import yay.evy.everest.vstuff.ropes.ConstraintTracker;
 import yay.evy.everest.vstuff.sound.RopeSoundHandler;
 import net.minecraft.sounds.SoundEvents;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 public class LeadConstraintItem extends Item {
     private BlockPos firstClickedPos;
@@ -36,7 +31,7 @@ public class LeadConstraintItem extends Item {
     private Integer activeConstraintId;
     private ResourceKey<Level> firstClickDimension; // <-- NEW
 
-    public LeadConstraintItem() {
+    public LeadConstraintItem(Properties pProperties) {
         super(new Properties().stacksTo(64));
     }
 

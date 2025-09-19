@@ -10,9 +10,9 @@ import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import yay.evy.everest.vstuff.sound.RopeSoundHandler;
-import yay.evy.everest.vstuff.vstuff;
+import yay.evy.everest.vstuff.VStuff;
 
-@Mod.EventBusSubscriber(modid = vstuff.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber(modid = VStuff.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class RopeSoundCommand {
 
     @SubscribeEvent

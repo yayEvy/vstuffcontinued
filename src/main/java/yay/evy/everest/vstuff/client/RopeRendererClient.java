@@ -352,7 +352,7 @@ public class RopeRendererClient {
 
 
 
-
+    // tf is this empty space for
 
 
 
@@ -374,7 +374,7 @@ public class RopeRendererClient {
 
 
 
-
+    // why
 
 
 
