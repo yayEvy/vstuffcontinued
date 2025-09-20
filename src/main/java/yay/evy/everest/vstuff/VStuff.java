@@ -12,13 +12,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
-import yay.evy.everest.vstuff.blocks.ModBlockEntities;
-import yay.evy.everest.vstuff.blocks.ModBlocks;
-import yay.evy.everest.vstuff.index.VStuffCreativeModeTabs;
-import yay.evy.everest.vstuff.index.VStuffItems;
+import yay.evy.everest.vstuff.index.*;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.particles.ParticleTypes;
-import yay.evy.everest.vstuff.index.VStuffSounds;
 
 @Mod(VStuff.MOD_ID)
 public class VStuff {
@@ -31,13 +27,12 @@ public class VStuff {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
 
-        ModBlocks.register(modEventBus);
-
-        VStuffItems.register(modEventBus);
-        ModBlockEntities.register(modEventBus);
-
         VStuffCreativeModeTabs.register(modEventBus);
-        VStuffSounds.SOUND_EVENTS.register(FMLJavaModLoadingContext.get().getModEventBus());
+        VStuffBlockEntities.register();
+        VStuffBlocks.register();
+        VStuffItems.register();
+
+        VStuffSounds.register(FMLJavaModLoadingContext.get().getModEventBus());
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, VstuffConfig.SERVER_CONFIG);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, VstuffConfig.CLIENT_CONFIG);

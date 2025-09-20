@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.thruster;
+package yay.evy.everest.vstuff.content.thrust;
 
 import java.util.function.Supplier;
 

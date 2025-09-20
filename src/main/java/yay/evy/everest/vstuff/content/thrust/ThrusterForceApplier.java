@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.thruster;
+package yay.evy.everest.vstuff.content.thrust;
 
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
@@ -9,8 +9,6 @@ import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import net.minecraft.core.BlockPos;
 import yay.evy.everest.vstuff.VstuffConfig;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 
 public class ThrusterForceApplier {

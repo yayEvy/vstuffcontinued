@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.ropes;
+package yay.evy.everest.vstuff.content.constraint;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -9,8 +9,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.apigame.constraints.VSRopeConstraint;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
