@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.blocks;
+package yay.evy.everest.vstuff.content.thrust;
 
 
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
@@ -8,8 +8,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.spaceeye.elementa.svg.data.Rotation;
-import yay.evy.everest.vstuff.thruster.AbstractThrusterBlock;
+import yay.evy.everest.vstuff.index.VStuffBlockEntities;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -22,13 +21,13 @@ public class RotationalThrusterBlock extends AbstractThrusterBlock {
 
     @Override
     public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
-        return new RotationalThrusterBlockEntity(ModBlockEntities.ROTATIONAL_THRUSTER_BE.get(), pos, state);
+        return new RotationalThrusterBlockEntity(VStuffBlockEntities.ROTATIONAL_THRUSTER_BE.get(), pos, state);
     }
 
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@Nonnull Level level, @Nonnull BlockState state, @Nonnull BlockEntityType<T> type) {
-        if (type == ModBlockEntities.ROTATIONAL_THRUSTER_BE.get()) {
+        if (type == VStuffBlockEntities.ROTATIONAL_THRUSTER_BE.get()) {
             return new SmartBlockEntityTicker<>();
         }
         return null;

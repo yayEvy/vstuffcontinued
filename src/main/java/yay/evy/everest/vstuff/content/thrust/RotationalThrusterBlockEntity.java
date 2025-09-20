@@ -1,17 +1,15 @@
-package yay.evy.everest.vstuff.blocks;
+package yay.evy.everest.vstuff.content.thrust;
 
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.utility.Lang;
 import com.simibubi.create.foundation.utility.LangBuilder;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.network.chat.Component;
-import yay.evy.everest.vstuff.thruster.AbstractThrusterBlockEntity;
 
 import java.util.List;
 

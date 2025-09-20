@@ -3,7 +3,7 @@
   "minVersion": "0.8",
   "package": "yay.evy.everest.vstuff.compat.mixins",
   "compatibilityLevel": "JAVA_17",
-  "refmap": "vs_addon_template.refmap.json",
+  "refmap": "vstuff.refmap.json",
   "mixins": [
   ],
   "client": [

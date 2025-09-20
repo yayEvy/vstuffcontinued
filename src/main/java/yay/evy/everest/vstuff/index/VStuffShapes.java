@@ -22,7 +22,9 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class VStuffShapes {
 
 
-    
+    public static final VoxelShaper
+
+    ROTATION_THRUSTER = shape(16, 16, 16, 15, 15, 15).forDirectional();
 
 
     public static Builder shape(VoxelShape shape) {
@@ -92,5 +94,8 @@ public class VStuffShapes {
         }
 
     }
+
+
+    public static void register() {}
 }
 

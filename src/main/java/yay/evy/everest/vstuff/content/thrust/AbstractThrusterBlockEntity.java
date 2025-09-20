@@ -1,12 +1,7 @@
-package yay.evy.everest.vstuff.thruster;
+package yay.evy.everest.vstuff.content.thrust;
 
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
-import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
-import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
-import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.collision.Matrix3d;
-import com.simibubi.create.foundation.collision.OrientedBB;
 import com.simibubi.create.foundation.utility.Lang;
 import com.simibubi.create.foundation.utility.LangBuilder;
 import net.minecraft.ChatFormatting;
@@ -16,37 +11,25 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 import org.joml.*;
 import org.joml.Math;
 import org.valkyrienskies.core.api.ships.ClientShip;
-import org.valkyrienskies.core.api.ships.LoadedShip;
-import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import yay.evy.everest.vstuff.VstuffConfig;
-import yay.evy.everest.vstuff.blocks.RotationalThrusterBlockEntity;
 import yay.evy.everest.vstuff.particles.ParticleTypes;
 import yay.evy.everest.vstuff.particles.PlumeParticleData;
 
-import java.awt.*;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
 import static com.simibubi.create.content.kinetics.motor.CreativeMotorBlockEntity.MAX_SPEED;
-import static yay.evy.everest.vstuff.blocks.RotationalThrusterBlockEntity.BASE_MAX_THRUST;
+import static yay.evy.everest.vstuff.content.thrust.RotationalThrusterBlockEntity.BASE_MAX_THRUST;
 
 @SuppressWarnings({"deprecation", "unchecked"})
 public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {

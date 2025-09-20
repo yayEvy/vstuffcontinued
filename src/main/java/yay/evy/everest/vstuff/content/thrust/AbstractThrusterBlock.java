@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.thruster;
+package yay.evy.everest.vstuff.content.thrust;
 
 import com.simibubi.create.content.kinetics.base.KineticBlock;
 import net.minecraft.world.level.LevelReader;
@@ -16,7 +16,6 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
@@ -30,8 +29,7 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-
-import java.util.Properties;
+import yay.evy.everest.vstuff.index.VStuffShapes;
 
 
 @SuppressWarnings("deprecation")
@@ -56,6 +54,12 @@ public abstract class AbstractThrusterBlock extends KineticBlock implements Enti
         }
 
         return this.defaultBlockState().setValue(FACING, placeDirection);
+    }
+
+    @Override
+    public VoxelShape getShape(BlockState state, BlockGetter p_220053_2_, BlockPos p_220053_3_,
+                               CollisionContext p_220053_4_) {
+        return VStuffShapes.ROTATION_THRUSTER.get(state.getValue(FACING));
     }
 
     @Override
