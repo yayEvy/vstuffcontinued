@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.thruster;
+package yay.evy.everest.vstuff.content.thrust;
 
 import org.joml.Vector3d;
 

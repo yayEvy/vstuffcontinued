@@ -1,23 +1,17 @@
-package yay.evy.everest.vstuff.blocks;
+package yay.evy.everest.vstuff.content.thrust;
 
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.utility.Lang;
 import com.simibubi.create.foundation.utility.LangBuilder;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.network.chat.Component;
-import org.joml.Math;
-import yay.evy.everest.vstuff.VstuffConfig;
-import yay.evy.everest.vstuff.thruster.AbstractThrusterBlockEntity;
 
 import java.util.List;
-
-import static com.simibubi.create.content.kinetics.motor.CreativeMotorBlockEntity.MAX_SPEED;
 
 public class RotationalThrusterBlockEntity extends AbstractThrusterBlockEntity {
 
@@ -70,27 +64,4 @@ public class RotationalThrusterBlockEntity extends AbstractThrusterBlockEntity {
     @Override
     protected void addSpecificGoggleInfo(List<Component> tooltip, boolean isPlayerSneaking) {
     }
-    public void updateThrust(BlockState currentBlockState) {
-        float speed = getSpeed();
-        if (speed == 0) {
-            thrusterData.setThrust(0);
-            isThrustDirty = false;
-            return;
-        }
-
-        float obstructionEffect = calculateObstructionEffect(); // 0..1
-        float powerPercentage = org.joml.Math.min(Math.abs(speed) / MAX_SPEED, 1f); // scale rotation to 0..1
-
-        float thrustMultiplier = VstuffConfig.THRUSTER_THRUST_MULTIPLIER.get().floatValue(); // user-configurable
-
-        float softPower = (float) java.lang.Math.pow((double) powerPercentage, 1.2);
-
-        float thrust = BASE_MAX_THRUST * thrustMultiplier * softPower * obstructionEffect;
-
-        thrusterData.setThrust(thrust);
-        isThrustDirty = false;
-
-        System.out.println("[Thruster] speed=" + speed + ", obstruction=" + obstructionEffect + ", thrust=" + thrust);
-    }
-
 }

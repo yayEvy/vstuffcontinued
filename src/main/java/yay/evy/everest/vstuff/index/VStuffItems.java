@@ -1,9 +1,8 @@
 package yay.evy.everest.vstuff.index;
 
 import com.tterrag.registrate.util.entry.ItemEntry;
-import net.minecraftforge.eventbus.api.IEventBus;
-import yay.evy.everest.vstuff.item.LeadBreakItem;
-import yay.evy.everest.vstuff.item.LeadConstraintItem;
+import yay.evy.everest.vstuff.content.constraint.LeadBreakItem;
+import yay.evy.everest.vstuff.content.constraint.LeadConstraintItem;
 import yay.evy.everest.vstuff.VStuff;
 
 
@@ -20,5 +19,5 @@ public class VStuffItems {
             VStuff.REGISTRATE.item("lead_break_item", LeadBreakItem::new).register();
 
 
-    public static void register(IEventBus modEventBus) {}
+    public static void register() {}
 }

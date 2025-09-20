@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.Mod;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
 import yay.evy.everest.vstuff.rendering.RopeRendererType;
-import yay.evy.everest.vstuff.ropes.ConstraintTracker;
+import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
