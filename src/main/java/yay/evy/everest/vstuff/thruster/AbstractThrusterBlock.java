@@ -105,7 +105,9 @@ public abstract class AbstractThrusterBlock extends KineticBlock implements Enti
             // Initial obstruction check
             thrusterBE.calculateObstruction(level, pos, state.getValue(FACING));
             thrusterBE.updateThrust(state);
+            thrusterBE.setChanged();
         }
+        doRedstoneCheck(level, state, pos);
     }
 
 
@@ -121,12 +123,20 @@ public abstract class AbstractThrusterBlock extends KineticBlock implements Enti
     }
 
     @Override
-    public void neighborChanged(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull Block block, @Nonnull BlockPos fromPos, boolean isMoving) {
-        if (level.isClientSide()) return;
+    public void neighborChanged(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos,
+                                @Nonnull Block block, @Nonnull BlockPos fromPos, boolean isMoving) {
+        if (level.isClientSide) return;
+
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (blockEntity instanceof AbstractThrusterBlockEntity thrusterBlockEntity) {
+            thrusterBlockEntity.calculateObstruction(level, pos, state.getValue(FACING));
+            thrusterBlockEntity.updateThrust(state);
+            thrusterBlockEntity.setChanged();
+        }
         doRedstoneCheck(level, state, pos);
     }
     private void doRedstoneCheck(Level level, BlockState state, BlockPos pos) {
-        int newRedstonePower = level.getBestNeighborSignal(pos);
+        int newRedstonePower = 15;
         int oldRedstonePower = state.getValue(POWER);
         if (newRedstonePower == oldRedstonePower) return;
 
@@ -140,6 +150,8 @@ public abstract class AbstractThrusterBlock extends KineticBlock implements Enti
             thrusterBlockEntity.setChanged();
         }
     }
+
+
 
     @Override
     public BlockState rotate(@Nonnull BlockState state, @Nonnull Rotation rot) {

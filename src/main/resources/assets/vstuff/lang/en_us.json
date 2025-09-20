@@ -6,8 +6,21 @@
   "block.vstuff.redstone_magnet": "Redstone Magnet",
   "block.vstuff.rope_pulley": "Rope Pulley",
   "block.vstuff.pulley_anchor": "Pulley Anchor",
+  "block.vstuff.rotational_thruster": "Rotational Thruster",
   "item.vstuff.redstone_magnet": "Redstone Magnet",
   "creativetab.vstuff_tab": "VStuff",
   "pulley_mode.manual": "Manual",
+
+  "create.gui.goggles.thruster.status": "Thruster Status",
+  "create.gui.goggles.thruster.status.working" : "On",
+  "create.gui.goggles.thruster.obstructed": "Obstructed",
+  "create.gui.goggles.thruster.efficiency": "Efficiency",
+  "create.gui.goggles.thruster.thrust": "Thrust",
+  "create.gui.goggles.thruster.speed": "Speed",
+
+
+
+
+
   "pulley_mode.auto": "Auto"
 }

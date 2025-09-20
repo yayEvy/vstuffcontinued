@@ -10,6 +10,7 @@ import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.client.NetworkHandler;
+import yay.evy.everest.vstuff.ropes.ConstraintPersistence;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -212,7 +213,7 @@ public class ConstraintTracker {
 
     public static void mapConstraintToPersistenceId(Integer constraintId, String persistenceId) {
         constraintToPersistenceId.put(constraintId, persistenceId);
-     //   System.out.println("Mapped constraint " + constraintId + " to persistence ID " + persistenceId);
+        //   System.out.println("Mapped constraint " + constraintId + " to persistence ID " + persistenceId);
     }
 
     public static Map<Integer, RopeConstraintData> getActiveConstraints() {
@@ -255,7 +256,7 @@ public class ConstraintTracker {
             boolean exists = ship != null;
 
             if (!exists) {
-              //  System.out.println("Ship " + shipId + " not found in ship world");
+                //  System.out.println("Ship " + shipId + " not found in ship world");
                 var allShips = shipWorld.getAllShips();
                 //System.out.println("Available ships: " + allShips.stream().map(s -> s.getId()).toList());
             }
@@ -271,7 +272,7 @@ public class ConstraintTracker {
 
     private static void scheduleDelayedValidation(ServerLevel level, Integer constraintId, long delayMs) {
         delayedValidations.put(constraintId, System.currentTimeMillis() + delayMs);
-      //  System.out.println("Scheduled delayed validation for constraint " + constraintId + " in " + (delayMs/1000) + " seconds");
+        //  System.out.println("Scheduled delayed validation for constraint " + constraintId + " in " + (delayMs/1000) + " seconds");
     }
 
 
@@ -286,12 +287,12 @@ public class ConstraintTracker {
                 NetworkHandler.sendConstraintAddToPlayer(player, constraintId, data.shipA, data.shipB,
                         data.localPosA, data.localPosB, data.maxLength);
             }
-           // System.out.println("Synced " + activeConstraints.size() + " constraints to player " + player.getName().getString());
+            // System.out.println("Synced " + activeConstraints.size() + " constraints to player " + player.getName().getString());
         }
     }
     public static void validateAndCleanupConstraints(ServerLevel level) {
-      //  System.out.println("=== CONSTRAINT VALIDATION START ===");
-      //  System.out.println("Validating " + activeConstraints.size() + " active constraints...");
+        //  System.out.println("=== CONSTRAINT VALIDATION START ===");
+        //  System.out.println("Validating " + activeConstraints.size() + " active constraints...");
         java.util.List<Integer> constraintsToRemove = new java.util.ArrayList<>();
 
         Long groundBodyId = null;
@@ -299,14 +300,14 @@ public class ConstraintTracker {
             groundBodyId = VSGameUtilsKt.getShipObjectWorld(level)
                     .getDimensionToGroundBodyIdImmutable()
                     .get(VSGameUtilsKt.getDimensionId(level));
-         //   System.out.println("Ground body ID: " + groundBodyId);
+            //   System.out.println("Ground body ID: " + groundBodyId);
         } catch (Exception e) {
-           // System.err.println("Failed to get ground body ID, skipping validation: " + e.getMessage());
+            // System.err.println("Failed to get ground body ID, skipping validation: " + e.getMessage());
             return;
         }
 
         if (groundBodyId == null) {
-           // System.err.println("Ground body ID is null, skipping validation");
+            // System.err.println("Ground body ID is null, skipping validation");
             return;
         }
 
@@ -321,13 +322,13 @@ public class ConstraintTracker {
         for (Integer constraintId : delayedToProcess) {
             delayedValidations.remove(constraintId);
             if (activeConstraints.containsKey(constraintId)) {
-             //   System.out.println("Processing delayed validation for constraint " + constraintId);
+                //   System.out.println("Processing delayed validation for constraint " + constraintId);
                 RopeConstraintData data = activeConstraints.get(constraintId);
                 boolean shipAExists = isShipValid(level, data.shipA, groundBodyId);
                 boolean shipBExists = isShipValid(level, data.shipB, groundBodyId);
 
                 if (!shipAExists || !shipBExists) {
-                //    System.out.println("Delayed validation failed - removing constraint " + constraintId);
+                    //    System.out.println("Delayed validation failed - removing constraint " + constraintId);
                     constraintsToRemove.add(constraintId);
                 }
             }
@@ -346,7 +347,7 @@ public class ConstraintTracker {
                 boolean shipBExists = isShipValid(level, data.shipB, groundBodyId);
 
                 if (!shipAExists || !shipBExists) {
-                //    System.out.println("Constraint " + constraintId + " references missing ships - scheduling delayed validation");
+                    //    System.out.println("Constraint " + constraintId + " references missing ships - scheduling delayed validation");
                     scheduleDelayedValidation(level, constraintId, 5000);
                     continue;
                 }
@@ -354,7 +355,7 @@ public class ConstraintTracker {
 
 
                 if (!areAttachmentChunksLoaded(level, data, groundBodyId)) {
-               //     System.out.println("Constraint " + constraintId + " has attachment points in unloaded chunks - skipping validation");
+                    //     System.out.println("Constraint " + constraintId + " has attachment points in unloaded chunks - skipping validation");
                     continue;
                 }
 
@@ -363,11 +364,11 @@ public class ConstraintTracker {
                 boolean isValid = validA && validB;
 
                 if (!isValid) {
-                //    System.out.println("Generic constraint " + constraintId + " is invalid - marking for removal");
+                    //    System.out.println("Generic constraint " + constraintId + " is invalid - marking for removal");
                     constraintsToRemove.add(constraintId);
                 }
             } catch (Exception e) {
-             //   System.err.println("Error validating constraint " + constraintId + ": " + e.getMessage());
+                //   System.err.println("Error validating constraint " + constraintId + ": " + e.getMessage());
                 if (data.constraintType == RopeConstraintData.ConstraintType.ROPE_PULLEY) {
                     scheduleDelayedValidation(level, constraintId, 5000);
                 } else {
@@ -381,16 +382,16 @@ public class ConstraintTracker {
                 VSGameUtilsKt.getShipObjectWorld(level).removeConstraint(constraintId);
                 removeConstraintWithPersistence(level, constraintId);
             } catch (Exception e) {
-        //        System.err.println("Error removing invalid constraint " + constraintId + ": " + e.getMessage());
+                //        System.err.println("Error removing invalid constraint " + constraintId + ": " + e.getMessage());
             }
         }
 
-       // System.out.println("=== CONSTRAINT VALIDATION END ===");
-      //  System.out.println("Constraint validation complete. Removed " + constraintsToRemove.size() + " invalid constraints.");
+        // System.out.println("=== CONSTRAINT VALIDATION END ===");
+        //  System.out.println("Constraint validation complete. Removed " + constraintsToRemove.size() + " invalid constraints.");
     }
 
     public static void cleanupOrphanedConstraints(ServerLevel level, net.minecraft.core.BlockPos sourceBlockPos) {
-       // System.out.println("Cleaning up orphaned constraints for block at " + sourceBlockPos);
+        // System.out.println("Cleaning up orphaned constraints for block at " + sourceBlockPos);
 
         java.util.List<Integer> constraintsToRemove = new java.util.ArrayList<>();
 
@@ -402,7 +403,7 @@ public class ConstraintTracker {
                     data.sourceBlockPos != null &&
                     data.sourceBlockPos.equals(sourceBlockPos)) {
 
-             //   System.out.println("Found orphaned constraint " + constraintId + " for block " + sourceBlockPos);
+                //   System.out.println("Found orphaned constraint " + constraintId + " for block " + sourceBlockPos);
                 constraintsToRemove.add(constraintId);
             }
         }
@@ -411,9 +412,9 @@ public class ConstraintTracker {
             try {
                 VSGameUtilsKt.getShipObjectWorld(level).removeConstraint(constraintId);
                 removeConstraintWithPersistence(level, constraintId);
-             //   System.out.println("Cleaned up orphaned constraint " + constraintId);
+                //   System.out.println("Cleaned up orphaned constraint " + constraintId);
             } catch (Exception e) {
-             //   System.err.println("Error cleaning up orphaned constraint " + constraintId + ": " + e.getMessage());
+                //   System.err.println("Error cleaning up orphaned constraint " + constraintId + ": " + e.getMessage());
             }
         }
     }
@@ -502,7 +503,7 @@ public class ConstraintTracker {
                     );
 
                     if (!level.isLoaded(worldBlockPos)) {
-                    //    System.out.println("Ship block world position " + worldBlockPos + " is not loaded - skipping validation");
+                        //    System.out.println("Ship block world position " + worldBlockPos + " is not loaded - skipping validation");
                         return true;
                     }
 

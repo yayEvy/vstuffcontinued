@@ -10,10 +10,12 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 import yay.evy.everest.vstuff.blocks.ModBlockEntities;
 import yay.evy.everest.vstuff.blocks.ModBlocks;
+import yay.evy.everest.vstuff.client.VStuffClient;
 import yay.evy.everest.vstuff.index.VStuffCreativeModeTabs;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.client.NetworkHandler;
@@ -50,10 +52,13 @@ public class VStuff {
         MinecraftForge.EVENT_BUS.register(this);
 
         NetworkHandler.registerPackets();
+        modEventBus.addListener(this::onClientSetup);
 
         LOGGER.info("VStuff mod initialized");
     }
-
+    private void onClientSetup(final FMLClientSetupEvent event) {
+        event.enqueueWork(VStuffClient::registerRenderLayers);
+    }
     public static CreateRegistrate registrate() {
         return REGISTRATE;
     }

@@ -29,7 +29,7 @@ public class LeadConstraintItem extends Item {
     private Long firstShipId;
     private Entity firstEntity;
     private Integer activeConstraintId;
-    private ResourceKey<Level> firstClickDimension; // <-- NEW
+    private ResourceKey<Level> firstClickDimension;
 
     public LeadConstraintItem(Properties pProperties) {
         super(new Properties().stacksTo(64));
@@ -49,7 +49,7 @@ public class LeadConstraintItem extends Item {
         if (firstClickedPos == null && firstEntity == null) {
             firstClickedPos = clickedPos;
             firstShipId = getShipIdAtPos(serverLevel, clickedPos);
-            firstClickDimension = serverLevel.dimension(); // <-- store dimension
+            firstClickDimension = serverLevel.dimension();
             return InteractionResult.SUCCESS;
         } else {
             if (firstClickedPos != null && firstClickedPos.equals(clickedPos)) {

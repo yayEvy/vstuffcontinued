@@ -207,7 +207,7 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
 
     protected int getOverriddenPowerOrState(BlockState currentBlockState) {
 
-        return 15;
+        return currentBlockState.getValue(AbstractThrusterBlock.POWER);
     }
 
     public void emitParticles(Level level, BlockPos pos, BlockState state) {
@@ -335,11 +335,30 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
     public void onLoad() {
         super.onLoad();
         if (!level.isClientSide) {
-            calculateObstruction(level, worldPosition, getBlockState().getValue(AbstractThrusterBlock.FACING));
-            isThrustDirty = true;
-            updateThrust(getBlockState());
+            level.getServer().execute(() -> {
+                // Recalculate
+                recalcThruster();
+
+                // Re-register applier with the attachment
+                ThrusterForceAttachment attachment = ThrusterForceAttachment.get(level, worldPosition);
+                if (attachment != null) {
+                    ThrusterData data = getThrusterData();
+                    data.setDirection(VectorConversionsMCKt.toJOMLD(getBlockState().getValue(AbstractThrusterBlock.FACING).getNormal()));
+
+                    ThrusterForceApplier applier = new ThrusterForceApplier(data);
+                    attachment.addApplier(worldPosition, applier);
+
+                    System.out.println("[Thruster] onLoad: re-registered applier at " + worldPosition);
+                }
+            });
         }
     }
 
+    private void recalcThruster() {
+        calculateObstruction(level, worldPosition, getBlockState().getValue(AbstractThrusterBlock.FACING));
+        isThrustDirty = true;
+        updateThrust(getBlockState());
+        setChanged();
+    }
 
 }

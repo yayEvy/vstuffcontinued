@@ -42,7 +42,6 @@ public class ThrusterDamager {
 
     private boolean shouldDamageEntities() {
         return VstuffConfig.THRUSTER_DAMAGE_ENTITIES.get()
-                && thruster.isPowered()
                 && thruster.isWorking();
     }
 

@@ -9,8 +9,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.apigame.constraints.VSRopeConstraint;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -260,7 +258,7 @@ public class ConstraintPersistence extends SavedData {
             restoredConstraints.remove(id);
             markConstraintAsRemoved(id);
             setDirty();
-    //        System.out.println("Removed constraint from persistence: " + id);
+            //        System.out.println("Removed constraint from persistence: " + id);
         }
     }
 
@@ -427,14 +425,14 @@ public class ConstraintPersistence extends SavedData {
 
 
     private void cleanupDeadConstraints(ServerLevel level) {
-      //  System.out.println("Starting cleanup of dead constraints...");
+        //  System.out.println("Starting cleanup of dead constraints...");
 
         try {
             Long groundBodyId = VSGameUtilsKt.getShipObjectWorld(level).getDimensionToGroundBodyIdImmutable()
                     .get(VSGameUtilsKt.getDimensionId(level));
 
             if (groundBodyId == null) {
-         //       System.err.println("Cannot cleanup - ground body ID is null");
+                //       System.err.println("Cannot cleanup - ground body ID is null");
                 return;
             }
 
@@ -457,24 +455,24 @@ public class ConstraintPersistence extends SavedData {
                         (actualShipB != null && VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(actualShipB) != null);
 
                 if (!shipAValid || !shipBValid) {
-               //     System.out.println("Marking constraint " + persistenceId + " for removal - ships still don't exist");
+                    //     System.out.println("Marking constraint " + persistenceId + " for removal - ships still don't exist");
                     toRemove.add(persistenceId);
                 }
             }
 
             for (String deadId : toRemove) {
                 removeConstraint(deadId);
-              //  System.out.println("Cleaned up dead constraint: " + deadId);
+                //  System.out.println("Cleaned up dead constraint: " + deadId);
             }
 
             if (toRemove.size() > 0) {
-             //   System.out.println("Cleaned up " + toRemove.size() + " dead constraints");
+                //   System.out.println("Cleaned up " + toRemove.size() + " dead constraints");
             } else {
-             //   System.out.println("No dead constraints found during cleanup");
+                //   System.out.println("No dead constraints found during cleanup");
             }
 
         } catch (Exception e) {
-      //      System.err.println("Error during constraint cleanup: " + e.getMessage());
+            //      System.err.println("Error during constraint cleanup: " + e.getMessage());
             e.printStackTrace();
         }
     }
