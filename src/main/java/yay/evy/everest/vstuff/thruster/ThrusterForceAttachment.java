@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.thrust;
+package yay.evy.everest.vstuff.thruster;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,6 +12,7 @@ import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.ShipForcesInducer;
 import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 
 @SuppressWarnings("deprecation")

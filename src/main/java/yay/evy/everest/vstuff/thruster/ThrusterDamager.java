@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.thrust;
+package yay.evy.everest.vstuff.thruster;
 
 
 import com.simibubi.create.foundation.collision.Matrix3d;
@@ -9,6 +9,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.*;
 import org.joml.Math;
@@ -18,6 +19,7 @@ import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import yay.evy.everest.vstuff.MathUtility;
 import yay.evy.everest.vstuff.VstuffConfig;
 
+import java.awt.*;
 import java.util.List;
 
 public class ThrusterDamager {

@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.contraint;
+package yay.evy.everest.vstuff.item;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -16,6 +16,7 @@ import org.joml.Vector3d;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.index.VStuffItems;
+import yay.evy.everest.vstuff.ropes.ConstraintTracker;
 import yay.evy.everest.vstuff.sound.RopeSoundHandler;
 
 import java.util.List;

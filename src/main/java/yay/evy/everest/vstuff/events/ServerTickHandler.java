@@ -4,8 +4,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import yay.evy.everest.vstuff.content.contraint.ConstraintTracker;
-import yay.evy.everest.vstuff.content.contraint.ConstraintPersistence;
+import org.joml.Vector3d;
+import yay.evy.everest.vstuff.ropes.ConstraintTracker;
+import yay.evy.everest.vstuff.ropes.ConstraintPersistence;
 import net.minecraftforge.event.server.ServerStartedEvent;
 
 import java.util.HashMap;

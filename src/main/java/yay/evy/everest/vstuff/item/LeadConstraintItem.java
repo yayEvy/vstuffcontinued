@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.contraint;
+package yay.evy.everest.vstuff.item;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -20,6 +20,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.core.apigame.constraints.VSRopeConstraint;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.network.RopeSoundPacket;
+import yay.evy.everest.vstuff.ropes.ConstraintTracker;
 import yay.evy.everest.vstuff.sound.RopeSoundHandler;
 import net.minecraft.sounds.SoundEvents;
 

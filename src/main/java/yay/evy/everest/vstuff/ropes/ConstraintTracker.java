@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.contraint;
+package yay.evy.everest.vstuff.ropes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
