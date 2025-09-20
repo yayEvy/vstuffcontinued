@@ -41,9 +41,8 @@ public class VStuff {
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, VstuffConfig.SERVER_CONFIG);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, VstuffConfig.CLIENT_CONFIG);
-        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        ParticleTypes.register(modBus);
+        ParticleTypes.register(modEventBus);
 
         REGISTRATE.registerEventListeners(modEventBus);
 
