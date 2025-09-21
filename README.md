@@ -1,28 +1,15 @@
-adds stuff to vs2 that i wanted to do because yea
+VStuff!
 
-features as of v0.1.8
+features as of v0.2.0 (in dev)
 
-ropes (world to world, ship to ship, ship to world)
+- ropes (world to world, ship to ship, ship to world)
+- rope item, crafted with a lead surrounded by string, is consumed if in survival
+- rope cutter cutter item, breaks ropes
+- phys pulley, can be used to control rope lengths
+- rotational thruster, generates thrust via rotation
 
-ship lead item, crafted with a lead surrounded by string, is consumed if in survival
-
-ship lead cutter item, crafted with a lead and one red dye, shapeless, makes 4, breaks the lead you're looking at
-
-constraints persist between restarts ig
-
-recipes
-
-survival compat
-
-
-
-
-
-
-
-
-
-
-thats all lol
-
-
+PLANNED:
+- cw additions merge into vstuff
+- rope style changer
+- better config for rope related things
+  
