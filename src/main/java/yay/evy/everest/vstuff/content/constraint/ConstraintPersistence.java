@@ -13,10 +13,7 @@ import org.joml.Vector3d;
 import org.valkyrienskies.core.apigame.constraints.VSRopeConstraint;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class ConstraintPersistence extends SavedData {
     private static final String DATA_NAME = "vstuff_constraints";
@@ -30,6 +27,7 @@ public class ConstraintPersistence extends SavedData {
     private boolean cleanupScheduled = false;
     private int ticksUntilCleanup = 0;
     private ServerLevel cleanupLevel = null;
+
 
     public static class PersistedConstraintData {
         public Long shipA;
@@ -254,11 +252,16 @@ public class ConstraintPersistence extends SavedData {
 
 
     public void removeConstraint(String id) {
+        PersistedConstraintData data = persistedConstraints.get(id);
+        if (data != null && (data.shipAIsGround || data.shipBIsGround)) {
+            System.out.println("Skipping removal of ground rope constraint: " + id);
+            return;
+        }
+
         if (persistedConstraints.remove(id) != null) {
             restoredConstraints.remove(id);
             markConstraintAsRemoved(id);
             setDirty();
-            //        System.out.println("Removed constraint from persistence: " + id);
         }
     }
 
@@ -363,61 +366,52 @@ public class ConstraintPersistence extends SavedData {
     }
 
     public void restoreConstraintsInstance(ServerLevel level) {
-        Long currentGroundBodyId;
-        try {
-            currentGroundBodyId = VSGameUtilsKt.getShipObjectWorld(level).getDimensionToGroundBodyIdImmutable()
-                    .get(VSGameUtilsKt.getDimensionId(level));
-        } catch (Exception e) {
-            System.err.println("Failed to get ground body ID: " + e.getMessage());
-            return;
-        }
 
-        int successCount = 0;
-        int failCount = 0;
-        int skipCount = 0;
+        if (hasAttemptedRestore) return;
+        hasAttemptedRestore = true;
 
-        for (Map.Entry<String, PersistedConstraintData> entry : persistedConstraints.entrySet()) {
-            String persistenceId = entry.getKey();
-            PersistedConstraintData data = entry.getValue();
+        level.getServer().execute(() -> {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException ignored) {}
 
-            if (removedConstraints.contains(persistenceId)) {
-                skipCount++;
-                continue;
+            Long currentGroundBodyId;
+            try {
+                currentGroundBodyId = VSGameUtilsKt.getShipObjectWorld(level).getDimensionToGroundBodyIdImmutable()
+                        .get(VSGameUtilsKt.getDimensionId(level));
+            } catch (Exception e) {
+                System.err.println("Failed to get ground body ID: " + e.getMessage());
+                return;
             }
 
-            Long actualShipA = data.shipAIsGround ? currentGroundBodyId : data.shipA;
-            Long actualShipB = data.shipBIsGround ? currentGroundBodyId : data.shipB;
+            int successCount = 0;
+            int failCount = 0;
+            int skipCount = 0;
 
-            boolean shipAValid = data.shipAIsGround || (actualShipA != null &&
-                    VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(actualShipA) != null);
-            boolean shipBValid = data.shipBIsGround || (actualShipB != null &&
-                    VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(actualShipB) != null);
+            for (Map.Entry<String, PersistedConstraintData> entry : persistedConstraints.entrySet()) {
+                String persistenceId = entry.getKey();
+                PersistedConstraintData data = entry.getValue();
 
-            if (!shipAValid || !shipBValid) {
-                System.out.println("Skipping constraint " + persistenceId + " due to invalid ships: " + actualShipA + ", " + actualShipB);
-                skipCount++;
-                continue;
+                if (removedConstraints.contains(persistenceId)) { skipCount++; continue; }
+                if (restoredConstraints.contains(persistenceId)) { skipCount++; continue; }
+
+                Long actualShipA = data.shipAIsGround ? currentGroundBodyId : data.shipA;
+                Long actualShipB = data.shipBIsGround ? currentGroundBodyId : data.shipB;
+
+                if (validateShipsAndCreateConstraint(level, persistenceId, data, actualShipA, actualShipB)) {
+                    restoredConstraints.add(persistenceId);
+                    successCount++;
+                } else {
+                    failCount++;
+                }
             }
 
-            VSRopeConstraint ropeConstraint = new VSRopeConstraint(actualShipA, actualShipB, data.compliance, data.localPosA, data.localPosB, data.maxForce, data.maxLength);
-            Integer newConstraintId = VSGameUtilsKt.getShipObjectWorld(level).createNewConstraint(ropeConstraint);
-
-            if (newConstraintId != null) {
-                ConstraintTracker.addConstraintToTracker(newConstraintId, actualShipA, actualShipB, data.localPosA, data.localPosB, data.maxLength, data.compliance, data.maxForce, data.constraintType, data.sourceBlockPos);
-                ConstraintTracker.mapConstraintToPersistenceId(newConstraintId, persistenceId);
-                restoredConstraints.add(persistenceId);
-                successCount++;
-            } else {
-                System.out.println("Failed to create constraint for " + persistenceId);
-                failCount++;
+            for (ServerPlayer player : level.getServer().getPlayerList().getPlayers()) {
+                ConstraintTracker.syncAllConstraintsToPlayer(player);
             }
-        }
 
-        for (ServerPlayer player : level.getServer().getPlayerList().getPlayers()) {
-            ConstraintTracker.syncAllConstraintsToPlayer(player);
-        }
-
-        System.out.println("Restoration complete: " + successCount + " success, " + failCount + " failed, " + skipCount + " skipped");
+            System.out.println("Restoration complete: " + successCount + " success, " + failCount + " failed, " + skipCount + " skipped");
+        });
     }
 
 
@@ -425,26 +419,21 @@ public class ConstraintPersistence extends SavedData {
 
 
     private void cleanupDeadConstraints(ServerLevel level) {
-        //  System.out.println("Starting cleanup of dead constraints...");
-
         try {
             Long groundBodyId = VSGameUtilsKt.getShipObjectWorld(level).getDimensionToGroundBodyIdImmutable()
                     .get(VSGameUtilsKt.getDimensionId(level));
 
-            if (groundBodyId == null) {
-                //       System.err.println("Cannot cleanup - ground body ID is null");
-                return;
-            }
+            if (groundBodyId == null) return;
 
-            java.util.List<String> toRemove = new java.util.ArrayList<>();
+            List<String> toRemove = new ArrayList<>();
 
             for (Map.Entry<String, PersistedConstraintData> entry : persistedConstraints.entrySet()) {
                 String persistenceId = entry.getKey();
                 PersistedConstraintData data = entry.getValue();
 
-                if (restoredConstraints.contains(persistenceId)) {
-                    continue;
-                }
+                if (restoredConstraints.contains(persistenceId)) continue;
+
+                if (data.shipAIsGround || data.shipBIsGround) continue;
 
                 Long actualShipA = data.shipAIsGround ? groundBodyId : data.shipA;
                 Long actualShipB = data.shipBIsGround ? groundBodyId : data.shipB;
@@ -454,25 +443,11 @@ public class ConstraintPersistence extends SavedData {
                 boolean shipBValid = data.shipBIsGround ||
                         (actualShipB != null && VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(actualShipB) != null);
 
-                if (!shipAValid || !shipBValid) {
-                    //     System.out.println("Marking constraint " + persistenceId + " for removal - ships still don't exist");
-                    toRemove.add(persistenceId);
-                }
+                if (!shipAValid || !shipBValid) toRemove.add(persistenceId);
             }
 
-            for (String deadId : toRemove) {
-                removeConstraint(deadId);
-                //  System.out.println("Cleaned up dead constraint: " + deadId);
-            }
-
-            if (toRemove.size() > 0) {
-                //   System.out.println("Cleaned up " + toRemove.size() + " dead constraints");
-            } else {
-                //   System.out.println("No dead constraints found during cleanup");
-            }
-
+            for (String deadId : toRemove) removeConstraint(deadId);
         } catch (Exception e) {
-            //      System.err.println("Error during constraint cleanup: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -550,9 +525,7 @@ public class ConstraintPersistence extends SavedData {
             boolean shipBValid = data.shipBIsGround ||
                     (actualShipB != null && VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(actualShipB) != null);
 
-            if (!shipAValid || !shipBValid) {
-                return false;
-            }
+            if (!shipAValid || !shipBValid) return false;
 
             VSRopeConstraint ropeConstraint = new VSRopeConstraint(
                     actualShipA, actualShipB,
@@ -565,6 +538,7 @@ public class ConstraintPersistence extends SavedData {
             Integer newConstraintId = VSGameUtilsKt.getShipObjectWorld(level).createNewConstraint(ropeConstraint);
             if (newConstraintId != null) {
                 ConstraintTracker.addConstraintToTracker(
+                        level,
                         newConstraintId, actualShipA, actualShipB,
                         data.localPosA, data.localPosB, data.maxLength,
                         data.compliance, data.maxForce,

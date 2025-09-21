@@ -19,6 +19,8 @@ import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.core.apigame.constraints.VSRopeConstraint;
 import yay.evy.everest.vstuff.client.NetworkHandler;
+import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
+import yay.evy.everest.vstuff.content.pulley.PhysPulleyItem;
 import yay.evy.everest.vstuff.network.RopeSoundPacket;
 import yay.evy.everest.vstuff.sound.RopeSoundHandler;
 import net.minecraft.sounds.SoundEvents;
@@ -34,6 +36,7 @@ public class LeadConstraintItem extends Item {
         super(new Properties().stacksTo(64));
     }
 
+
     @Override
     public InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
@@ -44,19 +47,37 @@ public class LeadConstraintItem extends Item {
             return InteractionResult.PASS;
         }
 
+        // Handle pulley targeting first
+        PhysPulleyBlockEntity pulley = PhysPulleyItem.getWaitingPulley(player);
+        if (pulley != null) {
+            pulley.targetPos = clickedPos;
+            pulley.hasTarget = true;
+            pulley.waitingForTarget = false;
+            pulley.setChanged();
+            pulley.sendData();
 
+            pulley.createManualConstraint();
+
+            player.sendSystemMessage(Component.literal("§aPulley target set and constraint created!"));
+            PhysPulleyItem.clearWaitingPulley(player);
+
+            return InteractionResult.SUCCESS;
+        }
+
+        // Otherwise, handle rope constraint logic
         if (firstClickedPos == null && firstEntity == null) {
             firstClickedPos = clickedPos;
             firstShipId = getShipIdAtPos(serverLevel, clickedPos);
             firstClickDimension = serverLevel.dimension();
             return InteractionResult.SUCCESS;
         } else {
+            // Prevent double-click on same block
             if (firstClickedPos != null && firstClickedPos.equals(clickedPos)) {
                 resetState();
                 return InteractionResult.FAIL;
             }
 
-            Long secondShipId = getShipIdAtPos(serverLevel, clickedPos);
+            // Dimension safety check
             if (!serverLevel.dimension().equals(firstClickDimension)) {
                 player.displayClientMessage(
                         Component.literal("§cCannot create rope across dimensions!"),
@@ -65,15 +86,18 @@ public class LeadConstraintItem extends Item {
                 resetState();
                 return InteractionResult.FAIL;
             }
+
+            Long secondShipId = getShipIdAtPos(serverLevel, clickedPos);
             createLeadConstraint(serverLevel, clickedPos, secondShipId, player);
 
-
+            if (player instanceof ServerPlayer serverPlayer) {
+                ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);
+            }
 
             resetState();
             return InteractionResult.SUCCESS;
         }
     }
-
 
 
 

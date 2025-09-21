@@ -10,7 +10,7 @@ import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.client.NetworkHandler;
-import yay.evy.everest.vstuff.ropes.ConstraintPersistence;
+import yay.evy.everest.vstuff.content.constraint.ConstraintPersistence;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +22,7 @@ public class ConstraintTracker {
 
     public static final Map<Integer, RopeConstraintData> activeConstraints = new ConcurrentHashMap<>();
     private static final Map<Integer, String> constraintToPersistenceId = new ConcurrentHashMap<>();
+    private static long lastJoinTime = 0L;
 
 
     public static class RopeConstraintData {
@@ -36,32 +37,16 @@ public class ConstraintTracker {
         public final net.minecraft.core.BlockPos sourceBlockPos;
         public final BlockPos anchorBlockPosA;
         public final BlockPos anchorBlockPosB;
-
-
-
+        public final boolean isShipA;
+        public final boolean isShipB;
 
         public enum ConstraintType {
             ROPE_PULLEY,
             GENERIC
         }
 
-        public RopeConstraintData(Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
-                                  double maxLength, double compliance, double maxForce) {
-            this.shipA = shipA;
-            this.shipB = shipB;
-            this.localPosA = new Vector3d(localPosA);
-            this.localPosB = new Vector3d(localPosB);
-            this.maxLength = maxLength;
-            this.compliance = compliance;
-            this.maxForce = maxForce;
-            this.constraintType = ConstraintType.GENERIC;
-            this.sourceBlockPos = null;
-            this.anchorBlockPosA = null;
-            this.anchorBlockPosB = null;
-        }
-
-
-        public RopeConstraintData(Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
+        // This is the primary constructor. Keep this one.
+        public RopeConstraintData(ServerLevel level, Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
                                   double maxLength, double compliance, double maxForce,
                                   ConstraintType constraintType, net.minecraft.core.BlockPos sourceBlockPos) {
             this.shipA = shipA;
@@ -75,6 +60,16 @@ public class ConstraintTracker {
             this.sourceBlockPos = sourceBlockPos;
             this.anchorBlockPosA = null;
             this.anchorBlockPosB = null;
+
+            Long groundBodyId = VSGameUtilsKt.getShipObjectWorld(level).getDimensionToGroundBodyIdImmutable().get(VSGameUtilsKt.getDimensionId(level));
+            this.isShipA = !shipA.equals(groundBodyId);
+            this.isShipB = !shipB.equals(groundBodyId);
+        }
+
+        // This is the old constructor, which now calls the main constructor
+        public RopeConstraintData(ServerLevel level, Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
+                                  double maxLength, double compliance, double maxForce) {
+            this(level, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, ConstraintType.GENERIC, null);
         }
 
         public Vector3d getWorldPosA(ServerLevel level, float partialTick) {
@@ -138,7 +133,7 @@ public class ConstraintTracker {
             }
         }
 
-        RopeConstraintData data = new RopeConstraintData(shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, constraintType, sourceBlockPos);
+        RopeConstraintData data = new RopeConstraintData(level, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, constraintType, sourceBlockPos);
         activeConstraints.put(constraintId, data);
 
         ConstraintPersistence persistence = ConstraintPersistence.get(level);
@@ -221,7 +216,7 @@ public class ConstraintTracker {
     }
 
 
-    public static void addConstraintToTracker(Integer constraintId, Long shipA, Long shipB,
+    public static void addConstraintToTracker(ServerLevel level, Integer constraintId, Long shipA, Long shipB,
                                               Vector3d localPosA, Vector3d localPosB, double maxLength,
                                               double compliance, double maxForce,
                                               RopeConstraintData.ConstraintType constraintType,
@@ -231,14 +226,12 @@ public class ConstraintTracker {
             return;
         }
 
-        RopeConstraintData data = new RopeConstraintData(shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, constraintType, sourceBlockPos);
+        RopeConstraintData data = new RopeConstraintData(level, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, constraintType, sourceBlockPos);
         activeConstraints.put(constraintId, data);
 
         NetworkHandler.sendConstraintAdd(constraintId, shipA, shipB, localPosA, localPosB, maxLength);
         //System.out.println("Added " + constraintType + " constraint " + constraintId + " to tracker (restoration) with source block " + sourceBlockPos);
     }
-
-
 
 
 
@@ -257,6 +250,7 @@ public class ConstraintTracker {
 
             if (!exists) {
                 //  System.out.println("Ship " + shipId + " not found in ship world");
+                // Try alternative lookup methods
                 var allShips = shipWorld.getAllShips();
                 //System.out.println("Available ships: " + allShips.stream().map(s -> s.getId()).toList());
             }
@@ -267,6 +261,7 @@ public class ConstraintTracker {
             return false;
         }
     }
+
 
     private static final Map<Integer, Long> delayedValidations = new ConcurrentHashMap<>();
 
@@ -287,108 +282,16 @@ public class ConstraintTracker {
                 NetworkHandler.sendConstraintAddToPlayer(player, constraintId, data.shipA, data.shipB,
                         data.localPosA, data.localPosB, data.maxLength);
             }
-            // System.out.println("Synced " + activeConstraints.size() + " constraints to player " + player.getName().getString());
+            // Sync all constraints to player
+            NetworkHandler.sendClearAllConstraintsToPlayer(player);
+            syncAllConstraintsToPlayer(player);
+
+            // Update the last join time to delay the cleanup process
+            lastJoinTime = System.currentTimeMillis();
+            System.out.println("Player joined, setting lastJoinTime for delayed cleanup.");
         }
     }
-    public static void validateAndCleanupConstraints(ServerLevel level) {
-        //  System.out.println("=== CONSTRAINT VALIDATION START ===");
-        //  System.out.println("Validating " + activeConstraints.size() + " active constraints...");
-        java.util.List<Integer> constraintsToRemove = new java.util.ArrayList<>();
 
-        Long groundBodyId = null;
-        try {
-            groundBodyId = VSGameUtilsKt.getShipObjectWorld(level)
-                    .getDimensionToGroundBodyIdImmutable()
-                    .get(VSGameUtilsKt.getDimensionId(level));
-            //   System.out.println("Ground body ID: " + groundBodyId);
-        } catch (Exception e) {
-            // System.err.println("Failed to get ground body ID, skipping validation: " + e.getMessage());
-            return;
-        }
-
-        if (groundBodyId == null) {
-            // System.err.println("Ground body ID is null, skipping validation");
-            return;
-        }
-
-        long currentTime = System.currentTimeMillis();
-        java.util.List<Integer> delayedToProcess = new java.util.ArrayList<>();
-        for (Map.Entry<Integer, Long> entry : delayedValidations.entrySet()) {
-            if (currentTime >= entry.getValue()) {
-                delayedToProcess.add(entry.getKey());
-            }
-        }
-
-        for (Integer constraintId : delayedToProcess) {
-            delayedValidations.remove(constraintId);
-            if (activeConstraints.containsKey(constraintId)) {
-                //   System.out.println("Processing delayed validation for constraint " + constraintId);
-                RopeConstraintData data = activeConstraints.get(constraintId);
-                boolean shipAExists = isShipValid(level, data.shipA, groundBodyId);
-                boolean shipBExists = isShipValid(level, data.shipB, groundBodyId);
-
-                if (!shipAExists || !shipBExists) {
-                    //    System.out.println("Delayed validation failed - removing constraint " + constraintId);
-                    constraintsToRemove.add(constraintId);
-                }
-            }
-        }
-
-        for (Map.Entry<Integer, RopeConstraintData> entry : activeConstraints.entrySet()) {
-            Integer constraintId = entry.getKey();
-            RopeConstraintData data = entry.getValue();
-
-            if (delayedValidations.containsKey(constraintId)) {
-                continue;
-            }
-
-            try {
-                boolean shipAExists = isShipValid(level, data.shipA, groundBodyId);
-                boolean shipBExists = isShipValid(level, data.shipB, groundBodyId);
-
-                if (!shipAExists || !shipBExists) {
-                    //    System.out.println("Constraint " + constraintId + " references missing ships - scheduling delayed validation");
-                    scheduleDelayedValidation(level, constraintId, 5000);
-                    continue;
-                }
-
-
-
-                if (!areAttachmentChunksLoaded(level, data, groundBodyId)) {
-                    //     System.out.println("Constraint " + constraintId + " has attachment points in unloaded chunks - skipping validation");
-                    continue;
-                }
-
-                boolean validA = isValidAttachmentPoint(level, data.localPosA, data.shipA, groundBodyId);
-                boolean validB = isValidAttachmentPoint(level, data.localPosB, data.shipB, groundBodyId);
-                boolean isValid = validA && validB;
-
-                if (!isValid) {
-                    //    System.out.println("Generic constraint " + constraintId + " is invalid - marking for removal");
-                    constraintsToRemove.add(constraintId);
-                }
-            } catch (Exception e) {
-                //   System.err.println("Error validating constraint " + constraintId + ": " + e.getMessage());
-                if (data.constraintType == RopeConstraintData.ConstraintType.ROPE_PULLEY) {
-                    scheduleDelayedValidation(level, constraintId, 5000);
-                } else {
-                    scheduleDelayedValidation(level, constraintId, 5000);
-                }
-            }
-        }
-
-        for (Integer constraintId : constraintsToRemove) {
-            try {
-                VSGameUtilsKt.getShipObjectWorld(level).removeConstraint(constraintId);
-                removeConstraintWithPersistence(level, constraintId);
-            } catch (Exception e) {
-                //        System.err.println("Error removing invalid constraint " + constraintId + ": " + e.getMessage());
-            }
-        }
-
-        // System.out.println("=== CONSTRAINT VALIDATION END ===");
-        //  System.out.println("Constraint validation complete. Removed " + constraintsToRemove.size() + " invalid constraints.");
-    }
 
     public static void cleanupOrphanedConstraints(ServerLevel level, net.minecraft.core.BlockPos sourceBlockPos) {
         // System.out.println("Cleaning up orphaned constraints for block at " + sourceBlockPos);
@@ -446,81 +349,129 @@ public class ConstraintTracker {
         }
     }
 
+    public static void validateAndCleanupConstraints(ServerLevel level) {
+        // Skip validation for 15 seconds after a player joins
+        if (System.currentTimeMillis() - lastJoinTime < 15000) return;
 
+        java.util.List<Integer> constraintsToRemove = new java.util.ArrayList<>();
 
-    private static boolean isValidAttachmentPoint(ServerLevel level, Vector3d localPos, Long shipId, Long groundBodyId) {
+        Long groundBodyId;
         try {
-            if (shipId.equals(groundBodyId)) {
+            groundBodyId = VSGameUtilsKt.getShipObjectWorld(level)
+                    .getDimensionToGroundBodyIdImmutable()
+                    .get(VSGameUtilsKt.getDimensionId(level));
+        } catch (Exception e) {
+            return; // Cannot validate without ground body
+        }
+        if (groundBodyId == null) return;
+
+        long currentTime = System.currentTimeMillis();
+
+        // --- Process delayed validations ---
+        java.util.List<Integer> delayedToProcess = new java.util.ArrayList<>();
+        for (Map.Entry<Integer, Long> entry : delayedValidations.entrySet()) {
+            if (currentTime >= entry.getValue()) delayedToProcess.add(entry.getKey());
+        }
+
+        for (Integer constraintId : delayedToProcess) {
+            delayedValidations.remove(constraintId);
+            RopeConstraintData data = activeConstraints.get(constraintId);
+            if (data == null) continue;
+
+            boolean shipAExists = isShipValid(level, data.shipA, groundBodyId);
+            boolean shipBExists = isShipValid(level, data.shipB, groundBodyId);
+
+            if (!shipAExists || !shipBExists) {
+                constraintsToRemove.add(constraintId);
+            }
+        }
+
+        // --- Validate active constraints ---
+        for (Map.Entry<Integer, RopeConstraintData> entry : activeConstraints.entrySet()) {
+            Integer constraintId = entry.getKey();
+            RopeConstraintData data = entry.getValue();
+
+            // Skip if already scheduled for delayed validation
+            if (delayedValidations.containsKey(constraintId)) continue;
+
+            boolean shipAExists = isShipValid(level, data.shipA, groundBodyId);
+            boolean shipBExists = isShipValid(level, data.shipB, groundBodyId);
+
+            if (!shipAExists || !shipBExists) {
+                // Ship missing → schedule delayed validation instead of removing
+                scheduleDelayedValidation(level, constraintId, 5000);
+                continue;
+            }
+
+            // Skip validation if chunks are not loaded
+            if (!areAttachmentChunksLoaded(level, data, groundBodyId)) continue;
+
+            boolean validA = isValidAttachmentPoint(level, data.localPosA, data.shipA, groundBodyId, data.isShipA);
+            boolean validB = isValidAttachmentPoint(level, data.localPosB, data.shipB, groundBodyId, data.isShipB);
+
+            if (!validA || !validB) {
+                // Invalid attachment → schedule delayed validation
+                scheduleDelayedValidation(level, constraintId, 5000);
+            }
+        }
+
+        // --- Remove constraints marked for removal by delayed validation ---
+        for (Integer constraintId : constraintsToRemove) {
+            try {
+                VSGameUtilsKt.getShipObjectWorld(level).removeConstraint(constraintId);
+                removeConstraintWithPersistence(level, constraintId);
+            } catch (Exception ignored) {}
+        }
+    }
+    public static boolean constraintExists(ServerLevel level, Integer constraintId) {
+        if (constraintId == null) return false;
+
+        try {
+            var shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
+
+            return getActiveConstraints().containsKey(constraintId);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Safe attachment point validation:
+     * - Returns true if the block exists, or if chunk is not loaded
+     * - Uses a small epsilon to avoid false invalidation
+     */
+
+    private static boolean isValidAttachmentPoint(ServerLevel level, Vector3d localPos, Long shipId, Long groundBodyId, boolean isShip) {
+        try {
+            if (!isShip) { // If it's a world attachment point
+                // Logic for a world-side attachment point. No transformations needed.
                 net.minecraft.core.BlockPos blockPos = new net.minecraft.core.BlockPos(
                         (int) Math.floor(localPos.x),
                         (int) Math.floor(localPos.y),
                         (int) Math.floor(localPos.z)
                 );
-
-                if (!level.isLoaded(blockPos)) {
-                    System.out.println("World block at " + blockPos + " is not loaded - skipping validation");
-                    return true;
-                }
-
+                if (!level.isLoaded(blockPos)) return true;
                 net.minecraft.world.level.block.state.BlockState state = level.getBlockState(blockPos);
-                boolean valid = !state.isAir();
-                return valid;
-            } else {
+                return !state.isAir();
+            } else { // If it's a ship attachment point
+                // Logic for a ship-side attachment point. Transformation is needed.
                 org.valkyrienskies.core.api.ships.Ship ship = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
-                if (ship == null) {
-                    return false;
-                }
-
-                boolean looksLikeWorldCoords = Math.abs(localPos.x) > 1000000 || Math.abs(localPos.z) > 1000000;
-
-                if (looksLikeWorldCoords) {
-                    Vector3d actualShipLocal = new Vector3d();
-                    ship.getTransform().getWorldToShip().transformPosition(localPos, actualShipLocal);
-
-                    Vector3d worldPos = new Vector3d();
-                    ship.getTransform().getShipToWorld().transformPosition(actualShipLocal, worldPos);
-                    net.minecraft.core.BlockPos worldBlockPos = new net.minecraft.core.BlockPos(
-                            (int) Math.floor(worldPos.x),
-                            (int) Math.floor(worldPos.y),
-                            (int) Math.floor(worldPos.z)
-                    );
-
-                    if (!level.isLoaded(worldBlockPos)) {
-                        System.out.println("Ship block world position " + worldBlockPos + " is not loaded - skipping validation");
-                        return true;
-                    }
-
-                    net.minecraft.world.level.block.state.BlockState state = level.getBlockState(worldBlockPos);
-                    boolean valid = !state.isAir();
-                    return valid;
-                } else {
-                    Vector3d worldPos = new Vector3d();
-                    ship.getTransform().getShipToWorld().transformPosition(localPos, worldPos);
-                    net.minecraft.core.BlockPos worldBlockPos = new net.minecraft.core.BlockPos(
-                            (int) Math.floor(worldPos.x),
-                            (int) Math.floor(worldPos.y),
-                            (int) Math.floor(worldPos.z)
-                    );
-
-                    if (!level.isLoaded(worldBlockPos)) {
-                        //    System.out.println("Ship block world position " + worldBlockPos + " is not loaded - skipping validation");
-                        return true;
-                    }
-
-                    net.minecraft.world.level.block.state.BlockState state = level.getBlockState(worldBlockPos);
-                    boolean valid = !state.isAir();
-                    return valid;
-                }
+                if (ship == null) return false;
+                Vector3d worldPos = new Vector3d();
+                ship.getTransform().getShipToWorld().transformPosition(localPos, worldPos);
+                net.minecraft.core.BlockPos worldBlockPos = new net.minecraft.core.BlockPos(
+                        (int) Math.floor(worldPos.x),
+                        (int) Math.floor(worldPos.y),
+                        (int) Math.floor(worldPos.z)
+                );
+                if (!level.isLoaded(worldBlockPos)) return true;
+                net.minecraft.world.level.block.state.BlockState state = level.getBlockState(worldBlockPos);
+                return !state.isAir();
             }
         } catch (Exception e) {
-            //System.err.println("Error checking attachment point validity for shipId " + shipId + ", localPos " + localPos + ": " + e.getMessage());
             return true;
         }
     }
-
-
-
-
 
 
 

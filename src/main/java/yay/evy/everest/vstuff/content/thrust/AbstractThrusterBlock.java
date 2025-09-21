@@ -81,26 +81,40 @@ public abstract class AbstractThrusterBlock extends KineticBlock implements Enti
     public void onPlace(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos,
                         @Nonnull BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
+
         if (level.isClientSide()) return;
 
-        ThrusterForceAttachment attachment = ThrusterForceAttachment.get(level, pos);
         BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (blockEntity instanceof AbstractThrusterBlockEntity thrusterBE) {
-            ThrusterData data = thrusterBE.getThrusterData();
-            data.setDirection(VectorConversionsMCKt.toJOMLD(state.getValue(FACING).getNormal()));
-            data.setThrust(0);
+        if (!(blockEntity instanceof AbstractThrusterBlockEntity thrusterBE)) return;
 
+        ThrusterForceAttachment attachment = ThrusterForceAttachment.get(level, pos);
+
+        ThrusterData data = thrusterBE.getThrusterData();
+        data.setDirection(VectorConversionsMCKt.toJOMLD(state.getValue(FACING).getNormal()));
+        data.setThrust(0);
+
+        if (attachment != null) {
             ThrusterForceApplier applier = new ThrusterForceApplier(data);
             attachment.addApplier(pos, applier);
-
-            System.out.println("[Thruster] onPlace: added applier at " + pos + " attachment=" + (attachment != null));
-
-
-            // Initial obstruction check
-            thrusterBE.calculateObstruction(level, pos, state.getValue(FACING));
-            thrusterBE.updateThrust(state);
-            thrusterBE.setChanged();
+            System.out.println("[Thruster] onPlace: added applier at " + pos);
+        } else {
+            level.getServer().execute(() -> {
+                ThrusterForceAttachment deferredAttachment = ThrusterForceAttachment.get(level, pos);
+                if (deferredAttachment != null) {
+                    ThrusterForceApplier applier = new ThrusterForceApplier(data);
+                    deferredAttachment.addApplier(pos, applier);
+                    System.out.println("[Thruster] onPlace: deferred registration succeeded at " + pos);
+                } else {
+                    System.out.println("[Thruster] onPlace: deferred registration still null at " + pos);
+                }
+            });
         }
+
+        // Initial obstruction check & thrust update
+        thrusterBE.calculateObstruction(level, pos, state.getValue(FACING));
+        thrusterBE.updateThrust(state);
+        thrusterBE.setChanged();
+
         doRedstoneCheck(level, state, pos);
     }
 

@@ -27,6 +27,8 @@ public class ServerTickHandler {
         }
     }
 
+    // this drove me insane so fuck you now you dont get rope validation :clueless:
+/*
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
@@ -49,5 +51,7 @@ public class ServerTickHandler {
         }
     }
 
+
+ */
 
 }

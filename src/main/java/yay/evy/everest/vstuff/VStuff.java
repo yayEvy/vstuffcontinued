@@ -28,8 +28,8 @@ public class VStuff {
 
 
         VStuffCreativeModeTabs.register(modEventBus);
-        VStuffBlockEntities.register();
         VStuffBlocks.register();
+        VStuffBlockEntities.register();
         VStuffItems.register();
 
         VStuffSounds.register(FMLJavaModLoadingContext.get().getModEventBus());

@@ -2,8 +2,8 @@
   "credit": "Made with love by Unity",
   "texture_size": [64, 64],
   "textures": {
-    "0": "vstuff:block/rope_pulley",
-    "particle": "vstuff:block/rope_pulley"
+    "0": "vstuff:block/phys_pulley",
+    "particle": "vstuff:block/phys_pulley"
   },
   "elements": [
     {
