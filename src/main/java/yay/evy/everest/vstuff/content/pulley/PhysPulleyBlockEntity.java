@@ -9,6 +9,7 @@ import com.simibubi.create.foundation.utility.VecHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Position;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
@@ -162,78 +163,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         super.addBehaviours(behaviours);
 
-        ValueBoxTransform transform = new ValueBoxTransform() {
-            @Override
-            public Vec3 getLocalOffset(BlockState state) {
-                return VecHelper.voxelSpace(8, 14, 8);
-            }
-
-            @Override
-            public void rotate(BlockState state, PoseStack ms) {
-            }
-
-            public boolean isSideActive(BlockState state, Direction side) {
-                return side == Direction.UP;
-            }
-
-            @Override
-            public float getScale() {
-                return 0.4f;
-            }
-        };
-
-        MODE = new ScrollValueBehaviour(
-                Component.literal("Pulley Mode"),
-                this,
-                transform
-        ) {
-            @Override
-            public String getClipboardKey() {
-                return "PulleyMode";
-            }
-
-            @Override
-            public String formatValue() {
-                int value = getValue();
-                if (value < 0 || value >= MODES.length) {
-                    return "INVALID";
-                }
-                return MODES[value].getDisplayName().getString();
-            }
-
-
-
-            @Override
-            public void write(CompoundTag compound, boolean clientPacket) {
-                super.write(compound, clientPacket);
-                compound.putInt("PulleyMode", getValue());
-            }
-
-            @Override
-            public void read(CompoundTag compound, boolean clientPacket) {
-                super.read(compound, clientPacket);
-                if (compound.contains("PulleyMode")) {
-                    setValue(compound.getInt("PulleyMode"));
-                }
-            }
-        };
-
-        MODE.between(0, MODES.length - 1);
-
-        if (loadedPulleyMode != null) {
-            MODE.setValue(loadedPulleyMode);
-            loadedPulleyMode = null;
-        } else {
-            MODE.setValue(0);
-        }
-
-        MODE.withCallback(i -> {
-            if (i < 0) MODE.setValue(0);
-            else if (i >= MODES.length) MODE.setValue(MODES.length - 1);
-            updatePulleyMode();
-        });
-
-        behaviours.add(MODE);
     }
 
     public static class SelectedRegion {
@@ -252,12 +181,13 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
 
     public PulleyMode getPulleyMode() {
-        int value = MODE.getValue();
-        if (value < 0 || value >= MODES.length) {
-            return PulleyMode.MANUAL; // Default fallback
+        if (MODES.length > 0) {
+            return MODES[0];
+        } else {
+            return PulleyMode.MANUAL;
         }
-        return MODES[value];
     }
+
 
     private void onModeChanged(PulleyMode oldMode, PulleyMode newMode) {
         System.out.println("Pulley mode changed from " + oldMode + " to " + newMode);
@@ -268,7 +198,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
                 // System.out.println("Cancelled manual target setting - switching to auto mode");
             }
 
-            // Keep existing constraints but clear manual target state if no constraint exists
             if (constraintId == null) {
                 hasTarget = false;
                 targetPos = null;
@@ -276,7 +205,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             }
 
         } else if (oldMode == PulleyMode.AUTO && newMode == PulleyMode.MANUAL) {
-            // Switching from auto to manual
             // System.out.println("Switched to manual mode - player control enabled");
 
 
@@ -912,14 +840,26 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
         super.onLoad();
         initializeRopeInventory();
         ropeStateInitialized = false;
-        restoring = true;  // new boolean field
+        restoring = true;
 
-        if (constraintId != null && level instanceof ServerLevel) {
-            recreateConstraintOnLoad((ServerLevel) level);
-            ropeStateInitialized = true;
-            restoring = false;
+        if (manualMode && hasTarget && level instanceof ServerLevel serverLevel) {
+            Integer newId = createConstraintWithLength(currentRopeLength);
+            if (newId != null) constraintId = newId;
         }
+
+
+        if (hasTarget && level instanceof ServerLevel serverLevel) {
+            Integer newId = createConstraintWithLength(currentRopeLength);
+            if (newId != null) {
+                constraintId = newId;
+                System.out.println("Recreated constraint at length " + currentRopeLength + " after reload");
+            }
+        }
+
+        ropeStateInitialized = true;
+        restoring = false;
     }
+
 
     @Override
     public void tick() {
@@ -948,16 +888,21 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
         }
 
         double speed = getSpeed();
+        BlockPos pulleyBlockPos = getBlockPos();
+        if (pulleyBlockPos == null) return;
+
 
         if (currentMode == PulleyMode.AUTO && speed < 0 && !hasTarget && !isLowering) {
             BlockPos autoTarget = findAutoTarget();
             if (autoTarget != null) {
                 pendingTargetPos = autoTarget;
 
-                Ship pulleyShip = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, getBlockPos());
+                Ship pulleyShip = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, pulleyBlockPos);
                 Ship targetShip = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, autoTarget);
 
-                Vector3d pulleyWorldPos = getWorldPosition(serverLevel, getBlockPos(), pulleyShip);
+                if (pulleyShip == null || targetShip == null) return;
+
+                Vector3d pulleyWorldPos = getWorldPosition(serverLevel, pulleyBlockPos, pulleyShip);
                 Vector3d targetWorldPos = getWorldPosition(serverLevel, autoTarget, targetShip);
 
                 double rawDistance = pulleyWorldPos.distance(targetWorldPos);
@@ -971,15 +916,16 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             }
         }
 
+
         if (isLowering && pendingTargetPos != null) {
-            double step = LENGTH_CHANGE_RATE / 8.0;
-
-            Ship pulleyShip = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, getBlockPos());
+            Ship pulleyShip = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, pulleyBlockPos);
             Ship targetShip = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, pendingTargetPos);
+            if (pulleyShip == null || targetShip == null) return;
 
-            Vector3d pulleyWorldPos = getWorldPosition(serverLevel, getBlockPos(), pulleyShip);
+            Vector3d pulleyWorldPos = getWorldPosition(serverLevel, pulleyBlockPos, pulleyShip);
             Vector3d targetWorldPos = getWorldPosition(serverLevel, pendingTargetPos, targetShip);
 
+            double step = LENGTH_CHANGE_RATE / 8.0;
             double distance = pendingTargetDistance;
             double newLen = Math.min(currentRopeLength + step, distance);
             double progress = distance > 0 ? newLen / distance : 1.0;
@@ -994,7 +940,25 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             isRopeRendering = true;
             sendData();
 
+            BlockPos checkPos = BlockPos.containing(ropeEndPos.x, ropeEndPos.y, ropeEndPos.z);
+
+            Ship foundShip = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, checkPos);
+            if (foundShip != null) {
+                finishAutoAttach(serverLevel, checkPos);
+                return;
+            }
+
+            if (isBlockSuperglued(serverLevel, checkPos)) {
+                Set<BlockPos> cluster = findSupergluedCluster(serverLevel, checkPos);
+                PhysifyResult result = physifyBlocksIntoShip(serverLevel, cluster, checkPos);
+                if (result != null && result.ship != null) {
+                    finishAutoAttach(serverLevel, checkPos);
+                    return;
+                }
+            }
+
             if (progress >= 0.999) {
+                finishAutoAttach(serverLevel, pendingTargetPos);
                 isLowering = false;
 
                 targetPos = pendingTargetPos;
@@ -1009,31 +973,54 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             }
         }
 
+
         else if (currentMode == PulleyMode.MANUAL && hasTarget) {
             double step = LENGTH_CHANGE_RATE / 4.0;
             if (speed > 0) extendRope(step);
             else if (speed < 0) retractRope(step);
 
-            // Update rope end position for rendering
-            Ship pulleyShip = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, getBlockPos());
-            Ship targetShip = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, targetPos);
+            if (targetPos != null) {
+                Ship pulleyShip = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, pulleyBlockPos);
+                Ship targetShip = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, targetPos);
 
-            if (pulleyShip != null && targetShip != null) {
-                Vector3d pulleyWorldPos = getWorldPosition(serverLevel, getBlockPos(), pulleyShip);
-                Vector3d targetWorldPos = getWorldPosition(serverLevel, targetPos, targetShip);
-                Vector3d dir = targetWorldPos.sub(pulleyWorldPos).normalize();
+                if (pulleyShip != null && targetShip != null) {
+                    Vector3d pulleyWorldPos = getWorldPosition(serverLevel, pulleyBlockPos, pulleyShip);
+                    Vector3d targetWorldPos = getWorldPosition(serverLevel, targetPos, targetShip);
+                    Vector3d dir = targetWorldPos.sub(pulleyWorldPos).normalize();
 
-                ropeEndPos = pulleyWorldPos.add(dir.mul(currentRopeLength));
-                isRopeRendering = true;
-                sendData();
+                    ropeEndPos = pulleyWorldPos.add(dir.mul(currentRopeLength));
+                    isRopeRendering = true;
+                    sendData();
+                }
             }
         }
+
 
         else if (currentMode == PulleyMode.AUTO && hasTarget) {
             double step = LENGTH_CHANGE_RATE / 4.0;
             if (speed < 0) retractRope(step);
             else if (speed > 0) extendRope(step);
         }
+    }
+
+
+    private void finishAutoAttach(ServerLevel serverLevel, BlockPos attachPos) {
+        isLowering = false;
+        pendingTargetPos = null;
+        targetPos = attachPos;
+        hasTarget = true;
+
+        if (constraintId != null) removeExistingConstraint();
+
+        if (createAutoConstraint()) {
+            System.out.println("AUTO MODE: Rope attached to " + attachPos);
+        } else {
+            System.err.println("AUTO MODE: Failed to create constraint at " + attachPos);
+        }
+    }
+
+    public void removeExistingConstraint() {
+        removeExistingConstraint(false);
     }
 
 
@@ -1073,86 +1060,68 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
     private void extendRope(double amount) {
         if (level.isClientSide) return;
-        ServerLevel serverLevel = (ServerLevel) level;
 
-        if (!hasTarget) return; // Must have a target
-
-        if (constraintId != null && lastMode != PulleyMode.MANUAL && !isConstraintValid(constraintId, serverLevel)) {
-            clearConstraint();
+        if (!hasTarget) {
+            return;
         }
 
-        double available = getAvailableRopeForExtension();
-        if (available <= 0 || !consumeRope(amount)) return;
+        double newLength = currentRopeLength + amount;
 
-        double newLength = Math.min(currentRopeLength + amount, getRawMaxRopeLength());
+        if (lastMode == PulleyMode.MANUAL) {
+            currentRopeLength = newLength;
+            actuallyConsumeRope(amount);
 
-        if (Math.abs(newLength - currentRopeLength) > 1e-6) {
+            if (constraintId != null && level instanceof ServerLevel serverLevel) {
+                removeExistingConstraint(true);
 
-            if (lastMode == PulleyMode.MANUAL) {
-                currentRopeLength = newLength;
-                actuallyConsumeRope(amount);
-                setChanged();
-                sendData();
-                return;
-            }
-
-            else {
-                if (constraintId != null) {
-                    removeExistingConstraint();
-                    constraintId = null;
-                }
-
-                currentRopeLength = newLength;
-                actuallyConsumeRope(amount);
-
-                Integer newId = createConstraintWithLength(newLength);
+                Integer newId = createConstraintWithLength(currentRopeLength);
                 if (newId != null) constraintId = newId;
             }
 
             setChanged();
             sendData();
+            return;
+        }
+
+        if (consumeRope(amount)) {
+            currentRopeLength = newLength;
+            setChanged();
+            sendData();
         }
     }
+
 
     private void retractRope(double amount) {
         if (level.isClientSide) return;
-        ServerLevel serverLevel = (ServerLevel) level;
 
-        if (!hasTarget) return;
-
-        if (constraintId != null && lastMode != PulleyMode.MANUAL && !isConstraintValid(constraintId, serverLevel)) {
-            clearConstraint();
+        if (!hasTarget) {
+            return;
         }
 
-        double newLength = Math.max(minRopeLength, currentRopeLength - amount);
-        if (newLength >= currentRopeLength) return;
+        double newLength = currentRopeLength - amount;
+        if (newLength < baseRopeLength) newLength = baseRopeLength;
 
-        // Manual-mode update
         if (lastMode == PulleyMode.MANUAL) {
             currentRopeLength = newLength;
-            returnRope(currentRopeLength - newLength);
+            returnRope(amount);
+
+            if (constraintId != null && level instanceof ServerLevel serverLevel) {
+                removeExistingConstraint(true);
+
+                Integer newId = createConstraintWithLength(currentRopeLength);
+                if (newId != null) constraintId = newId;
+            }
+
             setChanged();
             sendData();
             return;
-
-        }
-        else {
-            if (constraintId != null) {
-                removeExistingConstraint();
-                constraintId = null;
-            }
-
-            returnRope(currentRopeLength - newLength);
-            currentRopeLength = newLength;
-
-            Integer newId = createConstraintWithLength(newLength);
-            if (newId != null) constraintId = newId;
         }
 
+        returnRope(amount);
+        currentRopeLength = newLength;
         setChanged();
         sendData();
     }
-
 
 
     public double getCurrentRopeLength() {
@@ -1357,7 +1326,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
                     shipA.longValue(), shipB.longValue(),
                     1e-9,
                     localPosA, localPosB,
-                    180000000000.0,
+                    900000000,
                     restoredLength
             );
 
@@ -1366,7 +1335,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
                 constraintId = newConstraintId;
                 currentRopeLength = restoredLength;
                 ropeStateInitialized = true;
-                isRopeRendering = true; // <-- ADD THIS LINE
+                isRopeRendering = true;
 
                 ConstraintTracker.addConstraintWithPersistence(serverLevel, constraintId, shipA, shipB,
                         localPosA, localPosB, currentRopeLength, 1e-9, 50000000,
@@ -1404,9 +1373,8 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
         }
     }
 
-
-    public void removeExistingConstraint() {
-        if (isManualMode()) {
+    public void removeExistingConstraint(boolean force) {
+        if (isManualMode() && !force) {
             System.out.println("MANUAL MODE: Skipping removeExistingConstraint");
             return;
         }
@@ -1422,10 +1390,11 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
         this.previewTargetPos = null;
         this.previewAttachVec = null;
 
-        this.currentRopeLength = baseRopeLength;
-
-        System.out.println("Pulley state fully reset");
+        if (!isManualMode()) {
+            this.currentRopeLength = baseRopeLength;
+        }
     }
+
 
 
 
@@ -1567,7 +1536,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             System.out.println("MANUAL MODE: Calculated target rope length = " + targetLength);
 
             this.targetRopeLength = targetLength;
-            this.isExtending = true;  // start smooth extension
+            this.isExtending = true;
 
 
             double initialLength = targetLength;
@@ -1821,7 +1790,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             return localPos;
         }
 
-        // Fallback
         return blockWorldPos;
     }
 
@@ -1830,13 +1798,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);
 
-        tooltip.add(Component.literal(" ")); // blank line
-
-
-        PulleyMode currentMode = getPulleyMode();
-        tooltip.add(Component.literal("Mode: " + currentMode.name())
-                .withStyle(currentMode == PulleyMode.MANUAL ? ChatFormatting.BLUE : ChatFormatting.GREEN));
-
+        tooltip.add(Component.literal(" "));
 
 
         ItemStack ropeStack = ropeInventory.getStackInSlot(0);
@@ -1855,41 +1817,31 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             float speed = getSpeed();
             if (Math.abs(speed) > 4) {
                 String direction = speed > 0 ? "Retracting" : "Extending";
-                tooltip.add(Component.literal("Status: " + direction + " (" + String.format("%.1f", speed) + " RPM)")
+                tooltip.add(Component.literal("Status: " + direction + " (" + String.format("%.1f", speed))
                         .withStyle(ChatFormatting.GREEN));
             } else {
                 tooltip.add(Component.literal("Status: Idle")
                         .withStyle(ChatFormatting.GRAY));
             }
         } else {
-
-            if (currentMode == PulleyMode.AUTO) {
-                if (hasRope()) {
-                    tooltip.add(Component.literal("Ready - Apply rotation to extend")
-                            .withStyle(ChatFormatting.YELLOW));
-                } else {
-                    tooltip.add(Component.literal("Need rope to begin")
-                            .withStyle(ChatFormatting.RED));
-                }
+            if (hasTarget && hasRope()) {
+                tooltip.add(Component.literal("Ready - Right-click to create constraint")
+                        .withStyle(ChatFormatting.YELLOW));
+            } else if (waitingForTarget) {
+                tooltip.add(Component.literal("§e§lClick any block to set target")
+                        .withStyle(ChatFormatting.YELLOW));
+            } else if (!hasRope()){
+                tooltip.add(Component.literal("Need rope and a target")
+                        .withStyle(ChatFormatting.RED));
             } else {
-                if (hasTarget && hasRope()) {
-                    tooltip.add(Component.literal("Ready - Right-click to create constraint")
-                            .withStyle(ChatFormatting.YELLOW));
-                } else if (waitingForTarget) {
-                    tooltip.add(Component.literal("§e§lClick any block to set target")
-                            .withStyle(ChatFormatting.YELLOW));
-                } else if (!hasRope()){
-                    tooltip.add(Component.literal("Need rope and a target")
-                            .withStyle(ChatFormatting.RED));
-                } else {
-                    tooltip.add(Component.literal("No Target - Shift+Right-click to set")
-                            .withStyle(ChatFormatting.GRAY));
-                }
+                tooltip.add(Component.literal("No Target - Shift+Right-click to set")
+                        .withStyle(ChatFormatting.GRAY));
             }
         }
 
         return true;
     }
+
 
 
     private InteractionResult handleTargetSetting(Player player) {
@@ -1924,7 +1876,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
                 if (pulleyShip != null || targetShip != null) {
                     try {
-                        Thread.sleep(50); // Small delay
+                        Thread.sleep(50);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
@@ -2007,7 +1959,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             return distance;
         } catch (Exception e) {
             System.err.println("Error calculating world distance: " + e.getMessage());
-            // Fallback to simple block distance
             return Math.sqrt(pos1.distSqr(pos2));
         }
     }
@@ -2015,7 +1966,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
     private Vector3d getWorldPosition(BlockPos pos) {
         Vector3d localPos = new Vector3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
 
-        // Check if this position is on a ship
         Ship shipObject = VSGameUtilsKt.getShipObjectManagingPos((ServerLevel) level, pos);
         if (shipObject != null) {
             Vector3d worldPos = new Vector3d();
@@ -2023,7 +1973,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             return worldPos;
         }
 
-        // Not on a ship, return local position as world position
         return localPos;
     }
 
@@ -2035,7 +1984,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
 
     private void actuallyConsumeRope(double extensionAmount) {
-        // No rope consumed, so do nothing here
     }
 
     private void returnRope(double amount) {
@@ -2064,13 +2012,12 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             tag.putLong("TargetPos", targetPos.asLong());
         }
 
-        // Always save pulley mode
+        // Aghytyytf
         tag.putInt("PulleyMode", MODE != null ? MODE.getValue() : 0);
 
         tag.putBoolean("HasTarget", hasTarget);
         tag.putBoolean("WaitingForTarget", waitingForTarget);
 
-        // Rope consumption state
         tag.putDouble("ConsumedRopeLength", consumedRopeLength);
         tag.putDouble("BaseRopeLength", baseRopeLength);
         tag.putBoolean("RopeStateInitialized", ropeStateInitialized);
@@ -2081,6 +2028,9 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
         tag.putDouble("CurrentRopeLength", currentRopeLength);
         tag.putDouble("MinRopeLength", minRopeLength);
+
+        tag.putBoolean("ManualMode", isManualMode());
+
 
         // Save constraint data
         if (shipA != null && shipB != null && localPosA != null && localPosB != null) {
@@ -2098,7 +2048,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
         tag.putBoolean("IsLowering", isLowering);
         tag.putBoolean("IsRopeRendering", isRopeRendering);
 
-        // DEBUG
         System.out.println("Saving rope state - Length: " + currentRopeLength +
                 ", Consumed: " + consumedRopeLength +
                 ", Constraint: " + constraintId +
@@ -2117,13 +2066,14 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
         if (tag.contains("PulleyMode")) {
             int savedMode = tag.getInt("PulleyMode");
             if (savedMode >= 0 && savedMode < MODES.length) {
-                loadedPulleyMode = savedMode; // store for use in addBehaviours
+                loadedPulleyMode = savedMode;
             }
         }
         isLowering = tag.getBoolean("IsLowering");
         isRopeRendering = tag.getBoolean("IsRopeRendering");
 
 
+        manualMode = tag.getBoolean("ManualMode");
 
         lastMode = getPulleyMode();
 

@@ -23,12 +23,10 @@ public class PhysPulleyItem extends BlockItem {
         waitingPulleys.put(player.getUUID(), pulley);
     }
 
-    // Call this when pulley target is set or canceled
     public static void clearWaitingPulley(Player player) {
         waitingPulleys.remove(player.getUUID());
     }
 
-    // Returns pulley BE if player currently has one waiting
     public static PhysPulleyBlockEntity getWaitingPulley(Player player) {
         return waitingPulleys.get(player.getUUID());
     }

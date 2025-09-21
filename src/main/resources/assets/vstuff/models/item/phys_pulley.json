@@ -1,5 +1,5 @@
 {
-  "parent": "vstuff:block/rope_pulley",
+  "parent": "vstuff:block/phys_pulley",
   "display": {
     "thirdperson_righthand": {
       "rotation": [75, 45, 0],
