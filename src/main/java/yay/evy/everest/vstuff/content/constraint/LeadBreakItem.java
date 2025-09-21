@@ -14,6 +14,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.sound.RopeSoundHandler;
@@ -40,7 +41,7 @@ public class LeadBreakItem extends Item {
                     ConstraintTracker.removeConstraintWithPersistence(serverLevel, targetConstraintId);
                     NetworkHandler.sendConstraintRemove(targetConstraintId);
                     forceRemoveConstraint(serverLevel, targetConstraintId);
-                    if (RopeSoundHandler.isEnabled()) {
+                    if (VstuffConfig.ROPE_SOUNDS.get()) {
                         serverLevel.playSound(
                                 null,
                                 player.blockPosition(),

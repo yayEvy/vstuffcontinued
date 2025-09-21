@@ -31,6 +31,7 @@ public class VStuff {
         VStuffBlocks.register();
         VStuffBlockEntities.register();
         VStuffItems.register();
+        VStuffPonders.register();
 
         VStuffSounds.register(FMLJavaModLoadingContext.get().getModEventBus());
 

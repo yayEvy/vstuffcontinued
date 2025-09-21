@@ -15,6 +15,7 @@ public class VstuffConfig {
     public static final ForgeConfigSpec.ConfigValue<Boolean> THRUSTER_DAMAGE_ENTITIES;
     public static final ForgeConfigSpec.ConfigValue<Double> THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER;
     public static final ForgeConfigSpec.ConfigValue<Double> THRUSTER_PARTICLE_COUNT_MULTIPLIER;
+    public static final ForgeConfigSpec.BooleanValue ROPE_SOUNDS;
 
     static {
         // Server builder
@@ -42,6 +43,9 @@ public class VstuffConfig {
         THRUSTER_PARTICLE_COUNT_MULTIPLIER = serverBuilder
                 .comment("Multiplier for thruster particle count (default: 1.0)")
                 .define("particleCountMultiplier", 1.0);
+        ROPE_SOUNDS = serverBuilder
+                .comment("Toggle on or off client rope sounds (default: true)")
+                .define("ropeSounds", true);
         serverBuilder.pop();
 
         SERVER_CONFIG = serverBuilder.build();

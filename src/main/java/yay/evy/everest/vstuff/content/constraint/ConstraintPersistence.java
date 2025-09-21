@@ -372,7 +372,7 @@ public class ConstraintPersistence extends SavedData {
 
         level.getServer().execute(() -> {
             try {
-                Thread.sleep(2000);
+                Thread.sleep(100);
             } catch (InterruptedException ignored) {}
 
             Long currentGroundBodyId;

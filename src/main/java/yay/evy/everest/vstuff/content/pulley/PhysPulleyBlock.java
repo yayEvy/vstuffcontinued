@@ -80,27 +80,7 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
         super.onRemove(state, level, pos, newState, isMoving);
     }
 
-    @Override
-    public InteractionResult onWrenched(BlockState state, UseOnContext context) {
-        Level level = context.getLevel();
-        BlockPos pos = context.getClickedPos();
-        Player player = context.getPlayer();
 
-        if (level.isClientSide || player == null) {
-            return InteractionResult.SUCCESS;
-        }
-
-        ItemStack stack = getCloneItemStack(state, null, level, pos, player);
-        if (stack.isEmpty()) {
-            stack = new ItemStack(this);
-        }
-
-        ItemHandlerHelper.giveItemToPlayer(player, stack);
-
-        level.removeBlock(pos, false);
-
-        return InteractionResult.SUCCESS;
-    }
 
 
     @Override

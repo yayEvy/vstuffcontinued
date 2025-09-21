@@ -18,6 +18,7 @@ import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.core.apigame.constraints.VSRopeConstraint;
+import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyItem;
@@ -218,7 +219,7 @@ public class LeadConstraintItem extends Item {
                             new RopeSoundPacket(false)
                     );
 
-                    if (RopeSoundHandler.isEnabled()) {
+                    if (VstuffConfig.ROPE_SOUNDS.get()) {
                         level.playSound(
                                 null,
                                 BlockPos.containing(finalWorldPosA.x, finalWorldPosA.y, finalWorldPosA.z),

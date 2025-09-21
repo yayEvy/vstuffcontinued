@@ -44,4 +44,7 @@ public class GoggleUtils {
                 .text("- ")
                 .add(Lang.itemName(lensStack).style(ChatFormatting.GOLD));
     }
+
+
+    // silvern and wizard were here :)
 }
