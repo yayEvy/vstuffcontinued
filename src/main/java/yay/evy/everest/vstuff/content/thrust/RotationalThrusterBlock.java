@@ -45,7 +45,7 @@ public class RotationalThrusterBlock extends AbstractThrusterBlock {
         }
         return null;
     }
-
+// stuff wrench idk
 
     @Override
     public boolean canHarvestBlock(BlockState state, BlockGetter world, BlockPos pos, Player player) {

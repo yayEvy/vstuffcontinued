@@ -46,5 +46,5 @@ public class GoggleUtils {
     }
 
 
-    // silvern and wizard were here :)
+    // silvern and wizard were here :D
 }

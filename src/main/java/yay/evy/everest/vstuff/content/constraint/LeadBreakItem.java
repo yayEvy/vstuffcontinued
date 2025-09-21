@@ -41,6 +41,7 @@ public class LeadBreakItem extends Item {
                     ConstraintTracker.removeConstraintWithPersistence(serverLevel, targetConstraintId);
                     NetworkHandler.sendConstraintRemove(targetConstraintId);
                     forceRemoveConstraint(serverLevel, targetConstraintId);
+                    // config
                     if (VstuffConfig.ROPE_SOUNDS.get()) {
                         serverLevel.playSound(
                                 null,

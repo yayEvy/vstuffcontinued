@@ -218,7 +218,7 @@ public class LeadConstraintItem extends Item {
                             PacketDistributor.PLAYER.with(() -> serverPlayer),
                             new RopeSoundPacket(false)
                     );
-
+// config
                     if (VstuffConfig.ROPE_SOUNDS.get()) {
                         level.playSound(
                                 null,

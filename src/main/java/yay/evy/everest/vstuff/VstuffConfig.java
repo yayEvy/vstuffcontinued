@@ -47,7 +47,7 @@ public class VstuffConfig {
                 .comment("Toggle on or off client rope sounds (default: true)")
                 .define("ropeSounds", true);
         serverBuilder.pop();
-
+// woooooooo
         SERVER_CONFIG = serverBuilder.build();
 
         // Client builder (empty for now)
