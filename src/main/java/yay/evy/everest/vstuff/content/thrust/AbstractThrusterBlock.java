@@ -35,7 +35,7 @@ import java.util.Arrays;
 public abstract class AbstractThrusterBlock extends KineticBlock implements EntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.AXIS;
-    public static final IntegerProperty POWER = IntegerProperty.create("redstone_power", 0, 15);
+    public static final IntegerProperty RPM = IntegerProperty.create("rpm", 0, 256);
 
     protected AbstractThrusterBlock(Properties properties) {
         super(properties);
@@ -58,7 +58,7 @@ public abstract class AbstractThrusterBlock extends KineticBlock implements Enti
 
     @Override
     protected void createBlockStateDefinition(@Nonnull StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, POWER, AXIS);
+        builder.add(FACING, AXIS, RPM);
     }
 
     @Override
@@ -128,7 +128,6 @@ public abstract class AbstractThrusterBlock extends KineticBlock implements Enti
         thrusterBE.updateThrust(state);
         thrusterBE.setChanged();
 
-        doRedstoneCheck(level, state, pos);
     }
 
 
@@ -153,30 +152,16 @@ public abstract class AbstractThrusterBlock extends KineticBlock implements Enti
             thrusterBlockEntity.calculateObstruction(level, pos, state.getValue(FACING));
             thrusterBlockEntity.updateThrust(state);
             thrusterBlockEntity.setChanged();
-        }
-        doRedstoneCheck(level, state, pos);
-    }
-    private void doRedstoneCheck(Level level, BlockState state, BlockPos pos) {
-        int newRedstonePower = 15;
-        int oldRedstonePower = state.getValue(POWER);
-        if (newRedstonePower == oldRedstonePower) return;
+            state.setValue(RPM, (int) thrusterBlockEntity.getSpeed());
 
-        BlockState newState = state.setValue(POWER, newRedstonePower);
-        level.setBlock(pos, newState, Block.UPDATE_ALL);
-
-        BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (blockEntity instanceof AbstractThrusterBlockEntity thrusterBlockEntity) {
-            thrusterBlockEntity.calculateObstruction(level, pos, state.getValue(FACING));
-            thrusterBlockEntity.updateThrust(newState);
-            thrusterBlockEntity.setChanged();
         }
     }
-
 
 
     @Override
     public BlockState rotate(@Nonnull BlockState state, @Nonnull Rotation rot) {
-        return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
+        return state.setValue(FACING, rot.rotate(state.getValue(FACING)))
+                .setValue(AXIS, getAxisFromFacingDir(rot.rotate(state.getValue(FACING))));
     }
 
     @Override

@@ -46,8 +46,7 @@ public class ThrusterDamager {
     @SuppressWarnings("null")
     private void doEntityDamageCheck() {
         //Broad phase
-        float visualPowerPercent = ((float)Math.max(thruster.getOverriddenPowerOrState(thruster.getBlockState()), LOWEST_POWER_THRSHOLD) - LOWEST_POWER_THRSHOLD) / 15.0f;
-        float distanceByPower = Math.lerp(0.55f,1.5f, visualPowerPercent);
+        float distanceByPower = Math.lerp(0.55f,1.5f, 1f);
         Direction plumeDirection = thruster.getBlockState().getValue(AbstractThrusterBlock.FACING).getOpposite();
         AABB plumeAABB = calculateAabb(plumeDirection, distanceByPower);
         List<Entity> damageCandidates = thruster.getLevel().getEntities(null, plumeAABB);
@@ -64,14 +63,14 @@ public class ThrusterDamager {
         nozzleInfo.obbRotationWorldJOML().transform(localPlumeVec);
         Vec3 worldPlumeDirection = VectorConversionsMCKt.toMinecraft(localPlumeVec);
 
-        double potentialPlumeLength = thruster.getEmptyBlocks() * distanceByPower;
+        double potentialPlumeLength = thruster.getEmptyBlocks() * distanceByPower * thruster.getSpeedScalar();
         double correctedPlumeLength = performRaycastCheck(nozzleInfo.thrusterNozzleWorldPosMC(), worldPlumeDirection, potentialPlumeLength);
 
         if (correctedPlumeLength <= 0.01) return;
 
         ObbCalculationResult obbResult = calculateObb(plumeDirection, correctedPlumeLength, nozzleInfo);
 
-        applyDamageToEntities(thruster.getLevel(), damageCandidates, obbResult, visualPowerPercent);
+        applyDamageToEntities(thruster.getLevel(), damageCandidates, obbResult, 1f);
 
     }
 
@@ -167,7 +166,7 @@ public class ThrusterDamager {
                 float invSqrDistance = visualPowerPercent * 8.0f / (float)Math.max(1, entity.position().distanceToSqr(obbResult.thrusterNozzleWorldPosMC));
                 float damageAmount = 3 + invSqrDistance;
 
-                entity.hurt(fireDamageSource, damageAmount);
+                entity.hurt(fireDamageSource, damageAmount * thruster.getSpeedScalar());
                 entity.setSecondsOnFire(3);
             }
         }
