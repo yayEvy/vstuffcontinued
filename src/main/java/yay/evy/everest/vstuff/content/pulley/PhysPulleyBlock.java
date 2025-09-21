@@ -30,6 +30,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
 import yay.evy.everest.vstuff.index.VStuffBlockEntities;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.AllItems;
@@ -162,26 +163,27 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
     @Override
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block,
                                 BlockPos fromPos, boolean isMoving) {
-        if (!level.isClientSide) {
-            boolean powered = level.hasNeighborSignal(pos);
-            if (powered != state.getValue(POWERED)) {
-                level.setBlock(pos, state.setValue(POWERED, powered), 3);
-            }
+        if (level.isClientSide) return;
 
+        boolean powered = level.hasNeighborSignal(pos);
+
+        if (powered != state.getValue(POWERED)) {
+            level.setBlock(pos, state.setValue(POWERED, powered), 3);
+        }
+
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be instanceof PhysPulleyBlockEntity pulley) {
             if (powered) {
-                BlockEntity blockEntity = level.getBlockEntity(pos);
-                if (blockEntity instanceof PhysPulleyBlockEntity pulley) {
-                    if (!pulley.isManualMode()) {
-                        pulley.removeExistingConstraint();
-                    }
+                if (level instanceof ServerLevel serverLevel) {
+                    pulley.removeExistingConstraint(true);
+                    pulley.setChanged();
+                    level.sendBlockUpdated(pos, state, state, 3);
                 }
             }
-
         }
     }
 
-
-    @Override
+        @Override
     public Class<PhysPulleyBlockEntity> getBlockEntityClass() {
         return PhysPulleyBlockEntity.class;
     }
