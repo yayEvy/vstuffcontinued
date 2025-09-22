@@ -30,5 +30,9 @@
   "vstuff.ponder.rotational_thruster.text_1": "This is the Rotational Thruster!",
   "vstuff.ponder.rotational_thruster.text_2": "By giving it rotational force...",
   "vstuff.ponder.rotational_thruster.text_3": "...it produces thrust!",
-  "vstuff.ponder.rotational_thruster.header": "Rotational Thruster"
+  "vstuff.ponder.rotational_thruster.header": "Rotational Thruster",
+  "vstuff.lead_constraint_item.tooltip.summary": "A rope for VS2 ships!",
+  "vstuff.lead_break_item.tooltip.summary": "Cuts ropes.",
+  "vstuff.tooltip.holdForDetails": "Hold [%s] for summary"
+
 }

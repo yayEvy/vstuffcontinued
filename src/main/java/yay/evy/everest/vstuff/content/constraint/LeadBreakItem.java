@@ -159,10 +159,5 @@ public class LeadBreakItem extends Item {
         return minDistanceToRope;
     }
 
-    @Override
-    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.literal("§7Look at a lead and right-click to cut it"));
-        tooltip.add(Component.literal("§7Drops a Ship Lead when used"));
-        super.appendHoverText(stack, level, tooltip, flag);
-    }
+
 }

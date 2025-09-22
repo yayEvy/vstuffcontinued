@@ -100,20 +100,6 @@ public class LeadConstraintItem extends Item {
         }
     }
 
-
-
-    @Override
-    public void appendHoverText(ItemStack stack, Level level, java.util.List<Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
-        tooltip.add(Component.literal("§7Right-click two blocks to create rope constraint"));
-        tooltip.add(Component.literal("§7Persists between world/server restarts"));
-        tooltip.add(Component.literal("§7Works between ships and the world"));
-        super.appendHoverText(stack, level, tooltip, flag);
-    }
-
-
-
-
-
     private void createLeadConstraint(ServerLevel level, BlockPos secondPos, Long secondShipId, Player player) {
         if (firstClickedPos == null && firstEntity == null) return;
 
