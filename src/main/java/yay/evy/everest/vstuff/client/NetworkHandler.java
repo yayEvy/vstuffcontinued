@@ -36,8 +36,8 @@ public class NetworkHandler {
 
 
     public static void sendConstraintAdd(Integer constraintId, Long shipA, Long shipB,
-                                         Vector3d localPosA, Vector3d localPosB, double maxLength) {
-        ConstraintSyncPacket packet = new ConstraintSyncPacket(constraintId, shipA, shipB, localPosA, localPosB, maxLength);
+                                         Vector3d localPosA, Vector3d localPosB, double maxLength, String style) {
+        ConstraintSyncPacket packet = new ConstraintSyncPacket(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
         INSTANCE.send(PacketDistributor.ALL.noArg(), packet);
     }
 
@@ -53,8 +53,8 @@ public class NetworkHandler {
 
 
     public static void sendConstraintAddToPlayer(ServerPlayer player, Integer constraintId, Long shipA, Long shipB,
-                                                 Vector3d localPosA, Vector3d localPosB, double maxLength) {
-        ConstraintSyncPacket packet = new ConstraintSyncPacket(constraintId, shipA, shipB, localPosA, localPosB, maxLength);
+                                                 Vector3d localPosA, Vector3d localPosB, double maxLength, String style) {
+        ConstraintSyncPacket packet = new ConstraintSyncPacket(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
         INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);
     }
     public static void sendClearAllConstraints() {

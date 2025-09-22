@@ -74,9 +74,9 @@ public class LeadBreakItem extends Item {
                         System.out.println("Removed constraint (2nd attempt): " + targetConstraintId);
                     }
 
-                    player.drop(new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get()), false);
                     if (!player.getAbilities().instabuild) {
                         itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
+                        player.drop(new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get()), false);
                     }
 
                     return InteractionResultHolder.success(itemStack);

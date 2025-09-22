@@ -1,6 +1,7 @@
 package yay.evy.everest.vstuff.content.constraint;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -9,6 +10,7 @@ import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.constraint.ConstraintPersistence;
 
@@ -39,6 +41,7 @@ public class ConstraintTracker {
         public final BlockPos anchorBlockPosB;
         public final boolean isShipA;
         public final boolean isShipB;
+        public final String style;
 
         public enum ConstraintType {
             ROPE_PULLEY,
@@ -48,7 +51,7 @@ public class ConstraintTracker {
         // This is the primary constructor. Keep this one.
         public RopeConstraintData(ServerLevel level, Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
                                   double maxLength, double compliance, double maxForce,
-                                  ConstraintType constraintType, net.minecraft.core.BlockPos sourceBlockPos) {
+                                  ConstraintType constraintType, net.minecraft.core.BlockPos sourceBlockPos, String style) {
             this.shipA = shipA;
             this.shipB = shipB;
             this.localPosA = new Vector3d(localPosA);
@@ -60,6 +63,7 @@ public class ConstraintTracker {
             this.sourceBlockPos = sourceBlockPos;
             this.anchorBlockPosA = null;
             this.anchorBlockPosB = null;
+            this.style = style;
 
             Long groundBodyId = VSGameUtilsKt.getShipObjectWorld(level).getDimensionToGroundBodyIdImmutable().get(VSGameUtilsKt.getDimensionId(level));
             this.isShipA = !shipA.equals(groundBodyId);
@@ -68,8 +72,8 @@ public class ConstraintTracker {
 
         // This is the old constructor, which now calls the main constructor
         public RopeConstraintData(ServerLevel level, Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
-                                  double maxLength, double compliance, double maxForce) {
-            this(level, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, ConstraintType.GENERIC, null);
+                                  double maxLength, double compliance, double maxForce, String style) {
+            this(level, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, ConstraintType.GENERIC, null, style);
         }
 
         public Vector3d getWorldPosA(ServerLevel level, float partialTick) {
@@ -119,7 +123,7 @@ public class ConstraintTracker {
                                                     Vector3d localPosA, Vector3d localPosB, double maxLength,
                                                     double compliance, double maxForce,
                                                     RopeConstraintData.ConstraintType constraintType,
-                                                    net.minecraft.core.BlockPos sourceBlockPos) {
+                                                    net.minecraft.core.BlockPos sourceBlockPos, String style) {
 
         if (constraintType == RopeConstraintData.ConstraintType.ROPE_PULLEY && sourceBlockPos != null) {
             boolean existingConstraintFound = activeConstraints.values().stream()
@@ -133,25 +137,26 @@ public class ConstraintTracker {
             }
         }
 
-        RopeConstraintData data = new RopeConstraintData(level, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, constraintType, sourceBlockPos);
+        RopeConstraintData data = new RopeConstraintData(level, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, constraintType, sourceBlockPos, style);
         activeConstraints.put(constraintId, data);
+        System.out.println(style);
 
         ConstraintPersistence persistence = ConstraintPersistence.get(level);
         String persistenceId = java.util.UUID.randomUUID().toString();
 
         constraintToPersistenceId.put(constraintId, persistenceId);
 
-        persistence.addConstraint(persistenceId, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, level, constraintType, sourceBlockPos);
-        NetworkHandler.sendConstraintAdd(constraintId, shipA, shipB, localPosA, localPosB, maxLength);
-        System.out.println("Added " + constraintType + " constraint " + constraintId + " with source block " + sourceBlockPos);
+        persistence.addConstraint(persistenceId, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, level, constraintType, sourceBlockPos, style);
+        NetworkHandler.sendConstraintAdd(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
+        System.out.println("Added " + constraintType + " constraint " + constraintId + " with source block " + sourceBlockPos + " and style " + style);
     }
 
 
     public static void addConstraintWithPersistence(ServerLevel level, Integer constraintId, Long shipA, Long shipB,
                                                     Vector3d localPosA, Vector3d localPosB, double maxLength,
-                                                    double compliance, double maxForce) {
+                                                    double compliance, double maxForce, String style) {
         addConstraintWithPersistence(level, constraintId, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce,
-                RopeConstraintData.ConstraintType.GENERIC, null);
+                RopeConstraintData.ConstraintType.GENERIC, null, style);
     }
 
 
@@ -199,7 +204,8 @@ public class ConstraintTracker {
                     data.shipB,
                     data.localPosA,
                     data.localPosB,
-                    data.maxLength
+                    data.maxLength,
+                    data.style
             );
         }
     }
@@ -220,16 +226,16 @@ public class ConstraintTracker {
                                               Vector3d localPosA, Vector3d localPosB, double maxLength,
                                               double compliance, double maxForce,
                                               RopeConstraintData.ConstraintType constraintType,
-                                              net.minecraft.core.BlockPos sourceBlockPos) {
+                                              net.minecraft.core.BlockPos sourceBlockPos, String style) {
         if (activeConstraints.containsKey(constraintId)) {
             System.out.println("Constraint " + constraintId + " already exists in tracker, skipping");
             return;
         }
 
-        RopeConstraintData data = new RopeConstraintData(level, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, constraintType, sourceBlockPos);
+        RopeConstraintData data = new RopeConstraintData(level, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, constraintType, sourceBlockPos, style);
         activeConstraints.put(constraintId, data);
 
-        NetworkHandler.sendConstraintAdd(constraintId, shipA, shipB, localPosA, localPosB, maxLength);
+        NetworkHandler.sendConstraintAdd(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
         //System.out.println("Added " + constraintType + " constraint " + constraintId + " to tracker (restoration) with source block " + sourceBlockPos);
     }
 
@@ -280,7 +286,7 @@ public class ConstraintTracker {
                 RopeConstraintData data = entry.getValue();
 
                 NetworkHandler.sendConstraintAddToPlayer(player, constraintId, data.shipA, data.shipB,
-                        data.localPosA, data.localPosB, data.maxLength);
+                        data.localPosA, data.localPosB, data.maxLength, data.style);
             }
             // Sync all constraints to player
             NetworkHandler.sendClearAllConstraintsToPlayer(player);

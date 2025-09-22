@@ -1,6 +1,7 @@
 package yay.evy.everest.vstuff.client;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.common.Mod;
@@ -21,13 +22,15 @@ public class ClientConstraintTracker {
         public final Vector3d localPosA;
         public final Vector3d localPosB;
         public final double maxLength;
+        public final String style;
 
-        public ClientRopeData(Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB, double maxLength) {
+        public ClientRopeData(Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB, double maxLength, String style) {
             this.shipA = shipA;
             this.shipB = shipB;
             this.localPosA = new Vector3d(localPosA);
             this.localPosB = new Vector3d(localPosB);
             this.maxLength = maxLength;
+            this.style = style;
         }
 
         public Vector3d getWorldPosA(Level level, float partialTick) {
@@ -129,8 +132,8 @@ public class ClientConstraintTracker {
     }
 
     public static void addClientConstraint(Integer constraintId, Long shipA, Long shipB,
-                                           Vector3d localPosA, Vector3d localPosB, double maxLength) {
-        clientConstraints.put(constraintId, new ClientRopeData(shipA, shipB, localPosA, localPosB, maxLength));
+                                           Vector3d localPosA, Vector3d localPosB, double maxLength, String style) {
+        clientConstraints.put(constraintId, new ClientRopeData(shipA, shipB, localPosA, localPosB, maxLength, style));
     }
 
     public static void removeClientConstraint(Integer constraintId) {

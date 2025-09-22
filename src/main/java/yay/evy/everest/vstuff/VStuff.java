@@ -2,6 +2,7 @@ package yay.evy.everest.vstuff;
 
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -60,5 +61,8 @@ public class VStuff {
         }
     }
 
+    public static ResourceLocation getRopeStyle(String style) {
+        return new ResourceLocation(MOD_ID, "textures/entity/rope/rope_" + style + ".png");
+    }
 
 }

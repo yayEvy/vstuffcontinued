@@ -18,9 +18,10 @@ public class ConstraintSyncPacket {
     private final Vector3d localPosA;
     private final Vector3d localPosB;
     private final double maxLength;
+    private final String style;
 
     public ConstraintSyncPacket(Integer constraintId, Long shipA, Long shipB,
-                                Vector3d localPosA, Vector3d localPosB, double maxLength) {
+                                Vector3d localPosA, Vector3d localPosB, double maxLength, String style) {
         this.action = Action.ADD;
         this.constraintId = constraintId;
         this.shipA = shipA;
@@ -28,6 +29,7 @@ public class ConstraintSyncPacket {
         this.localPosA = localPosA != null ? new Vector3d(localPosA) : new Vector3d();
         this.localPosB = localPosB != null ? new Vector3d(localPosB) : new Vector3d();
         this.maxLength = maxLength;
+        this.style = style;
     }
 
     public ConstraintSyncPacket() {
@@ -38,6 +40,7 @@ public class ConstraintSyncPacket {
         this.localPosA = null;
         this.localPosB = null;
         this.maxLength = 0;
+        this.style = "normal";
     }
 
     public ConstraintSyncPacket(Integer constraintId) {
@@ -48,6 +51,7 @@ public class ConstraintSyncPacket {
         this.localPosA = null;
         this.localPosB = null;
         this.maxLength = 0;
+        this.style = "normal";
     }
 
     public ConstraintSyncPacket(FriendlyByteBuf buf) {
@@ -62,6 +66,7 @@ public class ConstraintSyncPacket {
                 this.localPosA = new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
                 this.localPosB = new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
                 this.maxLength = buf.readDouble();
+                this.style = buf.readUtf();
                 break;
             case REMOVE:
                 this.constraintId = buf.readInt();
@@ -70,6 +75,7 @@ public class ConstraintSyncPacket {
                 this.localPosA = null;
                 this.localPosB = null;
                 this.maxLength = 0;
+                this.style = "normal";
                 break;
             case CLEAR_ALL:
             default:
@@ -79,6 +85,7 @@ public class ConstraintSyncPacket {
                 this.localPosA = null;
                 this.localPosB = null;
                 this.maxLength = 0;
+                this.style = "normal";
                 break;
         }
     }
@@ -111,6 +118,7 @@ public class ConstraintSyncPacket {
                 buf.writeDouble(localPosB.y);
                 buf.writeDouble(localPosB.z);
                 buf.writeDouble(maxLength);
+                buf.writeUtf(style);
                 break;
             case REMOVE:
                 if (constraintId == null) {
@@ -129,7 +137,7 @@ public class ConstraintSyncPacket {
             try {
                 switch (action) {
                     case ADD:
-                        ClientConstraintTracker.addClientConstraint(constraintId, shipA, shipB, localPosA, localPosB, maxLength);
+                        ClientConstraintTracker.addClientConstraint(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
                         break;
                     case REMOVE:
                         ClientConstraintTracker.removeClientConstraint(constraintId);

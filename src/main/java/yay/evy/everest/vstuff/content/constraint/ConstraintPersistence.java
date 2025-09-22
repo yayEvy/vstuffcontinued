@@ -41,19 +41,20 @@ public class ConstraintPersistence extends SavedData {
         public boolean shipBIsGround;
         public ConstraintTracker.RopeConstraintData.ConstraintType constraintType;
         public net.minecraft.core.BlockPos sourceBlockPos;
+        public String style;
 
         public PersistedConstraintData(Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
                                        double maxLength, double compliance, double maxForce,
-                                       boolean shipAIsGround, boolean shipBIsGround) {
+                                       boolean shipAIsGround, boolean shipBIsGround, String style) {
             this(shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce,
-                    shipAIsGround, shipBIsGround, ConstraintTracker.RopeConstraintData.ConstraintType.GENERIC, null);
+                    shipAIsGround, shipBIsGround, ConstraintTracker.RopeConstraintData.ConstraintType.GENERIC, null, style);
         }
 
         public PersistedConstraintData(Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
                                        double maxLength, double compliance, double maxForce,
                                        boolean shipAIsGround, boolean shipBIsGround,
                                        ConstraintTracker.RopeConstraintData.ConstraintType constraintType,
-                                       net.minecraft.core.BlockPos sourceBlockPos) {
+                                       net.minecraft.core.BlockPos sourceBlockPos, String style) {
             this.shipA = shipA;
             this.shipB = shipB;
             this.shipAIsGround = shipAIsGround;
@@ -65,6 +66,7 @@ public class ConstraintPersistence extends SavedData {
             this.maxForce = maxForce;
             this.constraintType = constraintType != null ? constraintType : ConstraintTracker.RopeConstraintData.ConstraintType.GENERIC;
             this.sourceBlockPos = sourceBlockPos;
+            this.style = style;
         }
     }
 
@@ -143,14 +145,16 @@ public class ConstraintPersistence extends SavedData {
                 );
             }
 
+            String style = constraintTag.getString("style");
+
             System.out.println("LOADING FROM NBT - ID: " + id +
                     ", shipA: " + shipA + ", shipB: " + shipB +
                     ", shipAIsGround: " + shipAIsGround + ", shipBIsGround: " + shipBIsGround +
-                    ", constraintType: " + constraintType + ", sourceBlockPos: " + sourceBlockPos);
+                    ", constraintType: " + constraintType + ", sourceBlockPos: " + sourceBlockPos + ", style: " + style);
 
             data.persistedConstraints.put(id, new PersistedConstraintData(
                     shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce,
-                    shipAIsGround, shipBIsGround, constraintType, sourceBlockPos
+                    shipAIsGround, shipBIsGround, constraintType, sourceBlockPos, style
             ));
         }
 
@@ -223,7 +227,7 @@ public class ConstraintPersistence extends SavedData {
     public void addConstraint(String id, Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
                               double maxLength, double compliance, double maxForce, ServerLevel level,
                               ConstraintTracker.RopeConstraintData.ConstraintType constraintType,
-                              net.minecraft.core.BlockPos sourceBlockPos) {
+                              net.minecraft.core.BlockPos sourceBlockPos, String style) {
         boolean shipAIsGround = false;
         boolean shipBIsGround = false;
 
@@ -239,7 +243,7 @@ public class ConstraintPersistence extends SavedData {
 
         persistedConstraints.put(id, new PersistedConstraintData(
                 shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce,
-                shipAIsGround, shipBIsGround, constraintType, sourceBlockPos
+                shipAIsGround, shipBIsGround, constraintType, sourceBlockPos, style
         ));
         setDirty();
     }
@@ -542,7 +546,7 @@ public class ConstraintPersistence extends SavedData {
                         newConstraintId, actualShipA, actualShipB,
                         data.localPosA, data.localPosB, data.maxLength,
                         data.compliance, data.maxForce,
-                        data.constraintType, data.sourceBlockPos
+                        data.constraintType, data.sourceBlockPos, data.style
                 );
                 ConstraintTracker.mapConstraintToPersistenceId(newConstraintId, persistenceId);
                 return true;

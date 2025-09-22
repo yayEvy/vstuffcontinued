@@ -32,6 +32,7 @@ public class LeadConstraintItem extends Item {
     private Entity firstEntity;
     private Integer activeConstraintId;
     private ResourceKey<Level> firstClickDimension;
+    private String ropeStyle = "normal";
 
     public LeadConstraintItem(Properties pProperties) {
         super(new Properties().stacksTo(64));
@@ -197,7 +198,7 @@ public class LeadConstraintItem extends Item {
                 activeConstraintId = constraintId;
                 ConstraintTracker.addConstraintWithPersistence(level, constraintId, finalShipA, finalShipB,
                         finalLocalPosA, finalLocalPosB, maxLength,
-                        compliance, maxForce);
+                        compliance, maxForce, ropeStyle);
 
                 if (player instanceof ServerPlayer serverPlayer) {
                     NetworkHandler.INSTANCE.send(
