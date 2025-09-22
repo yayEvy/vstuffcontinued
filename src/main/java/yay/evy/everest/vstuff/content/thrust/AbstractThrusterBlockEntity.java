@@ -192,7 +192,14 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
     public void emitParticles(Level level, BlockPos pos, BlockState state) {
         if (emptyBlocks == 0) return;
 
-        double particleCountMultiplier = org.joml.Math.clamp(0.0, 2.0, VstuffConfig.THRUSTER_PARTICLE_COUNT_MULTIPLIER.get() * getSpeedScalar());
+        if (!(level instanceof ClientLevel clientLevel)) {
+            return;
+        }
+
+        double particleCountMultiplier = org.joml.Math.clamp(
+                0.0, 2.0,
+                VstuffConfig.THRUSTER_PARTICLE_COUNT_MULTIPLIER.get() * getSpeedScalar()
+        );
         if (particleCountMultiplier <= 0) return;
 
         clientTick++;
@@ -202,38 +209,33 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
         }
 
         this.particleSpawnAccumulator += particleCountMultiplier;
-
         int particlesToSpawn = (int) this.particleSpawnAccumulator;
         if (particlesToSpawn == 0) return;
-
         this.particleSpawnAccumulator -= particlesToSpawn;
+
         Direction direction = state.getValue(AbstractThrusterBlock.FACING);
         Direction oppositeDirection = direction.getOpposite();
 
         double currentNozzleOffset = NOZZLE_OFFSET_FROM_CENTER;
         Vector3d additionalVel = new Vector3d();
-        ClientShip ship = VSGameUtilsKt.getShipObjectManagingPos((ClientLevel) level, pos);
+
+        ClientShip ship = VSGameUtilsKt.getShipObjectManagingPos(clientLevel, pos);
         if (ship != null) {
             Vector3dc shipWorldVelocityJOML = ship.getVelocity();
             Matrix4dc transform = ship.getRenderTransform().getShipToWorld();
             Matrix4dc invTransform = ship.getRenderTransform().getWorldToShip();
 
-            Vector3d shipVelocity = invTransform
-                    // Rotate velocity with ship transform
-                    .transformDirection(new Vector3d(shipWorldVelocityJOML));
-
-            Vector3d particleEjectionUnitVecJOML = transform
-                    // Rotate velocity with ship transform
-                    .transformDirection(VectorConversionsMCKt.toJOMLD(oppositeDirection.getNormal()));
+            Vector3d shipVelocity = invTransform.transformDirection(new Vector3d(shipWorldVelocityJOML));
+            Vector3d particleEjectionUnitVecJOML = transform.transformDirection(VectorConversionsMCKt.toJOMLD(oppositeDirection.getNormal()));
 
             double shipVelComponentAlongRotatedEjection = shipWorldVelocityJOML.dot(particleEjectionUnitVecJOML);
             if (shipVelComponentAlongRotatedEjection > 0.0) {
                 Vector3d normalizedVelocity = new Vector3d();
                 shipWorldVelocityJOML.normalize(normalizedVelocity);
                 double shipVelComponentAlongRotatedEjectionNormalized = normalizedVelocity.dot(particleEjectionUnitVecJOML);
-                //Effect is used to smooth transition from no additional offset/vel to full in range [0, 1]
-                double effect = org.joml.Math.clamp(0.0, 1, shipVelComponentAlongRotatedEjectionNormalized);
-                double additionalOffset = (shipVelComponentAlongRotatedEjection) * VstuffConfig.THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER.get();
+
+                double effect = org.joml.Math.clamp(0.0, 1.0, shipVelComponentAlongRotatedEjectionNormalized);
+                double additionalOffset = shipVelComponentAlongRotatedEjection * VstuffConfig.THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER.get();
                 currentNozzleOffset += additionalOffset * effect;
                 additionalVel = new Vector3d(shipVelocity).mul(SHIP_VELOCITY_INHERITANCE * effect);
             }
@@ -244,15 +246,16 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
         double particleZ = pos.getZ() + 0.5 + oppositeDirection.getStepZ() * currentNozzleOffset;
 
         Vector3d particleVelocity = new Vector3d(oppositeDirection.getStepX(), oppositeDirection.getStepY(), oppositeDirection.getStepZ())
-                .mul(PARTICLE_VELOCITY * getSpeedScalar()).add(additionalVel);
+                .mul(PARTICLE_VELOCITY * getSpeedScalar())
+                .add(additionalVel);
 
-        // Spawn the calculated number of particles.
         for (int i = 0; i < particlesToSpawn; i++) {
-            level.addParticle(new PlumeParticleData(particleType), true,
+            clientLevel.addParticle(new PlumeParticleData(particleType), true,
                     particleX, particleY, particleZ,
                     particleVelocity.x, particleVelocity.y, particleVelocity.z);
         }
     }
+
 
 
     public void calculateObstruction(Level level, BlockPos pos, Direction forwardDirection){
