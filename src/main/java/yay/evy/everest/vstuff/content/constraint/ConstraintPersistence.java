@@ -12,6 +12,7 @@ import net.minecraft.world.level.storage.DimensionDataStorage;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.apigame.constraints.VSRopeConstraint;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import yay.evy.everest.vstuff.utils.RopeStyles;
 
 import java.util.*;
 
@@ -41,11 +42,11 @@ public class ConstraintPersistence extends SavedData {
         public boolean shipBIsGround;
         public ConstraintTracker.RopeConstraintData.ConstraintType constraintType;
         public net.minecraft.core.BlockPos sourceBlockPos;
-        public String style;
+        public RopeStyles.RopeStyle style;
 
         public PersistedConstraintData(Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
                                        double maxLength, double compliance, double maxForce,
-                                       boolean shipAIsGround, boolean shipBIsGround, String style) {
+                                       boolean shipAIsGround, boolean shipBIsGround, RopeStyles.RopeStyle style) {
             this(shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce,
                     shipAIsGround, shipBIsGround, ConstraintTracker.RopeConstraintData.ConstraintType.GENERIC, null, style);
         }
@@ -54,7 +55,7 @@ public class ConstraintPersistence extends SavedData {
                                        double maxLength, double compliance, double maxForce,
                                        boolean shipAIsGround, boolean shipBIsGround,
                                        ConstraintTracker.RopeConstraintData.ConstraintType constraintType,
-                                       net.minecraft.core.BlockPos sourceBlockPos, String style) {
+                                       net.minecraft.core.BlockPos sourceBlockPos, RopeStyles.RopeStyle style) {
             this.shipA = shipA;
             this.shipB = shipB;
             this.shipAIsGround = shipAIsGround;
@@ -146,6 +147,8 @@ public class ConstraintPersistence extends SavedData {
             }
 
             String style = constraintTag.getString("style");
+            String primitiveType = constraintTag.getString("primitiveStyle");
+            String styleLKey = constraintTag.getString("styleLKey");
 
             System.out.println("LOADING FROM NBT - ID: " + id +
                     ", shipA: " + shipA + ", shipB: " + shipB +
@@ -154,7 +157,7 @@ public class ConstraintPersistence extends SavedData {
 
             data.persistedConstraints.put(id, new PersistedConstraintData(
                     shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce,
-                    shipAIsGround, shipBIsGround, constraintType, sourceBlockPos, style
+                    shipAIsGround, shipBIsGround, constraintType, sourceBlockPos, new RopeStyles.RopeStyle(style, primitiveType, styleLKey)
             ));
         }
 
@@ -227,7 +230,7 @@ public class ConstraintPersistence extends SavedData {
     public void addConstraint(String id, Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
                               double maxLength, double compliance, double maxForce, ServerLevel level,
                               ConstraintTracker.RopeConstraintData.ConstraintType constraintType,
-                              net.minecraft.core.BlockPos sourceBlockPos, String style) {
+                              net.minecraft.core.BlockPos sourceBlockPos, RopeStyles.RopeStyle style) {
         boolean shipAIsGround = false;
         boolean shipBIsGround = false;
 

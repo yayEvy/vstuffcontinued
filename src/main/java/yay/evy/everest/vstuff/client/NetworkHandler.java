@@ -7,6 +7,8 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import org.joml.Vector3d;
 import yay.evy.everest.vstuff.network.RopeSoundPacket;
+import yay.evy.everest.vstuff.network.RopeStyleSelectionPacket;
+import yay.evy.everest.vstuff.utils.RopeStyles;
 
 public class NetworkHandler {
 
@@ -32,11 +34,16 @@ public class NetworkHandler {
                 .decoder(RopeSoundPacket::decode)
                 .consumerMainThread(RopeSoundPacket::handle)
                 .add();
+        INSTANCE.messageBuilder(RopeStyleSelectionPacket.class, packetId++)
+                .encoder(RopeStyleSelectionPacket::encode)
+                .decoder(RopeStyleSelectionPacket::new)
+                .consumerMainThread(RopeStyleSelectionPacket::handle)
+                .add();
     }
 
 
     public static void sendConstraintAdd(Integer constraintId, Long shipA, Long shipB,
-                                         Vector3d localPosA, Vector3d localPosB, double maxLength, String style) {
+                                         Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle style) {
         ConstraintSyncPacket packet = new ConstraintSyncPacket(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
         INSTANCE.send(PacketDistributor.ALL.noArg(), packet);
     }
@@ -53,7 +60,7 @@ public class NetworkHandler {
 
 
     public static void sendConstraintAddToPlayer(ServerPlayer player, Integer constraintId, Long shipA, Long shipB,
-                                                 Vector3d localPosA, Vector3d localPosB, double maxLength, String style) {
+                                                 Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle style) {
         ConstraintSyncPacket packet = new ConstraintSyncPacket(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
         INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);
     }

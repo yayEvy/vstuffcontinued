@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import yay.evy.everest.vstuff.utils.RopeStyles;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,9 +23,9 @@ public class ClientConstraintTracker {
         public final Vector3d localPosA;
         public final Vector3d localPosB;
         public final double maxLength;
-        public final String style;
+        public final RopeStyles.RopeStyle style;
 
-        public ClientRopeData(Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB, double maxLength, String style) {
+        public ClientRopeData(Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle style) {
             this.shipA = shipA;
             this.shipB = shipB;
             this.localPosA = new Vector3d(localPosA);
@@ -132,7 +133,7 @@ public class ClientConstraintTracker {
     }
 
     public static void addClientConstraint(Integer constraintId, Long shipA, Long shipB,
-                                           Vector3d localPosA, Vector3d localPosB, double maxLength, String style) {
+                                           Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle style) {
         clientConstraints.put(constraintId, new ClientRopeData(shipA, shipB, localPosA, localPosB, maxLength, style));
     }
 

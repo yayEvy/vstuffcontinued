@@ -21,6 +21,7 @@ import yay.evy.everest.vstuff.particles.ParticleTypes;
 public class VStuff {
     public static final String MOD_ID = "vstuff";
     public static final Logger LOGGER = LogUtils.getLogger();
+    public static final String NAME = "VStuff";
 
     public static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MOD_ID);
 

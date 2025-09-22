@@ -54,4 +54,24 @@ public class RopeRendererType extends RenderType {
                         .setWriteMaskState(RenderStateShard.COLOR_WRITE)
                         .createCompositeState(true));
     }
+
+    public static RenderType ropeRendererChainStyle(ResourceLocation texture) {
+        return create("rope_renderer",
+                DefaultVertexFormat.NEW_ENTITY,
+                VertexFormat.Mode.TRIANGLES,
+                256,
+                true,
+                true,
+                RenderType.CompositeState.builder()
+                        .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
+                        .setTextureState(new RenderStateShard.TextureStateShard(texture, false, false))
+                        .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                        .setCullState(CULL)
+                        .setLightmapState(LIGHTMAP)
+                        .setOverlayState(NO_OVERLAY)
+                        .setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
+                        .setWriteMaskState(COLOR_DEPTH_WRITE)
+                        .createCompositeState(true));
+    }
+
 }
