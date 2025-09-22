@@ -441,16 +441,10 @@ public class ConstraintTracker {
         }
     }
 
-    /**
-     * Safe attachment point validation:
-     * - Returns true if the block exists, or if chunk is not loaded
-     * - Uses a small epsilon to avoid false invalidation
-     */
 
-    private static boolean isValidAttachmentPoint(ServerLevel level, Vector3d localPos, Long shipId, Long groundBodyId, boolean isShip) {
+    public static boolean isValidAttachmentPoint(ServerLevel level, Vector3d localPos, Long shipId, Long groundBodyId, boolean isShip) {
         try {
-            if (!isShip) { // If it's a world attachment point
-                // Logic for a world-side attachment point. No transformations needed.
+            if (!isShip) {
                 net.minecraft.core.BlockPos blockPos = new net.minecraft.core.BlockPos(
                         (int) Math.floor(localPos.x),
                         (int) Math.floor(localPos.y),
@@ -459,8 +453,7 @@ public class ConstraintTracker {
                 if (!level.isLoaded(blockPos)) return true;
                 net.minecraft.world.level.block.state.BlockState state = level.getBlockState(blockPos);
                 return !state.isAir();
-            } else { // If it's a ship attachment point
-                // Logic for a ship-side attachment point. Transformation is needed.
+            } else {
                 org.valkyrienskies.core.api.ships.Ship ship = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
                 if (ship == null) return false;
                 Vector3d worldPos = new Vector3d();
@@ -478,8 +471,4 @@ public class ConstraintTracker {
             return true;
         }
     }
-
-
-
-
 }
