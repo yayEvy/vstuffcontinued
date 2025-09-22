@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class RopeRendererClient {
-    private static final ResourceLocation ROPE_TEXTURE = new ResourceLocation("vstuff", "textures/entity/rope.png");
+    private static final ResourceLocation ROPE_TEXTURE = new ResourceLocation("minecraft", "textures/block/white_wool.png");
     private static final float ROPE_WIDTH = 0.28f;
     private static final int ROPE_CURVE_SEGMENTS = 32;
     private static final float ROPE_SAG_FACTOR = 1.02f;

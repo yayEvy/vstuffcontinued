@@ -54,7 +54,7 @@ public class RotationalThrusterBlockEntity extends AbstractThrusterBlockEntity {
         int speed = 0;
         float thrust = 0f;
         if (thrusterData != null) {
-            speed = (int)getSpeed();
+            speed = (int) Math.abs(getSpeed());
             thrust = thrusterData.getThrust();
         }
         return Lang.text("Speed: " + speed + " rpm, Thrust: " + thrust);

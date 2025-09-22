@@ -17,9 +17,12 @@
     },
     "facing=up":    {
       "model": "vstuff:block/rotational_thruster/block_vertical",
-      "x": 180 },
+      "x": 180,
+      "y": 90
+    },
     "facing=down":  {
-      "model": "vstuff:block/rotational_thruster/block_vertical"
+      "model": "vstuff:block/rotational_thruster/block_vertical",
+      "y": 90
     }
   }
 }

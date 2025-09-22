@@ -66,8 +66,4 @@ public class RotationalThrusterBlock extends AbstractThrusterBlock {
         }
         return Collections.singletonList(stack);
     }
-
-
-
-
 }

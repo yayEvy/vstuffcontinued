@@ -1,12 +1,17 @@
 package yay.evy.everest.vstuff.content.thrust;
 
 import com.simibubi.create.content.kinetics.base.KineticBlock;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 
 import net.minecraft.core.BlockPos;
@@ -27,6 +32,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import yay.evy.everest.vstuff.index.VStuffShapes;
 
 import java.util.Arrays;
 
@@ -77,7 +83,7 @@ public abstract class AbstractThrusterBlock extends KineticBlock implements Enti
     private Direction.Axis getAxisFromFacingDir(Direction facing) {
         switch (facing) {
             case EAST, WEST  -> { return Direction.Axis.Z; }
-            case UP, DOWN -> { return Direction.Axis.Z;}
+            case UP, DOWN -> { return Direction.Axis.X;}
             default -> { return Direction.Axis.X; } // north, south
         }
     }
@@ -167,5 +173,19 @@ public abstract class AbstractThrusterBlock extends KineticBlock implements Enti
     @Override
     public BlockState mirror(@Nonnull BlockState state, @Nonnull Mirror mirrorIn) {
         return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public @NotNull VoxelShape getShape(BlockState state, BlockGetter p_220053_2_, BlockPos p_220053_3_,
+                                        CollisionContext p_220053_4_) {
+        return VStuffShapes.ROTATIONAL_THRUSTER.get(state.getValue(FACING));
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public @NotNull VoxelShape getCollisionShape(BlockState state, BlockGetter p_220071_2_, BlockPos p_220071_3_,
+                                                 CollisionContext p_220071_4_) {
+        return getShape(state, p_220071_2_, p_220071_3_, p_220071_4_);
     }
 }

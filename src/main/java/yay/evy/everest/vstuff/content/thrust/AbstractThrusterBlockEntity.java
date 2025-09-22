@@ -185,7 +185,7 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
     }
 
     protected float getSpeedScalar() {
-        return getSpeed() / 256;
+        return Math.abs(getSpeed() / 256);
     }
 
 

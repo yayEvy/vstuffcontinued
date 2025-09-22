@@ -1,19 +1,12 @@
 package yay.evy.everest.vstuff.index;
 
-import static net.minecraft.core.Direction.EAST;
-import static net.minecraft.core.Direction.NORTH;
-import static net.minecraft.core.Direction.SOUTH;
-import static net.minecraft.core.Direction.UP;
-
 import java.util.function.BiFunction;
 
 import com.simibubi.create.foundation.utility.VoxelShaper;
+
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.DirectionalBlock;
-import net.minecraft.world.level.block.piston.PistonHeadBlock;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -21,9 +14,19 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class VStuffShapes {
 
+    public static final VoxelShaper
 
-    
-
+    ROTATIONAL_THRUSTER = shape(0, 4, 0, 16, 16, 16) // main
+            .add(0, 3, 0, 2, 4, 16) // front rim
+            .add(14, 3, 0, 16, 4, 16) // front rim
+            .add(4, 2, 4, 12, 4, 12) // nozzle (large layer)
+            .add(5, 0, 5, 11, 2, 11) // nozzle (small layer)
+            .erase(15, 5, 2, 16, 14, 14) // side
+            .erase(0, 5, 2, 1, 14, 14) // side
+            .erase(2, 4, 0, 14, 16, 1) // top
+            .erase(2, 4, 15, 14, 16, 16) // bottom
+            .erase(2, 15, 0, 14, 16, 16) // back
+            .forDirectional(); // i hate this so much.
 
     public static Builder shape(VoxelShape shape) {
         return new Builder(shape);
