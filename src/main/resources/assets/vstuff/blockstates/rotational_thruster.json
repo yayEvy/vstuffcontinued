@@ -1,10 +1,25 @@
 {
   "variants": {
-    "facing=north": { "model": "vstuff:block/rotational_thruster" },
-    "facing=south": { "model": "vstuff:block/rotational_thruster", "y": 180 },
-    "facing=west":  { "model": "vstuff:block/rotational_thruster", "y": 270 },
-    "facing=east":  { "model": "vstuff:block/rotational_thruster", "y": 90 },
-    "facing=up":    { "model": "vstuff:block/rotational_thruster", "x": -90 },
-    "facing=down":  { "model": "vstuff:block/rotational_thruster", "x": 90 }
+    "facing=north": {
+      "model": "vstuff:block/rotational_thruster/block", "y": 90
+    },
+    "facing=south": {
+      "model": "vstuff:block/rotational_thruster/block",
+      "y": 270
+    },
+    "facing=west":  {
+      "model": "vstuff:block/rotational_thruster/block",
+      "y": 0
+    },
+    "facing=east":  {
+      "model": "vstuff:block/rotational_thruster/block",
+      "y": 180
+    },
+    "facing=up":    {
+      "model": "vstuff:block/rotational_thruster/block_vertical",
+      "x": 180 },
+    "facing=down":  {
+      "model": "vstuff:block/rotational_thruster/block_vertical"
+    }
   }
 }

@@ -36,7 +36,6 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
     // Constants
     protected static final int OBSTRUCTION_LENGTH = 10;
     protected static final int TICKS_PER_ENTITY_CHECK = 5;
-    protected static final int LOWEST_POWER_THRSHOLD = 5;
     private static final float PARTICLE_VELOCITY = 4;
     private static final double NOZZLE_OFFSET_FROM_CENTER = 0.9;
     private static final double SHIP_VELOCITY_INHERITANCE = 0.5;
@@ -132,7 +131,7 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
 
         float thrustMultiplier = VstuffConfig.THRUSTER_THRUST_MULTIPLIER.get().floatValue(); // user-configurable
 
-        float softPower = (float) java.lang.Math.pow((double) powerPercentage, 1.2);
+        float softPower = (float) java.lang.Math.pow(powerPercentage, 1.2);
 
         float thrust = BASE_MAX_THRUST * thrustMultiplier * softPower * obstructionEffect;
 
@@ -180,28 +179,24 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
 
     protected void addSpecificGoggleInfo(List<Component> tooltip, boolean isPlayerSneaking) {}
 
-    protected boolean isPowered() {
-        return getOverriddenPowerOrState(getBlockState()) > 0;
-    }
 
     protected float calculateObstructionEffect() {
         return (float) emptyBlocks / (float) OBSTRUCTION_LENGTH;
     }
 
-    protected int getOverriddenPowerOrState(BlockState currentBlockState) {
-
-        return currentBlockState.getValue(AbstractThrusterBlock.POWER);
+    protected float getSpeedScalar() {
+        return getSpeed() / 256;
     }
+
 
     public void emitParticles(Level level, BlockPos pos, BlockState state) {
         if (emptyBlocks == 0) return;
-        int power = getOverriddenPowerOrState(state);
 
-        double particleCountMultiplier = org.joml.Math.clamp(0.0, 2.0, VstuffConfig.THRUSTER_PARTICLE_COUNT_MULTIPLIER.get());
+        double particleCountMultiplier = org.joml.Math.clamp(0.0, 2.0, VstuffConfig.THRUSTER_PARTICLE_COUNT_MULTIPLIER.get() * getSpeedScalar());
         if (particleCountMultiplier <= 0) return;
 
         clientTick++;
-        if (power < LOWEST_POWER_THRSHOLD && clientTick % 2 == 0) {
+        if (clientTick % 2 == 0) {
             clientTick = 0;
             return;
         }
@@ -212,7 +207,6 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
         if (particlesToSpawn == 0) return;
 
         this.particleSpawnAccumulator -= particlesToSpawn;
-        float powerPercentage = Math.max(power, LOWEST_POWER_THRSHOLD) / 15.0f;
         Direction direction = state.getValue(AbstractThrusterBlock.FACING);
         Direction oppositeDirection = direction.getOpposite();
 
@@ -250,7 +244,7 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
         double particleZ = pos.getZ() + 0.5 + oppositeDirection.getStepZ() * currentNozzleOffset;
 
         Vector3d particleVelocity = new Vector3d(oppositeDirection.getStepX(), oppositeDirection.getStepY(), oppositeDirection.getStepZ())
-                .mul(PARTICLE_VELOCITY * powerPercentage).add(additionalVel);
+                .mul(PARTICLE_VELOCITY * getSpeedScalar()).add(additionalVel);
 
         // Spawn the calculated number of particles.
         for (int i = 0; i < particlesToSpawn; i++) {

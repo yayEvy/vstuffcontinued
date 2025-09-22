@@ -2,6 +2,7 @@ package yay.evy.everest.vstuff.content.thrust;
 
 import com.simibubi.create.content.kinetics.base.KineticBlock;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 import javax.annotation.Nonnull;
@@ -27,11 +28,14 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
+import java.util.Arrays;
+
 
 @SuppressWarnings("deprecation")
 public abstract class AbstractThrusterBlock extends KineticBlock implements EntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
-    public static final IntegerProperty POWER = IntegerProperty.create("redstone_power", 0, 15);
+    public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.AXIS;
+    public static final IntegerProperty RPM = IntegerProperty.create("rpm", 0, 256);
 
     protected AbstractThrusterBlock(Properties properties) {
         super(properties);
@@ -49,24 +53,33 @@ public abstract class AbstractThrusterBlock extends KineticBlock implements Enti
             placeDirection = baseDirection.getOpposite();
         }
 
-        return this.defaultBlockState().setValue(FACING, placeDirection);
+        return this.defaultBlockState().setValue(FACING, placeDirection).setValue(AXIS, baseDirection.getAxis());
     }
 
     @Override
     protected void createBlockStateDefinition(@Nonnull StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, POWER);
+        builder.add(FACING, AXIS, RPM);
     }
 
     @Override
     public Direction.Axis getRotationAxis(BlockState state) {
-        return state.getValue(FACING).getAxis();
+        Direction facing = state.getValue(FACING);
+        return getAxisFromFacingDir(facing);
     }
 
 
     @Override
     public boolean hasShaftTowards(LevelReader world, BlockPos pos, BlockState state, Direction face) {
         Direction facing = state.getValue(FACING);
-        return face.getAxis() != facing.getAxis();
+        return face.getAxis() == getAxisFromFacingDir(facing);
+    }
+
+    private Direction.Axis getAxisFromFacingDir(Direction facing) {
+        switch (facing) {
+            case EAST, WEST  -> { return Direction.Axis.Z; }
+            case UP, DOWN -> { return Direction.Axis.Z;}
+            default -> { return Direction.Axis.X; } // north, south
+        }
     }
 
     @Nullable
@@ -115,7 +128,6 @@ public abstract class AbstractThrusterBlock extends KineticBlock implements Enti
         thrusterBE.updateThrust(state);
         thrusterBE.setChanged();
 
-        doRedstoneCheck(level, state, pos);
     }
 
 
@@ -140,30 +152,16 @@ public abstract class AbstractThrusterBlock extends KineticBlock implements Enti
             thrusterBlockEntity.calculateObstruction(level, pos, state.getValue(FACING));
             thrusterBlockEntity.updateThrust(state);
             thrusterBlockEntity.setChanged();
-        }
-        doRedstoneCheck(level, state, pos);
-    }
-    private void doRedstoneCheck(Level level, BlockState state, BlockPos pos) {
-        int newRedstonePower = 15;
-        int oldRedstonePower = state.getValue(POWER);
-        if (newRedstonePower == oldRedstonePower) return;
+            state.setValue(RPM, (int) thrusterBlockEntity.getSpeed());
 
-        BlockState newState = state.setValue(POWER, newRedstonePower);
-        level.setBlock(pos, newState, Block.UPDATE_ALL);
-
-        BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (blockEntity instanceof AbstractThrusterBlockEntity thrusterBlockEntity) {
-            thrusterBlockEntity.calculateObstruction(level, pos, state.getValue(FACING));
-            thrusterBlockEntity.updateThrust(newState);
-            thrusterBlockEntity.setChanged();
         }
     }
-
 
 
     @Override
     public BlockState rotate(@Nonnull BlockState state, @Nonnull Rotation rot) {
-        return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
+        return state.setValue(FACING, rot.rotate(state.getValue(FACING)))
+                .setValue(AXIS, getAxisFromFacingDir(rot.rotate(state.getValue(FACING))));
     }
 
     @Override
