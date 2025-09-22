@@ -2,7 +2,6 @@ package yay.evy.everest.vstuff;
 
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -13,7 +12,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
-//import yay.evy.everest.vstuff.events.ColorHaggler;
 import yay.evy.everest.vstuff.index.*;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.particles.ParticleTypes;
@@ -46,8 +44,7 @@ public class VStuff {
         REGISTRATE.registerEventListeners(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
-       //  MinecraftForge.EVENT_BUS.register(new ColorHaggler());
-        // keep this for when I fix the color thingies -Bry
+
         NetworkHandler.registerPackets();
 
         LOGGER.info("VStuff mod initialized");
@@ -64,8 +61,5 @@ public class VStuff {
         }
     }
 
-    public static ResourceLocation getRopeStyle(String style) {
-        return new ResourceLocation(MOD_ID, "textures/entity/rope/rope_" + style + ".png");
-    }
 
 }
