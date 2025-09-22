@@ -125,6 +125,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
     private Vector3d pulleyWorldPos;
     private Vector3d targetWorldPos;
     private Vector3d previewAttachVec = null;
+    private boolean wasCut = false;
 
     private boolean manualMode = false;
 
@@ -842,13 +843,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
         ropeStateInitialized = false;
         restoring = true;
 
-        if (manualMode && hasTarget && level instanceof ServerLevel serverLevel) {
-            Integer newId = createConstraintWithLength(currentRopeLength);
-            if (newId != null) constraintId = newId;
-        }
-
-
-        if (hasTarget && level instanceof ServerLevel serverLevel) {
+        if (!wasCut && hasTarget && constraintId != null && level instanceof ServerLevel serverLevel) {
             Integer newId = createConstraintWithLength(currentRopeLength);
             if (newId != null) {
                 constraintId = newId;
@@ -859,6 +854,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
         ropeStateInitialized = true;
         restoring = false;
     }
+
 
 
     @Override
@@ -1374,6 +1370,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
     }
 
     public void removeExistingConstraint(boolean force) {
+        wasCut = true;  // mark pulley as cut
         if (isManualMode() && !force) {
             System.out.println("MANUAL MODE: Skipping removeExistingConstraint");
             return;
@@ -1392,6 +1389,8 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
         if (!isManualMode()) {
             this.currentRopeLength = baseRopeLength;
+            this.hasTarget = false;
+            this.targetPos = null;
         }
     }
 
@@ -1633,7 +1632,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
         return InteractionResult.PASS;
     }
 
-    // Fix the rope inventory initialization
     private void initializeRopeInventory() {
         ItemStack existingStack = ItemStack.EMPTY;
         if (ropeInventory != null) {
@@ -1803,8 +1801,9 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
         ItemStack ropeStack = ropeInventory.getStackInSlot(0);
         if (!ropeStack.isEmpty()) {
-            double maxLength = getMaxRopeLength();
-            tooltip.add(Component.literal("Rope: " + ropeStack.getCount() + "/64 (" + String.format("%.1f", maxLength) + " blocks)")
+            double maxLength = getMaxRopeLength() - baseRopeLength;
+            tooltip.add(Component.literal("Rope: " + ropeStack.getCount() + "/64 (" +
+                            String.format("%.1f", maxLength) + " blocks)")
                     .withStyle(ChatFormatting.YELLOW));
         } else {
             tooltip.add(Component.literal("No Rope - Right-click with rope item")
@@ -1816,9 +1815,10 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
                     .withStyle(ChatFormatting.BLUE));
             float speed = getSpeed();
             if (Math.abs(speed) > 4) {
-                String direction = speed > 0 ? "Retracting" : "Extending";
+                String direction = speed > 0 ? "Extending" : "Retracting";
                 tooltip.add(Component.literal("Status: " + direction + " (" + String.format("%.1f", speed))
                         .withStyle(ChatFormatting.GREEN));
+
             } else {
                 tooltip.add(Component.literal("Status: Idle")
                         .withStyle(ChatFormatting.GRAY));
@@ -2048,6 +2048,8 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
         tag.putBoolean("IsLowering", isLowering);
         tag.putBoolean("IsRopeRendering", isRopeRendering);
 
+        tag.putBoolean("WasCut", wasCut);
+
         System.out.println("Saving rope state - Length: " + currentRopeLength +
                 ", Consumed: " + consumedRopeLength +
                 ", Constraint: " + constraintId +
@@ -2072,6 +2074,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
         isLowering = tag.getBoolean("IsLowering");
         isRopeRendering = tag.getBoolean("IsRopeRendering");
 
+        wasCut = tag.getBoolean("WasCut");
 
         manualMode = tag.getBoolean("ManualMode");
 
