@@ -5,7 +5,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
-public class RopeStyleChangingScreen extends AbstractSimiContainerScreen {
+public class RopeStyleChangingScreen extends AbstractSimiContainerScreen<RopeStyleChangingMenu> {
 
     public RopeStyleChangingScreen(RopeStyleChangingMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
