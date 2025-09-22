@@ -19,6 +19,7 @@ import org.joml.Vector3d;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.rendering.RopeRendererType;
 import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
+import yay.evy.everest.vstuff.utils.RopeStyles;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -146,7 +147,7 @@ public class RopeRendererClient {
     }
     private static void renderClientRope(PoseStack poseStack, MultiBufferSource bufferSource,
                                          Integer constraintId, ClientConstraintTracker.ClientRopeData ropeData,
-                                         Level level, Vec3 cameraPos, float partialTick, String texture) {
+                                         Level level, Vec3 cameraPos, float partialTick, RopeStyles.RopeStyle style) {
         if (!level.isClientSide) {
             System.err.println("Warning: Client renderer called on server side!");
             return;
@@ -160,14 +161,14 @@ public class RopeRendererClient {
             double maxRopeLength = ropeData.maxLength;
 
             renderRope(poseStack, bufferSource, startPos, endPos,
-                    actualRopeLength, maxRopeLength, cameraPos, partialTick, level, texture);
+                    actualRopeLength, maxRopeLength, cameraPos, partialTick, level, style);
         }
     }
 
 
     private static void renderServerRope(PoseStack poseStack, MultiBufferSource bufferSource,
                                          Integer constraintId, ConstraintTracker.RopeConstraintData ropeData,
-                                         Level level, Vec3 cameraPos, float partialTick, String texture) {
+                                         Level level, Vec3 cameraPos, float partialTick, RopeStyles.RopeStyle style) {
         try {
             Vector3d startPos = ropeData.getWorldPosA((ServerLevel) level, 0.0f);
             Vector3d endPos = ropeData.getWorldPosB((ServerLevel) level, 0.0f);
@@ -186,7 +187,7 @@ public class RopeRendererClient {
                 double maxRopeLength = ropeData.maxLength;
 
                 renderRope(poseStack, bufferSource, renderStart, renderEnd,
-                        actualRopeLength, maxRopeLength, cameraPos, partialTick, level, texture);
+                        actualRopeLength, maxRopeLength, cameraPos, partialTick, level, style);
             }
         } catch (Exception e) {
             System.err.println("Error in renderServerRope: " + e.getMessage());
@@ -199,7 +200,7 @@ public class RopeRendererClient {
 
     private static void renderRope(PoseStack poseStack, MultiBufferSource bufferSource,
                                    Vector3d startPos, Vector3d endPos, double actualRopeLength,
-                                   double maxRopeLength, Vec3 cameraPos, float partialTick, Level level, String style) {
+                                   double maxRopeLength, Vec3 cameraPos, float partialTick, Level level, RopeStyles.RopeStyle style) {
         Vec3 start = new Vec3(startPos.x - cameraPos.x, startPos.y - cameraPos.y, startPos.z - cameraPos.z);
         Vec3 end = new Vec3(endPos.x - cameraPos.x, endPos.y - cameraPos.y, endPos.z - cameraPos.z);
 
@@ -213,8 +214,12 @@ public class RopeRendererClient {
             return;
         }
 
+        RenderType renderType;
         poseStack.pushPose();
-        RenderType renderType = RopeRendererType.ropeRenderer(VStuff.getRopeStyle(style));
+        switch (style.getRenderStyle()) {
+            case CHAIN -> renderType = RopeRendererType.ropeRendererChainStyle(style.getTexture());
+            default -> renderType = RopeRendererType.ropeRenderer(style.getTexture());
+        }
         VertexConsumer vertexConsumer = bufferSource.getBuffer(renderType);
         renderSingleRopeSegment(poseStack, vertexConsumer, start, end, actualRopeLength, maxRopeLength, partialTick, level, cameraPos);
         poseStack.popPose();

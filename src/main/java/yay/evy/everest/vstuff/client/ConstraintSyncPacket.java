@@ -3,6 +3,7 @@ package yay.evy.everest.vstuff.client;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 import org.joml.Vector3d;
+import yay.evy.everest.vstuff.utils.RopeStyles;
 
 import java.util.function.Supplier;
 
@@ -18,10 +19,13 @@ public class ConstraintSyncPacket {
     private final Vector3d localPosA;
     private final Vector3d localPosB;
     private final double maxLength;
+    private final RopeStyles.RopeStyle ropeStyle;
     private final String style;
+    private final RopeStyles.PrimitiveRopeStyle basicStyle;
+    private final String styleLKey;
 
     public ConstraintSyncPacket(Integer constraintId, Long shipA, Long shipB,
-                                Vector3d localPosA, Vector3d localPosB, double maxLength, String style) {
+                                Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle ropeStyle) {
         this.action = Action.ADD;
         this.constraintId = constraintId;
         this.shipA = shipA;
@@ -29,7 +33,10 @@ public class ConstraintSyncPacket {
         this.localPosA = localPosA != null ? new Vector3d(localPosA) : new Vector3d();
         this.localPosB = localPosB != null ? new Vector3d(localPosB) : new Vector3d();
         this.maxLength = maxLength;
-        this.style = style;
+        this.ropeStyle = ropeStyle;
+        this.style = ropeStyle.getStyle();
+        this.basicStyle = ropeStyle.getBasicStyle();
+        this.styleLKey = ropeStyle.getLangKey();
     }
 
     public ConstraintSyncPacket() {
@@ -40,7 +47,10 @@ public class ConstraintSyncPacket {
         this.localPosA = null;
         this.localPosB = null;
         this.maxLength = 0;
-        this.style = "normal";
+        this.ropeStyle = new RopeStyles.RopeStyle("none", RopeStyles.PrimitiveRopeStyle.BASIC, "none");
+        this.style = ropeStyle.getStyle();
+        this.basicStyle = ropeStyle.getBasicStyle();
+        this.styleLKey = ropeStyle.getLangKey();
     }
 
     public ConstraintSyncPacket(Integer constraintId) {
@@ -51,7 +61,10 @@ public class ConstraintSyncPacket {
         this.localPosA = null;
         this.localPosB = null;
         this.maxLength = 0;
-        this.style = "normal";
+        this.ropeStyle = new RopeStyles.RopeStyle("none", RopeStyles.PrimitiveRopeStyle.BASIC, "none");
+        this.style = ropeStyle.getStyle();
+        this.basicStyle = ropeStyle.getBasicStyle();
+        this.styleLKey = ropeStyle.getLangKey();
     }
 
     public ConstraintSyncPacket(FriendlyByteBuf buf) {
@@ -67,6 +80,9 @@ public class ConstraintSyncPacket {
                 this.localPosB = new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
                 this.maxLength = buf.readDouble();
                 this.style = buf.readUtf();
+                this.basicStyle = buf.readEnum(RopeStyles.PrimitiveRopeStyle.class);
+                this.styleLKey = buf.readUtf();
+                this.ropeStyle = new RopeStyles.RopeStyle(style, basicStyle, styleLKey);
                 break;
             case REMOVE:
                 this.constraintId = buf.readInt();
@@ -75,7 +91,10 @@ public class ConstraintSyncPacket {
                 this.localPosA = null;
                 this.localPosB = null;
                 this.maxLength = 0;
-                this.style = "normal";
+                this.style = "none";
+                this.basicStyle = RopeStyles.PrimitiveRopeStyle.BASIC;
+                this.styleLKey = "none";
+                this.ropeStyle = new RopeStyles.RopeStyle(style, basicStyle, styleLKey);
                 break;
             case CLEAR_ALL:
             default:
@@ -85,7 +104,10 @@ public class ConstraintSyncPacket {
                 this.localPosA = null;
                 this.localPosB = null;
                 this.maxLength = 0;
-                this.style = "normal";
+                this.style = "none";
+                this.basicStyle = RopeStyles.PrimitiveRopeStyle.BASIC;
+                this.styleLKey = "none";
+                this.ropeStyle = new RopeStyles.RopeStyle(style, basicStyle, styleLKey);
                 break;
         }
     }
@@ -119,6 +141,8 @@ public class ConstraintSyncPacket {
                 buf.writeDouble(localPosB.z);
                 buf.writeDouble(maxLength);
                 buf.writeUtf(style);
+                buf.writeEnum(basicStyle);
+                buf.writeUtf(styleLKey);
                 break;
             case REMOVE:
                 if (constraintId == null) {
@@ -137,7 +161,7 @@ public class ConstraintSyncPacket {
             try {
                 switch (action) {
                     case ADD:
-                        ClientConstraintTracker.addClientConstraint(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
+                        ClientConstraintTracker.addClientConstraint(constraintId, shipA, shipB, localPosA, localPosB, maxLength, ropeStyle);
                         break;
                     case REMOVE:
                         ClientConstraintTracker.removeClientConstraint(constraintId);

@@ -13,6 +13,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.constraint.ConstraintPersistence;
+import yay.evy.everest.vstuff.utils.RopeStyles;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +42,7 @@ public class ConstraintTracker {
         public final BlockPos anchorBlockPosB;
         public final boolean isShipA;
         public final boolean isShipB;
-        public final String style;
+        public final RopeStyles.RopeStyle style;
 
         public enum ConstraintType {
             ROPE_PULLEY,
@@ -51,7 +52,7 @@ public class ConstraintTracker {
         // This is the primary constructor. Keep this one.
         public RopeConstraintData(ServerLevel level, Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
                                   double maxLength, double compliance, double maxForce,
-                                  ConstraintType constraintType, net.minecraft.core.BlockPos sourceBlockPos, String style) {
+                                  ConstraintType constraintType, net.minecraft.core.BlockPos sourceBlockPos, RopeStyles.RopeStyle style) {
             this.shipA = shipA;
             this.shipB = shipB;
             this.localPosA = new Vector3d(localPosA);
@@ -72,7 +73,7 @@ public class ConstraintTracker {
 
         // This is the old constructor, which now calls the main constructor
         public RopeConstraintData(ServerLevel level, Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
-                                  double maxLength, double compliance, double maxForce, String style) {
+                                  double maxLength, double compliance, double maxForce, RopeStyles.RopeStyle style) {
             this(level, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, ConstraintType.GENERIC, null, style);
         }
 
@@ -123,7 +124,7 @@ public class ConstraintTracker {
                                                     Vector3d localPosA, Vector3d localPosB, double maxLength,
                                                     double compliance, double maxForce,
                                                     RopeConstraintData.ConstraintType constraintType,
-                                                    net.minecraft.core.BlockPos sourceBlockPos, String style) {
+                                                    net.minecraft.core.BlockPos sourceBlockPos, RopeStyles.RopeStyle style) {
 
         if (constraintType == RopeConstraintData.ConstraintType.ROPE_PULLEY && sourceBlockPos != null) {
             boolean existingConstraintFound = activeConstraints.values().stream()
@@ -154,7 +155,7 @@ public class ConstraintTracker {
 
     public static void addConstraintWithPersistence(ServerLevel level, Integer constraintId, Long shipA, Long shipB,
                                                     Vector3d localPosA, Vector3d localPosB, double maxLength,
-                                                    double compliance, double maxForce, String style) {
+                                                    double compliance, double maxForce, RopeStyles.RopeStyle style) {
         addConstraintWithPersistence(level, constraintId, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce,
                 RopeConstraintData.ConstraintType.GENERIC, null, style);
     }
@@ -226,7 +227,7 @@ public class ConstraintTracker {
                                               Vector3d localPosA, Vector3d localPosB, double maxLength,
                                               double compliance, double maxForce,
                                               RopeConstraintData.ConstraintType constraintType,
-                                              net.minecraft.core.BlockPos sourceBlockPos, String style) {
+                                              net.minecraft.core.BlockPos sourceBlockPos, RopeStyles.RopeStyle style) {
         if (activeConstraints.containsKey(constraintId)) {
             System.out.println("Constraint " + constraintId + " already exists in tracker, skipping");
             return;

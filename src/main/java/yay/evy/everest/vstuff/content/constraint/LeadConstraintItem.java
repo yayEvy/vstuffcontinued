@@ -25,6 +25,7 @@ import yay.evy.everest.vstuff.content.pulley.PhysPulleyItem;
 import yay.evy.everest.vstuff.network.RopeSoundPacket;
 import yay.evy.everest.vstuff.sound.RopeSoundHandler;
 import net.minecraft.sounds.SoundEvents;
+import yay.evy.everest.vstuff.utils.RopeStyles;
 
 public class LeadConstraintItem extends Item {
     private BlockPos firstClickedPos;
@@ -33,6 +34,7 @@ public class LeadConstraintItem extends Item {
     private Integer activeConstraintId;
     private ResourceKey<Level> firstClickDimension;
     private String ropeStyle = "normal";
+    private RopeStyles.RopeStyle style = new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.BASIC, "vstuff.ropes.normal");
 
     public LeadConstraintItem(Properties pProperties) {
         super(new Properties().stacksTo(64));
@@ -104,11 +106,6 @@ public class LeadConstraintItem extends Item {
     private void createLeadConstraint(ServerLevel level, BlockPos secondPos, Long secondShipId, Player player) {
         if (firstClickedPos == null && firstEntity == null) return;
 
-
-
-
-
-
         Vector3d firstWorldPos;
         Vector3d firstLocalPos;
         Long shipA;
@@ -129,7 +126,6 @@ public class LeadConstraintItem extends Item {
 
         createConstraintConsistent(level, shipA, shipB, firstLocalPos, secondLocalPos, firstWorldPos, secondWorldPos, player);
     }
-
 
     private void createConstraintConsistent(ServerLevel level, Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
                                             Vector3d worldPosA, Vector3d worldPosB, Player player) {
@@ -198,7 +194,7 @@ public class LeadConstraintItem extends Item {
                 activeConstraintId = constraintId;
                 ConstraintTracker.addConstraintWithPersistence(level, constraintId, finalShipA, finalShipB,
                         finalLocalPosA, finalLocalPosB, maxLength,
-                        compliance, maxForce, ropeStyle);
+                        compliance, maxForce, style);
 
                 if (player instanceof ServerPlayer serverPlayer) {
                     NetworkHandler.INSTANCE.send(

@@ -7,14 +7,9 @@ import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import yay.evy.everest.vstuff.content.rope_changer_menu.RopeStyleChangingMenu;
-import yay.evy.everest.vstuff.content.rope_changer_menu.RopeStyleChangingScreen;
 
 
 public class VStuffMenuTypes {
-
-    public static final MenuEntry<RopeStyleChangingMenu> ROPE_STYLE_CHANGER =
-            register("rope_style_changer", RopeStyleChangingMenu::new, () -> RopeStyleChangingScreen::new);
 
     private static <C extends AbstractContainerMenu, S extends Screen & MenuAccess<C>> MenuEntry<C> register(
             String name, MenuBuilder.ForgeMenuFactory<C> factory, NonNullSupplier<MenuBuilder.ScreenFactory<C, S>> screenFactory) {
