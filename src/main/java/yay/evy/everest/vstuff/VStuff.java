@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
+//import yay.evy.everest.vstuff.events.ColorHaggler;
 import yay.evy.everest.vstuff.index.*;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.particles.ParticleTypes;
@@ -44,7 +45,8 @@ public class VStuff {
         REGISTRATE.registerEventListeners(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
-
+       //  MinecraftForge.EVENT_BUS.register(new ColorHaggler());
+        // keep this for when I fix the color thingies -Bry
         NetworkHandler.registerPackets();
 
         LOGGER.info("VStuff mod initialized");
