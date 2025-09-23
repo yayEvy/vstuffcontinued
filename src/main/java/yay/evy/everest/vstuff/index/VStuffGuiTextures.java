@@ -17,9 +17,9 @@ Copied from Create
 public enum VStuffGuiTextures implements ScreenElement {
 
 
-    ROPE_MENU("bogeymenu", 279, 184),
-    ROPE_MENU_SCROLL_BAR("bogeymenu", 280, 0, 8, 15),
-    ROPE_MENU_SCROLL_BAR_DISABLED("bogeymenu", 288, 0, 8, 15),
+    ROPE_MENU("rope_style_changer", 279, 184),
+    ROPE_MENU_SCROLL_BAR("rope_style_changer", 280, 0, 8, 15),
+    ROPE_MENU_SCROLL_BAR_DISABLED("rope_style_changer", 288, 0, 8, 15),
     ;
 
     public static final int FONT_COLOR = 0x575F7A;

@@ -37,9 +37,10 @@ public class TooltipHandler {
         List<Component> tooltip = event.getToolTip();
         List<Component> tooltipList = new ArrayList<>();
 
-        if (ForgeRegistries.ITEMS.getKey(item).getNamespace().equals(VStuff.MOD_ID)) {
+        if (tooltipModifications.containsKey(item)) {
             handleItemTooltip(tooltipList, item);
         }
+
         tooltip.addAll(1, tooltipList);
     }
 
