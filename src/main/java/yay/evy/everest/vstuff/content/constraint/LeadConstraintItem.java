@@ -22,10 +22,10 @@ import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyItem;
-import yay.evy.everest.vstuff.network.RopeSoundPacket;
-import yay.evy.everest.vstuff.sound.RopeSoundHandler;
+import yay.evy.everest.vstuff.content.rope_changer_menu.handler.RopeStyleHandlerServer;
+import yay.evy.everest.vstuff.util.packet.RopeSoundPacket;
 import net.minecraft.sounds.SoundEvents;
-import yay.evy.everest.vstuff.utils.RopeStyles;
+import yay.evy.everest.vstuff.util.RopeStyles;
 
 public class LeadConstraintItem extends Item {
     private BlockPos firstClickedPos;
@@ -33,13 +33,15 @@ public class LeadConstraintItem extends Item {
     private Entity firstEntity;
     private Integer activeConstraintId;
     private ResourceKey<Level> firstClickDimension;
-    private String ropeStyle = "normal";
     private RopeStyles.RopeStyle style = new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal");
 
     public LeadConstraintItem(Properties pProperties) {
         super(new Properties().stacksTo(64));
     }
 
+    public void setStyle(RopeStyles.RopeStyle style) {
+        this.style = style;
+    }
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
@@ -200,7 +202,7 @@ public class LeadConstraintItem extends Item {
                 activeConstraintId = constraintId;
                 ConstraintTracker.addConstraintWithPersistence(level, constraintId, finalShipA, finalShipB,
                         finalLocalPosA, finalLocalPosB, maxLength,
-                        compliance, maxForce, style);
+                        compliance, maxForce, RopeStyleHandlerServer.getStyle(player.getUUID()));
 
                 if (player instanceof ServerPlayer serverPlayer) {
                     NetworkHandler.INSTANCE.send(

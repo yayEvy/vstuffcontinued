@@ -17,7 +17,7 @@ import java.util.Set;
 @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public enum VStuffKeys {
 
-    ROPE_MENU("bogey_menu", GLFW.GLFW_KEY_LEFT_ALT);
+    ROPE_MENU("rope_menu_open", GLFW.GLFW_KEY_LEFT_ALT);
 
     private KeyMapping keybind;
     private String description;

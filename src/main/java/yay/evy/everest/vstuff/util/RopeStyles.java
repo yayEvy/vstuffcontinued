@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.utils;
+package yay.evy.everest.vstuff.util;
 
 import net.minecraft.resources.ResourceLocation;
 import yay.evy.everest.vstuff.VStuff;
@@ -28,7 +28,7 @@ public class RopeStyles {
         DYED,
         WOOL,
         CHAIN,
-        OTHER
+        OTHER,
     }
 
     public static class RopeStyle {
@@ -82,6 +82,14 @@ public class RopeStyles {
                 case WOOL -> this.associatedTexture = getDyedWoolStyle(style);
                 default -> this.associatedTexture = getRopeStyle(style);
             }
+        }
+
+        public String asString() {
+            return "RopeStyle with style " + style +
+                    ", basicStyle " + basicStyle.toString() +
+                    ", renderStyle " + renderStyle.toString() +
+                    ", texture at " + associatedTexture.getPath() +
+                    ", langKey " + langKey;
         }
 
         public ResourceLocation getTexture() {

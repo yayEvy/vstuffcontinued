@@ -16,17 +16,15 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
-import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.rendering.RopeRendererType;
 import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
-import yay.evy.everest.vstuff.utils.RopeStyles;
+import yay.evy.everest.vstuff.util.RopeStyles;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class RopeRendererClient {
-    private static final ResourceLocation ROPE_TEXTURE = VStuff.getRopeStyle("normal");
     private static final float ROPE_WIDTH = 0.28f;
     private static final int ROPE_CURVE_SEGMENTS = 32;
     private static final float ROPE_SAG_FACTOR = 1.02f;
@@ -101,7 +99,7 @@ public class RopeRendererClient {
             Vec3 cameraPos = event.getCamera().getPosition();
             float partialTick = event.getPartialTick();
 
-            RenderType renderType = RopeRendererType.ropeRenderer(ROPE_TEXTURE);
+            RenderType renderType = RopeRendererType.ropeRenderer(RopeStyles.getRopeStyle("normal"));
 
             Map<Integer, ClientConstraintTracker.ClientRopeData> constraints = ClientConstraintTracker.getClientConstraints();
             Map<Integer, ConstraintTracker.RopeConstraintData> serverConstraints = ConstraintTracker.getActiveConstraints();

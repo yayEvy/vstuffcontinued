@@ -12,7 +12,7 @@ import net.minecraft.world.level.storage.DimensionDataStorage;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.apigame.constraints.VSRopeConstraint;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import yay.evy.everest.vstuff.utils.RopeStyles;
+import yay.evy.everest.vstuff.util.RopeStyles;
 
 import java.util.*;
 

@@ -56,7 +56,7 @@ public class RopeRendererType extends RenderType {
     }
 
     public static RenderType ropeRendererChainStyle(ResourceLocation texture) {
-        return create("rope_renderer",
+        return create("rope_renderer_chain",
                 DefaultVertexFormat.NEW_ENTITY,
                 VertexFormat.Mode.TRIANGLES,
                 256,

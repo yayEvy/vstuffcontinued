@@ -1,7 +1,6 @@
 package yay.evy.everest.vstuff.content.constraint;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -10,10 +9,8 @@ import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.NetworkHandler;
-import yay.evy.everest.vstuff.content.constraint.ConstraintPersistence;
-import yay.evy.everest.vstuff.utils.RopeStyles;
+import yay.evy.everest.vstuff.util.RopeStyles;
 
 import java.util.HashMap;
 import java.util.Map;

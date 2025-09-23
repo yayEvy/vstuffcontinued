@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.utils.client;
+package yay.evy.everest.vstuff.util.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraftforge.api.distmarker.Dist;

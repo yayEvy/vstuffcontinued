@@ -45,7 +45,7 @@ public class TooltipHandler {
     }
 
     private static void handleItemTooltip(List<Component> tooltipList, Item item) {
-        wrapShiftHoldText(tooltipList, "vstuff.tooltip.holdForDetails", () -> {
+        wrapShiftHoldText(tooltipList, "vstuff.tooltip.hold_for_details", () -> {
             Function<SummaryPayload, String> modifier = tooltipModifications.get(item);
             if (modifier != null) {
                 String summary = modifier.apply(new SummaryPayload(item));
