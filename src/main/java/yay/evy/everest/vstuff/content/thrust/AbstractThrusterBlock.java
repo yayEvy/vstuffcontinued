@@ -48,6 +48,7 @@ public abstract class AbstractThrusterBlock extends KineticBlock implements Enti
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
+
     @Override
     public BlockState getStateForPlacement(@Nonnull BlockPlaceContext context) {
         Direction baseDirection = context.getNearestLookingDirection();
@@ -188,4 +189,5 @@ public abstract class AbstractThrusterBlock extends KineticBlock implements Enti
                                                  CollisionContext p_220071_4_) {
         return getShape(state, p_220071_2_, p_220071_3_, p_220071_4_);
     }
+
 }

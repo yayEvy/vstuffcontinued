@@ -66,6 +66,11 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
     }
 
 
+    @Override
+    public float calculateStressApplied() {
+        return 64.0f;
+    }
+
     @SuppressWarnings("null")
     @Override
     public void initialize() {

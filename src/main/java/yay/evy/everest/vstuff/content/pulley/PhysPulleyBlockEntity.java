@@ -2158,5 +2158,10 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
         ropeInventoryOptional.invalidate();
     }
 
+    @Override
+    public float calculateStressApplied() {
+        return 32f;
+    }
+
 
 }

@@ -134,17 +134,24 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (level.getBlockEntity(pos) instanceof PhysPulleyBlockEntity pulley) {
-            System.out.println("RopePulleyBlock.use called - Hand: " + hand + ", Shift: " + player.isShiftKeyDown() + ", Item: " + player.getItemInHand(hand).getItem());
+        ItemStack heldItem = player.getItemInHand(hand);
 
-            if (hand != InteractionHand.MAIN_HAND) {
-                return InteractionResult.PASS;
+        if (AllItems.WRENCH.isIn(heldItem)) {
+            UseOnContext context = new UseOnContext(player, hand, hit);
+            InteractionResult result = onWrenched(state, context);
+            if (result.consumesAction()) {
+                return result;
             }
+        }
 
+        if (level.getBlockEntity(pos) instanceof PhysPulleyBlockEntity pulley) {
             return pulley.use(state, level, pos, player, hand, hit);
         }
+
         return InteractionResult.PASS;
     }
+
+
 
     @Override
     public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
