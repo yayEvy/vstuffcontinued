@@ -4,7 +4,6 @@ import com.jozufozu.flywheel.util.transform.TransformStack;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.simibubi.create.content.trains.bogey.BogeySizes;
 import com.simibubi.create.foundation.gui.AbstractSimiScreen;
 import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.gui.element.GuiGameElement;
@@ -14,11 +13,9 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.protocol.game.ServerPacketListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
@@ -27,14 +24,10 @@ import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.rope_changer_menu.components.RopeStyleButton;
 import yay.evy.everest.vstuff.index.VStuffGuiTextures;
 import yay.evy.everest.vstuff.index.VStuffItems;
-import yay.evy.everest.vstuff.network.RopeSoundPacket;
 import yay.evy.everest.vstuff.network.RopeStyleSelectionPacket;
 import yay.evy.everest.vstuff.utils.RopeStyles;
 import yay.evy.everest.vstuff.utils.RopeStyles.RopeStyle;
 import yay.evy.everest.vstuff.utils.client.ClientTextUtils;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class RopeStyleChangingScreen extends AbstractSimiScreen {
 
@@ -45,12 +38,12 @@ public class RopeStyleChangingScreen extends AbstractSimiScreen {
     private final VStuffGuiTextures background = VStuffGuiTextures.ROPE_MENU;
     RopeStyle[] styleList =
             {
-                    new RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.BASIC, "vstuff.ropes.normal"),
+                    new RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal"),
                     new RopeStyle("chain", RopeStyles.PrimitiveRopeStyle.CHAIN, "minecraft.block.chain"),
-                    new RopeStyle("andesite", RopeStyles.PrimitiveRopeStyle.BASIC, "create.block.andesite_casing"),
-                    new RopeStyle("brass", RopeStyles.PrimitiveRopeStyle.BASIC, "create.block.brass_casing"),
-                    new RopeStyle("copper", RopeStyles.PrimitiveRopeStyle.BASIC, "create.block.copper_casing"),
-                    new RopeStyle("railway", RopeStyles.PrimitiveRopeStyle.BASIC, "create.block.railway_casing"),
+                    new RopeStyle("andesite", RopeStyles.PrimitiveRopeStyle.OTHER, "create.block.andesite_casing"),
+                    new RopeStyle("brass", RopeStyles.PrimitiveRopeStyle.OTHER, "create.block.brass_casing"),
+                    new RopeStyle("copper", RopeStyles.PrimitiveRopeStyle.OTHER, "create.block.copper_casing"),
+                    new RopeStyle("railway", RopeStyles.PrimitiveRopeStyle.OTHER, "create.block.railway_casing"),
                     new RopeStyle("white", RopeStyles.PrimitiveRopeStyle.WOOL, "vstuff.ropes.wool") // white wool as default
             };
     RopeStyle selectedStyle;

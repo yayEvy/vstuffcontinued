@@ -17,16 +17,18 @@ public class RopeStyles {
         return new ResourceLocation("minecraft", "textures/block/" + color + "_wool.png");
     }
 
+
     public enum RenderStyle {
         NORMAL,
         CHAIN
     }
 
     public enum PrimitiveRopeStyle {
-        BASIC,
+        NORMAL,
         DYED,
         WOOL,
-        CHAIN
+        CHAIN,
+        OTHER
     }
 
     public static class RopeStyle {
@@ -62,7 +64,7 @@ public class RopeStyles {
                 case "dyed" -> basicStyle = PrimitiveRopeStyle.DYED;
                 case "wool" -> basicStyle = PrimitiveRopeStyle.WOOL;
                 case "chain" -> basicStyle = PrimitiveRopeStyle.CHAIN;
-                default -> basicStyle = PrimitiveRopeStyle.BASIC;
+                default -> basicStyle = PrimitiveRopeStyle.NORMAL;
             }
 
             this.langKey = langKey;
@@ -100,6 +102,11 @@ public class RopeStyles {
 
         public PrimitiveRopeStyle getBasicStyle() {
             return this.basicStyle;
+        }
+
+        public boolean isDyeable() {
+            return ((this.basicStyle == PrimitiveRopeStyle.WOOL) || (this.basicStyle == PrimitiveRopeStyle.NORMAL));
+
         }
     }
 }
