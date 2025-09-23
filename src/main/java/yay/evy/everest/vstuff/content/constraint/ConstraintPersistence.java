@@ -71,6 +71,7 @@ public class ConstraintPersistence extends SavedData {
         }
     }
 
+
     public static ConstraintPersistence get(ServerLevel level) {
         DimensionDataStorage storage = level.getDataStorage();
         return storage.computeIfAbsent(ConstraintPersistence::load, ConstraintPersistence::new, DATA_NAME);
@@ -146,9 +147,12 @@ public class ConstraintPersistence extends SavedData {
                 );
             }
 
-            String style = constraintTag.getString("style");
-            String primitiveType = constraintTag.getString("primitiveStyle");
-            String styleLKey = constraintTag.getString("styleLKey");
+            String style = constraintTag.contains("style") ? constraintTag.getString("style") : "normal";
+            String primitiveType = constraintTag.contains("primitiveStyle") ? constraintTag.getString("primitiveStyle") : "normal";
+            String styleLKey = constraintTag.contains("styleLKey") ? constraintTag.getString("styleLKey") : "";
+
+            RopeStyles.RopeStyle ropeStyle = new RopeStyles.RopeStyle(style, primitiveType, styleLKey);
+
 
             System.out.println("LOADING FROM NBT - ID: " + id +
                     ", shipA: " + shipA + ", shipB: " + shipB +
@@ -206,6 +210,10 @@ public class ConstraintPersistence extends SavedData {
             constraintTag.putDouble("maxForce", data.maxForce);
 
             constraintTag.putString("constraintType", data.constraintType.name());
+            constraintTag.putString("style", data.style.getStyle());
+            constraintTag.putString("primitiveStyle", data.style.getBasicStyle().name().toLowerCase());
+            constraintTag.putString("styleLKey", data.style.getLangKey());
+
 
             if (data.sourceBlockPos != null) {
                 constraintTag.putInt("sourceBlockPos_x", data.sourceBlockPos.getX());

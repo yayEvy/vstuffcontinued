@@ -48,7 +48,7 @@ import yay.evy.everest.vstuff.index.VStuffBlocks;
 import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
-import yay.evy.everest.vstuff.utils.RopeStyles;
+import yay.evy.everest.vstuff.util.RopeStyles;
 
 
 import java.lang.reflect.Field;
