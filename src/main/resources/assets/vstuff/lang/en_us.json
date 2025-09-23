@@ -3,13 +3,10 @@
   "item.vstuff.lead_constraint_item.tooltip": "Creates rope constraints between ships and world",
   "item.vstuff.lead_break_item": "Rope Cutter",
   "item.vstuff.lead_break_item.tooltip": "Look at a rope and right-click to cut it",
-  "block.vstuff.redstone_magnet": "Redstone Magnet",
   "block.vstuff.phys_pulley": "Phys Pulley",
-  "block.vstuff.pulley_anchor": "Pulley Anchor",
   "block.vstuff.rotational_thruster": "Rotational Thruster",
   "item.vstuff.redstone_magnet": "Redstone Magnet",
   "creativetabs.main": "VStuff",
-  "pulley_mode.manual": "Manual",
 
   "create.gui.goggles.thruster.status": "Thruster Status",
   "create.gui.goggles.thruster.status.working" : "On",
