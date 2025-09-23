@@ -279,11 +279,17 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
 
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
+        super.addToGoggleTooltip(tooltip, isPlayerSneaking);
+
         boolean wasThrustDirty = isThrustDirty;
         calculateObstruction(getLevel(), worldPosition, getBlockState().getValue(AbstractThrusterBlock.FACING));
         isThrustDirty = wasThrustDirty;
 
-        Lang.translate("gui.goggles.thruster.status", new Object[0]).text(":").space().add(getGoggleStatus()).forGoggles(tooltip);
+        Lang.translate("gui.goggles.thruster.status")
+                .text(":")
+                .space()
+                .add(getGoggleStatus())
+                .forGoggles(tooltip);
 
         float efficiency = 100;
         ChatFormatting tooltipColor = ChatFormatting.GREEN;
@@ -291,11 +297,19 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
             efficiency = calculateObstructionEffect() * 100;
         }
 
-        Lang.builder().add(Lang.translate("gui.goggles.thruster.efficiency", new Object[0])).space().add(Lang.number(efficiency)).add(Lang.text("%")).style(tooltipColor).forGoggles(tooltip);
+        Lang.builder()
+                .add(Lang.translate("gui.goggles.thruster.efficiency"))
+                .space()
+                .add(Lang.number(efficiency))
+                .add(Lang.text("%"))
+                .style(tooltipColor)
+                .forGoggles(tooltip);
 
         addSpecificGoggleInfo(tooltip, isPlayerSneaking);
+
         return true;
     }
+
 
     @Override
     protected void write(CompoundTag compound, boolean clientPacket) {

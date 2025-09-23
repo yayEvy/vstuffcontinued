@@ -47,7 +47,7 @@ public class ConstraintSyncPacket {
         this.localPosA = null;
         this.localPosB = null;
         this.maxLength = 0;
-        this.ropeStyle = new RopeStyles.RopeStyle("none", RopeStyles.PrimitiveRopeStyle.BASIC, "none");
+        this.ropeStyle = new RopeStyles.RopeStyle("none", RopeStyles.PrimitiveRopeStyle.NORMAL, "none");
         this.style = ropeStyle.getStyle();
         this.basicStyle = ropeStyle.getBasicStyle();
         this.styleLKey = ropeStyle.getLangKey();
@@ -61,7 +61,7 @@ public class ConstraintSyncPacket {
         this.localPosA = null;
         this.localPosB = null;
         this.maxLength = 0;
-        this.ropeStyle = new RopeStyles.RopeStyle("none", RopeStyles.PrimitiveRopeStyle.BASIC, "none");
+        this.ropeStyle = new RopeStyles.RopeStyle("none", RopeStyles.PrimitiveRopeStyle.NORMAL, "none");
         this.style = ropeStyle.getStyle();
         this.basicStyle = ropeStyle.getBasicStyle();
         this.styleLKey = ropeStyle.getLangKey();
@@ -92,7 +92,7 @@ public class ConstraintSyncPacket {
                 this.localPosB = null;
                 this.maxLength = 0;
                 this.style = "none";
-                this.basicStyle = RopeStyles.PrimitiveRopeStyle.BASIC;
+                this.basicStyle = RopeStyles.PrimitiveRopeStyle.NORMAL;
                 this.styleLKey = "none";
                 this.ropeStyle = new RopeStyles.RopeStyle(style, basicStyle, styleLKey);
                 break;
@@ -105,7 +105,7 @@ public class ConstraintSyncPacket {
                 this.localPosB = null;
                 this.maxLength = 0;
                 this.style = "none";
-                this.basicStyle = RopeStyles.PrimitiveRopeStyle.BASIC;
+                this.basicStyle = RopeStyles.PrimitiveRopeStyle.NORMAL;
                 this.styleLKey = "none";
                 this.ropeStyle = new RopeStyles.RopeStyle(style, basicStyle, styleLKey);
                 break;

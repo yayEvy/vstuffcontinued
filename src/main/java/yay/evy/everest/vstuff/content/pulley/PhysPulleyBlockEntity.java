@@ -311,7 +311,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
                         serverLevel, constraintId, shipA, shipB,
                         localPosA, localPosB, currentRopeLength,
                         compliance, maxForce,
-                        ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY, getBlockPos(), new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.BASIC, "vstuff.ropes.normal")
+                        ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY, getBlockPos(), new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal")
                 );
 
                 setChanged();
@@ -1219,7 +1219,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
                 ConstraintTracker.addConstraintWithPersistence(serverLevel, constraintId, realShipA, realShipB,
                         localPosA, localPosB, length, 1e-9, 50000000,
                         ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY, getBlockPos(),
-                        new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.BASIC, "vstuff.ropes.normal"));
+                        new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal"));
 
                 System.out.println("Created constraint " + constraintId + " with length " + length);
                 return constraintId;
@@ -1346,7 +1346,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
                 ConstraintTracker.addConstraintWithPersistence(serverLevel, constraintId, shipA, shipB,
                         localPosA, localPosB, currentRopeLength, 1e-9, 50000000,
                         ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY, getBlockPos(),
-                        new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.BASIC, "vstuff.ropes.normal"));
+                        new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal"));
 
                 System.out.println("Successfully restored constraint " + constraintId + " with length " + currentRopeLength);
                 setChanged();
@@ -1575,7 +1575,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
                 ConstraintTracker.addConstraintWithPersistence(serverLevel, constraintId, shipA, shipB,
                         localPosA, localPosB, currentRopeLength, 1e-9, 15000000.0,
                         ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY, getBlockPos(),
-                        new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.BASIC, "vstuff.ropes.normal"));
+                        new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal"));
 
                 setChanged();
                 sendData();
@@ -1932,7 +1932,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
                 ConstraintTracker.addConstraintWithPersistence(serverLevel, constraintId, shipA, shipB,
                         localPosA, localPosB, currentRopeLength, compliance, maxForce,
                         ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY, getBlockPos(),
-                        new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.BASIC, "vstuff.ropes.normal"));
+                        new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal"));
 
                 setChanged();
                 sendData();

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CCC",
+    "ERE",
+    "CCC"
+  ],
+  "key": {
+    "E": { "item": "create:electron_tube" },
+    "R": { "item": "create:precision_mechanism" },
+    "C": { "item": "create:brass_casing" }
+  },
+  "result": {
+    "item": "vstuff:rotational_thruster",
+    "count": 1
+  }
+}

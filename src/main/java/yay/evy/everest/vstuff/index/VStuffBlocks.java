@@ -1,5 +1,6 @@
 package yay.evy.everest.vstuff.index;
 
+import com.simibubi.create.content.kinetics.BlockStressDefaults;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
 import net.minecraft.world.level.block.Blocks;
@@ -19,12 +20,14 @@ public class VStuffBlocks {
     public static final BlockEntry<RotationalThrusterBlock> ROTATIONAL_THRUSTER =
             REGISTRATE.block("rotational_thruster", RotationalThrusterBlock::new)
                     .initialProperties(() -> Blocks.IRON_BLOCK)
+                    .transform(BlockStressDefaults.setImpact(32.0))
                     .simpleItem()
                     .register();
 
     public static final BlockEntry<PhysPulleyBlock> PHYS_PULLEY =
             REGISTRATE.block("phys_pulley", PhysPulleyBlock::new)
                     .properties(props -> BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK))
+                    .transform(BlockStressDefaults.setImpact(4.0))
                     .simpleItem()
                     .register();
 

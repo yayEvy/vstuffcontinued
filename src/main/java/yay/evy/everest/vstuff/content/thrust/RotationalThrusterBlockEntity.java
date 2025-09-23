@@ -61,6 +61,8 @@ public class RotationalThrusterBlockEntity extends AbstractThrusterBlockEntity {
     }
 
 
+
+
     @Override
     protected void addSpecificGoggleInfo(List<Component> tooltip, boolean isPlayerSneaking) {
     }

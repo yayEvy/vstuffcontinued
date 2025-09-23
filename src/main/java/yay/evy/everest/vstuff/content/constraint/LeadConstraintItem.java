@@ -34,7 +34,7 @@ public class LeadConstraintItem extends Item {
     private Integer activeConstraintId;
     private ResourceKey<Level> firstClickDimension;
     private String ropeStyle = "normal";
-    private RopeStyles.RopeStyle style = new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.BASIC, "vstuff.ropes.normal");
+    private RopeStyles.RopeStyle style = new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal");
 
     public LeadConstraintItem(Properties pProperties) {
         super(new Properties().stacksTo(64));
