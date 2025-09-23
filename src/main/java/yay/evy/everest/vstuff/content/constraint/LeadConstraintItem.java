@@ -167,13 +167,19 @@ public class LeadConstraintItem extends Item {
         double maxForce = baseMaxForce * Math.min(massRatio, 20.0);
 
 
-        if (distance > 300.0) {
+        double maxAllowedLength = VstuffConfig.MAX_ROPE_LENGTH.get();
+
+        if (distance > maxAllowedLength) {
             if (player != null) {
-                player.displayClientMessage(Component.literal("§cRope too long! Max length is 300 blocks."), true);
+                player.displayClientMessage(
+                        Component.literal("§cRope too long! Max length is " + maxAllowedLength + " blocks."),
+                        true
+                );
             }
             resetState();
             return;
         }
+
 
         if (shipAIsWorld || shipBIsWorld) {
             maxForce *= 10.0;

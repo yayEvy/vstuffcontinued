@@ -15,6 +15,7 @@ public class VstuffConfig {
     public static final ForgeConfigSpec.ConfigValue<Boolean> THRUSTER_DAMAGE_ENTITIES;
     public static final ForgeConfigSpec.ConfigValue<Double> THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER;
     public static final ForgeConfigSpec.ConfigValue<Double> THRUSTER_PARTICLE_COUNT_MULTIPLIER;
+    public static final ForgeConfigSpec.ConfigValue<Double> MAX_ROPE_LENGTH;
     public static final ForgeConfigSpec.BooleanValue ROPE_SOUNDS;
 
     static {
@@ -46,6 +47,9 @@ public class VstuffConfig {
         ROPE_SOUNDS = serverBuilder
                 .comment("Toggle on or off client rope sounds (default: true)")
                 .define("ropeSounds", true);
+        MAX_ROPE_LENGTH = serverBuilder
+                .comment("Set the max length for ropes (default: 200)")
+                .define("max_rope_length", 200.0);
         serverBuilder.pop();
 // woooooooo
         SERVER_CONFIG = serverBuilder.build();
