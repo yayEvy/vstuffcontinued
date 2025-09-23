@@ -172,16 +172,15 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
                                 BlockPos fromPos, boolean isMoving) {
         if (level.isClientSide) return;
 
-        boolean powered = level.hasNeighborSignal(pos);
+        boolean currentlyPowered = level.hasNeighborSignal(pos);
+        boolean previouslyPowered = state.getValue(POWERED);
 
-        if (powered != state.getValue(POWERED)) {
-            level.setBlock(pos, state.setValue(POWERED, powered), 3);
-        }
+        if (currentlyPowered != previouslyPowered) {
+            level.setBlock(pos, state.setValue(POWERED, currentlyPowered), 3);
 
-        BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof PhysPulleyBlockEntity pulley) {
-            if (powered) {
-                if (level instanceof ServerLevel serverLevel) {
+            if (currentlyPowered) {
+                BlockEntity be = level.getBlockEntity(pos);
+                if (be instanceof PhysPulleyBlockEntity pulley) {
                     pulley.removeExistingConstraint(true);
                     pulley.setChanged();
                     level.sendBlockUpdated(pos, state, state, 3);
@@ -190,7 +189,8 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
         }
     }
 
-        @Override
+
+    @Override
     public Class<PhysPulleyBlockEntity> getBlockEntityClass() {
         return PhysPulleyBlockEntity.class;
     }

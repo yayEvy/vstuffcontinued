@@ -16,6 +16,7 @@ public class VstuffConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER;
     public static final ForgeConfigSpec.ConfigValue<Double> THRUSTER_PARTICLE_COUNT_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Double> MAX_ROPE_LENGTH;
+    public static final ForgeConfigSpec.ConfigValue<Double> PULLEY_SPEED;
     public static final ForgeConfigSpec.BooleanValue ROPE_SOUNDS;
 
     static {
@@ -50,6 +51,9 @@ public class VstuffConfig {
         MAX_ROPE_LENGTH = serverBuilder
                 .comment("Set the max length for ropes (default: 200)")
                 .define("max_rope_length", 200.0);
+        PULLEY_SPEED = serverBuilder
+                .comment("Set the pulley extension/retraction speed (default: 0.1)")
+                .define("pulley_speed", 0.1);
         serverBuilder.pop();
 // woooooooo
         SERVER_CONFIG = serverBuilder.build();

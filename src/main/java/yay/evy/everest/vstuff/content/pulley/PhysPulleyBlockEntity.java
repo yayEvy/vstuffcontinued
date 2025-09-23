@@ -42,6 +42,7 @@ import org.valkyrienskies.core.api.ships.properties.ChunkClaim;
 import org.valkyrienskies.core.apigame.constraints.VSRopeConstraint;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
+import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.index.VStuffBlockEntities;
 import yay.evy.everest.vstuff.index.VStuffBlocks;
 import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
@@ -89,7 +90,9 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
     private int tickCounter = 0;
     private static final double MIN_SPEED_THRESHOLD = 1.0;
-    private static final double LENGTH_CHANGE_RATE = 0.1;
+    private double getLengthChangeRate() {
+        return VstuffConfig.PULLEY_SPEED.get();
+    }
     private double consumedRopeLength = 0.0;
     private double baseRopeLength = 1.0;
     private boolean ropeStateInitialized = false;
@@ -921,7 +924,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             Vector3d pulleyWorldPos = getWorldPosition(serverLevel, pulleyBlockPos, pulleyShip);
             Vector3d targetWorldPos = getWorldPosition(serverLevel, pendingTargetPos, targetShip);
 
-            double step = LENGTH_CHANGE_RATE / 8.0;
+            double step = getLengthChangeRate() / 8.0;
             double distance = pendingTargetDistance;
             double newLen = Math.min(currentRopeLength + step, distance);
             double progress = distance > 0 ? newLen / distance : 1.0;
@@ -971,7 +974,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
 
         else if (currentMode == PulleyMode.MANUAL && hasTarget) {
-            double step = LENGTH_CHANGE_RATE / 4.0;
+            double step = getLengthChangeRate() / 4.0;
             if (speed > 0) extendRope(step);
             else if (speed < 0) retractRope(step);
 
@@ -993,7 +996,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
 
         else if (currentMode == PulleyMode.AUTO && hasTarget) {
-            double step = LENGTH_CHANGE_RATE / 4.0;
+            double step = getLengthChangeRate() / 4.0;
             if (speed < 0) retractRope(step);
             else if (speed > 0) extendRope(step);
         }
@@ -1061,9 +1064,15 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             return;
         }
 
+        double maxRopeLength = getRawMaxRopeLength();
+
         double newLength = currentRopeLength + amount;
 
         if (lastMode == PulleyMode.MANUAL) {
+            if (newLength > maxRopeLength) {
+                newLength = maxRopeLength;
+                amount = newLength - currentRopeLength;
+            }
             currentRopeLength = newLength;
             actuallyConsumeRope(amount);
 

@@ -30,6 +30,10 @@ public class RopeBreakHandler {
             Integer id = entry.getKey();
             RopeConstraintData data = entry.getValue();
 
+            if (data.constraintType == ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY) {
+                continue;
+            }
+
             try {
                 boolean validA = ConstraintTracker.isValidAttachmentPoint(
                         level,
