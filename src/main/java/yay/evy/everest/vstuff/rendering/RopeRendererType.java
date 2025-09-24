@@ -66,12 +66,11 @@ public class RopeRendererType extends RenderType {
                         .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
                         .setTextureState(new RenderStateShard.TextureStateShard(texture, false, false))
                         .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-                        .setCullState(CULL)
+                        .setCullState(NO_CULL)
                         .setLightmapState(LIGHTMAP)
                         .setOverlayState(NO_OVERLAY)
                         .setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
                         .setWriteMaskState(COLOR_DEPTH_WRITE)
                         .createCompositeState(true));
     }
-
 }

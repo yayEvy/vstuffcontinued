@@ -3,6 +3,8 @@ package yay.evy.everest.vstuff.content.constraint;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -440,33 +442,42 @@ public class ConstraintTracker {
     }
 
 
-    public static boolean isValidAttachmentPoint(ServerLevel level, Vector3d localPos, Long shipId, Long groundBodyId, boolean isShip) {
+    public static boolean isValidAttachmentPoint(
+            ServerLevel level,
+            Vector3d localPos,
+            Long shipId,
+            Long groundBodyId,
+            boolean isShip
+    ) {
         try {
             if (!isShip) {
-                net.minecraft.core.BlockPos blockPos = new net.minecraft.core.BlockPos(
-                        (int) Math.floor(localPos.x),
-                        (int) Math.floor(localPos.y),
-                        (int) Math.floor(localPos.z)
-                );
-                if (!level.isLoaded(blockPos)) return true;
-                net.minecraft.world.level.block.state.BlockState state = level.getBlockState(blockPos);
+                // Ground block
+                BlockPos blockPos = BlockPos.containing(localPos.x, localPos.y, localPos.z);
+
+                if (!level.isLoaded(blockPos)) return false;
+
+                BlockState state = level.getBlockState(blockPos);
                 return !state.isAir();
             } else {
-                org.valkyrienskies.core.api.ships.Ship ship = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
+                // Ship block
+                Ship ship = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
                 if (ship == null) return false;
+
                 Vector3d worldPos = new Vector3d();
                 ship.getTransform().getShipToWorld().transformPosition(localPos, worldPos);
-                net.minecraft.core.BlockPos worldBlockPos = new net.minecraft.core.BlockPos(
-                        (int) Math.floor(worldPos.x),
-                        (int) Math.floor(worldPos.y),
-                        (int) Math.floor(worldPos.z)
-                );
-                if (!level.isLoaded(worldBlockPos)) return true;
-                net.minecraft.world.level.block.state.BlockState state = level.getBlockState(worldBlockPos);
+
+                BlockPos worldBlockPos = BlockPos.containing(worldPos.x, worldPos.y, worldPos.z);
+
+                if (!level.isLoaded(worldBlockPos)) return false;
+
+                BlockState state = level.getBlockState(worldBlockPos);
                 return !state.isAir();
             }
         } catch (Exception e) {
-            return true;
+            // If anything fails, treat it as invalid so we don't keep ghost ropes
+            return false;
         }
     }
+
+
 }

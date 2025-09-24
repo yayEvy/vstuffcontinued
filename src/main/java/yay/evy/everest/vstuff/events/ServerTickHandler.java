@@ -12,7 +12,7 @@ import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
 public class ServerTickHandler {
 
     private static int tickCounter = 0;
-    private static final int TICKS_PER_SECOND = 20; // 20 ticks = 1 second
+    private static final int TICKS_PER_SECOND = 5;
 
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {

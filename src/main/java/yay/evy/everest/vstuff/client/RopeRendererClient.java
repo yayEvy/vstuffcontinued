@@ -15,6 +15,7 @@ import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3d;
 import yay.evy.everest.vstuff.rendering.RopeRendererType;
 import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
@@ -67,17 +68,16 @@ public class RopeRendererClient {
                 currentEndPos.set(newEnd);
             }
         }
+
         public Vector3d getInterpolatedStartPos(float partialTick) {
             if (!initialized) return new Vector3d(currentStartPos);
             return new Vector3d(prevStartPos).lerp(currentStartPos, partialTick);
         }
 
         public Vector3d getInterpolatedEndPos(float partialTick) {
-            if (!initialized) return new Vector3d(currentEndPos);
+            if (!initialized) return new Vector3d(prevEndPos).lerp(currentEndPos, partialTick);
             return new Vector3d(prevEndPos).lerp(currentEndPos, partialTick);
         }
-
-
     }
     @SubscribeEvent
     public static void onRenderLevel(RenderLevelStageEvent event) {
@@ -192,10 +192,6 @@ public class RopeRendererClient {
         }
     }
 
-
-
-
-
     private static void renderRope(PoseStack poseStack, MultiBufferSource bufferSource,
                                    Vector3d startPos, Vector3d endPos, double actualRopeLength,
                                    double maxRopeLength, Vec3 cameraPos, float partialTick, Level level, RopeStyles.RopeStyle style) {
@@ -215,18 +211,26 @@ public class RopeRendererClient {
         RenderType renderType;
         poseStack.pushPose();
         switch (style.getRenderStyle()) {
-            case CHAIN -> renderType = RopeRendererType.ropeRendererChainStyle(style.getTexture());
-            default -> renderType = RopeRendererType.ropeRenderer(style.getTexture());
+            case CHAIN:
+                renderChainRope(poseStack, bufferSource, start, end,
+                        actualRopeLength, maxRopeLength, partialTick, level, cameraPos, style, style.getTexture());
+                break;
+
+            default:
+                renderType = RopeRendererType.ropeRenderer(style.getTexture());
+                VertexConsumer vertexConsumerNormal = bufferSource.getBuffer(renderType);
+                renderNormalRope(poseStack, vertexConsumerNormal, start, end,
+                        actualRopeLength, maxRopeLength, partialTick, level, cameraPos);
+                break;
         }
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(renderType);
-        renderSingleRopeSegment(poseStack, vertexConsumer, start, end, actualRopeLength, maxRopeLength, partialTick, level, cameraPos);
+
+
         poseStack.popPose();
     }
 
-
-    private static void renderSingleRopeSegment(PoseStack poseStack, VertexConsumer vertexConsumer,
-                                                Vec3 start, Vec3 end, double actualRopeLength,
-                                                double maxRopeLength, float partialTick, Level level, Vec3 cameraPos) {
+    private static void renderNormalRope(PoseStack poseStack, VertexConsumer vertexConsumer,
+                                         Vec3 start, Vec3 end, double actualRopeLength,
+                                         double maxRopeLength, float partialTick, Level level, Vec3 cameraPos) {
         Matrix4f matrix = poseStack.last().pose();
         Vec3 direction = end.subtract(start);
         double currentDistance = direction.length();
@@ -274,18 +278,47 @@ public class RopeRendererClient {
             bottomRightStrip[i] = center.add(right.scale(halfWidth)).add(up.scale(-halfWidth));
         }
 
-        renderRopeFaceWithGapFilling(vertexConsumer, matrix, topLeftStrip, topRightStrip, up, curvePoints, totalCurveLength, level, cameraPos);
-        renderRopeFaceWithGapFilling(vertexConsumer, matrix, topRightStrip, bottomRightStrip, right, curvePoints, totalCurveLength, level, cameraPos);
-        renderRopeFaceWithGapFilling(vertexConsumer, matrix, bottomRightStrip, bottomLeftStrip, up.scale(-1), curvePoints, totalCurveLength, level, cameraPos);
-        renderRopeFaceWithGapFilling(vertexConsumer, matrix, bottomLeftStrip, topLeftStrip, right.scale(-1), curvePoints, totalCurveLength, level, cameraPos);
-        renderRopeFaceWithGapFilling(vertexConsumer, matrix, topLeftStrip, bottomRightStrip, right.add(up).normalize(), curvePoints, totalCurveLength, level, cameraPos);
-        renderRopeFaceWithGapFilling(vertexConsumer, matrix, topRightStrip, bottomLeftStrip, right.subtract(up).normalize(), curvePoints, totalCurveLength, level, cameraPos);
+        double textureScale = 0.28 / ROPE_WIDTH;
+
+        renderRopeFaceWithGapFilling(vertexConsumer, matrix, topLeftStrip, topRightStrip, up, curvePoints, totalCurveLength, level, cameraPos, textureScale);
+        renderRopeFaceWithGapFilling(vertexConsumer, matrix, topRightStrip, bottomRightStrip, right, curvePoints, totalCurveLength, level, cameraPos, textureScale);
+        renderRopeFaceWithGapFilling(vertexConsumer, matrix, bottomRightStrip, bottomLeftStrip, up.scale(-1), curvePoints, totalCurveLength, level, cameraPos, textureScale);
+        renderRopeFaceWithGapFilling(vertexConsumer, matrix, bottomLeftStrip, topLeftStrip, right.scale(-1), curvePoints, totalCurveLength, level, cameraPos, textureScale);
+        renderRopeFaceWithGapFilling(vertexConsumer, matrix, topLeftStrip, bottomRightStrip, right.add(up).normalize(), curvePoints, totalCurveLength, level, cameraPos, textureScale);
+        renderRopeFaceWithGapFilling(vertexConsumer, matrix, topRightStrip, bottomLeftStrip, right.subtract(up).normalize(), curvePoints, totalCurveLength, level, cameraPos, textureScale);
+
+    }
+
+
+
+    private static void renderSingleChainQuad(VertexConsumer vertexConsumer, Matrix4f matrix, Vec3 center,
+                                              Vec3 right, Vec3 up, Level level, Vec3 cameraPos) {
+        float halfWidth = ROPE_WIDTH * 0.5f;
+        int light = calculateDynamicLighting(level, center.add(cameraPos), center.add(cameraPos), cameraPos);
+        Vec3 normal = up.cross(right).normalize();
+
+        Vec3 p1 = center.add(right.scale(-halfWidth)).add(up.scale(halfWidth));
+        Vec3 p2 = center.add(right.scale(halfWidth)).add(up.scale(halfWidth));
+        Vec3 p3 = center.add(right.scale(halfWidth)).add(up.scale(-halfWidth));
+        Vec3 p4 = center.add(right.scale(-halfWidth)).add(up.scale(-halfWidth));
+
+        addRopeVertex(vertexConsumer, matrix, p1, 0.0f, 0.0f, light, normal);
+        addRopeVertex(vertexConsumer, matrix, p2, 1.0f, 0.0f, light, normal);
+        addRopeVertex(vertexConsumer, matrix, p3, 1.0f, 1.0f, light, normal);
+        addRopeVertex(vertexConsumer, matrix, p4, 0.0f, 1.0f, light, normal);
+
+        normal = normal.scale(-1);
+        addRopeVertex(vertexConsumer, matrix, p4, 0.0f, 1.0f, light, normal);
+        addRopeVertex(vertexConsumer, matrix, p3, 1.0f, 1.0f, light, normal);
+        addRopeVertex(vertexConsumer, matrix, p2, 1.0f, 0.0f, light, normal);
+        addRopeVertex(vertexConsumer, matrix, p1, 0.0f, 0.0f, light, normal);
     }
 
 
     private static void renderRopeFaceWithGapFilling(VertexConsumer vertexConsumer, Matrix4f matrix,
                                                      Vec3[] strip1, Vec3[] strip2, Vec3 normal,
-                                                     Vec3[] curvePoints, double totalCurveLength, Level level, Vec3 cameraPos) {
+                                                     Vec3[] curvePoints, double totalCurveLength,
+                                                     Level level, Vec3 cameraPos, double textureScale) {
         double[] cumulativeDistances = new double[ROPE_CURVE_SEGMENTS + 1];
         cumulativeDistances[0] = 0;
         for (int i = 0; i < ROPE_CURVE_SEGMENTS; i++) {
@@ -293,7 +326,6 @@ public class RopeRendererClient {
             cumulativeDistances[i + 1] = cumulativeDistances[i] + segmentLength;
         }
 
-        double textureScale = 0.5 / ROPE_WIDTH;
         for (int i = 0; i < ROPE_CURVE_SEGMENTS; i++) {
             float vStart = (float) (cumulativeDistances[i] * textureScale);
             float vEnd = (float) (cumulativeDistances[i + 1] * textureScale);
@@ -323,6 +355,56 @@ public class RopeRendererClient {
         }
     }
 
+    private static void renderChainRope(PoseStack poseStack, MultiBufferSource bufferSource,
+                                        Vec3 start, Vec3 end, double actualRopeLength,
+                                        double maxRopeLength, float partialTick, Level level, Vec3 cameraPos,
+                                        RopeStyles.RopeStyle style, ResourceLocation chainTexture) {
+        Matrix4f matrix = poseStack.last().pose();
+
+        RenderType renderType = RopeRendererType.ropeRendererChainStyle(chainTexture);
+        VertexConsumer vertexConsumer = bufferSource.getBuffer(renderType);
+
+        double stretchFactor = Math.min(actualRopeLength / Math.max(maxRopeLength, 0.1), 1.0);
+        double sagAmount = ROPE_SAG_FACTOR * (1.0 - stretchFactor * stretchFactor) * actualRopeLength * 0.35;
+
+        long currentTimeNanos = System.nanoTime();
+        float gameTime = (currentTimeNanos % 100_000_000_000L) / 1_000_000_000.0f;
+        float windOffset = (float) (Math.sin(gameTime * 0.8) * 0.3 + Math.sin(gameTime * 1.3) * 0.2) * WIND_STRENGTH;
+
+        Vec3[] curvePoints = new Vec3[ROPE_CURVE_SEGMENTS + 1];
+        for (int i = 0; i <= ROPE_CURVE_SEGMENTS; i++) {
+            float t = (float) i / ROPE_CURVE_SEGMENTS;
+            curvePoints[i] = calculateCatenaryPosition(start, end, t, sagAmount, windOffset, gameTime);
+        }
+
+        double totalCurveLength = 0;
+        for (int i = 0; i < ROPE_CURVE_SEGMENTS; i++) {
+            totalCurveLength += curvePoints[i].distanceTo(curvePoints[i + 1]);
+        }
+
+        Vec3 overallDirection = end.subtract(start).normalize();
+        Vec3 worldUp = new Vec3(0, 1, 0);
+        Vec3 right = Math.abs(overallDirection.dot(worldUp)) > 0.9 ? new Vec3(1, 0, 0) : overallDirection.cross(worldUp).normalize();
+        Vec3 up = right.cross(overallDirection).normalize();
+
+        Vec3[] topRightStrip = new Vec3[ROPE_CURVE_SEGMENTS + 1];
+        Vec3[] topLeftStrip = new Vec3[ROPE_CURVE_SEGMENTS + 1];
+        Vec3[] bottomLeftStrip = new Vec3[ROPE_CURVE_SEGMENTS + 1];
+        Vec3[] bottomRightStrip = new Vec3[ROPE_CURVE_SEGMENTS + 1];
+
+        float halfWidth = ROPE_WIDTH * 1.3f;
+        for (int i = 0; i <= ROPE_CURVE_SEGMENTS; i++) {
+            Vec3 center = curvePoints[i];
+            topRightStrip[i] = center.add(right.scale(halfWidth)).add(up.scale(halfWidth));
+            topLeftStrip[i] = center.add(right.scale(-halfWidth)).add(up.scale(halfWidth));
+            bottomLeftStrip[i] = center.add(right.scale(-halfWidth)).add(up.scale(-halfWidth));
+            bottomRightStrip[i] = center.add(right.scale(halfWidth)).add(up.scale(-halfWidth));
+        }
+
+        double textureScale = 0.3 / ROPE_WIDTH;
+        renderRopeFaceWithGapFilling(vertexConsumer, matrix, topLeftStrip, bottomRightStrip, right.add(up).normalize(), curvePoints, totalCurveLength, level, cameraPos, textureScale);
+        renderRopeFaceWithGapFilling(vertexConsumer, matrix, topRightStrip, bottomLeftStrip, right.subtract(up).normalize(), curvePoints, totalCurveLength, level, cameraPos, textureScale);
+    }
 
 
 
@@ -337,6 +419,8 @@ public class RopeRendererClient {
                 .uv2(light)
                 .normal((float) normal.x, (float) normal.y, (float) normal.z)
                 .endVertex();
+
+
     }
 
     private static void addRopeVertexWithAlpha(VertexConsumer consumer, Matrix4f matrix, Vec3 pos,
@@ -352,17 +436,6 @@ public class RopeRendererClient {
     }
 
 
-
-
-
-
-    // tf is this empty space for
-
-
-
-
-
-
     private static Vec3 calculateCatenaryPosition(Vec3 start, Vec3 end, float t,
                                                   double sagAmount, float windOffset, float gameTime) {
         Vec3 linearPos = start.lerp(end, t);
@@ -374,14 +447,6 @@ public class RopeRendererClient {
 
         return linearPos.add(windSway, -sagCurve, windSwayZ);
     }
-
-
-
-
-    // why
-
-
-
 
     private static int calculateDynamicLighting(Level level, Vec3 pos1, Vec3 pos2, Vec3 cameraPos) {
         Vec3 worldPos1 = pos1.add(cameraPos);
@@ -402,8 +467,4 @@ public class RopeRendererClient {
             return (8 << 20) | (8 << 4);
         }
     }
-
-
-
-
 }

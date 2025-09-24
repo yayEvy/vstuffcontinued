@@ -17,6 +17,11 @@ public class RopeStyles {
         return new ResourceLocation("minecraft", "textures/block/" + color + "_wool.png");
     }
 
+    // New method to get the vanilla Minecraft chain texture
+    public static ResourceLocation getChainStyle() {
+        return new ResourceLocation("minecraft", "textures/item/chain.png");
+    }
+
 
     public enum RenderStyle {
         NORMAL,
@@ -53,6 +58,7 @@ public class RopeStyles {
             switch (basicStyle) {
                 case DYED -> this.associatedTexture = getDyedRopeStyle(style);
                 case WOOL -> this.associatedTexture = getDyedWoolStyle(style);
+                case CHAIN -> this.associatedTexture = getChainStyle(); // Use new method
                 default -> this.associatedTexture = getRopeStyle(style);
             }
         }
@@ -80,6 +86,7 @@ public class RopeStyles {
             switch (basicStyle) {
                 case DYED -> this.associatedTexture = getDyedRopeStyle(style);
                 case WOOL -> this.associatedTexture = getDyedWoolStyle(style);
+                case CHAIN -> this.associatedTexture = getChainStyle(); // Use new method
                 default -> this.associatedTexture = getRopeStyle(style);
             }
         }
