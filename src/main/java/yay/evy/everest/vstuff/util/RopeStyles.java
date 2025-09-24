@@ -17,9 +17,8 @@ public class RopeStyles {
         return new ResourceLocation("minecraft", "textures/block/" + color + "_wool.png");
     }
 
-    // New method to get the vanilla Minecraft chain texture
     public static ResourceLocation getChainStyle() {
-        return new ResourceLocation("minecraft", "textures/item/chain.png");
+        return new ResourceLocation("vstuff", "textures/entity/rope/rope_chain.png");
     }
 
 

@@ -291,30 +291,6 @@ public class RopeRendererClient {
 
 
 
-    private static void renderSingleChainQuad(VertexConsumer vertexConsumer, Matrix4f matrix, Vec3 center,
-                                              Vec3 right, Vec3 up, Level level, Vec3 cameraPos) {
-        float halfWidth = ROPE_WIDTH * 0.5f;
-        int light = calculateDynamicLighting(level, center.add(cameraPos), center.add(cameraPos), cameraPos);
-        Vec3 normal = up.cross(right).normalize();
-
-        Vec3 p1 = center.add(right.scale(-halfWidth)).add(up.scale(halfWidth));
-        Vec3 p2 = center.add(right.scale(halfWidth)).add(up.scale(halfWidth));
-        Vec3 p3 = center.add(right.scale(halfWidth)).add(up.scale(-halfWidth));
-        Vec3 p4 = center.add(right.scale(-halfWidth)).add(up.scale(-halfWidth));
-
-        addRopeVertex(vertexConsumer, matrix, p1, 0.0f, 0.0f, light, normal);
-        addRopeVertex(vertexConsumer, matrix, p2, 1.0f, 0.0f, light, normal);
-        addRopeVertex(vertexConsumer, matrix, p3, 1.0f, 1.0f, light, normal);
-        addRopeVertex(vertexConsumer, matrix, p4, 0.0f, 1.0f, light, normal);
-
-        normal = normal.scale(-1);
-        addRopeVertex(vertexConsumer, matrix, p4, 0.0f, 1.0f, light, normal);
-        addRopeVertex(vertexConsumer, matrix, p3, 1.0f, 1.0f, light, normal);
-        addRopeVertex(vertexConsumer, matrix, p2, 1.0f, 0.0f, light, normal);
-        addRopeVertex(vertexConsumer, matrix, p1, 0.0f, 0.0f, light, normal);
-    }
-
-
     private static void renderRopeFaceWithGapFilling(VertexConsumer vertexConsumer, Matrix4f matrix,
                                                      Vec3[] strip1, Vec3[] strip2, Vec3 normal,
                                                      Vec3[] curvePoints, double totalCurveLength,
@@ -378,13 +354,22 @@ public class RopeRendererClient {
         }
 
         double totalCurveLength = 0;
+        double[] cumulativeDistances = new double[ROPE_CURVE_SEGMENTS + 1];
+        cumulativeDistances[0] = 0;
         for (int i = 0; i < ROPE_CURVE_SEGMENTS; i++) {
-            totalCurveLength += curvePoints[i].distanceTo(curvePoints[i + 1]);
+            double segLength = curvePoints[i].distanceTo(curvePoints[i + 1]);
+            totalCurveLength += segLength;
+            cumulativeDistances[i + 1] = totalCurveLength;
         }
+
+        double repeatInterval = 1;
+        double textureScale = 1 / repeatInterval;
 
         Vec3 overallDirection = end.subtract(start).normalize();
         Vec3 worldUp = new Vec3(0, 1, 0);
-        Vec3 right = Math.abs(overallDirection.dot(worldUp)) > 0.9 ? new Vec3(1, 0, 0) : overallDirection.cross(worldUp).normalize();
+        Vec3 right = Math.abs(overallDirection.dot(worldUp)) > 0.9
+                ? new Vec3(1, 0, 0)
+                : overallDirection.cross(worldUp).normalize();
         Vec3 up = right.cross(overallDirection).normalize();
 
         Vec3[] topRightStrip = new Vec3[ROPE_CURVE_SEGMENTS + 1];
@@ -392,7 +377,7 @@ public class RopeRendererClient {
         Vec3[] bottomLeftStrip = new Vec3[ROPE_CURVE_SEGMENTS + 1];
         Vec3[] bottomRightStrip = new Vec3[ROPE_CURVE_SEGMENTS + 1];
 
-        float halfWidth = ROPE_WIDTH * 1.3f;
+        float halfWidth = ROPE_WIDTH * 5f;
         for (int i = 0; i <= ROPE_CURVE_SEGMENTS; i++) {
             Vec3 center = curvePoints[i];
             topRightStrip[i] = center.add(right.scale(halfWidth)).add(up.scale(halfWidth));
@@ -401,11 +386,44 @@ public class RopeRendererClient {
             bottomRightStrip[i] = center.add(right.scale(halfWidth)).add(up.scale(-halfWidth));
         }
 
-        double textureScale = 0.3 / ROPE_WIDTH;
-        renderRopeFaceWithGapFilling(vertexConsumer, matrix, topLeftStrip, bottomRightStrip, right.add(up).normalize(), curvePoints, totalCurveLength, level, cameraPos, textureScale);
-        renderRopeFaceWithGapFilling(vertexConsumer, matrix, topRightStrip, bottomLeftStrip, right.subtract(up).normalize(), curvePoints, totalCurveLength, level, cameraPos, textureScale);
+        renderRopeFaceWithRepeatingUVs(vertexConsumer, matrix, topLeftStrip, bottomRightStrip,
+                right.add(up).normalize(), curvePoints, cumulativeDistances, textureScale, level, cameraPos);
+
+        renderRopeFaceWithRepeatingUVs(vertexConsumer, matrix, topRightStrip, bottomLeftStrip,
+                right.subtract(up).normalize(), curvePoints, cumulativeDistances, textureScale, level, cameraPos);
     }
 
+
+    private static void renderRopeFaceWithRepeatingUVs(VertexConsumer vertexConsumer, Matrix4f matrix,
+                                                       Vec3[] strip1, Vec3[] strip2, Vec3 normal,
+                                                       Vec3[] curvePoints, double[] cumulativeDistances,
+                                                       double textureScale, Level level, Vec3 cameraPos) {
+        double linkLength = 1;
+        double ropeLength = cumulativeDistances[ROPE_CURVE_SEGMENTS];
+        double textureScalePerBlock = 0.5 / linkLength;
+
+        double leftover = ropeLength % linkLength;
+        double uvOffset = -(leftover * 0.5 * textureScalePerBlock);
+
+        for (int i = 0; i < ROPE_CURVE_SEGMENTS; i++) {
+            float vStart = (float) (cumulativeDistances[i]     * textureScalePerBlock + uvOffset);
+            float vEnd   = (float) (cumulativeDistances[i + 1] * textureScalePerBlock + uvOffset);
+
+            Vec3 p1 = strip1[i];
+            Vec3 p2 = strip2[i];
+            Vec3 p3 = strip2[i + 1];
+            Vec3 p4 = strip1[i + 1];
+
+            int light = calculateDynamicLighting(level, p1, p2, cameraPos);
+
+            addRopeVertex(vertexConsumer, matrix, p1, 0.0f, vStart, light, normal);
+            addRopeVertex(vertexConsumer, matrix, p2, 1.0f, vStart, light, normal);
+            addRopeVertex(vertexConsumer, matrix, p4, 0.0f, vEnd,   light, normal);
+            addRopeVertex(vertexConsumer, matrix, p2, 1.0f, vStart, light, normal);
+            addRopeVertex(vertexConsumer, matrix, p3, 1.0f, vEnd,   light, normal);
+            addRopeVertex(vertexConsumer, matrix, p4, 0.0f, vEnd,   light, normal);
+        }
+    }
 
 
 
