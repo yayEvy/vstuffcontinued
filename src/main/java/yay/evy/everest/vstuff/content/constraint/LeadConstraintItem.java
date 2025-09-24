@@ -205,24 +205,17 @@ public class LeadConstraintItem extends Item {
                         compliance, maxForce, RopeStyleHandlerServer.getStyle(player.getUUID()));
 
                 if (player instanceof ServerPlayer serverPlayer) {
+                    RopeStyles.RopeStyle ropeStyle = RopeStyleHandlerServer.getStyle(player.getUUID());
                     NetworkHandler.INSTANCE.send(
                             PacketDistributor.PLAYER.with(() -> serverPlayer),
-                            new RopeSoundPacket(false)
+                            new RopeSoundPacket(false, ropeStyle.getBasicStyle())
                     );
-// config
-                    if (VstuffConfig.ROPE_SOUNDS.get()) {
-                        level.playSound(
-                                null,
-                                BlockPos.containing(finalWorldPosA.x, finalWorldPosA.y, finalWorldPosA.z),
-                                SoundEvents.LEASH_KNOT_PLACE,
-                                SoundSource.PLAYERS,
-                                1.0F,
-                                1.0F
-                        );
-                    }
+
+
 
                     ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);
                 }
+
 
                 if (player != null && !player.getAbilities().instabuild) {
                     for (int i = 0; i < player.getInventory().getContainerSize(); i++) {

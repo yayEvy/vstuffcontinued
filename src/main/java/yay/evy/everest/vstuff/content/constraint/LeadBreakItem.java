@@ -19,6 +19,7 @@ import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.sound.RopeSoundHandler;
+import yay.evy.everest.vstuff.util.RopeStyles;
 
 import java.util.List;
 import java.util.Map;
@@ -44,10 +45,16 @@ public class LeadBreakItem extends Item {
                     forceRemoveConstraint(serverLevel, targetConstraintId);
                     // config
                     if (VstuffConfig.ROPE_SOUNDS.get()) {
+                        var style = (data != null) ? data.style.getBasicStyle() : RopeStyles.PrimitiveRopeStyle.NORMAL;
+
+                        var sound = (style == RopeStyles.PrimitiveRopeStyle.CHAIN)
+                                ? SoundEvents.CHAIN_BREAK
+                                : SoundEvents.LEASH_KNOT_BREAK;
+
                         serverLevel.playSound(
                                 null,
                                 player.blockPosition(),
-                                SoundEvents.LEASH_KNOT_BREAK,
+                                sound,
                                 SoundSource.PLAYERS,
                                 1.0F,
                                 1.0F
