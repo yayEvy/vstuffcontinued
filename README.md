@@ -7,9 +7,10 @@ features as of v0.2.0 (in dev)
 - rope cutter cutter item, breaks ropes
 - phys pulley, can be used to control rope lengths
 - rotational thruster, generates thrust via rotation
-
+- rope style changer
+- complete config
+  
 PLANNED:
 - cw additions merge into vstuff
-- rope style changer
-- better config for rope related things
+
   
