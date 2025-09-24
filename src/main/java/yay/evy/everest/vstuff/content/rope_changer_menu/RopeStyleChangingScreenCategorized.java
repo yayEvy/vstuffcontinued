@@ -13,7 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.network.PacketDistributor;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.rope_changer_menu.components.RopeStyleCategory;
-import yay.evy.everest.vstuff.content.rope_changer_menu.components.RopeStyleData;
+import yay.evy.everest.vstuff.index.VStuffRopeStyles;
 import yay.evy.everest.vstuff.util.RopeStyles;
 import yay.evy.everest.vstuff.util.RopeStyles.RopeStyle;
 import yay.evy.everest.vstuff.util.client.ClientTextUtils;
@@ -63,13 +63,13 @@ public class RopeStyleChangingScreenCategorized extends AbstractSimiScreen {
     }
     Player player;
 
-    private final VStuffGuiTextures background = VStuffGuiTextures.ROPE_MENU;
+    private final VStuffGuiTextures background = VStuffGuiTextures.ROPE_STYLER;
     // The names of bogey categories
-    private final List<Component> categoryComponentList = RopeStyleData.CATEGORIES.stream()
+    private final List<Component> categoryComponentList = VStuffRopeStyles.CATEGORIES.stream()
             .map(RopeStyleCategory::getName)
             .toList();
     // The category that is currently selected
-    private RopeStyleCategory selectedCategory = RopeStyleData.CATEGORIES.get(0);
+    private RopeStyleCategory selectedCategory = VStuffRopeStyles.CATEGORIES.get(0);
     private int categoryIndex = 0; // for the scroll input on window resize
     // The list of bogies being displayed
     RopeStyle[] displayedStyles = new RopeStyle[6];
@@ -116,7 +116,7 @@ public class RopeStyleChangingScreenCategorized extends AbstractSimiScreen {
                     scrollOffs = 0.0F;
                     scrollTo(0.0F);
                     this.categoryIndex = categoryIndex;
-                    setupList(selectedCategory = RopeStyleData.CATEGORIES.get(categoryIndex));
+                    setupList(selectedCategory = VStuffRopeStyles.CATEGORIES.get(categoryIndex));
 
                     if (!selectedCategory.getCategoryStyles().isEmpty()) {
                         selectedStyle = selectedCategory.getCategoryStyles().get(0);
@@ -167,7 +167,7 @@ public class RopeStyleChangingScreenCategorized extends AbstractSimiScreen {
         // Render scroll bar
         // Formula is barPos = startLoc + (endLoc - startLoc) * scrollOffs
         int scrollBarPos = (int) (41 + (134 - 41) * scrollOffs);
-        VStuffGuiTextures barTexture = canScroll() ? VStuffGuiTextures.ROPE_MENU_SCROLL_BAR : VStuffGuiTextures.ROPE_MENU_SCROLL_BAR_DISABLED;
+        VStuffGuiTextures barTexture = canScroll() ? VStuffGuiTextures.ROPE_SCROLL : VStuffGuiTextures.ROPE_SCROLL_DISABLED;
         barTexture.render(guiGraphics, x + 11, y + scrollBarPos);
 
         // Render the bogey icons & bogey names
@@ -231,12 +231,12 @@ public class RopeStyleChangingScreenCategorized extends AbstractSimiScreen {
     }
 
     private void setupList(RopeStyleCategory categoryEntry, int offset) {
-        List<RopeStyle> bogies = categoryEntry.getCategoryStyles();
+        List<RopeStyle> styles = categoryEntry.getCategoryStyles();
 
         // Max of 6 slots, objects inside the slots will be mutated later
         for (int i = 0; i < 6; i++) {
-            if (i < bogies.size()) {
-                displayedStyles[i] = bogies.get(i+offset);
+            if (i < styles.size()) {
+                displayedStyles[i] = styles.get(i+offset);
                 styleButtons[i].active = true;
             } else {
                 // I know, this is silly but its best way to know if rendering should be skipped

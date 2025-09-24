@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.level.GameType;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import yay.evy.everest.vstuff.content.rope_changer_menu.RopeStyleChangingScreen;
+import yay.evy.everest.vstuff.content.rope_changer_menu.RopeStyleChangingScreenCategorized;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.index.VStuffKeys;
 import yay.evy.everest.vstuff.util.EntityUtils;
@@ -37,7 +37,7 @@ public class RopeStyleMenuHandler {
         if (!EntityUtils.isHolding(player, VStuffItems.LEAD_CONSTRAINT_ITEM::isIn))
             return;
 
-        ScreenOpener.open(new RopeStyleChangingScreen(player));
+        ScreenOpener.open(new RopeStyleChangingScreenCategorized(player));
     }
 
 }
