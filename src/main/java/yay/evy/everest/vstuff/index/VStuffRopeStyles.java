@@ -20,10 +20,12 @@ public class VStuffRopeStyles {
     private static final RopeStyle BRASS = new RopeStyle("brass", PrimitiveRopeStyle.OTHER, "block.create.brass_casing");
     private static final RopeStyle COPPER = new RopeStyle("copper", PrimitiveRopeStyle.OTHER, "block.create.copper_casing");
     private static final RopeStyle TRAIN = new RopeStyle("railway", PrimitiveRopeStyle.OTHER, "block.create.railway_casing");
-    private static final RopeStyle INDUSTRIAL = new RopeStyle("industrial", PrimitiveRopeStyle.OTHER, "block.create.industrial_iron_block");
+    private static final RopeStyle INDUSTRIAL = new RopeStyle("industrial", PrimitiveRopeStyle.OTHER, "vstuff.rope.industrial");
 
+    private static final RopeStyle PRIDE = new RopeStyle("pride", PrimitiveRopeStyle.OTHER, "vstuff.rope.pride");
     private static final RopeStyle GAY = new RopeStyle("gay", PrimitiveRopeStyle.OTHER, "vstuff.rope.gay");
     private static final RopeStyle LESBIAN = new RopeStyle("lesbian", PrimitiveRopeStyle.OTHER, "vstuff.rope.lesbian");
+    private static final RopeStyle BISEXUAL = new RopeStyle("bisexual", PrimitiveRopeStyle.OTHER, "vstuff.rope.bisexual");
     private static final RopeStyle TRANSGENDER = new RopeStyle("transgender", PrimitiveRopeStyle.OTHER, "vstuff.rope.transgender");
     private static final RopeStyle NONBINARY = new RopeStyle("nonbinary", PrimitiveRopeStyle.OTHER, "vstuff.rope.nonbinary");
     private static final RopeStyle ASEXUAL = new RopeStyle("asexual", PrimitiveRopeStyle.OTHER, "vstuff.rope.asexual");
@@ -62,7 +64,7 @@ public class VStuffRopeStyles {
     private static final RopeStyleCategory FLAGS = new RopeStyleCategory(
         Component.translatable("vstuff.rope_category.pride_flags"),
         new RopeStyle[]{
-            GAY, LESBIAN, TRANSGENDER, NONBINARY, ASEXUAL
+            PRIDE, GAY, LESBIAN, BISEXUAL, TRANSGENDER, NONBINARY, ASEXUAL
         }
     );
 

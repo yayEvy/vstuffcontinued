@@ -139,7 +139,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
                     renderIcon(guiGraphics, ms, icon, x + 20, y + 42 + (i * 18));
 
                 // name
-                Component bogeyName = ClientTextUtils.getComponentWithWidthCutoff(Component.translatable(style.getLangKey()), 55);
+                Component bogeyName = ClientTextUtils.getComponentWithWidthCutoff(Component.translatable(style.getLangKey()), 114);
                 // button has already been added in init, now just draw text
                 guiGraphics.drawString(font, bogeyName, x + 40, y + 46 + (i * 18), 0xFFFFFF);
             }
