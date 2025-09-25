@@ -1,5 +1,6 @@
 package yay.evy.everest.vstuff.content.constraint;
 
+import com.simibubi.create.CreateClient;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -13,11 +14,15 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.network.PacketDistributor;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.core.apigame.constraints.VSRopeConstraint;
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
@@ -33,21 +38,25 @@ public class LeadConstraintItem extends Item {
     private Entity firstEntity;
     private Integer activeConstraintId;
     private ResourceKey<Level> firstClickDimension;
-    private RopeStyles.RopeStyle style = new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal");
 
     public LeadConstraintItem(Properties pProperties) {
         super(new Properties().stacksTo(64));
     }
 
-    public void setStyle(RopeStyles.RopeStyle style) {
-        this.style = style;
-    }
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
         BlockPos clickedPos = context.getClickedPos().immutable();
         Player player = context.getPlayer();
+
+        if (!canConnectRope(level, clickedPos)) { // rope cannot be made on non-full blocks
+            player.displayClientMessage(
+                    Component.translatable("vstuff.message.nonfullblock_fail"),
+                    true
+            );
+            return InteractionResult.FAIL;
+        }
 
         if (!(level instanceof ServerLevel serverLevel) || player == null) {
             return InteractionResult.PASS;
@@ -69,20 +78,31 @@ public class LeadConstraintItem extends Item {
             return InteractionResult.SUCCESS;
         }
 
-        if (firstClickedPos == null && firstEntity == null) {
+        if (firstClickedPos == null && firstEntity == null) { // behavior for first position selected
             firstClickedPos = clickedPos;
             firstShipId = getShipIdAtPos(serverLevel, clickedPos);
             firstClickDimension = serverLevel.dimension();
+            player.displayClientMessage(
+                    Component.translatable("vstuff.message.rope_first"),
+                    true
+            );
+            drawOutline(level, clickedPos);
             return InteractionResult.SUCCESS;
+
         } else {
-            if (firstClickedPos != null && firstClickedPos.equals(clickedPos)) {
+            if (firstClickedPos != null && (player.isShiftKeyDown() || firstClickedPos.equals(clickedPos))) {
                 resetState();
-                return InteractionResult.FAIL;
+                player.displayClientMessage(
+                        Component.translatable("vstuff.message.rope_reset"),
+                        true
+                );
+                return InteractionResult.SUCCESS;
+                // reset pos if player shift-clicks or player clicks on first clicked block
             }
 
             if (!serverLevel.dimension().equals(firstClickDimension)) {
                 player.displayClientMessage(
-                        Component.literal("§cCannot create rope across dimensions!"),
+                        Component.translatable("vstuff.message.interdimensional_fail"),
                         true
                 );
                 resetState();
@@ -94,6 +114,16 @@ public class LeadConstraintItem extends Item {
 
             if (player instanceof ServerPlayer serverPlayer) {
                 ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);
+
+                Component notif = Component.translatable("vstuff.message.rope_created");
+
+                if (RopeStyleHandlerServer.getStyle(player.getUUID()) != null &&
+                    RopeStyleHandlerServer.getStyle(player.getUUID()).getBasicStyle() == RopeStyles.PrimitiveRopeStyle.CHAIN) {
+                    notif = Component.translatable("vstuff.message.chain_created");
+                }
+
+                player.displayClientMessage(notif, true);
+                drawOutline(level, clickedPos);
             }
 
             resetState();
@@ -224,7 +254,7 @@ public class LeadConstraintItem extends Item {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error creating rope constraint: " + e.getMessage());
+            VStuff.LOGGER.error("Error creating rope constraint: {}",  e.getMessage());
             e.printStackTrace();
         }
 
@@ -325,12 +355,29 @@ public class LeadConstraintItem extends Item {
         return new Vector3d(worldPos);
     }
 
+    private boolean canConnectRope(Level level, BlockPos clickedPos) {
+        return level.getBlockState(clickedPos).isCollisionShapeFullBlock(level, clickedPos);
+    }
+
+    private static void drawOutline(Level level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        VoxelShape shape = state.getShape(level, pos);
+
+        if (shape.isEmpty())
+            return;
+
+        CreateClient.OUTLINER.showAABB(pos, shape.bounds()
+                        .move(pos))
+                .colored(0xFFFFFF)
+                .lineWidth(1 / 16f);
+    }
+
     private void resetState() {
         firstClickedPos = null;
         firstShipId = null;
         firstEntity = null;
         firstClickDimension = null;
-        System.out.println("LeadConstraintItem state reset");
+        VStuff.LOGGER.info("Reset LeadContraintItem state");
     }
 
 

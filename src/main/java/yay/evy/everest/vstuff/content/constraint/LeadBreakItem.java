@@ -15,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.index.VStuffItems;
@@ -37,16 +38,26 @@ public class LeadBreakItem extends Item {
             Integer targetConstraintId = findTargetedLead(serverLevel, player);
             if (targetConstraintId != null) {
                 try {
-                    System.out.println("Attempting to remove constraint: " + targetConstraintId);
+                    VStuff.LOGGER.info("Attempting to remove constraint: {}", targetConstraintId);
 
                     VSGameUtilsKt.getShipObjectWorld(serverLevel).removeConstraint(targetConstraintId);
                     ConstraintTracker.RopeConstraintData data = ConstraintTracker.getActiveConstraints().get(targetConstraintId);
                     ConstraintTracker.removeConstraintWithPersistence(serverLevel, targetConstraintId);
                     NetworkHandler.sendConstraintRemove(targetConstraintId);
                     forceRemoveConstraint(serverLevel, targetConstraintId);
+
+                    RopeStyles.PrimitiveRopeStyle style = (data != null)
+                            ? data.style.getBasicStyle()
+                            : RopeStyles.PrimitiveRopeStyle.NORMAL;
+
+                    Component notif = (style == RopeStyles.PrimitiveRopeStyle.CHAIN)
+                            ? Component.translatable("vstuff.message.chain_break")
+                            : Component.translatable("vstuff.message.rope_break");
+
+                    player.displayClientMessage(notif, true);
+
                     // config
                     if (VstuffConfig.ROPE_SOUNDS.get()) {
-                        var style = (data != null) ? data.style.getBasicStyle() : RopeStyles.PrimitiveRopeStyle.NORMAL;
 
                         var sound = (style == RopeStyles.PrimitiveRopeStyle.CHAIN)
                                 ? SoundEvents.CHAIN_BREAK
@@ -69,10 +80,10 @@ public class LeadBreakItem extends Item {
                         ConstraintTracker.cleanupOrphanedConstraints(serverLevel, data.sourceBlockPos);
                     }
 
-                    System.out.println("Removed constraint (1st attempt): " + targetConstraintId);
+                    VStuff.LOGGER.info("Removed constraint (1st attempt): {}", targetConstraintId);
 
                     if (ConstraintTracker.getActiveConstraints().containsKey(targetConstraintId)) {
-                        System.out.println("Constraint " + targetConstraintId + " still present, retrying...");
+                        VStuff.LOGGER.warn("Constraint {} still present, retrying...", targetConstraintId);
 
                         VSGameUtilsKt.getShipObjectWorld(serverLevel).removeConstraint(targetConstraintId);
                         ConstraintTracker.removeConstraintWithPersistence(serverLevel, targetConstraintId);
@@ -82,7 +93,7 @@ public class LeadBreakItem extends Item {
                         persistence.saveNow(serverLevel);
 
 
-                        System.out.println("Removed constraint (2nd attempt): " + targetConstraintId);
+                        VStuff.LOGGER.info("Removed constraint (2nd attempt): {}", targetConstraintId);
                     }
 
                     if (!player.getAbilities().instabuild) {
@@ -92,7 +103,7 @@ public class LeadBreakItem extends Item {
 
                     return InteractionResultHolder.success(itemStack);
                 } catch (Exception e) {
-                    System.err.println("Error removing constraint: " + e.getMessage());
+                    VStuff.LOGGER.error("Error removing constraint: {}", e.getMessage());
                     e.printStackTrace();
                 }
             }

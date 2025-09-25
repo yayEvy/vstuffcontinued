@@ -68,15 +68,11 @@ public class TooltipHandler {
     }
 
     private static void populateModifiables() {
-        tooltipModifications.put(VStuffItems.LEAD_CONSTRAINT_ITEM.get(), (payload) -> {
-            return Component.translatable(payload.path + ".tooltip.summary").getString()
-                    .replace("{}", "A rope for VS2 ships!");
-        });
+        tooltipModifications.put(VStuffItems.LEAD_CONSTRAINT_ITEM.get(),
+                (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
 
-        tooltipModifications.put(VStuffItems.LEAD_BREAK_ITEM.get(), (payload) -> {
-            return Component.translatable(payload.path + ".tooltip.summary").getString()
-                    .replace("{}", "Cuts ropes.");
-        });
+        tooltipModifications.put(VStuffItems.LEAD_BREAK_ITEM.get(),
+                (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
     }
 
     private static class SummaryPayload {

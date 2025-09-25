@@ -3,6 +3,7 @@ package yay.evy.everest.vstuff.content.ropestyler;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.world.entity.player.Player;
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.ropestyler.components.RopeStyleCategory;
 import yay.evy.everest.vstuff.index.VStuffRopeStyles;
 import yay.evy.everest.vstuff.util.RopeStyles.RopeStyle;
@@ -301,7 +302,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
 
         RopeStyle style = selectedStyle;
 
-        System.out.println("Attempting to set player [" + player.getName() + "] selected rope style to " + selectedStyle.asString());
+        VStuff.LOGGER.info("Attempting to set player [{}] selected rope style to {}", player.getName(), selectedStyle.asString());
 
         RopeStyleHandlerServer.addStyle(player.getUUID(), style);
 

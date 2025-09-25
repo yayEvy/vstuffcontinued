@@ -16,8 +16,16 @@
   "create.gui.goggles.thruster.efficiency": "Efficiency",
   "create.gui.goggles.thruster.thrust": "Thrust",
   "create.gui.goggles.thruster.speed": "Speed",
-
   "vstuff.gui.rope_menu.title": "Rope Styles",
+
+  "vstuff.message.rope_reset": "§aRope selection reset.",
+  "vstuff.message.rope_created": "§aSuccessfully created rope!",
+  "vstuff.message.chain_created": "§aSuccessfully created chain!",
+  "vstuff.message.interdimensional_fail": "§cCannot create rope across dimensions!",
+  "vstuff.message.nonfullblock_fail": "§cCannot create rope connected to a non-full block!",
+  "vstuff.message.rope_first": "§aFirst position selected.",
+  "vstuff.message.rope_break": "§aRope broken!",
+  "vstuff.message.chain_break": "§aChain broken!",
 
   "vstuff.ponder.phys_pulley.text_1": "The Phys Pulley can lift and lower objects, but first it needs a rope.",
   "vstuff.ponder.phys_pulley.text_2": "The amount of rope you provide determines the pulley's maximum length.",
@@ -32,7 +40,13 @@
   "vstuff.ponder.rotational_thruster.text_3": "...it produces thrust!",
   "vstuff.ponder.rotational_thruster.header": "Rotational Thruster",
 
-  "vstuff.lead_constraint_item.tooltip.summary": "A rope for VS2 ships! Press the _Open Rope Styler_ key (defaults to _ALT_) to change the rope texture.",
+  "vstuff.lead_constraint_item.tooltip.summary": "A rope for VS2 ships! Press the _Open Rope Styler_ key (default _ALT_) to change the rope texture.",
+  "vstuff.lead_constraint_item.tooltip.condition1": "When Used on two different blocks",
+  "vstuff.lead_constraint_item.tooltip.behavior1": "_Creates_ a _Rope Constraint_ between two blocks.",
+  "vstuff.lead_constraint_item.tooltip.condition2": "When Used on any block while Sneaking",
+  "vstuff.lead_constraint_item.tooltip.behavior2": "_Resets_ the selected position.",
+
+
   "vstuff.lead_break_item.tooltip.summary": "Cuts ropes.",
   "vstuff.tooltip.hold_for_details": "Hold [%s] for summary",
 
