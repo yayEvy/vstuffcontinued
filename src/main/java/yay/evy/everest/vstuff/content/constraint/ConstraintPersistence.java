@@ -12,6 +12,7 @@ import net.minecraft.world.level.storage.DimensionDataStorage;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.apigame.constraints.VSRopeConstraint;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.physics_api.constraints.ConstraintData;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
 import java.util.*;
@@ -233,6 +234,13 @@ public class ConstraintPersistence extends SavedData {
         System.out.println("Saved " + persistedConstraints.size() + " constraints to disk");
         return tag;
     }
+
+    public void saveNow(ServerLevel level) {
+        setDirty();
+        level.getDataStorage().save();
+    }
+
+
 
 
     public void addConstraint(String id, Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
