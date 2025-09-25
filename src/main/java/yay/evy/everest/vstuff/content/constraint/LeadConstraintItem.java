@@ -53,7 +53,6 @@ public class LeadConstraintItem extends Item {
             return InteractionResult.PASS;
         }
 
-        // Handle pulley targeting first
         PhysPulleyBlockEntity pulley = PhysPulleyItem.getWaitingPulley(player);
         if (pulley != null) {
             pulley.targetPos = clickedPos;
@@ -70,20 +69,17 @@ public class LeadConstraintItem extends Item {
             return InteractionResult.SUCCESS;
         }
 
-        // Otherwise, handle rope constraint logic
         if (firstClickedPos == null && firstEntity == null) {
             firstClickedPos = clickedPos;
             firstShipId = getShipIdAtPos(serverLevel, clickedPos);
             firstClickDimension = serverLevel.dimension();
             return InteractionResult.SUCCESS;
         } else {
-            // Prevent double-click on same block
             if (firstClickedPos != null && firstClickedPos.equals(clickedPos)) {
                 resetState();
                 return InteractionResult.FAIL;
             }
 
-            // Dimension safety check
             if (!serverLevel.dimension().equals(firstClickDimension)) {
                 player.displayClientMessage(
                         Component.literal("§cCannot create rope across dimensions!"),

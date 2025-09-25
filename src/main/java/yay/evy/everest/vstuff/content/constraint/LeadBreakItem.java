@@ -23,6 +23,7 @@ import yay.evy.everest.vstuff.util.RopeStyles;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class LeadBreakItem extends Item {
     public LeadBreakItem(Properties pProperties) {
@@ -77,6 +78,8 @@ public class LeadBreakItem extends Item {
                         ConstraintTracker.removeConstraintWithPersistence(serverLevel, targetConstraintId);
                         NetworkHandler.sendConstraintRemove(targetConstraintId);
                         forceRemoveConstraint(serverLevel, targetConstraintId);
+                        ConstraintPersistence persistence = ConstraintPersistence.get(serverLevel);
+                        persistence.saveNow(serverLevel);
 
 
                         System.out.println("Removed constraint (2nd attempt): " + targetConstraintId);
@@ -104,6 +107,11 @@ public class LeadBreakItem extends Item {
             VSGameUtilsKt.getShipObjectWorld(level).removeConstraint(id);
         } catch (Exception ignored) {}
 
+        ConstraintPersistence persistence = ConstraintPersistence.get(level);
+        persistence.saveNow(level);
+
+
+
         ConstraintTracker.removeConstraintWithPersistence(level, id);
         ConstraintTracker.getActiveConstraints().remove(id);
         NetworkHandler.sendConstraintRemove(id);
@@ -116,8 +124,8 @@ public class LeadBreakItem extends Item {
                 ConstraintTracker.cleanupOrphanedConstraints(level, data.anchorBlockPosB);
             }
         }
-
     }
+
 
 
     private Integer findTargetedLead(ServerLevel level, Player player) {
