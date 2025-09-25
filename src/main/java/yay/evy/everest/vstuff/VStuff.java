@@ -30,6 +30,7 @@ public class VStuff {
 
 
         VStuffCreativeModeTabs.register(modEventBus);
+        VStuffRopeStyles.register();
         VStuffBlocks.register();
         VStuffBlockEntities.register();
         VStuffItems.register();

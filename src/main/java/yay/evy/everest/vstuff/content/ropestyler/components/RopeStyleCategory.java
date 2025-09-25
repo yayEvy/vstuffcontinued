@@ -1,13 +1,11 @@
-package yay.evy.everest.vstuff.content.rope_changer_menu.components;
+package yay.evy.everest.vstuff.content.ropestyler.components;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 public class RopeStyleCategory {

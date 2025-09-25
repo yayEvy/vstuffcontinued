@@ -1,18 +1,13 @@
 package yay.evy.everest.vstuff.events;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
-import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import yay.evy.everest.vstuff.content.rope_changer_menu.handler.RopeStyleMenuHandler;
+import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleMenuHandler;
 
 @EventBusSubscriber(value = Dist.CLIENT, modid = "vstuff")
 public class ClientEvents {

@@ -17,6 +17,10 @@ public class RopeStyles {
         return new ResourceLocation("minecraft", "textures/block/" + color + "_wool.png");
     }
 
+    public static ResourceLocation getLogStyle(String log) {
+        return new ResourceLocation("minecraft", "textures/block/" + log + "_log.png");
+    }
+
     // New method to get the vanilla Minecraft chain texture
     public static ResourceLocation getChainStyle() {
         return new ResourceLocation("minecraft", "textures/item/chain.png");
@@ -30,10 +34,10 @@ public class RopeStyles {
 
     public enum PrimitiveRopeStyle {
         NORMAL,
-        DYED,
         WOOL,
         CHAIN,
         OTHER,
+        LOG
     }
 
     public static class RopeStyle {
@@ -56,9 +60,9 @@ public class RopeStyles {
             }
 
             switch (basicStyle) {
-                case DYED -> this.associatedTexture = getDyedRopeStyle(style);
                 case WOOL -> this.associatedTexture = getDyedWoolStyle(style);
                 case CHAIN -> this.associatedTexture = getChainStyle(); // Use new method
+                case LOG -> this.associatedTexture = getLogStyle(style);
                 default -> this.associatedTexture = getRopeStyle(style);
             }
         }
@@ -67,9 +71,9 @@ public class RopeStyles {
             PrimitiveRopeStyle basicStyle;
 
             switch (basicStyleSTR) {
-                case "dyed" -> basicStyle = PrimitiveRopeStyle.DYED;
                 case "wool" -> basicStyle = PrimitiveRopeStyle.WOOL;
                 case "chain" -> basicStyle = PrimitiveRopeStyle.CHAIN;
+                case "log" -> basicStyle = PrimitiveRopeStyle.LOG;
                 default -> basicStyle = PrimitiveRopeStyle.NORMAL;
             }
 
@@ -84,9 +88,9 @@ public class RopeStyles {
             }
 
             switch (basicStyle) {
-                case DYED -> this.associatedTexture = getDyedRopeStyle(style);
                 case WOOL -> this.associatedTexture = getDyedWoolStyle(style);
                 case CHAIN -> this.associatedTexture = getChainStyle(); // Use new method
+                case LOG -> this.associatedTexture = getLogStyle(style);
                 default -> this.associatedTexture = getRopeStyle(style);
             }
         }

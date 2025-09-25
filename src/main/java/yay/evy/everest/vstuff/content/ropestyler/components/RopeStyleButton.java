@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.rope_changer_menu.components;
+package yay.evy.everest.vstuff.content.ropestyler.components;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;

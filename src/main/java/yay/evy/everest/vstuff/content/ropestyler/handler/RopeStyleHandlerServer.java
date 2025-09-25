@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.rope_changer_menu.handler;
+package yay.evy.everest.vstuff.content.ropestyler.handler;
 
 import org.jetbrains.annotations.Nullable;
 

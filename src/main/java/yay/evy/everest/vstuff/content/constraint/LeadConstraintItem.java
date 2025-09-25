@@ -22,7 +22,7 @@ import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyItem;
-import yay.evy.everest.vstuff.content.rope_changer_menu.handler.RopeStyleHandlerServer;
+import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
 import yay.evy.everest.vstuff.util.packet.RopeSoundPacket;
 import net.minecraft.sounds.SoundEvents;
 import yay.evy.everest.vstuff.util.RopeStyles;

@@ -1,11 +1,11 @@
-package yay.evy.everest.vstuff.content.rope_changer_menu.handler;
+package yay.evy.everest.vstuff.content.ropestyler.handler;
 
 import com.simibubi.create.foundation.gui.ScreenOpener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.level.GameType;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import yay.evy.everest.vstuff.content.rope_changer_menu.RopeStyleChangingScreenCategorized;
+import yay.evy.everest.vstuff.content.ropestyler.RopeStylerScreen;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.index.VStuffKeys;
 import yay.evy.everest.vstuff.util.EntityUtils;
@@ -37,7 +37,7 @@ public class RopeStyleMenuHandler {
         if (!EntityUtils.isHolding(player, VStuffItems.LEAD_CONSTRAINT_ITEM::isIn))
             return;
 
-        ScreenOpener.open(new RopeStyleChangingScreenCategorized(player));
+        ScreenOpener.open(new RopeStylerScreen(player));
     }
 
 }

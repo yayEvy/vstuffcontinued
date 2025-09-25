@@ -1,64 +1,36 @@
-package yay.evy.everest.vstuff.content.rope_changer_menu;
+package yay.evy.everest.vstuff.content.ropestyler;
 
-import com.google.common.collect.ImmutableList;
-import com.jozufozu.flywheel.util.transform.TransformStack;
-import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.network.PacketDistributor;
-import yay.evy.everest.vstuff.client.NetworkHandler;
-import yay.evy.everest.vstuff.content.rope_changer_menu.components.RopeStyleCategory;
+import yay.evy.everest.vstuff.content.ropestyler.components.RopeStyleCategory;
 import yay.evy.everest.vstuff.index.VStuffRopeStyles;
-import yay.evy.everest.vstuff.util.RopeStyles;
 import yay.evy.everest.vstuff.util.RopeStyles.RopeStyle;
 import yay.evy.everest.vstuff.util.client.ClientTextUtils;
 import yay.evy.everest.vstuff.index.VStuffGuiTextures;
-import yay.evy.everest.vstuff.content.rope_changer_menu.handler.RopeStyleMenuHandler;
-import yay.evy.everest.vstuff.content.rope_changer_menu.handler.RopeStyleHandlerServer;
-import yay.evy.everest.vstuff.content.rope_changer_menu.components.RopeStyleButton;
+import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
+import yay.evy.everest.vstuff.content.ropestyler.components.RopeStyleButton;
 
-import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllSoundEvents;
-import com.simibubi.create.content.trains.bogey.AbstractBogeyBlock;
-import com.simibubi.create.content.trains.bogey.BogeySizes;
-import com.simibubi.create.content.trains.bogey.BogeyStyle;
 import com.simibubi.create.foundation.gui.AbstractSimiScreen;
-import com.simibubi.create.foundation.gui.AllGuiTextures;
 import com.simibubi.create.foundation.gui.AllIcons;
-import com.simibubi.create.foundation.gui.element.GuiGameElement;
 import com.simibubi.create.foundation.gui.widget.*;
-import com.simibubi.create.foundation.utility.AnimationTickHolder;
 import com.simibubi.create.foundation.utility.Components;
-import com.simibubi.create.foundation.utility.Pair;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import org.joml.Quaternionf;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 
 import java.util.List;
 
-public class RopeStyleChangingScreenCategorized extends AbstractSimiScreen {
+public class RopeStylerScreen extends AbstractSimiScreen {
 
-    public RopeStyleChangingScreenCategorized(Player player) {
+    public RopeStylerScreen(Player player) {
         this.player = player;
     }
     Player player;
@@ -95,7 +67,7 @@ public class RopeStyleChangingScreenCategorized extends AbstractSimiScreen {
 
         // Need buttons first, otherwise setupList will crash
         for (int i = 0; i < 6; i++) {
-            addRenderableWidget(styleButtons[i] = new RopeStyleButton(x + 19, y + 41 + (i * 18), 82, 17, bogeySelection(i)));
+            addRenderableWidget(styleButtons[i] = new RopeStyleButton(x + 19, y + 41 + (i * 18), 145, 17, bogeySelection(i)));
         }
 
         // Initial setup
@@ -106,9 +78,9 @@ public class RopeStyleChangingScreenCategorized extends AbstractSimiScreen {
         scrollOffs = 0;
         scrollTo(0);
 
-        // Category selector START
+        // category select
         Label categoryLabel = new Label(x + 14, y + 25, Components.immutableEmpty()).withShadow();
-        ScrollInput categoryScrollInput = new SelectionScrollInput(x + 9, y + 20, 77, 18)
+        ScrollInput categoryScrollInput = new SelectionScrollInput(x + 9, y + 20, 150, 18)
                 .forOptions(categoryComponentList)
                 .writingTo(categoryLabel)
                 .setState(categoryIndex)
@@ -128,7 +100,6 @@ public class RopeStyleChangingScreenCategorized extends AbstractSimiScreen {
         addRenderableWidget(categoryLabel);
         addRenderableWidget(categoryScrollInput);
 
-        // Close Button
         IconButton closeButton = new IconButton(x + background.width - 33, y + background.height - 24, AllIcons.I_CONFIRM);
         closeButton.withCallback(this::onMenuClose);
         addRenderableWidget(closeButton);
@@ -141,28 +112,16 @@ public class RopeStyleChangingScreenCategorized extends AbstractSimiScreen {
         int x = guiLeft;
         int y = guiTop;
 
-        // Render Background
+        // bg
         background.render(guiGraphics, x, y);
 
-        // Header (Bogey Preview Text) START
+        // header
         MutableComponent header = Component.translatable("vstuff.gui.rope_menu.title");
         int halfWidth = background.width / 2;
         int halfHeaderWidth = font.width(header) / 2;
         guiGraphics.drawString(font, header, x + halfWidth - halfHeaderWidth, y + 4, 0x582424, false);
 
-        // Train casing on right side of screen where arrow is pointing START
-        ms.pushPose();
 
-        TransformStack msr = TransformStack.cast(ms);
-        msr.pushPose()
-                .translate(x + background.width + 4, y + background.height + 4, 100)
-                .scale(40)
-                .rotateX(-22)
-                .rotateY(63);
-
-        GuiGameElement.of(AllBlocks.RAILWAY_CASING.getDefaultState()).render(guiGraphics);
-
-        ms.popPose();
 
         // Render scroll bar
         // Formula is barPos = startLoc + (endLoc - startLoc) * scrollOffs
@@ -170,53 +129,29 @@ public class RopeStyleChangingScreenCategorized extends AbstractSimiScreen {
         VStuffGuiTextures barTexture = canScroll() ? VStuffGuiTextures.ROPE_SCROLL : VStuffGuiTextures.ROPE_SCROLL_DISABLED;
         barTexture.render(guiGraphics, x + 11, y + scrollBarPos);
 
-        // Render the bogey icons & bogey names
+        // render names and textures
         for (int i = 0; i < 6; i++) {
             RopeStyle style = displayedStyles[i];
             if (style != null) {
-                // Icon
+                // texture
                 ResourceLocation icon = style.getTexture();
                 if (icon != null)
                     renderIcon(guiGraphics, ms, icon, x + 20, y + 42 + (i * 18));
 
-                // Text
+                // name
                 Component bogeyName = ClientTextUtils.getComponentWithWidthCutoff(Component.translatable(style.getLangKey()), 55);
                 // button has already been added in init, now just draw text
                 guiGraphics.drawString(font, bogeyName, x + 40, y + 46 + (i * 18), 0xFFFFFF);
             }
         }
 
-        // Draw bogey name, gauge indicators and render bogey
+        // show name of selected
         if (selectedStyle != null) {
-            Minecraft mc = Minecraft.getInstance();
             Component displayName = Component.translatable(selectedStyle.getLangKey());
-            // Bogey Name
-            Component bogeyName = ClientTextUtils.getComponentWithWidthCutoff(displayName, 126);
-            guiGraphics.drawCenteredString(font, bogeyName, x + 190, y + 25, 0xFFFFFF);
-
-            ResourceLocation styleTexture = selectedStyle.getTexture();
+            Component shortenedName = ClientTextUtils.getComponentWithWidthCutoff(displayName, 126);
+            guiGraphics.drawString(font, shortenedName, x + 15, y + 165, 0xFFFFFF);
 
             ms.popPose();
-
-            // Clear depth rectangle to allow proper tooltips
-            {
-                double x0 = x + 120;
-                double y0 = y + 48;
-                double w = 140;
-                double h = 77;
-                double bottom = y0+h;
-
-                Window window = mc.getWindow();
-                double scale = window.getGuiScale();
-
-                RenderSystem.clearDepth(0.86); // same depth as gui
-                RenderSystem.enableScissor((int) (x0*scale), window.getHeight() - (int) (bottom*scale), (int) (w*scale), (int) (h*scale));
-
-                RenderSystem.clear(GL11.GL_DEPTH_BUFFER_BIT, false);
-
-                RenderSystem.disableScissor();
-                RenderSystem.clearDepth(1.0);
-            }
         }
     }
 
@@ -233,13 +168,11 @@ public class RopeStyleChangingScreenCategorized extends AbstractSimiScreen {
     private void setupList(RopeStyleCategory categoryEntry, int offset) {
         List<RopeStyle> styles = categoryEntry.getCategoryStyles();
 
-        // Max of 6 slots, objects inside the slots will be mutated later
         for (int i = 0; i < 6; i++) {
             if (i < styles.size()) {
                 displayedStyles[i] = styles.get(i+offset);
                 styleButtons[i].active = true;
             } else {
-                // I know, this is silly but its best way to know if rendering should be skipped
                 displayedStyles[i] = null;
                 styleButtons[i].active = false;
             }

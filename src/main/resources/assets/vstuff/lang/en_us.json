@@ -36,10 +36,20 @@
   "vstuff.lead_break_item.tooltip.summary": "Cuts ropes.",
   "vstuff.tooltip.hold_for_details": "Hold [%s] for summary",
 
-  "vstuff.ropes.normal": "Normal",
-  "vstuff.ropes.chain": "Chain",
-  "vstuff.ropes.wool": "Wool",
-  "vstuff.ropes.plain": "Plain",
+  "vstuff.rope.normal": "Normal",
+  "vstuff.rope.wool": "Wool",
+  "vstuff.rope.plain": "Plain",
+  "vstuff.rope.gay": "Gay",
+  "vstuff.rope.lesbian": "Lesbian",
+  "vstuff.rope.transgender": "Transgender",
+  "vstuff.rope.bisexual": "Bisexual",
+  "vstuff.rope.nonbinary": "Nonbinary",
+  "vstuff.rope.asexual": "Asexual",
+
+  "vstuff.rope_category.normal": "Basic Styles",
+  "vstuff.rope_category.casing": "Casing Styles",
+  "vstuff.rope_category.pride_flags": "Pride Flags",
+  "vstuff.rope_category.logs": "Log Styles",
 
   "vstuff.keyinfo.rope_menu_open": "Open Rope Styler"
 
