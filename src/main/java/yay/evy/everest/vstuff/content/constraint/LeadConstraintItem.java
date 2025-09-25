@@ -110,15 +110,15 @@ public class LeadConstraintItem extends Item {
             }
 
             Long secondShipId = getShipIdAtPos(serverLevel, clickedPos);
-            createLeadConstraint(serverLevel, clickedPos, secondShipId, player);
+            boolean created = createLeadConstraint(serverLevel, clickedPos, secondShipId, player);
 
-            if (player instanceof ServerPlayer serverPlayer) {
+            if (created && player instanceof ServerPlayer serverPlayer) {
                 ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);
 
                 Component notif = Component.translatable("vstuff.message.rope_created");
 
                 if (RopeStyleHandlerServer.getStyle(player.getUUID()) != null &&
-                    RopeStyleHandlerServer.getStyle(player.getUUID()).getBasicStyle() == RopeStyles.PrimitiveRopeStyle.CHAIN) {
+                        RopeStyleHandlerServer.getStyle(player.getUUID()).getBasicStyle() == RopeStyles.PrimitiveRopeStyle.CHAIN) {
                     notif = Component.translatable("vstuff.message.chain_created");
                 }
 
@@ -127,12 +127,14 @@ public class LeadConstraintItem extends Item {
             }
 
             resetState();
-            return InteractionResult.SUCCESS;
+            return created ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+
+
         }
     }
 
-    private void createLeadConstraint(ServerLevel level, BlockPos secondPos, Long secondShipId, Player player) {
-        if (firstClickedPos == null && firstEntity == null) return;
+    private boolean createLeadConstraint(ServerLevel level, BlockPos secondPos, Long secondShipId, Player player) {
+        if (firstClickedPos == null && firstEntity == null) return false;
 
         Vector3d firstWorldPos;
         Vector3d firstLocalPos;
@@ -152,11 +154,13 @@ public class LeadConstraintItem extends Item {
         Long shipB = secondShipId != null ? secondShipId : getGroundBodyId(level);
         Vector3d secondLocalPos = getLocalPositionFixed(level, secondPos, secondShipId, shipB);
 
-        createConstraintConsistent(level, shipA, shipB, firstLocalPos, secondLocalPos, firstWorldPos, secondWorldPos, player);
+        return createConstraintConsistent(level, shipA, shipB, firstLocalPos, secondLocalPos, firstWorldPos, secondWorldPos, player);
     }
 
-    private void createConstraintConsistent(ServerLevel level, Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
-                                            Vector3d worldPosA, Vector3d worldPosB, Player player) {
+    private boolean createConstraintConsistent(ServerLevel level, Long shipA, Long shipB,
+                                               Vector3d localPosA, Vector3d localPosB,
+                                               Vector3d worldPosA, Vector3d worldPosB,
+                                               Player player) {
         Long groundBodyId = getGroundBodyId(level);
         Long finalShipA, finalShipB;
         Vector3d finalLocalPosA, finalLocalPosB;
@@ -181,20 +185,7 @@ public class LeadConstraintItem extends Item {
             finalWorldPosB = worldPosB;
         }
 
-
-
         double distance = finalWorldPosA.distance(finalWorldPosB);
-        double maxLength = distance + 0.5;
-        double massA = getMassForShip(level, finalShipA);
-        double massB = getMassForShip(level, finalShipB);
-        double effectiveMass = Math.min(massA, massB);
-        if (effectiveMass < 100.0) effectiveMass = 100.0;
-        double compliance = 1e-12 / effectiveMass;
-        double massRatio = Math.max(massA, massB) / Math.min(massA, massB);
-        double baseMaxForce = 50000000000000.0;
-        double maxForce = baseMaxForce * Math.min(massRatio, 20.0);
-
-
         double maxAllowedLength = VstuffConfig.MAX_ROPE_LENGTH.get();
 
         if (distance > maxAllowedLength) {
@@ -205,9 +196,18 @@ public class LeadConstraintItem extends Item {
                 );
             }
             resetState();
-            return;
+            return false;
         }
 
+        double maxLength = distance + 0.5;
+        double massA = getMassForShip(level, finalShipA);
+        double massB = getMassForShip(level, finalShipB);
+        double effectiveMass = Math.min(massA, massB);
+        if (effectiveMass < 100.0) effectiveMass = 100.0;
+        double compliance = 1e-12 / effectiveMass;
+        double massRatio = Math.max(massA, massB) / Math.min(massA, massB);
+        double baseMaxForce = 50000000000000.0;
+        double maxForce = baseMaxForce * Math.min(massRatio, 20.0);
 
         if (shipAIsWorld || shipBIsWorld) {
             maxForce *= 10.0;
@@ -237,11 +237,8 @@ public class LeadConstraintItem extends Item {
                             new RopeSoundPacket(false, ropeStyle.getBasicStyle())
                     );
 
-
-
                     ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);
                 }
-
 
                 if (player != null && !player.getAbilities().instabuild) {
                     for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
@@ -252,13 +249,17 @@ public class LeadConstraintItem extends Item {
                         }
                     }
                 }
+
+                return true;
             }
         } catch (Exception e) {
             VStuff.LOGGER.error("Error creating rope constraint: {}",  e.getMessage());
             e.printStackTrace();
         }
 
+        return false;
     }
+
     private double getMassForShip(ServerLevel level, Long shipId) {
         Long groundBodyId = getGroundBodyId(level);
         if (shipId.equals(groundBodyId)) {
