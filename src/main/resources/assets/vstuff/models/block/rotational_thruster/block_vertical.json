@@ -6,7 +6,7 @@
       "0": "vstuff:block/rotational_thruster/thruster_nozzle",
       "1": "vstuff:block/rotational_thruster/thruster_body",
       "2": "vstuff:block/rotational_thruster/thruster_rims",
-		"particle": "#"
+		"particle": "#1"
 	},
 	"elements": [
 		{
