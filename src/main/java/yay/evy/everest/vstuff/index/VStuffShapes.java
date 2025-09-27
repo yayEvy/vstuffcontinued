@@ -31,8 +31,11 @@ public class VStuffShapes {
         PHYS_PULLEY = shape(0, 0, 0, 16, 16, 16) // main
             .erase(15, 2, 2, 16, 14, 14) // side
             .erase(0, 2, 2, 1, 14, 14) // side
-            .erase(3, 15, 0, 13, 16, 16) // back
-            .erase(3, 0, 0, 13, 1, 16) // back
+            .erase(3, 15, 0, 13, 16, 16)
+            .erase(3, 0, 0, 13, 1, 16)
+            .erase(3, 14, 0, 13, 15, 13)
+            .erase(3, 1, 0, 13, 2, 13)
+            .erase(3, 0, 0, 13, 16, 1) // top
             .forDirectional();
 
 
