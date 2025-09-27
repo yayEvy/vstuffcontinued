@@ -1,8 +1,10 @@
 package yay.evy.everest.vstuff.content.constraint;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -15,6 +17,7 @@ import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -373,7 +376,6 @@ public class ConstraintTracker {
 
         long currentTime = System.currentTimeMillis();
 
-        // --- Process delayed validations ---
         java.util.List<Integer> delayedToProcess = new java.util.ArrayList<>();
         for (Map.Entry<Integer, Long> entry : delayedValidations.entrySet()) {
             if (currentTime >= entry.getValue()) delayedToProcess.add(entry.getKey());
@@ -392,7 +394,6 @@ public class ConstraintTracker {
             }
         }
 
-        // --- Validate active constraints ---
         for (Map.Entry<Integer, RopeConstraintData> entry : activeConstraints.entrySet()) {
             Integer constraintId = entry.getKey();
             RopeConstraintData data = entry.getValue();
@@ -421,7 +422,6 @@ public class ConstraintTracker {
             }
         }
 
-        // --- Remove constraints marked for removal by delayed validation ---
         for (Integer constraintId : constraintsToRemove) {
             try {
                 VSGameUtilsKt.getShipObjectWorld(level).removeConstraint(constraintId);
@@ -477,6 +477,138 @@ public class ConstraintTracker {
             // If anything fails, treat it as invalid so we don't keep ghost ropes
             return false;
         }
+    }
+
+    public record FluidConverterLink(Long shipA, Vector3d localA, Long shipB, Vector3d localB, ResourceKey<Level> level) {
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof FluidConverterLink other)) return false;
+            return java.util.Objects.equals(shipA, other.shipA)
+                    && localA.equals(other.localA)
+                    && java.util.Objects.equals(shipB, other.shipB)
+                    && localB.equals(other.localB)
+                    && level.equals(other.level);
+        }
+
+        @Override
+        public int hashCode() {
+            return java.util.Objects.hash(shipA, localA, shipB, localB, level);
+        }
+
+        @Override
+        public String toString() {
+            return "FluidConverterLink{" +
+                    "shipA=" + shipA +
+                    ", localA=" + localA +
+                    ", shipB=" + shipB +
+                    ", localB=" + localB +
+                    ", level=" + level +
+                    '}';
+        }
+        public Vector3d worldA(Level level) {
+            Ship ship = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipA);
+            if (ship == null) return localA;
+            return ship.getTransform().getShipToWorld().transformPosition(localA, new Vector3d());
+        }
+
+        public Vector3d worldB(Level level) {
+            Ship ship = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipB);
+            if (ship == null) return localB;
+            return ship.getTransform().getShipToWorld().transformPosition(localB, new Vector3d());
+        }
+    }
+
+
+
+
+    public static List<FluidConverterLink> getFluidLinks(Level level) {
+        var dim = level.dimension();
+        return fluidConstraints.values().stream()
+                .filter(link -> link.level().equals(dim))
+                .toList();
+    }
+
+
+    public static void addFluidConstraint(int id,
+                                          Long shipIdA, Vector3d localPosA,
+                                          Long shipIdB, Vector3d localPosB,
+                                          ResourceKey<Level> level) {
+
+        fluidConstraints.put(id, new FluidConverterLink(shipIdA, localPosA, shipIdB, localPosB, level));
+    }
+
+
+
+
+    public static class FluidConstraintData {
+        public final BlockPos posA;
+        public final BlockPos posB;
+        public final ResourceKey<Level> dimension;
+
+        public FluidConstraintData(BlockPos posA, BlockPos posB, ResourceKey<Level> dimension) {
+            this.posA = posA;
+            this.posB = posB;
+            this.dimension = dimension;
+        }
+    }
+    public static void removeFluidConstraint(int constraintId) {
+        fluidConstraints.remove(constraintId);
+        System.out.println("Removed fluid constraint " + constraintId);
+    }
+
+    public static void validateFluidConstraints(ServerLevel level) {
+        java.util.List<Integer> toRemove = new java.util.ArrayList<>();
+        Long groundId = VSGameUtilsKt.getShipObjectWorld(level).getDimensionToGroundBodyIdImmutable()
+                .get(VSGameUtilsKt.getDimensionId(level));
+
+        for (Map.Entry<Integer, FluidConverterLink> entry : fluidConstraints.entrySet()) {
+            FluidConverterLink data = entry.getValue();
+
+            // Skip constraints from other dimensions
+            if (!data.level().equals(level.dimension())) continue;
+
+            Vector3d worldPosA = data.shipA().equals(groundId)
+                    ? data.localA()
+                    : VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(data.shipA())
+                    .getTransform().getShipToWorld().transformPosition(data.localA(), new Vector3d());
+
+            Vector3d worldPosB = data.shipB().equals(groundId)
+                    ? data.localB()
+                    : VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(data.shipB())
+                    .getTransform().getShipToWorld().transformPosition(data.localB(), new Vector3d());
+
+
+            // Convert to BlockPos for block checks
+            BlockPos posA = new BlockPos(
+                    (int) Math.floor(worldPosA.x),
+                    (int) Math.floor(worldPosA.y),
+                    (int) Math.floor(worldPosA.z)
+            );
+
+            BlockPos posB = new BlockPos(
+                    (int) Math.floor(worldPosB.x),
+                    (int) Math.floor(worldPosB.y),
+                    (int) Math.floor(worldPosB.z)
+            );
+
+            boolean existsA = level.isLoaded(posA) && !level.getBlockState(posA).isAir();
+            boolean existsB = level.isLoaded(posB) && !level.getBlockState(posB).isAir();
+
+            if (!existsA || !existsB) {
+                toRemove.add(entry.getKey());
+            }
+        }
+
+        toRemove.forEach(ConstraintTracker::removeFluidConstraint);
+    }
+
+    private static final Map<Integer, FluidConverterLink> fluidConstraints = new ConcurrentHashMap<>();
+
+
+
+    public static Map<Integer, FluidConverterLink> getFluidConstraints() {
+        return new HashMap<>(fluidConstraints);
     }
 
 

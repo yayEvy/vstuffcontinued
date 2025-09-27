@@ -50,7 +50,7 @@ public class LeadConstraintItem extends Item {
         BlockPos clickedPos = context.getClickedPos().immutable();
         Player player = context.getPlayer();
 
-        if (!canConnectRope(level, clickedPos)) { // rope cannot be made on non-full blocks
+        if (VstuffConfig.ROPE_ONLY_FULL_BLOCKS.get() && !canConnectRope(level, clickedPos)) {
             player.displayClientMessage(
                     Component.translatable("vstuff.message.nonfullblock_fail"),
                     true

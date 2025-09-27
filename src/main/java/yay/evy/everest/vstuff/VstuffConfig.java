@@ -18,6 +18,7 @@ public class VstuffConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> MAX_ROPE_LENGTH;
     public static final ForgeConfigSpec.ConfigValue<Double> PULLEY_SPEED;
     public static final ForgeConfigSpec.BooleanValue ROPE_SOUNDS;
+    public static final ForgeConfigSpec.BooleanValue ROPE_ONLY_FULL_BLOCKS;
 
     static {
         // Server builder
@@ -54,6 +55,9 @@ public class VstuffConfig {
         PULLEY_SPEED = serverBuilder
                 .comment("Set the pulley extension/retraction speed (default: 0.1)")
                 .define("pulley_speed", 0.1);
+        ROPE_ONLY_FULL_BLOCKS = serverBuilder
+                .comment("Whether ropes can only connect to full blocks ONLY (default: true)")
+                .define("ropeOnlyFullBlocks", true);
         serverBuilder.pop();
 // woooooooo
         SERVER_CONFIG = serverBuilder.build();
