@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.world.entity.player.Player;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.ropestyler.components.RopeStyleCategory;
 import yay.evy.everest.vstuff.index.VStuffRopeStyles;
 import yay.evy.everest.vstuff.util.RopeStyles.RopeStyle;
@@ -26,6 +27,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
+import yay.evy.everest.vstuff.util.packet.RopeStyleSelectPacket;
 
 import java.util.List;
 
@@ -152,7 +154,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
             Component shortenedName = ClientTextUtils.getComponentWithWidthCutoff(displayName, 126);
             guiGraphics.drawString(font, shortenedName, x + 15, y + 165, 0xFFFFFF);
 
-            ms.popPose();
+           // ms.popPose();
         }
     }
 
@@ -304,8 +306,9 @@ public class RopeStylerScreen extends AbstractSimiScreen {
 
         VStuff.LOGGER.info("Attempting to set player [{}] selected rope style to {}", player.getName(), selectedStyle.asString());
 
-        RopeStyleHandlerServer.addStyle(player.getUUID(), style);
+        NetworkHandler.INSTANCE.sendToServer(new RopeStyleSelectPacket(style.asString()));
 
         onClose();
     }
+
 }

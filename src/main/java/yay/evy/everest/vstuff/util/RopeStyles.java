@@ -3,7 +3,22 @@ package yay.evy.everest.vstuff.util;
 import net.minecraft.resources.ResourceLocation;
 import yay.evy.everest.vstuff.VStuff;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class RopeStyles {
+
+    private static final Map<String, RopeStyle> STYLE_REGISTRY = new HashMap<>();
+
+    public static void register(RopeStyle style) {
+        STYLE_REGISTRY.put(style.getStyle(), style);
+    }
+
+    public static RopeStyle fromString(String styleId) {
+        return STYLE_REGISTRY.get(styleId);
+    }
+
+    // === your existing code below ===
 
     public static ResourceLocation getRopeStyle(String style) {
         return new ResourceLocation(VStuff.MOD_ID, "textures/entity/rope/rope_" + style + ".png");
@@ -25,7 +40,6 @@ public class RopeStyles {
         return new ResourceLocation("minecraft", "textures/block/" + log + "_log.png");
     }
 
-
     public enum RenderStyle {
         NORMAL,
         CHAIN
@@ -40,7 +54,6 @@ public class RopeStyles {
     }
 
     public static class RopeStyle {
-
         private final ResourceLocation associatedTexture;
         private final RenderStyle renderStyle;
         private final String langKey;
@@ -51,55 +64,33 @@ public class RopeStyles {
             this.langKey = langKey;
             this.style = style;
             this.basicStyle = basicStyle;
-
-            if (basicStyle == PrimitiveRopeStyle.CHAIN) {
-                this.renderStyle = RenderStyle.CHAIN;
-            } else {
-                this.renderStyle = RenderStyle.NORMAL;
-            }
+            this.renderStyle = (basicStyle == PrimitiveRopeStyle.CHAIN ? RenderStyle.CHAIN : RenderStyle.NORMAL);
 
             switch (basicStyle) {
                 case WOOL -> this.associatedTexture = getDyedWoolStyle(style);
-                case CHAIN -> this.associatedTexture = getChainStyle(); // Use new method
+                case CHAIN -> this.associatedTexture = getChainStyle();
                 case LOG -> this.associatedTexture = getLogStyle(style);
                 default -> this.associatedTexture = getRopeStyle(style);
             }
+
+            // auto-register when created
+            RopeStyles.register(this);
         }
 
         public RopeStyle(String style, String basicStyleSTR, String langKey) {
-            PrimitiveRopeStyle basicStyle;
-
-            switch (basicStyleSTR) {
-                case "wool" -> basicStyle = PrimitiveRopeStyle.WOOL;
-                case "chain" -> basicStyle = PrimitiveRopeStyle.CHAIN;
-                case "log" -> basicStyle = PrimitiveRopeStyle.LOG;
-                default -> basicStyle = PrimitiveRopeStyle.NORMAL;
-            }
-
-            this.langKey = langKey;
-            this.style = style;
-            this.basicStyle = basicStyle;
-
-            if (basicStyle == PrimitiveRopeStyle.CHAIN) {
-                this.renderStyle = RenderStyle.CHAIN;
-            } else {
-                this.renderStyle = RenderStyle.NORMAL;
-            }
-
-            switch (basicStyle) {
-                case WOOL -> this.associatedTexture = getDyedWoolStyle(style);
-                case CHAIN -> this.associatedTexture = getChainStyle(); // Use new method
-                case LOG -> this.associatedTexture = getLogStyle(style);
-                default -> this.associatedTexture = getRopeStyle(style);
-            }
+            this(style,
+                    switch (basicStyleSTR) {
+                        case "wool" -> PrimitiveRopeStyle.WOOL;
+                        case "chain" -> PrimitiveRopeStyle.CHAIN;
+                        case "log" -> PrimitiveRopeStyle.LOG;
+                        default -> PrimitiveRopeStyle.NORMAL;
+                    },
+                    langKey
+            );
         }
 
         public String asString() {
-            return "RopeStyle with style " + style +
-                    ", basicStyle " + basicStyle.toString() +
-                    ", renderStyle " + renderStyle.toString() +
-                    ", texture at " + associatedTexture.getPath() +
-                    ", langKey " + langKey;
+            return style; // cleaner, just the ID
         }
 
         public ResourceLocation getTexture() {
@@ -123,8 +114,7 @@ public class RopeStyles {
         }
 
         public boolean isDyeable() {
-            return ((this.basicStyle == PrimitiveRopeStyle.WOOL) || (this.basicStyle == PrimitiveRopeStyle.NORMAL));
-
+            return (this.basicStyle == PrimitiveRopeStyle.WOOL || this.basicStyle == PrimitiveRopeStyle.NORMAL);
         }
     }
 }

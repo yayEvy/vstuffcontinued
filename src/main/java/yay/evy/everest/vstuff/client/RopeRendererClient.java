@@ -79,6 +79,7 @@ public class RopeRendererClient {
             return new Vector3d(prevEndPos).lerp(currentEndPos, partialTick);
         }
     }
+
     @SubscribeEvent
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
@@ -99,49 +100,42 @@ public class RopeRendererClient {
             Vec3 cameraPos = event.getCamera().getPosition();
             float partialTick = event.getPartialTick();
 
-            RenderType renderType = RopeRendererType.ropeRenderer(RopeStyles.getRopeStyle("normal"));
-
             Map<Integer, ClientConstraintTracker.ClientRopeData> constraints = ClientConstraintTracker.getClientConstraints();
-            Map<Integer, ConstraintTracker.RopeConstraintData> serverConstraints = ConstraintTracker.getActiveConstraints();
 
             boolean renderedAny = false;
 
-            if (constraints.isEmpty()) {
-                for (Map.Entry<Integer, ConstraintTracker.RopeConstraintData> entry : serverConstraints.entrySet()) {
-                    try {
-                        renderServerRope(poseStack, bufferSource, entry.getKey(), entry.getValue(), level, cameraPos, partialTick, entry.getValue().style);
-                        renderedAny = true;
-                    } catch (Exception e) {
-                        System.err.println("Error rendering server rope: " + e.getMessage());
-                    }
-                }
-            } else {
-                for (Map.Entry<Integer, ClientConstraintTracker.ClientRopeData> entry : constraints.entrySet()) {
-                    try {
-                        renderClientRope(poseStack, bufferSource, entry.getKey(), entry.getValue(), level, cameraPos, partialTick, entry.getValue().style);
-                        renderedAny = true;
-                    } catch (Exception e) {
-                        System.err.println("Error rendering client rope: " + e.getMessage());
-                    }
+            for (Map.Entry<Integer, ClientConstraintTracker.ClientRopeData> entry : constraints.entrySet()) {
+                try {
+                    renderClientRope(
+                            poseStack,
+                            bufferSource,
+                            entry.getKey(),
+                            entry.getValue(),
+                            level,
+                            cameraPos,
+                            partialTick,
+                            entry.getValue().style
+                    );
+                    renderedAny = true;
+                } catch (Exception e) {
+                    System.err.println("Error rendering client rope: " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
 
             if (renderedAny) {
-                bufferSource.endBatch(renderType);
+
+                bufferSource.endBatch();
             }
         } catch (Exception e) {
             System.err.println("Error in rope rendering: " + e.getMessage());
+            e.printStackTrace();
         }
     }
-
     private static void cleanupPositionCache() {
         Map<Integer, ClientConstraintTracker.ClientRopeData> constraints = ClientConstraintTracker.getClientConstraints();
-        Map<Integer, ConstraintTracker.RopeConstraintData> serverConstraints = ConstraintTracker.getActiveConstraints();
 
-        positionCache.entrySet().removeIf(entry ->
-                !constraints.containsKey(entry.getKey()) &&
-                        !serverConstraints.containsKey(entry.getKey())
-        );
+        positionCache.entrySet().removeIf(entry -> !constraints.containsKey(entry.getKey()));
     }
     private static void renderClientRope(PoseStack poseStack, MultiBufferSource bufferSource,
                                          Integer constraintId, ClientConstraintTracker.ClientRopeData ropeData,
@@ -163,34 +157,6 @@ public class RopeRendererClient {
         }
     }
 
-
-    private static void renderServerRope(PoseStack poseStack, MultiBufferSource bufferSource,
-                                         Integer constraintId, ConstraintTracker.RopeConstraintData ropeData,
-                                         Level level, Vec3 cameraPos, float partialTick, RopeStyles.RopeStyle style) {
-        try {
-            Vector3d startPos = ropeData.getWorldPosA((ServerLevel) level, 0.0f);
-            Vector3d endPos = ropeData.getWorldPosB((ServerLevel) level, 0.0f);
-
-            if (startPos != null && endPos != null) {
-                RopePositionCache cache = positionCache.computeIfAbsent(constraintId, k -> new RopePositionCache());
-
-                if (partialTick < 0.1f) {
-                    cache.updatePositions(startPos, endPos);
-                }
-
-                Vector3d renderStart = cache.getInterpolatedStartPos(partialTick);
-                Vector3d renderEnd = cache.getInterpolatedEndPos(partialTick);
-
-                double actualRopeLength = renderStart.distance(renderEnd);
-                double maxRopeLength = ropeData.maxLength;
-
-                renderRope(poseStack, bufferSource, renderStart, renderEnd,
-                        actualRopeLength, maxRopeLength, cameraPos, partialTick, level, style);
-            }
-        } catch (Exception e) {
-            System.err.println("Error in renderServerRope: " + e.getMessage());
-        }
-    }
 
     private static void renderRope(PoseStack poseStack, MultiBufferSource bufferSource,
                                    Vector3d startPos, Vector3d endPos, double actualRopeLength,

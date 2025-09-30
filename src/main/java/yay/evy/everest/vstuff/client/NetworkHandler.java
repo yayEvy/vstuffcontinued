@@ -9,6 +9,7 @@ import org.joml.Vector3d;
 import yay.evy.everest.vstuff.util.packet.ConstraintSyncPacket;
 import yay.evy.everest.vstuff.util.packet.RopeSoundPacket;
 import yay.evy.everest.vstuff.util.RopeStyles;
+import yay.evy.everest.vstuff.util.packet.RopeStyleSelectPacket;
 
 public class NetworkHandler {
 
@@ -30,11 +31,18 @@ public class NetworkHandler {
                 .add();
 
         INSTANCE.messageBuilder(RopeSoundPacket.class, packetId++)
-                .encoder(RopeSoundPacket::encode)
                 .decoder(RopeSoundPacket::decode)
+                .encoder(RopeSoundPacket::encode)
                 .consumerMainThread(RopeSoundPacket::handle)
                 .add();
+
+        INSTANCE.messageBuilder(RopeStyleSelectPacket.class, packetId++)
+                .decoder(RopeStyleSelectPacket::decode)
+                .encoder(RopeStyleSelectPacket::encode)
+                .consumerMainThread(RopeStyleSelectPacket::handle)
+                .add();
     }
+
 
 
     public static void sendConstraintAdd(Integer constraintId, Long shipA, Long shipB,

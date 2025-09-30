@@ -44,23 +44,25 @@ public class LeadConstraintItem extends Item {
     }
 
 
+
     @Override
     public InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
         BlockPos clickedPos = context.getClickedPos().immutable();
         Player player = context.getPlayer();
 
-        if (VstuffConfig.ROPE_ONLY_FULL_BLOCKS.get() && !canConnectRope(level, clickedPos)) {
-            player.displayClientMessage(
-                    Component.translatable("vstuff.message.nonfullblock_fail"),
-                    true
-            );
-            return InteractionResult.FAIL;
+
+        if (level.isClientSide()) {
+
+            yay.evy.everest.vstuff.client.ClientRopeUtil.drawOutline(level, clickedPos);
+            return InteractionResult.SUCCESS;
         }
+
 
         if (!(level instanceof ServerLevel serverLevel) || player == null) {
             return InteractionResult.PASS;
         }
+
 
         PhysPulleyBlockEntity pulley = PhysPulleyItem.getWaitingPulley(player);
         if (pulley != null) {
@@ -78,7 +80,8 @@ public class LeadConstraintItem extends Item {
             return InteractionResult.SUCCESS;
         }
 
-        if (firstClickedPos == null && firstEntity == null) { // behavior for first position selected
+
+        if (firstClickedPos == null && firstEntity == null) {
             firstClickedPos = clickedPos;
             firstShipId = getShipIdAtPos(serverLevel, clickedPos);
             firstClickDimension = serverLevel.dimension();
@@ -86,7 +89,6 @@ public class LeadConstraintItem extends Item {
                     Component.translatable("vstuff.message.rope_first"),
                     true
             );
-            drawOutline(level, clickedPos);
             return InteractionResult.SUCCESS;
 
         } else {
@@ -97,7 +99,6 @@ public class LeadConstraintItem extends Item {
                         true
                 );
                 return InteractionResult.SUCCESS;
-                // reset pos if player shift-clicks or player clicks on first clicked block
             }
 
             if (!serverLevel.dimension().equals(firstClickDimension)) {
@@ -123,13 +124,10 @@ public class LeadConstraintItem extends Item {
                 }
 
                 player.displayClientMessage(notif, true);
-                drawOutline(level, clickedPos);
             }
 
             resetState();
             return created ? InteractionResult.SUCCESS : InteractionResult.FAIL;
-
-
         }
     }
 

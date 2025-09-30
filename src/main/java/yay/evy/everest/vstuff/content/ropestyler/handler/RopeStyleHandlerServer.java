@@ -33,7 +33,7 @@ public class RopeStyleHandlerServer {
             System.out.println("successfully got style for uuid" + uuid);
             return selectedStyles.get(uuid);
         }
-        System.out.println("defaulting to normal rope style");
+      //  System.out.println("defaulting to normal rope style");
         return new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal");
     }
 

@@ -82,9 +82,9 @@ public class ConstraintPersistence extends SavedData {
         persistedConstraints.remove(id);
         restoredConstraints.remove(id);
         setDirty();
-        System.out.println("Marked constraint as permanently removed: " + id);
-        System.out.println("Removed constraints now contains: " + removedConstraints.size() + " entries");
-        System.out.println("Persisted constraints now contains: " + persistedConstraints.size() + " entries");
+   //     System.out.println("Marked constraint as permanently removed: " + id);
+     //   System.out.println("Removed constraints now contains: " + removedConstraints.size() + " entries");
+       // System.out.println("Persisted constraints now contains: " + persistedConstraints.size() + " entries");
     }
 
     public static ConstraintPersistence load(CompoundTag tag) {
@@ -222,10 +222,10 @@ public class ConstraintPersistence extends SavedData {
                 constraintTag.putInt("sourceBlockPos_z", data.sourceBlockPos.getZ());
             }
 
-            System.out.println("SAVING TO NBT - ID: " + constraintId +
-                    ", shipA: " + data.shipA + ", shipB: " + data.shipB +
-                    ", shipAIsGround: " + data.shipAIsGround + ", shipBIsGround: " + data.shipBIsGround +
-                    ", constraintType: " + data.constraintType + ", sourceBlockPos: " + data.sourceBlockPos);
+          //  System.out.println("SAVING TO NBT - ID: " + constraintId +
+              //      ", shipA: " + data.shipA + ", shipB: " + data.shipB +
+              //      ", shipAIsGround: " + data.shipAIsGround + ", shipBIsGround: " + data.shipBIsGround +
+                //    ", constraintType: " + data.constraintType + ", sourceBlockPos: " + data.sourceBlockPos);
 
             constraintsList.add(constraintTag);
         }

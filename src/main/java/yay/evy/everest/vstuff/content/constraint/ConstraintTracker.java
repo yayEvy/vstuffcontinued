@@ -132,27 +132,27 @@ public class ConstraintTracker {
             boolean existingConstraintFound = activeConstraints.values().stream()
                     .anyMatch(existing -> existing.constraintType == RopeConstraintData.ConstraintType.ROPE_PULLEY
                             && existing.sourceBlockPos != null
-                            && existing.sourceBlockPos.equals(sourceBlockPos));
+                            && existing.sourceBlockPos.equals(sourceBlockPos)
+                            && existing.style == style); // check style too
 
             if (existingConstraintFound) {
-                System.out.println("Constraint already exists for rope pulley at " + sourceBlockPos + ", not creating duplicate");
+                System.out.println("Constraint already exists for rope pulley at " + sourceBlockPos + " with style " + style + ", skipping");
                 return;
             }
         }
 
         RopeConstraintData data = new RopeConstraintData(level, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, constraintType, sourceBlockPos, style);
         activeConstraints.put(constraintId, data);
-        System.out.println(style);
+       // System.out.println("Added " + constraintType + " constraint " + constraintId + " with style " + style);
 
         ConstraintPersistence persistence = ConstraintPersistence.get(level);
         String persistenceId = java.util.UUID.randomUUID().toString();
-
         constraintToPersistenceId.put(constraintId, persistenceId);
 
         persistence.addConstraint(persistenceId, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, level, constraintType, sourceBlockPos, style);
         NetworkHandler.sendConstraintAdd(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
-        System.out.println("Added " + constraintType + " constraint " + constraintId + " with source block " + sourceBlockPos + " and style " + style);
     }
+
 
 
     public static void addConstraintWithPersistence(ServerLevel level, Integer constraintId, Long shipA, Long shipB,
