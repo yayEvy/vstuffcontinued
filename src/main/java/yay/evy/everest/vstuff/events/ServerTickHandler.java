@@ -21,7 +21,7 @@ public class ServerTickHandler {
             ConstraintPersistence.get(level).restoreConstraintsInstance(level);
         }
     }
-
+/*
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
@@ -45,4 +45,6 @@ public class ServerTickHandler {
             ConstraintTracker.validateAndCleanupConstraints(level);
         }
     }
+
+ */
 }
