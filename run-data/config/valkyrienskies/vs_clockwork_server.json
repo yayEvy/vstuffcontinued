@@ -1,0 +1,5 @@
+{
+  "blockBlacklist" : [ "minecraft:bedrock", "minecraft:end_portal_frame", "minecraft:end_portal", "minecraft:end_gateway", "minecraft:portal", "minecraft:air", "minecraft:water", "minecraft:flowing_water", "minecraft:lava", "minecraft:flowing_lava" ],
+  "maxGravitronMass" : 256,
+  "$schema" : "schemas/vs_clockwork_server.schema.json"
+}

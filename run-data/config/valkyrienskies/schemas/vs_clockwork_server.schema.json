@@ -1,0 +1,23 @@
+{
+  "$schema" : "https://json-schema.org/draft/2019-09/schema",
+  "type" : "object",
+  "properties" : {
+    "blockBlacklist" : {
+      "description" : "Blacklist of blocks that don't get assembled",
+      "type" : "array",
+      "items" : {
+        "type" : "string",
+        "description" : "Blacklist of blocks that don't get assembled"
+      }
+    },
+    "maxGravitronMass" : {
+      "type" : "integer",
+      "format" : "int32",
+      "description" : "Max Gravitron mass in 1000 kg"
+    },
+    "$schema" : {
+      "type" : "string"
+    }
+  },
+  "additionalProperties" : false
+}
