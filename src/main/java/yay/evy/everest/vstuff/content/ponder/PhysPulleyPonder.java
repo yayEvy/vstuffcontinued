@@ -5,12 +5,9 @@ import net.createmod.ponder.api.PonderPalette;
 import net.createmod.ponder.api.scene.SceneBuilder;
 import net.createmod.ponder.api.scene.SceneBuildingUtil;
 import net.createmod.ponder.api.scene.Selection;
-// removed: import net.createmod.ponder.foundation.element.InputWindowElement;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.AABB;
 import yay.evy.everest.vstuff.index.VStuffItems;
 
 public class PhysPulleyPonder {
@@ -22,7 +19,7 @@ public class PhysPulleyPonder {
         scene.setSceneOffsetY(0);
         scene.removeShadow();
 
-        ItemStack ropeItem = new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM);
+        ItemStack ropeItem = new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get());
 
         BlockPos baseStart = util.grid().at(0, 0, 0);
         BlockPos baseEnd = util.grid().at(4, 0, 4);
@@ -34,13 +31,13 @@ public class PhysPulleyPonder {
 
         Selection basePlate = util.select().fromTo(baseStart, baseEnd);
         Selection oakColumn = util.select().fromTo(columnStart, columnEnd);
-        Selection pulleySel = util.select().fromTo(pulleyPos, pulleyPos);
-        Selection crankSel = util.select().fromTo(crankPos, crankPos);
-        Selection ironSel = util.select().fromTo(ironBlockPos, ironBlockPos);
-
+        Selection pulleySel = util.select().position(pulleyPos);
+        Selection crankSel = util.select().position(crankPos);
+        Selection ironSel = util.select().position(ironBlockPos);
 
         scene.world().showSection(basePlate, Direction.DOWN);
         scene.idle(20);
+
         scene.world().showSection(oakColumn, Direction.UP);
         scene.idle(20);
 
@@ -99,5 +96,4 @@ public class PhysPulleyPonder {
 
         scene.markAsFinished();
     }
-    // help
 }
