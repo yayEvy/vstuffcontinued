@@ -28,7 +28,7 @@ plugins {
 
     id 'eclipse'
     id 'idea'
-        id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
 
@@ -195,6 +195,10 @@ repositories {
     }
 
     mavenLocal()
+
+    maven { url = "https://maven.createmod.net" } // Create, Ponder, Flywheel
+    maven { url = "https://maven.ithundxr.dev/mirror" } // Registrate
+    maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // ForgeConfigAPIPort
 }
 
 dependencies {
@@ -210,21 +214,15 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-annotations:2.13.3"
     implementation 'thedarkcolour:kotlinforforge:4.10.0'
 
-    runtimeOnly fg.deobf("maven.modrinth:create-clockwork:1.20.1-0.1.16")
-    compileOnly fg.deobf("maven.modrinth:create-stuff-additions:2.0.8")
-
-    implementation fg.deobf("maven.modrinth:architectury-api:9.2.14+forge")
-    implementation fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_forge_version}:slim") { transitive = false }
-    implementation fg.deobf("com.tterrag.registrate:Registrate:${registrate_forge_version}")
-    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${flywheel_forge_minecraft_version}:${flywheel_forge_version}")
 
 
+    implementation(fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false })
+    implementation(fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}"))
+    compileOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}"))
+    runtimeOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}"))
+    implementation(fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}"))
 
-    //  compileOnly fg.deobf(files("libs/create-stuff-additions1.20.1_v2.0.8.jar"))
-    //implementation fg.deobf("maven.modrinth:vlib:1.20.1-0.0.11-alpha+forge")
-   // implementation fg.deobf("maven.modrinth:forgified-fabric-api:0.92.2+1.11.12+1.20.1")
 
-    compileOnly fg.deobf("maven.modrinth:vmod:lK0oLDaV")
 
 
 

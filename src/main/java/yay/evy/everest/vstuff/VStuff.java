@@ -2,6 +2,7 @@ package yay.evy.everest.vstuff;
 
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
+import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.api.distmarker.Dist; // Import the Dist class
@@ -47,7 +48,9 @@ public class VStuff {
         MinecraftForge.EVENT_BUS.register(this);
         NetworkHandler.registerPackets();
 
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> VStuffPonders::register);
+
+       // DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> VStuffPonders::register);
+
 
 
         LOGGER.info("VStuff mod initialized");

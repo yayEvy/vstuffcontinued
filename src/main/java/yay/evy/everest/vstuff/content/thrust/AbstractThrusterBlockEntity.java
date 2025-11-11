@@ -2,8 +2,7 @@ package yay.evy.everest.vstuff.content.thrust;
 
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
-import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.LangBuilder;
+import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -155,7 +154,8 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
     }
 
     protected LangBuilder getGoggleStatus() {
-        return Lang.text("Speed: " + getSpeed() + " rpm, Thrust: " + thrusterData.getThrust());
+        return new LangBuilder("")
+                .text("Speed: " + getSpeed() + " rpm, Thrust: " + thrusterData.getThrust());
     }
 
     @Nullable
@@ -285,7 +285,8 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
         calculateObstruction(getLevel(), worldPosition, getBlockState().getValue(AbstractThrusterBlock.FACING));
         isThrustDirty = wasThrustDirty;
 
-        Lang.translate("gui.goggles.thruster.status")
+        new LangBuilder("vstuff")
+                .translate("gui.goggles.thruster.status")
                 .text(":")
                 .space()
                 .add(getGoggleStatus())
@@ -297,13 +298,14 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
             efficiency = calculateObstructionEffect() * 100;
         }
 
-        Lang.builder()
-                .add(Lang.translate("gui.goggles.thruster.efficiency"))
+        new LangBuilder("vstuff")
+                .translate("gui.goggles.thruster.efficiency")
                 .space()
-                .add(Lang.number(efficiency))
-                .add(Lang.text("%"))
+                .text(String.format("%.1f%%", efficiency))
                 .style(tooltipColor)
                 .forGoggles(tooltip);
+
+
 
         addSpecificGoggleInfo(tooltip, isPlayerSneaking);
 

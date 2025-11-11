@@ -1,7 +1,7 @@
 package yay.evy.everest.vstuff;
 
 import com.simibubi.create.foundation.item.TooltipHelper;
-import com.simibubi.create.foundation.item.TooltipHelper.Palette;
+import net.createmod.catnip.lang.FontHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -49,7 +49,7 @@ public class TooltipHandler {
             Function<SummaryPayload, String> modifier = tooltipModifications.get(item);
             if (modifier != null) {
                 String summary = modifier.apply(new SummaryPayload(item));
-                tooltipList.addAll(TooltipHelper.cutStringTextComponent(summary, Palette.STANDARD_CREATE));
+                tooltipList.addAll(TooltipHelper.cutStringTextComponent(summary, FontHelper.Palette.STANDARD_CREATE));
             }
         });
     }

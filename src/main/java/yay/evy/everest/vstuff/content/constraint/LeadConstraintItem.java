@@ -24,6 +24,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.core.apigame.constraints.VSRopeConstraint;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.VstuffConfig;
+import yay.evy.everest.vstuff.client.ClientRopeUtil;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyItem;
@@ -358,6 +359,7 @@ public class LeadConstraintItem extends Item {
         return level.getBlockState(clickedPos).isCollisionShapeFullBlock(level, clickedPos);
     }
 
+
     private static void drawOutline(Level level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
         VoxelShape shape = state.getShape(level, pos);
@@ -365,11 +367,9 @@ public class LeadConstraintItem extends Item {
         if (shape.isEmpty())
             return;
 
-        CreateClient.OUTLINER.showAABB(pos, shape.bounds()
-                        .move(pos))
-                .colored(0xFFFFFF)
-                .lineWidth(1 / 16f);
+        ClientRopeUtil.drawOutline(level, pos);
     }
+
 
     private void resetState() {
         firstClickedPos = null;

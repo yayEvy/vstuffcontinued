@@ -2,6 +2,7 @@ package yay.evy.everest.vstuff.content.ropestyler;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import net.createmod.catnip.gui.AbstractSimiScreen;
 import net.minecraft.world.entity.player.Player;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.NetworkHandler;
@@ -14,10 +15,8 @@ import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
 import yay.evy.everest.vstuff.content.ropestyler.components.RopeStyleButton;
 
 import com.simibubi.create.AllSoundEvents;
-import com.simibubi.create.foundation.gui.AbstractSimiScreen;
 import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.gui.widget.*;
-import com.simibubi.create.foundation.utility.Components;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -82,7 +81,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
         scrollTo(0);
 
         // category select
-        Label categoryLabel = new Label(x + 14, y + 25, Components.immutableEmpty()).withShadow();
+        Label categoryLabel = new Label(x + 14, y + 25, Component.empty()).withShadow();
         ScrollInput categoryScrollInput = new SelectionScrollInput(x + 9, y + 20, 150, 18)
                 .forOptions(categoryComponentList)
                 .writingTo(categoryLabel)

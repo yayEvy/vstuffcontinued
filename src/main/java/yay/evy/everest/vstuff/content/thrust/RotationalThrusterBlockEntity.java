@@ -2,8 +2,7 @@ package yay.evy.everest.vstuff.content.thrust;
 
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.LangBuilder;
+import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -57,7 +56,9 @@ public class RotationalThrusterBlockEntity extends AbstractThrusterBlockEntity {
             speed = (int) Math.abs(getSpeed());
             thrust = thrusterData.getThrust();
         }
-        return Lang.text("Speed: " + speed + " rpm, Thrust: " + thrust);
+
+        return new LangBuilder("vstuff")
+                .text("Speed: " + speed + " rpm, Thrust: " + thrust);
     }
 
 
