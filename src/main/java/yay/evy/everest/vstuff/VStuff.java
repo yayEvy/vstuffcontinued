@@ -17,6 +17,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
+import yay.evy.everest.vstuff.client.VStuffClient;
 import yay.evy.everest.vstuff.index.*;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.particles.ParticleTypes;
@@ -49,8 +50,7 @@ public class VStuff {
         NetworkHandler.registerPackets();
 
 
-       // DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> VStuffPonders::register);
-
+        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> VStuffClient::initialize);
 
 
         LOGGER.info("VStuff mod initialized");

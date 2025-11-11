@@ -49,7 +49,7 @@ public class RotationalThrusterBlockEntity extends AbstractThrusterBlockEntity {
     }
 
     @Override
-    protected LangBuilder getGoggleStatus() {
+    protected String getGoggleStatus() {
         int speed = 0;
         float thrust = 0f;
         if (thrusterData != null) {
@@ -57,9 +57,9 @@ public class RotationalThrusterBlockEntity extends AbstractThrusterBlockEntity {
             thrust = thrusterData.getThrust();
         }
 
-        return new LangBuilder("vstuff")
-                .text("Speed: " + speed + " rpm, Thrust: " + thrust);
+        return "Speed: " + speed + " rpm, Thrust: " + thrust;
     }
+
 
 
 

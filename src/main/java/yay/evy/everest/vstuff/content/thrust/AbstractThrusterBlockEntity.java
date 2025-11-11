@@ -153,10 +153,10 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
         return getSpeed() != 0;
     }
 
-    protected LangBuilder getGoggleStatus() {
-        return new LangBuilder("")
-                .text("Speed: " + getSpeed() + " rpm, Thrust: " + thrusterData.getThrust());
+    protected String getGoggleStatus() {
+        return "Speed: " + getSpeed() + " rpm, Thrust: " + thrusterData.getThrust();
     }
+
 
     @Nullable
     protected abstract Direction getFluidCapSide();
@@ -285,12 +285,10 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
         calculateObstruction(getLevel(), worldPosition, getBlockState().getValue(AbstractThrusterBlock.FACING));
         isThrustDirty = wasThrustDirty;
 
-        new LangBuilder("vstuff")
-                .translate("gui.goggles.thruster.status")
-                .text(":")
-                .space()
-                .add(getGoggleStatus())
-                .forGoggles(tooltip);
+        tooltip.add(Component.translatable("create.gui.goggles.thruster.status")
+                .append(Component.literal(": "))
+                .append(Component.literal(getGoggleStatus())
+                        .withStyle(ChatFormatting.AQUA)));
 
         float efficiency = 100;
         ChatFormatting tooltipColor = ChatFormatting.GREEN;
@@ -298,12 +296,10 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
             efficiency = calculateObstructionEffect() * 100;
         }
 
-        new LangBuilder("vstuff")
-                .translate("gui.goggles.thruster.efficiency")
-                .space()
-                .text(String.format("%.1f%%", efficiency))
-                .style(tooltipColor)
-                .forGoggles(tooltip);
+        tooltip.add(Component.translatable("create.gui.goggles.thruster.efficiency")
+                .append(Component.literal(" "))
+                .append(Component.literal(String.format("%.1f%%", efficiency))
+                        .withStyle(tooltipColor)));
 
 
 

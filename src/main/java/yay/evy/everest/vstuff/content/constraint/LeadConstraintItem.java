@@ -1,6 +1,7 @@
 package yay.evy.everest.vstuff.content.constraint;
 
 import com.simibubi.create.CreateClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -54,8 +55,9 @@ public class LeadConstraintItem extends Item {
 
 
         if (level.isClientSide()) {
+            Ship ship = VSGameUtilsKt.getShipObjectManagingPos(level, clickedPos);
+            ClientRopeUtil.drawOutline(level, clickedPos);
 
-            yay.evy.everest.vstuff.client.ClientRopeUtil.drawOutline(level, clickedPos);
             return InteractionResult.SUCCESS;
         }
 
@@ -360,15 +362,6 @@ public class LeadConstraintItem extends Item {
     }
 
 
-    private static void drawOutline(Level level, BlockPos pos) {
-        BlockState state = level.getBlockState(pos);
-        VoxelShape shape = state.getShape(level, pos);
-
-        if (shape.isEmpty())
-            return;
-
-        ClientRopeUtil.drawOutline(level, pos);
-    }
 
 
     private void resetState() {
@@ -376,6 +369,7 @@ public class LeadConstraintItem extends Item {
         firstShipId = null;
         firstEntity = null;
         firstClickDimension = null;
+
         VStuff.LOGGER.info("Reset LeadContraintItem state");
     }
 
