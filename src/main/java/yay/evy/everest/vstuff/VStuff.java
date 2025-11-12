@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import yay.evy.everest.vstuff.client.VStuffClient;
 import yay.evy.everest.vstuff.index.*;
 import yay.evy.everest.vstuff.client.NetworkHandler;
+import yay.evy.everest.vstuff.network.PhysGrabberNetwork;
 import yay.evy.everest.vstuff.particles.ParticleTypes;
 
 @Mod(VStuff.MOD_ID)
@@ -48,6 +49,7 @@ public class VStuff {
 
         MinecraftForge.EVENT_BUS.register(this);
         NetworkHandler.registerPackets();
+        PhysGrabberNetwork.register();
 
 
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> VStuffClient::initialize);

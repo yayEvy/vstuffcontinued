@@ -4,6 +4,7 @@ import com.tterrag.registrate.util.entry.ItemEntry;
 import yay.evy.everest.vstuff.content.constraint.LeadBreakItem;
 import yay.evy.everest.vstuff.content.constraint.LeadConstraintItem;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberItem;
 
 
 public class VStuffItems {
@@ -17,6 +18,9 @@ public class VStuffItems {
 
     public static final ItemEntry<LeadBreakItem> LEAD_BREAK_ITEM =
             VStuff.REGISTRATE.item("lead_break_item", LeadBreakItem::new).register();
+
+    public static final ItemEntry<PhysGrabberItem> PHYS_GRABBER =
+            VStuff.REGISTRATE.item("phys_grabber", PhysGrabberItem::new).register();
 
 
     public static void register() {}

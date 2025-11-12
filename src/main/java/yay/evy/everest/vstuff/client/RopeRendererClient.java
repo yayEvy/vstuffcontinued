@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.phys.Vec3;
@@ -183,11 +184,34 @@ public class RopeRendererClient {
                 break;
 
             default:
-                renderType = RopeRendererType.ropeRenderer(style.getTexture());
-                VertexConsumer vertexConsumerNormal = bufferSource.getBuffer(renderType);
-                renderNormalRope(poseStack, vertexConsumerNormal, start, end,
+                boolean underwater = false;
+                int samples = 8;
+                for (int i = 0; i <= samples; i++) {
+                    double t = i / (double) samples;
+                    Vector3d point = new Vector3d(startPos).lerp(endPos, t);
+                    BlockPos checkPos = new BlockPos(
+                            (int) Math.floor(point.x()),
+                            (int) Math.floor(point.y()),
+                            (int) Math.floor(point.z())
+                    );
+                    if (level.getFluidState(checkPos).is(FluidTags.WATER)) {
+                        underwater = true;
+                        break;
+                    }
+                }
+
+                renderType = underwater
+                        ? RopeRendererType.ropeRendererUnderwater(style.getTexture())
+                        : RopeRendererType.ropeRenderer(style.getTexture());
+
+                VertexConsumer vertexConsumer = bufferSource.getBuffer(renderType);
+
+                renderNormalRope(poseStack, vertexConsumer, start, end,
                         actualRopeLength, maxRopeLength, partialTick, level, cameraPos);
                 break;
+
+
+
         }
 
 

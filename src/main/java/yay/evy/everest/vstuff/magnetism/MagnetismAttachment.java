@@ -6,4 +6,5 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonSerialize
 @JsonDeserialize
 public class MagnetismAttachment {
+    // ts bullshit bro
 }

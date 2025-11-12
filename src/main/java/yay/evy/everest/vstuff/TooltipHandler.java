@@ -73,6 +73,9 @@ public class TooltipHandler {
 
         tooltipModifications.put(VStuffItems.LEAD_BREAK_ITEM.get(),
                 (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
+
+        tooltipModifications.put(VStuffItems.PHYS_GRABBER.get(),
+                (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
     }
 
     private static class SummaryPayload {
