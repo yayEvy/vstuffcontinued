@@ -6,9 +6,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-/**
- * Handles updating the PhysGrabber target every client tick.
- */
+
 @Mod.EventBusSubscriber(value = Dist.CLIENT)
 public class PhysGrabberClientTick {
 

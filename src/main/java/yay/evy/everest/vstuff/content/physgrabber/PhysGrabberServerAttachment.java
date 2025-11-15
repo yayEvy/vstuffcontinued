@@ -66,7 +66,11 @@ public class PhysGrabberServerAttachment implements ShipForcesInducer {
     public static PhysGrabberServerAttachment getOrCreate(ServerShip ship) {
         PhysGrabberServerAttachment grabber =
                 AttachmentUtils.getOrCreate(ship, PhysGrabberServerAttachment.class, PhysGrabberServerAttachment::new);
+
+
         ship.saveAttachment(PhysGrabberServerAttachment.class, grabber);
+
+
         return grabber;
     }
 }

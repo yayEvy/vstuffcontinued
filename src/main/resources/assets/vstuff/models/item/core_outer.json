@@ -1,20 +1,20 @@
 {
   "credit": "Made with Blockbench",
   "textures": {
-    "2": "vs_clockwork:item/wanderlite_crystal",
-    "particle": "vs_clockwork:item/wanderwand"
+    "2": "vstuff:item/wanderlite_crystal",
+    "particle": "vstuff:item/wanderwand"
   },
   "elements": [
     {
       "from": [
-        7.15,
-        11.66,
-        7.15
+        6.25,
+        10.75,
+        6.25
       ],
       "to": [
-        8.85,
-        13.34,
-        8.85
+        9.75,
+        14.25,
+        9.75
       ],
       "rotation": {
         "angle": -45,
@@ -88,7 +88,7 @@
       "name": "crystal",
       "origin": [
         8,
-        12.5,
+        8,
         8
       ],
       "color": 0,
