@@ -25,11 +25,10 @@ public class RopeStyles {
     }
 
     public static ResourceLocation getDyedRopeStyle(String color) {
-        return new ResourceLocation(VStuff.MOD_ID, "textures/entity/rope/rope_dyed_" + color + ".png");
+        return new ResourceLocation(VStuff.MOD_ID, "textures/entity/rope/ropedyed" + color + ".png");
     }
-
     public static ResourceLocation getDyedWoolStyle(String color) {
-        return new ResourceLocation("minecraft", "textures/block/" + color + "_wool.png");
+        return new ResourceLocation("vstuff", "textures/entity/rope/" + color + "_wool.png");
     }
 
     public static ResourceLocation getChainStyle() {
@@ -51,6 +50,7 @@ public class RopeStyles {
         CHAIN,
         OTHER,
         LOG,
+        DYED
     }
 
     public static class RopeStyle {

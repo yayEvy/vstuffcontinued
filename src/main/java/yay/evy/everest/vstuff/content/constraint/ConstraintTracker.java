@@ -44,7 +44,7 @@ public class ConstraintTracker {
         public final BlockPos anchorBlockPosB;
         public final boolean isShipA;
         public final boolean isShipB;
-        public final RopeStyles.RopeStyle style;
+        public RopeStyles.RopeStyle style;
 
         public enum ConstraintType {
             ROPE_PULLEY,
@@ -161,7 +161,10 @@ public class ConstraintTracker {
         addConstraintWithPersistence(level, constraintId, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce,
                 RopeConstraintData.ConstraintType.GENERIC, null, style);
     }
+    public static String persistanceIdViaConstraintId (Integer constraintId){
 
+        return constraintToPersistenceId.get(constraintId);
+    }
 
 
 

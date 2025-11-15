@@ -64,10 +64,29 @@
   "vstuff.rope.nonbinary": "Nonbinary",
   "vstuff.rope.asexual": "Asexual",
 
+  "vstuff.rope.light_gray": "Light Gray",
+  "vstuff.rope.gray": "Gray",
+  "vstuff.rope.black": "Black",
+  "vstuff.rope.brown": "Brown",
+  "vstuff.rope.red": "Red",
+  "vstuff.rope.orange": "Orange",
+  "vstuff.rope.yellow": "Yellow",
+  "vstuff.rope.lime": "Lime",
+  "vstuff.rope.green": "Green",
+  "vstuff.rope.cyan": "Cyan",
+  "vstuff.rope.light_blue": "Light Blue",
+  "vstuff.rope.blue": "Blue",
+  "vstuff.rope.purple": "Purple",
+  "vstuff.rope.magenta": "Magenta",
+  "vstuff.rope.pink": "Pink",
+  "vstuff.rope.white": "White",
+
   "vstuff.rope_category.normal": "Basic Styles",
   "vstuff.rope_category.casing": "Casing Styles",
   "vstuff.rope_category.pride_flags": "Pride Flags",
   "vstuff.rope_category.logs": "Log Styles",
+  "vstuff.rope_category.colored":"Colors",
+  "vstuff.rope_category.colored_wool": "Colored Wools",
 
   "vstuff.keyinfo.rope_menu_open": "Open Rope Styler"
 

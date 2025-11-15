@@ -849,7 +849,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             Integer newId = createConstraintWithLength(currentRopeLength);
             if (newId != null) {
                 constraintId = newId;
-             //   System.out.println("Recreated constraint at length " + currentRopeLength + " after reload");
+                //   System.out.println("Recreated constraint at length " + currentRopeLength + " after reload");
             }
         }
 
@@ -909,7 +909,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
                 isLowering = true;
                 sendData();
-            //    System.out.println("AUTO MODE: Starting lowering to " + pendingTargetPos + " over distance " + pendingTargetDistance);
+                //    System.out.println("AUTO MODE: Starting lowering to " + pendingTargetPos + " over distance " + pendingTargetDistance);
             }
         }
 
@@ -966,7 +966,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
                 if (constraintId != null) removeExistingConstraint();
                 createAutoConstraint();
 
-              //  System.out.println("AUTO MODE: Rope attached to " + targetPos);
+                //  System.out.println("AUTO MODE: Rope attached to " + targetPos);
             }
         }
 
@@ -1169,7 +1169,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
             if (currentDist < 0.1) {
                 localPosB = new Vector3d(localPosA.x, localPosA.y - length, localPosA.z);
-              //  System.out.println("Adjusted localPosB to maintain rope length after cut: " + localPosB);
+                //  System.out.println("Adjusted localPosB to maintain rope length after cut: " + localPosB);
             }
         }
 
@@ -1182,17 +1182,17 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
             Long realShipA = shipA;
             if (realShipA == null || shipWorld.getAllShips().getById(realShipA) == null) {
-               // System.out.println("Ship A missing or invalid, using groundShipId instead");
+                // System.out.println("Ship A missing or invalid, using groundShipId instead");
                 realShipA = groundShipId;
             }
 
             Long realShipB = shipB;
             if (realShipB == null || shipWorld.getAllShips().getById(realShipB) == null) {
-             //   System.out.println("Ship B missing or invalid, using groundShipId instead");
+                //   System.out.println("Ship B missing or invalid, using groundShipId instead");
                 realShipB = groundShipId;
             }
 
-         //   System.out.println("Creating constraint: shipA=" + realShipA + ", shipB=" + realShipB + ", length=" + length);
+            //   System.out.println("Creating constraint: shipA=" + realShipA + ", shipB=" + realShipB + ", length=" + length);
 
             VSRopeConstraint constraint = new VSRopeConstraint(
                     realShipA,
@@ -1219,14 +1219,14 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
                         ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY, getBlockPos(),
                         new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal"));
 
-             //   System.out.println("Created constraint " + constraintId + " with length " + length);
+                //   System.out.println("Created constraint " + constraintId + " with length " + length);
                 return constraintId;
             } else {
-               // System.err.println("Failed to create constraint");
+                // System.err.println("Failed to create constraint");
                 return null;
             }
         } catch (Exception e) {
-           // System.err.println("Error creating constraint: " + e.getMessage());
+            // System.err.println("Error creating constraint: " + e.getMessage());
             e.printStackTrace();
             return null;
         }
@@ -1258,7 +1258,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
     }
     private void forceConstraintRefresh(Player player) {
         if (constraintId != null && level instanceof ServerLevel serverLevel) {
-          //  System.out.println("Force refreshing constraint " + constraintId);
+            //  System.out.println("Force refreshing constraint " + constraintId);
 
             // Store current state
             double oldLength = currentRopeLength;
@@ -1284,7 +1284,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
     private void restoreConstraintAfterLoad(ServerLevel serverLevel) {
         try {
             if (targetPos == null || shipA == null || shipB == null || localPosA == null || localPosB == null) {
-           //     System.out.println("Missing constraint data, cannot restore. Clearing constraint ID.");
+                //     System.out.println("Missing constraint data, cannot restore. Clearing constraint ID.");
                 constraintId = null;
                 ropeStateInitialized = false;
                 setChanged();
@@ -1311,18 +1311,18 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             localPosB = newLocalPosB;
             consumedRopeLength = shouldBeConsumed;
 // f
-         //   System.out.println("Restoring constraint with updated data:");
-        //    System.out.println("  - ShipA: " + shipA + " -> " + newShipA);
-        //    System.out.println("  - ShipB: " + shipB + " -> " + newShipB);
-          //  System.out.println("  - Length: " + restoredLength);
-         //   System.out.println("  - Consumed: " + consumedRopeLength);
+            //   System.out.println("Restoring constraint with updated data:");
+            //    System.out.println("  - ShipA: " + shipA + " -> " + newShipA);
+            //    System.out.println("  - ShipB: " + shipB + " -> " + newShipB);
+            //  System.out.println("  - Length: " + restoredLength);
+            //   System.out.println("  - Consumed: " + consumedRopeLength);
 
             if (constraintId != null) {
                 try {
                     VSGameUtilsKt.getShipObjectWorld(serverLevel).removeConstraint(constraintId);
                     ConstraintTracker.removeConstraintWithPersistence(serverLevel, constraintId);
                 } catch (Exception e) {
-               //     System.out.println("Old constraint was already gone: " + e.getMessage());
+                    //     System.out.println("Old constraint was already gone: " + e.getMessage());
                 }
             }
 
@@ -1346,18 +1346,18 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
                         ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY, getBlockPos(),
                         new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal"));
 
-             //   System.out.println("Successfully restored constraint " + constraintId + " with length " + currentRopeLength);
+                //   System.out.println("Successfully restored constraint " + constraintId + " with length " + currentRopeLength);
                 setChanged();
                 sendData();
 
             } else {
-              //  System.err.println("Failed to restore constraint after world load");
+                //  System.err.println("Failed to restore constraint after world load");
                 constraintId = null;
                 ropeStateInitialized = false;
                 setChanged();
             }
         } catch (Exception e) {
-           // System.err.println("Error restoring constraint after load: " + e.getMessage());
+            // System.err.println("Error restoring constraint after load: " + e.getMessage());
             e.printStackTrace();
             constraintId = null;
             ropeStateInitialized = false;
@@ -1381,7 +1381,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
     public void removeExistingConstraint(boolean force) {
         wasCut = true;  // mark pulley as cut
         if (isManualMode() && !force) {
-           // System.out.println("MANUAL MODE: Skipping removeExistingConstraint");
+            // System.out.println("MANUAL MODE: Skipping removeExistingConstraint");
             return;
         }
 
@@ -1390,7 +1390,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             constraintId = null;
             setChanged();
             sendData();
-           // System.out.println("Removed constraint and cleaned up");
+            // System.out.println("Removed constraint and cleaned up");
         }
 
         this.previewTargetPos = null;
@@ -1412,9 +1412,9 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             try {
                 VSGameUtilsKt.getShipObjectWorld(serverLevel).removeConstraint(constraintId);
                 ConstraintTracker.removeConstraintWithPersistence(serverLevel, constraintId);
-            //    System.out.println("Cleaned up constraint " + constraintId);
+                //    System.out.println("Cleaned up constraint " + constraintId);
             } catch (Exception e) {
-              //  System.out.println("Constraint " + constraintId + " was already gone");
+                //  System.out.println("Constraint " + constraintId + " was already gone");
             }
             constraintId = null;
         }
@@ -1481,18 +1481,18 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
         this.setManualMode(true);
 
 //
-      //   System.out.println("MANUAL MODE: Starting constraint creation");
+        //   System.out.println("MANUAL MODE: Starting constraint creation");
 //
         if (!hasTarget) {
-         //   System.out.println("MANUAL MODE: No target set, cannot create constraint");
+            //   System.out.println("MANUAL MODE: No target set, cannot create constraint");
             return;
         }
         if (!hasRope()) {
-         //   System.out.println("MANUAL MODE: No rope available, cannot create constraint");
+            //   System.out.println("MANUAL MODE: No rope available, cannot create constraint");
             return;
         }
         if (constraintId != null) {
-           // System.out.println("MANUAL MODE: Constraint already exists with ID: " + constraintId);
+            // System.out.println("MANUAL MODE: Constraint already exists with ID: " + constraintId);
             return;
         }
 
@@ -1503,15 +1503,15 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             Ship targetShip = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, targetPos);
 
             if (pulleyShip == null) {
-           //     System.out.println("MANUAL MODE: pulleyShip is null");
+                //     System.out.println("MANUAL MODE: pulleyShip is null");
             } else {
-            //    System.out.println("MANUAL MODE: pulleyShip ID = " + pulleyShip.getId());
+                //    System.out.println("MANUAL MODE: pulleyShip ID = " + pulleyShip.getId());
             }
 
             if (targetShip == null) {
-            //    System.out.println("MANUAL MODE: targetShip is null");
+                //    System.out.println("MANUAL MODE: targetShip is null");
             } else {
-            //    System.out.println("MANUAL MODE: targetShip ID = " + targetShip.getId());
+                //    System.out.println("MANUAL MODE: targetShip ID = " + targetShip.getId());
             }
 
             shipA = pulleyShip != null ? Long.valueOf(pulleyShip.getId()) : getGroundBodyId(serverLevel);
@@ -1523,25 +1523,25 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             localPosA = getLocalPosition(serverLevel, getBlockPos(), pulleyShip, shipA);
             localPosB = getLocalPosition(serverLevel, targetPos, targetShip, shipB);
 
-         //  System.out.println("MANUAL MODE: localPosA = " + localPosA);
-        //    System.out.println("MANUAL MODE: localPosB = " + localPosB);
+            //  System.out.println("MANUAL MODE: localPosA = " + localPosA);
+            //    System.out.println("MANUAL MODE: localPosB = " + localPosB);
 
             Vector3d pulleyWorldPos = getWorldPosition(serverLevel, getBlockPos(), pulleyShip);
             Vector3d targetWorldPos = getWorldPosition(serverLevel, targetPos, targetShip);
 
-           // System.out.println("MANUAL MODE: pulleyWorldPos = " + pulleyWorldPos);
-          //  System.out.println("MANUAL MODE: targetWorldPos = " + targetWorldPos);
+            // System.out.println("MANUAL MODE: pulleyWorldPos = " + pulleyWorldPos);
+            //  System.out.println("MANUAL MODE: targetWorldPos = " + targetWorldPos);
 
             double distance = pulleyWorldPos.distance(targetWorldPos);
-           // System.out.println("MANUAL MODE: Distance between pulley and target = " + distance);
+            // System.out.println("MANUAL MODE: Distance between pulley and target = " + distance);
 
             double maxAvailable = getRawMaxRopeLength();
-           // System.out.println("MANUAL MODE: maxAvailable rope length = " + maxAvailable);
+            // System.out.println("MANUAL MODE: maxAvailable rope length = " + maxAvailable);
 
 
             double targetLength = Math.min(distance + 1.0, maxAvailable);
             targetLength = Math.max(targetLength, minRopeLength);
-         //   System.out.println("MANUAL MODE: Calculated target rope length = " + targetLength);
+            //   System.out.println("MANUAL MODE: Calculated target rope length = " + targetLength);
 
             this.targetRopeLength = targetLength;
             this.isExtending = true;
@@ -1562,7 +1562,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
             Integer newConstraintId = VSGameUtilsKt.getShipObjectWorld(serverLevel).createNewConstraint(constraint);
 
-          //  System.out.println("MANUAL MODE: createNewConstraint returned ID: " + newConstraintId);
+            //  System.out.println("MANUAL MODE: createNewConstraint returned ID: " + newConstraintId);
 
             if (newConstraintId != null) {
                 constraintId = newConstraintId;
@@ -1578,12 +1578,12 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
                 setChanged();
                 sendData();
 
-            //    System.out.println("MANUAL MODE: Successfully created constraint with ID " + constraintId);
+                //    System.out.println("MANUAL MODE: Successfully created constraint with ID " + constraintId);
             } else {
-             //   System.err.println("MANUAL MODE: Failed to create constraint (null ID returned)");
+                //   System.err.println("MANUAL MODE: Failed to create constraint (null ID returned)");
             }
         } catch (Exception e) {
-         //   System.err.println("MANUAL MODE: Exception while creating constraint: " + e.getMessage());
+            //   System.err.println("MANUAL MODE: Exception while creating constraint: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -1621,9 +1621,9 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
     }
 
     private InteractionResult insertRope(Player player, InteractionHand hand, ItemStack heldItem) {
-     //   System.out.println("Attempting to insert rope: held count = " + heldItem.getCount());
+        //   System.out.println("Attempting to insert rope: held count = " + heldItem.getCount());
         ItemStack remainder = ropeInventory.insertItem(0, heldItem, false);
-       // System.out.println("After insert: remainder count = " + remainder.getCount());
+        // System.out.println("After insert: remainder count = " + remainder.getCount());
 
         if (remainder.getCount() != heldItem.getCount()) {
             if (!player.getAbilities().instabuild) {
@@ -1633,12 +1633,12 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             int inserted = heldItem.getCount() - remainder.getCount();
 
             if (hasTarget && constraintId == null && hasRope()) {
-               // System.out.println("Creating constraint after rope insert.");
+                // System.out.println("Creating constraint after rope insert.");
                 createConstraint(player);
             }
             return InteractionResult.SUCCESS;
         }
-    //    System.out.println("No rope inserted.");
+        //    System.out.println("No rope inserted.");
         return InteractionResult.PASS;
     }
 
@@ -1718,7 +1718,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
     private boolean hasRope() {
         ItemStack ropeStack = ropeInventory.getStackInSlot(0);
-      //  System.out.println("hasRope check: stack = " + ropeStack + ", count = " + ropeStack.getCount());
+        //  System.out.println("hasRope check: stack = " + ropeStack + ", count = " + ropeStack.getCount());
         return !ropeStack.isEmpty() && ropeStack.getCount() > 0;
     }
 
@@ -1941,8 +1941,8 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
                 //    player.sendSystemMessage(Component.literal("§aConstraint created! " + pulleyType + " to " + targetType +
                 //            " - Length: " + String.format("%.1f", currentRopeLength)));
 
-           //   //  System.out.println("Created rope pulley constraint " + constraintId +
-               //         " (" + pulleyType + " to " + targetType + ") with length " + currentRopeLength);
+                //   //  System.out.println("Created rope pulley constraint " + constraintId +
+                //         " (" + pulleyType + " to " + targetType + ") with length " + currentRopeLength);
                 forceConstraintRefresh(player);
 
                 return true;
@@ -1965,7 +1965,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             Vector3d worldPos2 = getWorldPosition(pos2);
 
             double distance = worldPos1.distance(worldPos2);
-           // System.out.println("World positions - Pos1: " + worldPos1 + ", Pos2: " + worldPos2 + ", Distance: " + distance);
+            // System.out.println("World positions - Pos1: " + worldPos1 + ", Pos2: " + worldPos2 + ", Distance: " + distance);
 
             return distance;
         } catch (Exception e) {
@@ -2061,10 +2061,10 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
         tag.putBoolean("WasCut", wasCut);
 
-     //   System.out.println("Saving rope state - Length: " + currentRopeLength +
-            //    ", Consumed: " + consumedRopeLength +
-             //   ", Constraint: " + constraintId +
-             //   ", Mode: " + (MODE != null ? MODE.getValue() : "null"));
+        //   System.out.println("Saving rope state - Length: " + currentRopeLength +
+        //    ", Consumed: " + consumedRopeLength +
+        //   ", Constraint: " + constraintId +
+        //   ", Mode: " + (MODE != null ? MODE.getValue() : "null"));
     }
 
     @Override
@@ -2100,7 +2100,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
         if (tag.contains("ConstraintId")) {
             constraintId = tag.getInt("ConstraintId");
-           // System.out.println("Loaded constraint ID: " + constraintId);
+            // System.out.println("Loaded constraint ID: " + constraintId);
         } else {
             constraintId = null;
         }
@@ -2128,11 +2128,11 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
 
 
-       // System.out.println("Loaded rope state - Length: " + currentRopeLength +
+        // System.out.println("Loaded rope state - Length: " + currentRopeLength +
         //        ", Consumed: " + consumedRopeLength +
-          //      ", Constraint: " + constraintId +
-          //      ", Mode: " + (MODE != null ? MODE.getValue() : "null") +
-            //    ", HasTarget: " + hasTarget);
+        //      ", Constraint: " + constraintId +
+        //      ", Mode: " + (MODE != null ? MODE.getValue() : "null") +
+        //    ", HasTarget: " + hasTarget);
     }
     private double getRopeSpeedFromRPM() {
         double rpm = Math.abs(getSpeed());

@@ -45,6 +45,11 @@ public class NetworkHandler {
 
 
 
+    public static void sendConstraintRerender(Integer constraintId, Long shipA, Long shipB,
+                                              Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle style){
+        ConstraintSyncPacket packet = new ConstraintSyncPacket(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
+        INSTANCE.send(PacketDistributor.ALL.noArg(),packet );
+    }
     public static void sendConstraintAdd(Integer constraintId, Long shipA, Long shipB,
                                          Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle style) {
         ConstraintSyncPacket packet = new ConstraintSyncPacket(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);

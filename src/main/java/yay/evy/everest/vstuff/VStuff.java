@@ -18,6 +18,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 import yay.evy.everest.vstuff.client.VStuffClient;
+import yay.evy.everest.vstuff.events.ColorHaggler;
 import yay.evy.everest.vstuff.index.*;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.network.PhysGrabberNetwork;
@@ -50,6 +51,7 @@ public class VStuff {
         MinecraftForge.EVENT_BUS.register(this);
         NetworkHandler.registerPackets();
         PhysGrabberNetwork.register();
+        MinecraftForge.EVENT_BUS.register(new ColorHaggler());
 
 
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> VStuffClient::initialize);

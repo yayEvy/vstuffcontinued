@@ -66,8 +66,8 @@ public class VstuffConfig {
         // Client builder
         ForgeConfigSpec.Builder clientBuilder = new ForgeConfigSpec.Builder();
         ROPE_THICKNESS = clientBuilder
-                .comment("Client-side rope thickness (default 0.28, min 0.01, max 2.0)")
-                .defineInRange("thickness", 0.28, 0.01, 2.0);
+                .comment("Client-side rope thickness (default 0.28, min 0.01, max 1.0)")
+                .defineInRange("thickness", 0.28, 0.01, 1.0);
 
 
         CLIENT_CONFIG = clientBuilder.build();

@@ -1,16 +1,13 @@
-/*package yay.evy.everest.vstuff.events;
+package yay.evy.everest.vstuff.events;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
+import net.minecraft.client.telemetry.TelemetryProperty;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.Tags;
@@ -18,15 +15,24 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3d;
+import org.stringtemplate.v4.ST;
+import org.valkyrienskies.physics_api.constraints.ConstraintData;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.client.NetworkHandler;
+import yay.evy.everest.vstuff.content.constraint.ConstraintPersistence;
 import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
-import yay.evy.everest.vstuff.content.constraint.LeadBreakItem;
+import yay.evy.everest.vstuff.util.RopeStyles;
 
-import java.awt.event.ActionEvent;
 import java.util.Map;
+
+import static yay.evy.everest.vstuff.util.RopeStyles.PrimitiveRopeStyle.DYED;
+import static yay.evy.everest.vstuff.util.RopeStyles.PrimitiveRopeStyle.WOOL;
 
 @Mod.EventBusSubscriber(modid = VStuff.MOD_ID)
 public class ColorHaggler {
+
+
+
 
 
 
@@ -35,43 +41,134 @@ public class ColorHaggler {
     public void onPlayerRightClickItem(PlayerInteractEvent.RightClickItem event) {
         try {
             ItemStack itemStack = event.getItemStack();
-            System.out.println("test");
+            Item item = event.getItemStack().getItem();
+            Level level = event.getLevel();
+            Player player = event.getEntity();
 
 
-                if (itemStack.is(Tags.Items.DYES)) {
-                    System.out.println("it works!");
-                    if (!event.getLevel().isClientSide) {
-                        System.out.println("real " + itemStack);
+            if (level instanceof ServerLevel serverLevel) {
+                Integer targetConstraintId = findTargetedLead(serverLevel, player);
+               // Integer newConstraintId = targetConstraintId + 1000000;
+              //  String newPersistenceId = java.util.UUID.randomUUID().toString();
+                if (player instanceof ServerPlayer serverPlayer) {
+                    if (itemStack.is(Tags.Items.DYES)) {
+                        if (!event.getLevel().isClientSide) {
+                           /* System.out.println("ID: " + targetConstraintId);
+                            System.out.println("Color: " + item);
+                            System.out.println("Style: " + findRopesStyle(serverLevel, player));
+                           System.out.println(ropeIsColorable(serverLevel,player));*/
+                            if (ropeIsColorable(serverLevel, player)) {
+
+                                String persistanceId = ConstraintTracker.persistanceIdViaConstraintId(targetConstraintId);
+                                ConstraintTracker.RopeConstraintData data = ConstraintTracker.getActiveConstraints().get(targetConstraintId);
+                                ConstraintTracker.RopeConstraintData newData = data;
+                                ConstraintPersistence constraintPersistence = ConstraintPersistence.get(serverLevel);
 
 
+                                if (findRopesStyle(serverLevel, player).equals("plain") || findRopesBasicStyle(serverLevel, player).equals("DYED")) {
+                                    /*System.out.println("max length: " + data.maxLength);
+                                    System.out.println("complience: " + data.compliance);
+                                    System.out.println("max force: " + data.maxForce);
+                                    System.out.println("constraint type: " + data.constraintType); */
+                                    newData.style = new RopeStyles.RopeStyle(item.toString(), DYED, "vstuff.rope." + item.toString());
+
+                                    ConstraintTracker.getActiveConstraints().put(targetConstraintId, newData);
+
+
+
+                                    NetworkHandler.sendConstraintRerender( targetConstraintId, newData.shipA, newData.shipB
+                                            , newData.localPosA, newData.localPosB, newData.maxLength, newData.style);
+                                    constraintPersistence.addConstraint(persistanceId, newData.shipA, newData.shipB
+                                            , newData.localPosA, newData.localPosB, newData.maxLength, newData.compliance, newData.maxForce, serverLevel, newData.constraintType, null, newData.style);
+                                    ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);
+
+
+
+                                   /* System.out.println("new max length: " + newData.maxLength);
+                                    System.out.println("new complience: " + newData.compliance);
+                                    System.out.println("new max force: " + newData.maxForce);
+                                    System.out.println("new constraint type: " + newData.constraintType);*/
+                                }
+
+                                if (findRopesStyle(serverLevel, player).equals("white_wool") || findRopesBasicStyle(serverLevel, player).equals("WOOL")) {
+                                  /*  System.out.println("max length: " + data.maxLength);
+                                    System.out.println("complience: " + data.compliance);
+                                    System.out.println("max force: " + data.maxForce);
+                                    System.out.println("constraint type: " + data.constraintType);*/
+
+                                    newData.style = new RopeStyles.RopeStyle(item.toString() , WOOL, "vstuff.rope." + item.toString() );
+
+                                    //ConstraintTracker.getActiveConstraints().replace(targetConstraintId, data, newData);
+                                    ConstraintTracker.getActiveConstraints().put(targetConstraintId, newData);
+
+                                                    NetworkHandler.sendConstraintRerender( targetConstraintId, newData.shipA, newData.shipB
+                                                          , newData.localPosA, newData.localPosB, newData.maxLength, newData.style);
+                                    constraintPersistence.addConstraint(persistanceId, newData.shipA, newData.shipB
+                                            , newData.localPosA, newData.localPosB, newData.maxLength, newData.compliance, newData.maxForce, serverLevel, newData.constraintType, null, newData.style);
+                                                  ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);
+
+
+                                  /*  System.out.println("new max length: " + newData.maxLength);
+                                    System.out.println("new complience: " + newData.compliance);
+                                    System.out.println("new max force: " + newData.maxForce);
+                                    System.out.println("new constraint type: " + newData.constraintType);*/
+                                }
+
+
+                                ConstraintPersistence.get(serverLevel).saveNow(serverLevel);
+
+
+                                itemStack.shrink(1);
+                            }
+                        }
                     }
                 }
             }
-
+        }
         catch (Exception e) {
-            System.err.println("Darn it, the colors arent coloring, I blame Wizard >:(");
-            e.printStackTrace();}}
-
-    @SubscribeEvent
-    public void onPlayerRightClick(PlayerInteractEvent.RightClickItem event){
-        if (!event.getLevel().isClientSide) {
+           /* System.err.println("Darn it, the colors arent coloring, I blame Wizard >:(");
+            e.printStackTrace();*/}}
 
 
-        System.out.println("rope: " );
-    }}
 
-    private InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand){
-        ItemStack itemStack = player.getItemInHand(hand);
-if (level instanceof ServerLevel serverLevel) {
-    Integer targetConstraintId = findTargetedLead(serverLevel, player);
 
-    System.out.println("rope: " + targetConstraintId);
-}
 
-        return InteractionResultHolder.success(itemStack);
+
+
+
+
+
+    private boolean ropeIsColorable(ServerLevel level, Player player){
+        String ropesStyle = findRopesStyle(level, player);
+        String basicStyle = findRopesBasicStyle(level, player);
+        if (ropesStyle.equals("white_wool") || ropesStyle.equals("plain") ||basicStyle.equals("DYED") ||basicStyle.equals("WOOL")){
+            return true;
+        }
+
+
+        return false;
     }
 
-    private static Integer findTargetedLead(ServerLevel level, Player player) {
+    private String findRopesStyle(ServerLevel level, Player player) {
+        Integer targetConstraintId = findTargetedLead(level, player);
+        String ropeStyle = null;
+        ConstraintTracker.RopeConstraintData data = ConstraintTracker.getActiveConstraints().get(targetConstraintId);
+        ropeStyle = data.style.getStyle();
+        return ropeStyle;
+    }
+
+    private String findRopesBasicStyle(ServerLevel level, Player player) {
+
+    Integer targetConstraintId = findTargetedLead(level, player);
+
+        String basicRopeStyle = null;
+        ConstraintTracker.RopeConstraintData wizardsWorstKeptSecret = ConstraintTracker.getActiveConstraints().get(targetConstraintId);
+        basicRopeStyle = (wizardsWorstKeptSecret.style.getBasicStyle().toString());
+
+        return basicRopeStyle;
+    }
+
+    private Integer findTargetedLead(ServerLevel level, Player player) {
         Vec3 eyePos = player.getEyePosition();
         Vec3 lookVec = player.getViewVector(1.0f);
         double maxDistance = 10.0;
@@ -80,6 +177,7 @@ if (level instanceof ServerLevel serverLevel) {
 
         for (Map.Entry<Integer, ConstraintTracker.RopeConstraintData> entry : ConstraintTracker.getActiveConstraints().entrySet()) {
             Integer constraintId = entry.getKey();
+
             ConstraintTracker.RopeConstraintData constraint = entry.getValue();
 
             Vector3d worldPosA = constraint.getWorldPosA(level, 1.0f);
@@ -94,7 +192,8 @@ if (level instanceof ServerLevel serverLevel) {
 
         return closestConstraintId;
     }
-    private static double getDistanceToRope(Vec3 eyePos, Vec3 lookVec, Vector3d ropeStart, Vector3d ropeEnd, double maxDistance) {
+
+    private double getDistanceToRope(Vec3 eyePos, Vec3 lookVec, Vector3d ropeStart, Vector3d ropeEnd, double maxDistance) {
         Vec3 start = new Vec3(ropeStart.x, ropeStart.y, ropeStart.z);
         Vec3 end = new Vec3(ropeEnd.x, ropeEnd.y, ropeEnd.z);
         double minDistanceToRope = Double.MAX_VALUE;
@@ -112,11 +211,10 @@ if (level instanceof ServerLevel serverLevel) {
             Vec3 closestPointOnRope = start.add(ropeVec.scale(projection));
             double distanceToRope = rayPoint.distanceTo(closestPointOnRope);
             minDistanceToRope = Math.min(minDistanceToRope, distanceToRope);
-
-
         }
 
         return minDistanceToRope;
     }
+
+
 }
-*/
