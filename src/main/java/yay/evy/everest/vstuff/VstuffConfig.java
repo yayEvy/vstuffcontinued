@@ -17,6 +17,7 @@ public class VstuffConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> THRUSTER_PARTICLE_COUNT_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Double> MAX_ROPE_LENGTH;
     public static final ForgeConfigSpec.ConfigValue<Double> PULLEY_SPEED;
+    public static final ForgeConfigSpec.ConfigValue<Double> ROPE_THICKNESS;
     public static final ForgeConfigSpec.BooleanValue ROPE_SOUNDS;
     public static final ForgeConfigSpec.BooleanValue ROPE_ONLY_FULL_BLOCKS;
 
@@ -62,8 +63,13 @@ public class VstuffConfig {
 // woooooooo
         SERVER_CONFIG = serverBuilder.build();
 
-        // Client builder (empty for now)
+        // Client builder
         ForgeConfigSpec.Builder clientBuilder = new ForgeConfigSpec.Builder();
+        ROPE_THICKNESS = clientBuilder
+                .comment("Client-side rope thickness (default 0.28, min 0.01, max 2.0)")
+                .defineInRange("thickness", 0.28, 0.01, 2.0);
+
+
         CLIENT_CONFIG = clientBuilder.build();
     }
 }

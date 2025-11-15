@@ -18,6 +18,7 @@ import net.minecraftforge.fml.common.Mod;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3d;
+import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.rendering.RopeRendererType;
 import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
 import yay.evy.everest.vstuff.util.RopeStyles;
@@ -27,7 +28,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class RopeRendererClient {
-    private static final float ROPE_WIDTH = 0.28f;
+    private static float getRopeWidth() {
+        return VstuffConfig.ROPE_THICKNESS.get().floatValue();
+    }
     private static final int ROPE_CURVE_SEGMENTS = 32;
     private static final float ROPE_SAG_FACTOR = 1.02f;
     private static final double MAX_RENDER_DISTANCE = 300.0;
@@ -259,7 +262,7 @@ public class RopeRendererClient {
         Vec3[] bottomLeftStrip = new Vec3[ROPE_CURVE_SEGMENTS + 1];
         Vec3[] bottomRightStrip = new Vec3[ROPE_CURVE_SEGMENTS + 1];
 
-        float halfWidth = ROPE_WIDTH * 0.6f;
+        float halfWidth = getRopeWidth() * 0.6f;
         for (int i = 0; i <= ROPE_CURVE_SEGMENTS; i++) {
             Vec3 center = curvePoints[i];
             topRightStrip[i] = center.add(right.scale(halfWidth)).add(up.scale(halfWidth));
@@ -268,7 +271,7 @@ public class RopeRendererClient {
             bottomRightStrip[i] = center.add(right.scale(halfWidth)).add(up.scale(-halfWidth));
         }
 
-        double textureScale = 0.28 / ROPE_WIDTH;
+        double textureScale = 0.28 / getRopeWidth();
 
         renderRopeFaceWithGapFilling(vertexConsumer, matrix, topLeftStrip, topRightStrip, up, curvePoints, totalCurveLength, level, cameraPos, textureScale);
         renderRopeFaceWithGapFilling(vertexConsumer, matrix, topRightStrip, bottomRightStrip, right, curvePoints, totalCurveLength, level, cameraPos, textureScale);
@@ -367,7 +370,7 @@ public class RopeRendererClient {
         Vec3[] bottomLeftStrip = new Vec3[ROPE_CURVE_SEGMENTS + 1];
         Vec3[] bottomRightStrip = new Vec3[ROPE_CURVE_SEGMENTS + 1];
 
-        float halfWidth = ROPE_WIDTH * 5f;
+        float halfWidth = getRopeWidth() * 5f;
         for (int i = 0; i <= ROPE_CURVE_SEGMENTS; i++) {
             Vec3 center = curvePoints[i];
             topRightStrip[i] = center.add(right.scale(halfWidth)).add(up.scale(halfWidth));

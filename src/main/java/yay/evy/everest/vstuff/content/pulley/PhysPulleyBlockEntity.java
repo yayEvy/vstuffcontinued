@@ -858,7 +858,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
     }
 
 
-
     @Override
     public void tick() {
         super.tick();
@@ -923,7 +922,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             Vector3d pulleyWorldPos = getWorldPosition(serverLevel, pulleyBlockPos, pulleyShip);
             Vector3d targetWorldPos = getWorldPosition(serverLevel, pendingTargetPos, targetShip);
 
-            double step = getLengthChangeRate() / 8.0;
+            double step = getRopeSpeedFromRPM() / 8.0;
             double distance = pendingTargetDistance;
             double newLen = Math.min(currentRopeLength + step, distance);
             double progress = distance > 0 ? newLen / distance : 1.0;
@@ -973,7 +972,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
 
         else if (currentMode == PulleyMode.MANUAL && hasTarget) {
-            double step = getLengthChangeRate() / 4.0;
+            double step = getRopeSpeedFromRPM() / 4.0;
             if (speed > 0) extendRope(step);
             else if (speed < 0) retractRope(step);
 
@@ -995,7 +994,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
 
         else if (currentMode == PulleyMode.AUTO && hasTarget) {
-            double step = getLengthChangeRate() / 4.0;
+            double step = getRopeSpeedFromRPM() / 4.0;
             if (speed < 0) retractRope(step);
             else if (speed > 0) extendRope(step);
         }
@@ -1198,10 +1197,10 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             VSRopeConstraint constraint = new VSRopeConstraint(
                     realShipA,
                     realShipB,
-                    1e-9,
+                    4e-11,
                     localPosA,
                     localPosB,
-                    999999999,
+                    3e11,
                     length
             );
 
@@ -1216,7 +1215,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
                 ConstraintTracker.cleanupOrphanedConstraints(serverLevel, getBlockPos());
 
                 ConstraintTracker.addConstraintWithPersistence(serverLevel, constraintId, realShipA, realShipB,
-                        localPosA, localPosB, length, 1e-9, 50000000,
+                        localPosA, localPosB, length, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
                         ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY, getBlockPos(),
                         new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal"));
 
@@ -1343,7 +1342,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
                 isRopeRendering = true;
 
                 ConstraintTracker.addConstraintWithPersistence(serverLevel, constraintId, shipA, shipB,
-                        localPosA, localPosB, currentRopeLength, 1e-9, 50000000,
+                        localPosA, localPosB, currentRopeLength, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
                         ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY, getBlockPos(),
                         new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal"));
 
@@ -1553,7 +1552,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
             VSRopeConstraint constraint = new VSRopeConstraint(
                     shipA.longValue(), shipB.longValue(),
-                    1e-9, localPosA, localPosB, 900000000, initialLength
+                    1e-9, localPosA, localPosB, Double.POSITIVE_INFINITY, initialLength
             );
 
 
@@ -1572,7 +1571,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
                 isRopeRendering = true;
 
                 ConstraintTracker.addConstraintWithPersistence(serverLevel, constraintId, shipA, shipB,
-                        localPosA, localPosB, currentRopeLength, 1e-9, 15000000.0,
+                        localPosA, localPosB, currentRopeLength, Double.POSITIVE_INFINITY, 15000000.0,
                         ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY, getBlockPos(),
                         new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal"));
 
@@ -2134,6 +2133,12 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
           //      ", Constraint: " + constraintId +
           //      ", Mode: " + (MODE != null ? MODE.getValue() : "null") +
             //    ", HasTarget: " + hasTarget);
+    }
+    private double getRopeSpeedFromRPM() {
+        double rpm = Math.abs(getSpeed());
+        double efficiency = 0.0025;
+
+        return rpm * efficiency;
     }
 
     @Override
