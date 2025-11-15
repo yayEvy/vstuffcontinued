@@ -258,6 +258,7 @@ tasks.named('processResources', ProcessResources).configure {
             homepage: homepage, sources: sources, vs2_version: vs2_version
     ]
 
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     inputs.properties replaceProperties
 
     filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {

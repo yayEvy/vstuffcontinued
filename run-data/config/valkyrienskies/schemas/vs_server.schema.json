@@ -12,6 +12,28 @@
       },
       "additionalProperties" : false
     },
+    "Dynmap" : {
+      "type" : "object",
+      "properties" : {
+        "showIconMarkers" : {
+          "type" : "boolean",
+          "description" : "Show Ships as Icon Markers on Dynmap"
+        },
+        "showPolylineMarkers" : {
+          "type" : "boolean",
+          "description" : "Show Ships as Polyline Markers on Dynmap"
+        },
+        "showShipId" : {
+          "type" : "boolean",
+          "description" : "Show the Ship ID in the label"
+        },
+        "showShipMass" : {
+          "type" : "boolean",
+          "description" : "Show the Ship Mass in the label"
+        }
+      },
+      "additionalProperties" : false
+    },
     "FTBChunks" : {
       "type" : "object",
       "properties" : {
@@ -22,6 +44,36 @@
         "shipsProtectionOutOfBuildHeight" : {
           "type" : "boolean",
           "description" : "Are ships protected outside of build height (max and min)?"
+        }
+      },
+      "additionalProperties" : false
+    },
+    "Weather2" : {
+      "type" : "object",
+      "properties" : {
+        "enableWeatherCompat" : {
+          "type" : "boolean",
+          "description" : "If VS ships are affected by Weather2"
+        },
+        "stormDampening" : {
+          "type" : "number",
+          "format" : "float",
+          "description" : "Storm effect dampening on VS ships"
+        },
+        "stormRange" : {
+          "type" : "number",
+          "format" : "double",
+          "description" : "In what range storms affect VS ships"
+        },
+        "windMaxVel" : {
+          "type" : "number",
+          "format" : "float",
+          "description" : "The maximum velocity a VS ship can travel because of wind"
+        },
+        "windMultiplier" : {
+          "type" : "number",
+          "format" : "float",
+          "description" : "How much Weather 2's wind affects VS ships"
         }
       },
       "additionalProperties" : false
@@ -47,6 +99,11 @@
       "format" : "double",
       "description" : "Blast force in newtons of a TNT explosion at the center of the explosion."
     },
+    "maxAirborneTicksForReconnectedPlayerTeleport" : {
+      "type" : "integer",
+      "format" : "int32",
+      "description" : "Determines how many airborne ticks after a player leaves the ground of aship that they are still considered part of it when they disconnect, such that they willbe teleported back to it after reconnecnting."
+    },
     "minScaling" : {
       "type" : "number",
       "format" : "double",
@@ -61,9 +118,18 @@
       "type" : "boolean",
       "description" : "If true, prevents water and other fluids from flowing out of the ship's bounding box."
     },
+    "teleportReconnectedPlayers" : {
+      "type" : "boolean",
+      "description" : "If true, when a player disconnects, their position on the ship is saved such that if the ship is moved, when they reconnect they will be teleported to the same position in the ship as they left, instead of being left behind."
+    },
     "transformTeleports" : {
       "type" : "boolean",
       "description" : "If true, teleportation into the shipyard is redirected to the ship it belongs to instead."
+    },
+    "vsCommandPerms" : {
+      "type" : "integer",
+      "format" : "int32",
+      "description" : "The permission level required to use the /vs command. Must be 0 <= x <= 4"
     },
     "$schema" : {
       "type" : "string"

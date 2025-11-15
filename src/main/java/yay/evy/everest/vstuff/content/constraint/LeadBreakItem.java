@@ -28,7 +28,7 @@ import java.util.UUID;
 
 public class LeadBreakItem extends Item {
     public LeadBreakItem(Properties pProperties) {
-        super(new Properties().stacksTo(1).durability(64));
+        super(pProperties);
     }
 
     @Override

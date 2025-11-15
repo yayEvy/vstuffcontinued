@@ -63,8 +63,16 @@ public class VStuff {
         return REGISTRATE;
     }
 
-    public static ResourceLocation getRopeStyle(String style) {
-        return new ResourceLocation(MOD_ID, "textures/entity/rope/rope_" + style + ".png");
+    public static ResourceLocation asResource(String path) {
+        return new ResourceLocation(MOD_ID, path);
+    }
+
+    public static ResourceLocation asTextureResource(String path) {
+        return new ResourceLocation(MOD_ID, "textures/" + path);
+    }
+
+    public static ResourceLocation asModelResource(String path) {
+        return new ResourceLocation(MOD_ID, "models/" + path);
     }
 
     @SubscribeEvent

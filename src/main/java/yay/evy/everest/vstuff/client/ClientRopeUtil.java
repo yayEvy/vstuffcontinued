@@ -26,7 +26,7 @@ public class ClientRopeUtil {
         Outliner outliner = Outliner.getInstance();
         OutlineParams params = outliner.showAABB(pos, bb);
 
-        params.colored(0x00FF00)
+        params.colored(0x77DD77)
                 .lineWidth(1 / 16f);
     }
 
@@ -45,7 +45,7 @@ public class ClientRopeUtil {
         Outliner outliner = Outliner.getInstance();
         OutlineParams params = outliner.showAABB(pos, bb);
 
-        params.colored(0xFF0000)
+        params.colored(0xFF6961)
                 .lineWidth(1 / 16f);
     }
 }

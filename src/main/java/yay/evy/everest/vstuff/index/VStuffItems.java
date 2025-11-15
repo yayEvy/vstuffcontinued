@@ -1,27 +1,46 @@
 package yay.evy.everest.vstuff.index;
 
+import com.simibubi.create.foundation.data.AssetLookup;
+import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.ItemEntry;
+import net.minecraft.world.item.Rarity;
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.constraint.LeadBreakItem;
 import yay.evy.everest.vstuff.content.constraint.LeadConstraintItem;
-import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberItem;
 
 
 public class VStuffItems {
 
+    static CreateRegistrate REGISTRATE = VStuff.registrate();
+
     static {
-        VStuff.REGISTRATE.setCreativeTab(VStuffCreativeModeTabs.VSTUFF_MAIN);
+        REGISTRATE.setCreativeTab(VStuffCreativeModeTabs.VSTUFF_MAIN);
     }
 
     public static final ItemEntry<LeadConstraintItem> LEAD_CONSTRAINT_ITEM =
-            VStuff.REGISTRATE.item("lead_constraint_item", LeadConstraintItem::new).register();
+            REGISTRATE.item("lead_constraint_item", LeadConstraintItem::new)
+                    .properties(p -> p
+                            .stacksTo(64))
+                    .defaultModel()
+                    .register();
 
     public static final ItemEntry<LeadBreakItem> LEAD_BREAK_ITEM =
-            VStuff.REGISTRATE.item("lead_break_item", LeadBreakItem::new).register();
+            REGISTRATE.item("lead_break_item", LeadBreakItem::new)
+                    .properties(p -> p
+                            .stacksTo(1)
+                            .durability(238))
+                    .defaultModel()
+                    .register();
 
     public static final ItemEntry<PhysGrabberItem> PHYS_GRABBER =
-            VStuff.REGISTRATE.item("phys_grabber", PhysGrabberItem::new).register();
-
+            REGISTRATE.item("phys_grabber", PhysGrabberItem::new)
+                    .properties(p -> p
+                            .stacksTo(1)
+                            .rarity(Rarity.UNCOMMON)
+                            .durability(568))
+                    .model(AssetLookup.itemModelWithPartials())
+                    .register();
 
     public static void register() {}
 }

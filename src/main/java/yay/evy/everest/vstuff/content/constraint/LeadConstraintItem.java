@@ -1,37 +1,24 @@
 package yay.evy.everest.vstuff.content.constraint;
 
-import com.simibubi.create.CreateClient;
-import net.minecraft.client.Minecraft;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.network.PacketDistributor;
-import org.joml.Vector3d;
+import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import org.valkyrienskies.core.apigame.constraints.VSRopeConstraint;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.client.ClientRopeUtil;
-import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyItem;
 import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
-import yay.evy.everest.vstuff.util.packet.RopeSoundPacket;
-import net.minecraft.sounds.SoundEvents;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
 public class LeadConstraintItem extends Item {
@@ -42,20 +29,19 @@ public class LeadConstraintItem extends Item {
     private ResourceKey<Level> firstClickDimension;
 
     public LeadConstraintItem(Properties pProperties) {
-        super(new Properties().stacksTo(64));
+        super(pProperties);
     }
 
 
 
     @Override
-    public InteractionResult useOn(UseOnContext context) {
+    public @NotNull InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
         BlockPos clickedPos = context.getClickedPos().immutable();
         Player player = context.getPlayer();
 
 
         if (level.isClientSide()) {
-            Ship ship = VSGameUtilsKt.getShipObjectManagingPos(level, clickedPos);
             ClientRopeUtil.drawOutline(level, clickedPos);
 
             return InteractionResult.SUCCESS;
@@ -114,176 +100,25 @@ public class LeadConstraintItem extends Item {
             }
 
             Long secondShipId = getShipIdAtPos(serverLevel, clickedPos);
-            boolean created = createLeadConstraint(serverLevel, clickedPos, secondShipId, player);
+            RopeUtils.RopeInteractionReturn result = Rope.createNew(this, serverLevel, firstClickedPos, clickedPos, firstEntity, firstShipId, secondShipId, player);
 
-            if (created && player instanceof ServerPlayer serverPlayer) {
-                ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);
+            if (result == RopeUtils.RopeInteractionReturn.SUCCESS) {
+                // ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer); Rope.createNew does constraint syncing
 
-                Component notif = Component.translatable("vstuff.message.rope_created");
-
-                if (RopeStyleHandlerServer.getStyle(player.getUUID()) != null &&
-                        RopeStyleHandlerServer.getStyle(player.getUUID()).getBasicStyle() == RopeStyles.PrimitiveRopeStyle.CHAIN) {
-                    notif = Component.translatable("vstuff.message.chain_created");
-                }
+                Component notif = RopeStyleHandlerServer.getStyle(player.getUUID()).getBasicStyle() == RopeStyles.PrimitiveRopeStyle.CHAIN
+                        ? Component.translatable("vstuff.message.chain_created")
+                        : Component.translatable("vstuff.message.rope_created");
 
                 player.displayClientMessage(notif, true);
             }
 
             resetState();
-            return created ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+            return result == RopeUtils.RopeInteractionReturn.SUCCESS ? InteractionResult.SUCCESS : InteractionResult.FAIL;
         }
     }
 
-    private boolean createLeadConstraint(ServerLevel level, BlockPos secondPos, Long secondShipId, Player player) {
-        if (firstClickedPos == null && firstEntity == null) return false;
-
-        Vector3d firstWorldPos;
-        Vector3d firstLocalPos;
-        Long shipA;
-
-        if (firstEntity != null) {
-            firstWorldPos = new Vector3d(firstEntity.getX(), firstEntity.getY() + firstEntity.getBbHeight() / 2, firstEntity.getZ());
-            shipA = firstShipId != null ? firstShipId : getGroundBodyId(level);
-            firstLocalPos = convertWorldToLocal(level, firstWorldPos, shipA);
-        } else {
-            firstWorldPos = getWorldPosition(level, firstClickedPos, firstShipId);
-            shipA = firstShipId != null ? firstShipId : getGroundBodyId(level);
-            firstLocalPos = getLocalPositionFixed(level, firstClickedPos, firstShipId, shipA);
-        }
-
-        Vector3d secondWorldPos = getWorldPosition(level, secondPos, secondShipId);
-        Long shipB = secondShipId != null ? secondShipId : getGroundBodyId(level);
-        Vector3d secondLocalPos = getLocalPositionFixed(level, secondPos, secondShipId, shipB);
-
-        return createConstraintConsistent(level, shipA, shipB, firstLocalPos, secondLocalPos, firstWorldPos, secondWorldPos, player);
-    }
-
-    private boolean createConstraintConsistent(ServerLevel level, Long shipA, Long shipB,
-                                               Vector3d localPosA, Vector3d localPosB,
-                                               Vector3d worldPosA, Vector3d worldPosB,
-                                               Player player) {
-        Long groundBodyId = getGroundBodyId(level);
-        Long finalShipA, finalShipB;
-        Vector3d finalLocalPosA, finalLocalPosB;
-        Vector3d finalWorldPosA, finalWorldPosB;
-
-        boolean shipAIsWorld = shipA.equals(groundBodyId);
-        boolean shipBIsWorld = shipB.equals(groundBodyId);
-
-        if (shipAIsWorld && !shipBIsWorld) {
-            finalShipA = shipB;
-            finalShipB = shipA;
-            finalLocalPosA = localPosB;
-            finalLocalPosB = localPosA;
-            finalWorldPosA = worldPosB;
-            finalWorldPosB = worldPosA;
-        } else {
-            finalShipA = shipA;
-            finalShipB = shipB;
-            finalLocalPosA = localPosA;
-            finalLocalPosB = localPosB;
-            finalWorldPosA = worldPosA;
-            finalWorldPosB = worldPosB;
-        }
-
-        double distance = finalWorldPosA.distance(finalWorldPosB);
-        double maxAllowedLength = VstuffConfig.MAX_ROPE_LENGTH.get();
-
-        if (distance > maxAllowedLength) {
-            if (player != null) {
-                player.displayClientMessage(
-                        Component.literal("§cRope too long! Max length is " + maxAllowedLength + " blocks."),
-                        true
-                );
-            }
-            resetState();
-            return false;
-        }
-
-        double maxLength = distance + 0.5;
-        double massA = getMassForShip(level, finalShipA);
-        double massB = getMassForShip(level, finalShipB);
-        double effectiveMass = Math.min(massA, massB);
-        if (effectiveMass < 100.0) effectiveMass = 100.0;
-        double compliance = 1e-12 / effectiveMass;
-        double massRatio = Math.max(massA, massB) / Math.min(massA, massB);
-        double baseMaxForce = 50000000000000.0;
-        double maxForce = baseMaxForce * Math.min(massRatio, 20.0);
-
-        if (shipAIsWorld || shipBIsWorld) {
-            maxForce *= 10.0;
-            compliance *= 0.05;
-        }
-
-        VSRopeConstraint ropeConstraint = new VSRopeConstraint(
-                finalShipA, finalShipB,
-                compliance,
-                finalLocalPosA, finalLocalPosB,
-                maxForce,
-                maxLength
-        );
-
-        try {
-            Integer constraintId = VSGameUtilsKt.getShipObjectWorld(level).createNewConstraint(ropeConstraint);
-            if (constraintId != null) {
-                activeConstraintId = constraintId;
-                ConstraintTracker.addConstraintWithPersistence(level, constraintId, finalShipA, finalShipB,
-                        finalLocalPosA, finalLocalPosB, maxLength,
-                        compliance, maxForce, RopeStyleHandlerServer.getStyle(player.getUUID()));
-
-                if (player instanceof ServerPlayer serverPlayer) {
-                    RopeStyles.RopeStyle ropeStyle = RopeStyleHandlerServer.getStyle(player.getUUID());
-                    NetworkHandler.INSTANCE.send(
-                            PacketDistributor.PLAYER.with(() -> serverPlayer),
-                            new RopeSoundPacket(false, ropeStyle.getBasicStyle())
-                    );
-
-                    ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);
-                }
-
-                if (player != null && !player.getAbilities().instabuild) {
-                    for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
-                        ItemStack stack = player.getInventory().getItem(i);
-                        if (stack.getItem() instanceof LeadConstraintItem) {
-                            stack.shrink(1);
-                            break;
-                        }
-                    }
-                }
-
-                return true;
-            }
-        } catch (Exception e) {
-            VStuff.LOGGER.error("Error creating rope constraint: {}",  e.getMessage());
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
-    private double getMassForShip(ServerLevel level, Long shipId) {
-        Long groundBodyId = getGroundBodyId(level);
-        if (shipId.equals(groundBodyId)) {
-            return 1e12;
-        }
-
-        Ship shipObject = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
-        if (shipObject != null) {
-            try {
-                double mass = 1000.0;
-                var bounds = shipObject.getShipAABB();
-                if (bounds != null) {
-                    double volume = (bounds.maxX() - bounds.minX()) *
-                            (bounds.maxY() - bounds.minY()) *
-                            (bounds.maxZ() - bounds.minZ());
-                    mass = Math.max(volume * 10.0, 1000.0);
-                }
-                return Math.min(mass, 1e9);
-            } catch (Exception e) {
-                return 1000.0;
-            }
-        }
-        return 1000.0;
+    public void setActiveConstraintId(Integer id) {
+        this.activeConstraintId = id;
     }
 
     private Long getShipIdAtPos(ServerLevel level, BlockPos pos) {
@@ -291,86 +126,13 @@ public class LeadConstraintItem extends Item {
         return shipObject != null ? shipObject.getId() : null;
     }
 
-    private Long getGroundBodyId(ServerLevel level) {
-        return VSGameUtilsKt.getShipObjectWorld(level).getDimensionToGroundBodyIdImmutable()
-                .get(VSGameUtilsKt.getDimensionId(level));
-    }
-
-    private Vector3d getWorldPosition(ServerLevel level, BlockPos pos, Long shipId) {
-        Vector3d localPos = new Vector3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
-        if (shipId != null) {
-            Ship shipObject = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
-            if (shipObject != null) {
-                Vector3d worldPos = new Vector3d();
-                shipObject.getTransform().getShipToWorld().transformPosition(localPos, worldPos);
-                return worldPos;
-            }
-        }
-        return localPos;
-    }
-
-    private Vector3d getLocalPositionFixed(ServerLevel level, BlockPos pos, Long clickedShipId, Long targetShipId) {
-        Vector3d blockPos = new Vector3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
-
-        if (clickedShipId != null && clickedShipId.equals(targetShipId)) {
-            return blockPos;
-        }
-
-        if (targetShipId.equals(getGroundBodyId(level))) {
-            if (clickedShipId != null) {
-                Ship clickedShip = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(clickedShipId);
-                if (clickedShip != null) {
-                    Vector3d worldPos = new Vector3d();
-                    clickedShip.getTransform().getShipToWorld().transformPosition(blockPos, worldPos);
-                    return worldPos;
-                }
-            }
-            return blockPos;
-        }
-
-        Ship targetShip = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(targetShipId);
-        if (targetShip != null) {
-            Vector3d worldPos = blockPos;
-            if (clickedShipId != null && !clickedShipId.equals(targetShipId)) {
-                Ship clickedShip = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(clickedShipId);
-                if (clickedShip != null) {
-                    worldPos = new Vector3d();
-                    clickedShip.getTransform().getShipToWorld().transformPosition(blockPos, worldPos);
-                }
-            }
-            Vector3d localPos = new Vector3d();
-            targetShip.getTransform().getWorldToShip().transformPosition(worldPos, localPos);
-            return localPos;
-        }
-        return blockPos;
-    }
-
-    private Vector3d convertWorldToLocal(ServerLevel level, Vector3d worldPos, Long shipId) {
-        if (shipId != null && !shipId.equals(getGroundBodyId(level))) {
-            Ship shipObject = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
-            if (shipObject != null) {
-                Vector3d localPos = new Vector3d();
-                shipObject.getTransform().getWorldToShip().transformPosition(worldPos, localPos);
-                return localPos;
-            }
-        }
-        return new Vector3d(worldPos);
-    }
-
-    private boolean canConnectRope(Level level, BlockPos clickedPos) {
-        return level.getBlockState(clickedPos).isCollisionShapeFullBlock(level, clickedPos);
-    }
-
-
-
-
     private void resetState() {
         firstClickedPos = null;
         firstShipId = null;
         firstEntity = null;
         firstClickDimension = null;
 
-        VStuff.LOGGER.info("Reset LeadContraintItem state");
+        VStuff.LOGGER.info("Reset LeadConstraintItem state");
     }
 
 

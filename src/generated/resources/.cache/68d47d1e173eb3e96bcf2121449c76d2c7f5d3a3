@@ -1,11 +1,14 @@
-// 1.20.1	2025-10-20T10:46:47.8371996	Registrate Provider for vstuff [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
-54bd4676a03054050248a2619b6072b6bc9f2a7a assets/vstuff/blockstates/phys_pulley.json
+// 1.20.1	2025-11-14T19:23:03.0882428	Registrate Provider for vstuff [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+3de0141dc1648493d282cfed69d208f84b090065 assets/vstuff/blockstates/phys_pulley.json
 ada65a598b177387cce8b4fa538d054831819890 assets/vstuff/blockstates/rotational_thruster.json
-4572cb587404de21e66306b07dd5bdf6d7be8f1e assets/vstuff/lang/en_ud.json
-86a1162afa2c659c3ef31850abccb92ce1d1f059 assets/vstuff/lang/en_us.json
+6112a8212c38d624a3da912d68c57731b4b407b6 assets/vstuff/lang/en_ud.json
+73966219f9fa0fefb0364cb1af55e1699c389b3f assets/vstuff/lang/en_us.json
 3725e1308e5160b48ea68779143614a187f560ac assets/vstuff/models/item/lead_break_item.json
 1be9c03b646ca04abc0068c63836926b2622dd50 assets/vstuff/models/item/lead_constraint_item.json
-dfa79cfac40a9b083880ec97282cb6cf31908770 assets/vstuff/models/item/phys_pulley.json
-7e430be37682ff62531080e65373147aa8afc54a assets/vstuff/models/item/rotational_thruster.json
+630aa4d6a4edf2be76099637986311bc9b303464 assets/vstuff/models/item/phys_grabber.json
+75ed2f65544097ba043e13093a9baaee27a300ed assets/vstuff/models/item/phys_pulley.json
+aba17edb99a355e94c851da871e3dded0e2ffd17 assets/vstuff/models/item/rotational_thruster.json
+bc287033aa50b1580d0cfc6aaf8a359f13e2d44a data/minecraft/tags/blocks/mineable/axe.json
+bc287033aa50b1580d0cfc6aaf8a359f13e2d44a data/minecraft/tags/blocks/mineable/pickaxe.json
 9b732f327d789e082266581fb72ca704fb538ee5 data/vstuff/loot_tables/blocks/phys_pulley.json
 ce4668e7e7c1001f75c3721bcb7c9b54394b55d5 data/vstuff/loot_tables/blocks/rotational_thruster.json
