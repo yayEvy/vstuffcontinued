@@ -33,7 +33,7 @@ public class RopeRendererClient {
     }
     private static final int ROPE_CURVE_SEGMENTS = 32;
     private static final float ROPE_SAG_FACTOR = 1.02f;
-    private static final double MAX_RENDER_DISTANCE = 300.0;
+    //private static final double MAX_RENDER_DISTANCE = 300.0;
     private static final float WIND_STRENGTH = 0.02f;
     private static final Map<Integer, RopePositionCache> positionCache = new ConcurrentHashMap<>();
 
@@ -168,8 +168,13 @@ public class RopeRendererClient {
         Vec3 start = new Vec3(startPos.x - cameraPos.x, startPos.y - cameraPos.y, startPos.z - cameraPos.z);
         Vec3 end = new Vec3(endPos.x - cameraPos.x, endPos.y - cameraPos.y, endPos.z - cameraPos.z);
 
+
+        Minecraft mc = Minecraft.getInstance();
+        int renderChunks = mc.options.renderDistance().get();
+        double maxRenderDist = renderChunks * 16d;
+
         double distanceToCamera = Math.min(start.length(), end.length());
-        if (distanceToCamera > MAX_RENDER_DISTANCE) {
+        if (distanceToCamera > maxRenderDist) {
             return;
         }
 

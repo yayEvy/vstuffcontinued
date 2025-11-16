@@ -9,7 +9,6 @@ public class VstuffConfig {
 
     // Server-side values
     public static final ForgeConfigSpec.ConfigValue<Double> THRUSTER_THRUST_MULTIPLIER;
-    public static final ForgeConfigSpec.ConfigValue<Double> THRUSTER_CONSUMPTION_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Integer> THRUSTER_MAX_SPEED;
     public static final ForgeConfigSpec.ConfigValue<Integer> THRUSTER_TICKS_PER_UPDATE;
     public static final ForgeConfigSpec.ConfigValue<Boolean> THRUSTER_DAMAGE_ENTITIES;
@@ -29,9 +28,6 @@ public class VstuffConfig {
         THRUSTER_THRUST_MULTIPLIER = serverBuilder
                 .comment("Multiplier for thruster thrust (default: 1.0)")
                 .define("thrustMultiplier", 1.0);
-        THRUSTER_CONSUMPTION_MULTIPLIER = serverBuilder
-                .comment("Multiplier for thruster energy/fuel consumption (default: 1.0)")
-                .define("consumptionMultiplier", 1.0);
         THRUSTER_MAX_SPEED = serverBuilder
                 .comment("Maximum speed thrusters can push to (default: 20)")
                 .define("maxSpeed", 20);
@@ -47,9 +43,6 @@ public class VstuffConfig {
         THRUSTER_PARTICLE_COUNT_MULTIPLIER = serverBuilder
                 .comment("Multiplier for thruster particle count (default: 1.0)")
                 .define("particleCountMultiplier", 1.0);
-        ROPE_SOUNDS = serverBuilder
-                .comment("Toggle on or off client rope sounds (default: true)")
-                .define("ropeSounds", true);
         MAX_ROPE_LENGTH = serverBuilder
                 .comment("Set the max length for ropes (default: 200)")
                 .define("max_rope_length", 200.0);
@@ -68,7 +61,9 @@ public class VstuffConfig {
         ROPE_THICKNESS = clientBuilder
                 .comment("Client-side rope thickness (default 0.28, min 0.01, max 1.0)")
                 .defineInRange("thickness", 0.28, 0.01, 1.0);
-
+        ROPE_SOUNDS = clientBuilder
+                .comment("Toggle on or off client rope sounds (default: true)")
+                .define("ropeSounds", true);
 
         CLIENT_CONFIG = clientBuilder.build();
     }
