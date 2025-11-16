@@ -29,9 +29,9 @@ public class PhysGrabberItem extends Item {
         return InteractionResultHolder.success(player.getItemInHand(hand));
     }
 
-    @Override
-    @OnlyIn(Dist.CLIENT)
-    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(SimpleCustomRenderer.create(this, new PhysGrabberItemRenderer()));
-    }
+//    @Override
+//    @OnlyIn(Dist.CLIENT)
+//    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+//        consumer.accept(SimpleCustomRenderer.create(this, new PhysGrabberItemRenderer()));
+//    }
 }

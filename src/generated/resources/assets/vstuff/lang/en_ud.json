@@ -1,6 +1,8 @@
 {
   "block.vstuff.phys_pulley": "ʎǝןןnԀ sʎɥԀ",
   "block.vstuff.rotational_thruster": "ɹǝʇsnɹɥ⟘ ןɐuoıʇɐʇoᴚ",
+  "item.vstuff.empty_energy_core": "ǝɹoƆ ʎbɹǝuƎ ʎʇdɯƎ",
+  "item.vstuff.energy_core": "ǝɹoƆ ʎbɹǝuƎ",
   "item.vstuff.lead_break_item": "ɯǝʇI ʞɐǝɹᗺ pɐǝꞀ",
   "item.vstuff.lead_constraint_item": "ɯǝʇI ʇuıɐɹʇsuoƆ pɐǝꞀ",
   "item.vstuff.phys_grabber": "ɹǝqqɐɹ⅁ sʎɥԀ"

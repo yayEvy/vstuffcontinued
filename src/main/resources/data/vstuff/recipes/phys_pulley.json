@@ -12,7 +12,7 @@
     "C": { "item": "create:cogwheel" }
   },
   "result": {
-    "item": "vstuff:rope_pulley",
+    "item": "vstuff:phys_pulley",
     "count": 1
   }
 }

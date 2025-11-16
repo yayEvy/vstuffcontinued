@@ -8,6 +8,8 @@ import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.constraint.LeadBreakItem;
 import yay.evy.everest.vstuff.content.constraint.LeadConstraintItem;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberItem;
+import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.EmptyEnergyCoreItem;
+import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.EnergyCoreItem;
 
 
 public class VStuffItems {
@@ -42,5 +44,20 @@ public class VStuffItems {
                     .model(AssetLookup.itemModelWithPartials())
                     .register();
 
+    public static final ItemEntry<EmptyEnergyCoreItem> EMPTY_ENERGY_CORE =
+            REGISTRATE.item("empty_energy_core", EmptyEnergyCoreItem::new)
+                    .properties(p -> p
+                            .stacksTo(64))
+                    .model(AssetLookup.itemModelWithPartials())
+                    .register();
+
+    public static final ItemEntry<EnergyCoreItem> ENERGY_CORE =
+            REGISTRATE.item("energy_core", EnergyCoreItem::new)
+                    .properties(p -> p
+                            .stacksTo(64)
+                            .rarity(Rarity.UNCOMMON))
+                    .model(AssetLookup.itemModelWithPartials())
+                    .register();
+    
     public static void register() {}
 }

@@ -3,25 +3,29 @@
   "accept_mirrored": true,
   "category": "misc",
   "key": {
-    "C": {
-      "tag": "c:ingots/copper"
+    "I": {
+      "item": "create:industrial_iron_block"
     },
     "L": {
       "item": "create:andesite_alloy"
     },
-    "R": {
-      "item": "create:precision_mechanism"
+    "C": {
+      "item": "vstuff:energy_core"
+    },
+    "B": {
+      "item": "create:brass_ingot"
     },
     "S": {
-      "item": "create:fluid_pipe"
+      "item": "create:brass_sheet"
     }
   },
   "pattern": [
-    "LRSSS",
-    "CC   "
+    "  SSS",
+    "LCIII",
+    "BB   "
   ],
   "result": {
     "count": 1,
-    "id": "vstuff:phys_grabber"
+    "item": "vstuff:phys_grabber"
   }
 }
