@@ -10,6 +10,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class ClientRopeUtil {
+    private static final Object FAIL_OUTLINE_KEY = new Object();
 
     public static void drawOutline(Level level, BlockPos pos) {
         if (!level.isClientSide())
@@ -30,22 +31,20 @@ public class ClientRopeUtil {
                 .lineWidth(1 / 16f);
     }
 
+
     public static void drawFailOutline(Level level, BlockPos pos) {
-        if (!level.isClientSide())
-            return;
+        if (!level.isClientSide()) return;
 
-        BlockState state = level.getBlockState(pos);
-        VoxelShape shape = state.getShape(level, pos);
+        var state = level.getBlockState(pos);
+        var shape = state.getShape(level, pos);
+        if (shape.isEmpty()) return;
 
-        if (shape.isEmpty())
-            return;
-
-        AABB bb = shape.bounds().move(pos.getX(), pos.getY(), pos.getZ());
+        var bb = shape.bounds().move(pos.getX(), pos.getY(), pos.getZ());
 
         Outliner outliner = Outliner.getInstance();
-        OutlineParams params = outliner.showAABB(pos, bb);
+        OutlineParams params = outliner.showAABB(FAIL_OUTLINE_KEY, bb);
 
         params.colored(0xFF6961)
-                .lineWidth(1 / 16f);
+                .lineWidth(0.1f);
     }
 }
