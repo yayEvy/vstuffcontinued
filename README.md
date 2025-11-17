@@ -11,6 +11,7 @@ features as of v0.2.3
 - energy core
 - empty energy core
 - rope style changer
+- rope coloring using dyes
 - complete config
   
 PLANNED 0.3.0:
