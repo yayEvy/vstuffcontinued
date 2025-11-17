@@ -96,7 +96,7 @@ public class ColorHaggler {
                                     System.out.println("max force: " + data.maxForce);
                                     System.out.println("constraint type: " + data.constraintType);*/
 
-                                    newData.style = new RopeStyles.RopeStyle(item.toString() , WOOL, "vstuff.rope." + item.toString() );
+                                    newData.style = new RopeStyles.RopeStyle(item.toString() + "_wool" , WOOL, "vstuff.rope." + item.toString() );
 
                                     //ConstraintTracker.getActiveConstraints().replace(targetConstraintId, data, newData);
                                     ConstraintTracker.getActiveConstraints().put(targetConstraintId, newData);

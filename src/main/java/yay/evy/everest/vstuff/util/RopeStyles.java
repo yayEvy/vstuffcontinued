@@ -18,14 +18,14 @@ public class RopeStyles {
         return STYLE_REGISTRY.get(styleId);
     }
 
-    // === your existing code below ===
+    // === Silvern's existing code below ===
 
     public static ResourceLocation getRopeStyle(String style) {
         return new ResourceLocation(VStuff.MOD_ID, "textures/entity/rope/rope_" + style + ".png");
     }
 
     public static ResourceLocation getDyedRopeStyle(String color) {
-        return new ResourceLocation(VStuff.MOD_ID, "textures/entity/rope/ropedyed" + color + ".png");
+        return new ResourceLocation(VStuff.MOD_ID, "textures/entity/rope/rope_" + color + ".png");
     }
     public static ResourceLocation getDyedWoolStyle(String color) {
         return new ResourceLocation("vstuff", "textures/entity/rope/" + color + "_wool.png");
@@ -47,10 +47,11 @@ public class RopeStyles {
     public enum PrimitiveRopeStyle {
         NORMAL,
         WOOL,
+        DYED,
         CHAIN,
         OTHER,
-        LOG,
-        DYED
+        LOG
+
     }
 
     public static class RopeStyle {
@@ -70,6 +71,7 @@ public class RopeStyles {
                 case WOOL -> this.associatedTexture = getDyedWoolStyle(style);
                 case CHAIN -> this.associatedTexture = getChainStyle();
                 case LOG -> this.associatedTexture = getLogStyle(style);
+                case DYED ->  this.associatedTexture = getDyedRopeStyle(style);
                 default -> this.associatedTexture = getRopeStyle(style);
             }
 
@@ -81,6 +83,7 @@ public class RopeStyles {
             this(style,
                     switch (basicStyleSTR) {
                         case "wool" -> PrimitiveRopeStyle.WOOL;
+                        case "dyed" -> PrimitiveRopeStyle.DYED;
                         case "chain" -> PrimitiveRopeStyle.CHAIN;
                         case "log" -> PrimitiveRopeStyle.LOG;
                         default -> PrimitiveRopeStyle.NORMAL;
@@ -113,8 +116,5 @@ public class RopeStyles {
             return this.basicStyle;
         }
 
-        public boolean isDyeable() {
-            return (this.basicStyle == PrimitiveRopeStyle.WOOL || this.basicStyle == PrimitiveRopeStyle.NORMAL);
-        }
     }
 }
