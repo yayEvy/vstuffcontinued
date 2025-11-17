@@ -20,29 +20,33 @@ import yay.evy.everest.vstuff.rendering.EnergyCoreRenderTypes;
 public class PhysGrabberItemRenderer extends CustomRenderedItemModelRenderer {
 
 
-    private static final ResourceLocation EMPTY = VStuff.asTextureResource("block/empty.png");
-    private static final ResourceLocation TINT = VStuff.asTextureResource("block/blue_tint.png");
+    private static final ResourceLocation EMPTY = VStuff.asTextureResource("item/energy_core/empty.png");
+    private static final ResourceLocation TINT = VStuff.asTextureResource("item/energy_core/blue_tint.png");
 
-    private static final PartialModel CORE = PartialModel.of(VStuff.asResource("item/phys_grabber/core"));
-    private static final PartialModel CORE_INNER = PartialModel.of(VStuff.asResource("item/phys_grabber/core_inner"));
-    private static final PartialModel CORE_OUTER = PartialModel.of(VStuff.asResource("item/phys_grabber/core_outer"));
+    private static final PartialModel CORE = PartialModel.of(VStuff.asResource("item/energy_core/core"));
+    private static final PartialModel CORE_INNER = PartialModel.of(VStuff.asResource("item/energy_core/core_inner"));
+    private static final PartialModel CORE_OUTER = PartialModel.of(VStuff.asResource("item/energy_core/core_outer"));
 
     @Override
     protected void render(ItemStack stack, CustomRenderedItemModel model, PartialItemModelRenderer renderer, ItemDisplayContext transformType,
                           PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
+        ms.pushPose();
+
         renderer.render(model.getOriginalModel(), light);
 
-        TransformData data = new TransformData(new Vector3f(0.0F, -0.65F, 0.0F), new Vector3f(35.0F, -25.0F, 0.0F));
-        TransformData innerData = new TransformData(new Vector3f(0.0F, -0.65F, 0.0F), new Vector3f(35.0F, -25.0F, 0.0F));
+        TransformData data = new TransformData(new Vector3f(0.0F, -0.65F, 0.0F), new Vector3f(0.0F, 0.0F, 0.0F));
+        TransformData innerData = new TransformData(new Vector3f(0.0F, -0.65F, 0.0F), new Vector3f(0.0F, 0.0F, 0.0F));
 
         renderCore(ms, renderer, innerData, data, light);
+
+        ms.popPose();
     }
 
     private void renderCore(@NotNull PoseStack ms, @NotNull PartialItemModelRenderer renderer, @NotNull TransformData innerData, @NotNull TransformData data, int light) {
-        Vector3f modelOffset = new Vector3f(0.0F, -0.28125F, 0.0F);
-        renderAndTransform(ms, CORE_INNER, RenderType.endPortal(), renderer, modelOffset, innerData.offset(), innerData.rotation(), 1.5f, light);
-        renderAndTransform(ms, CORE, EnergyCoreRenderTypes.getCORE.apply(EMPTY), renderer, modelOffset, data.offset(), data.rotation(), 1.5f, light);
-        renderAndTransform(ms, CORE_OUTER, RenderType.entityTranslucent(TINT), renderer, modelOffset, data.offset(), data.rotation(), 1.5f, light);
+        Vector3f modelOffset = new Vector3f(0.0F, -0.55F, 0.3275F);
+        renderAndTransform(ms, CORE_INNER, RenderType.endPortal(), renderer, modelOffset, innerData.offset(), innerData.rotation(), 0.75f, light);
+        renderAndTransform(ms, CORE, EnergyCoreRenderTypes.getCORE.apply(EMPTY), renderer, modelOffset, data.offset(), data.rotation(), 0.75f, light);
+        renderAndTransform(ms, CORE_OUTER, RenderType.entityTranslucent(TINT), renderer, modelOffset, data.offset(), data.rotation(), 0.75f, light);
     }
 
     private void renderAndTransform(@NotNull PoseStack ms, @NotNull PartialModel model, @NotNull RenderType renderType, @NotNull PartialItemModelRenderer renderer, @NotNull Vector3f modelCorrection, @NotNull Vector3f offset, @NotNull Vector3f rotationVec, float scale, int light) {

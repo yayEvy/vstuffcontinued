@@ -100,9 +100,9 @@ public class LeadConstraintItem extends Item {
             }
 
             Long secondShipId = getShipIdAtPos(serverLevel, clickedPos);
-            RopeUtils.RopeInteractionReturn result = Rope.createNew(this, serverLevel, firstClickedPos, clickedPos, firstEntity, firstShipId, secondShipId, player);
+            RopeUtil.RopeInteractionReturn result = Rope.createNew(this, serverLevel, firstClickedPos, clickedPos, firstEntity, firstShipId, secondShipId, player);
 
-            if (result == RopeUtils.RopeInteractionReturn.SUCCESS) {
+            if (result == RopeUtil.RopeInteractionReturn.SUCCESS) {
                 // ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer); Rope.createNew does constraint syncing
 
                 Component notif = RopeStyleHandlerServer.getStyle(player.getUUID()).getBasicStyle() == RopeStyles.PrimitiveRopeStyle.CHAIN
@@ -113,7 +113,7 @@ public class LeadConstraintItem extends Item {
             }
 
             resetState();
-            return result == RopeUtils.RopeInteractionReturn.SUCCESS ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+            return result == RopeUtil.RopeInteractionReturn.SUCCESS ? InteractionResult.SUCCESS : InteractionResult.FAIL;
         }
     }
 

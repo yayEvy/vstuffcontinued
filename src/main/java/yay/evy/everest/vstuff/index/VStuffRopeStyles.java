@@ -3,18 +3,15 @@ package yay.evy.everest.vstuff.index;
 import net.minecraft.network.chat.Component;
 
 import yay.evy.everest.vstuff.content.ropestyler.components.RopeStyleCategory;
+import yay.evy.everest.vstuff.util.RopeStyles;
 import yay.evy.everest.vstuff.util.RopeStyles.RopeStyle;
 import yay.evy.everest.vstuff.util.RopeStyles.PrimitiveRopeStyle;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import java.util.*;
 public class VStuffRopeStyles {
 
     private static final RopeStyle NORMAL = new RopeStyle("normal", PrimitiveRopeStyle.NORMAL, "vstuff.rope.normal");
-    private static final RopeStyle PLAIN = new RopeStyle("plain", PrimitiveRopeStyle.NORMAL, "vstuff.rope.plain");
     private static final RopeStyle CHAIN = new RopeStyle("chain", PrimitiveRopeStyle.CHAIN, "block.minecraft.chain");
-    private static final RopeStyle WOOL = new RopeStyle("white", PrimitiveRopeStyle.WOOL, "vstuff.rope.wool");
 
     private static final RopeStyle LIGHT_GRAY = new RopeStyle("light_gray_dye", PrimitiveRopeStyle.DYED, "vstuff.rope.light_gray");
     private static final RopeStyle GRAY = new RopeStyle("gray_dye", PrimitiveRopeStyle.DYED, "vstuff.rope.gray");
@@ -33,22 +30,22 @@ public class VStuffRopeStyles {
     private static final RopeStyle PINK = new RopeStyle("pink_dye", PrimitiveRopeStyle.DYED, "vstuff.rope.pink");
     private static final RopeStyle WHITE = new RopeStyle("white_dye", PrimitiveRopeStyle.DYED, "vstuff.rope.white");
 
-    private static final RopeStyle LIGHT_GRAY_WOOL = new RopeStyle("light_gray_dye", PrimitiveRopeStyle.WOOL, "block.minecraft.light_gray_wool");
-    private static final RopeStyle GRAY_WOOL = new RopeStyle("gray_dye", PrimitiveRopeStyle.WOOL, "block.minecraft.gray_wool");
-    private static final RopeStyle BLACK_WOOL = new RopeStyle("black_dye", PrimitiveRopeStyle.WOOL, "block.minecraft.black_wool");
-    private static final RopeStyle BROWN_WOOL = new RopeStyle("brown_dye", PrimitiveRopeStyle.WOOL, "block.minecraft.brown_wool");
-    private static final RopeStyle RED_WOOL = new RopeStyle("red_dye", PrimitiveRopeStyle.WOOL, "block.minecraft.red_wool");
-    private static final RopeStyle ORANGE_WOOL = new RopeStyle("orange_dye", PrimitiveRopeStyle.WOOL, "block.minecraft.orange_wool");
-    private static final RopeStyle YELLOW_WOOL = new RopeStyle("yellow_dye", PrimitiveRopeStyle.WOOL, "block.minecraft.yellow_wool");
-    private static final RopeStyle LIME_WOOL = new RopeStyle("lime_dye", PrimitiveRopeStyle.WOOL, "block.minecraft.lime_wool");
-    private static final RopeStyle GREEN_WOOL = new RopeStyle("green_dye", PrimitiveRopeStyle.WOOL, "block.minecraft.green_wool");
-    private static final RopeStyle CYAN_WOOL = new RopeStyle("cyan_dye", PrimitiveRopeStyle.WOOL, "block.minecraft.cyan_wool");
-    private static final RopeStyle LIGHT_BLUE_WOOL = new RopeStyle("light_blue_dye", PrimitiveRopeStyle.WOOL, "block.minecraft.light_blue_wool");
-    private static final RopeStyle BLUE_WOOL = new RopeStyle("blue_dye", PrimitiveRopeStyle.WOOL, "block.minecraft.blue_wool");
-    private static final RopeStyle PURPLE_WOOL = new RopeStyle("purple_dye", PrimitiveRopeStyle.WOOL, "block.minecraft.purple_wool");
-    private static final RopeStyle MAGENTA_WOOL = new RopeStyle("magenta_dye", PrimitiveRopeStyle.WOOL, "block.minecraft.magenta_wool");
-    private static final RopeStyle PINK_WOOL = new RopeStyle("pink_dye", PrimitiveRopeStyle.WOOL, "block.minecraft.pink_wool");
-    private static final RopeStyle WHITE_WOOL = new RopeStyle("white_dye", PrimitiveRopeStyle.WOOL, "block.minecraft.white_wool");
+    private static final RopeStyle LIGHT_GRAY_WOOL = new RopeStyle("light_gray_wool", PrimitiveRopeStyle.WOOL, "block.minecraft.light_gray_wool");
+    private static final RopeStyle GRAY_WOOL = new RopeStyle("gray_wool", PrimitiveRopeStyle.WOOL, "block.minecraft.gray_wool");
+    private static final RopeStyle BLACK_WOOL = new RopeStyle("black_wool", PrimitiveRopeStyle.WOOL, "block.minecraft.black_wool");
+    private static final RopeStyle BROWN_WOOL = new RopeStyle("brown_wool", PrimitiveRopeStyle.WOOL, "block.minecraft.brown_wool");
+    private static final RopeStyle RED_WOOL = new RopeStyle("red_wool", PrimitiveRopeStyle.WOOL, "block.minecraft.red_wool");
+    private static final RopeStyle ORANGE_WOOL = new RopeStyle("orange_wool", PrimitiveRopeStyle.WOOL, "block.minecraft.orange_wool");
+    private static final RopeStyle YELLOW_WOOL = new RopeStyle("yellow_wool", PrimitiveRopeStyle.WOOL, "block.minecraft.yellow_wool");
+    private static final RopeStyle LIME_WOOL = new RopeStyle("lime_wool", PrimitiveRopeStyle.WOOL, "block.minecraft.lime_wool");
+    private static final RopeStyle GREEN_WOOL = new RopeStyle("green_wool", PrimitiveRopeStyle.WOOL, "block.minecraft.green_wool");
+    private static final RopeStyle CYAN_WOOL = new RopeStyle("cyan_wool", PrimitiveRopeStyle.WOOL, "block.minecraft.cyan_wool");
+    private static final RopeStyle LIGHT_BLUE_WOOL = new RopeStyle("light_blue_wool", PrimitiveRopeStyle.WOOL, "block.minecraft.light_blue_wool");
+    private static final RopeStyle BLUE_WOOL = new RopeStyle("blue_wool", PrimitiveRopeStyle.WOOL, "block.minecraft.blue_wool");
+    private static final RopeStyle PURPLE_WOOL = new RopeStyle("purple_wool", PrimitiveRopeStyle.WOOL, "block.minecraft.purple_wool");
+    private static final RopeStyle MAGENTA_WOOL = new RopeStyle("magenta_wool", PrimitiveRopeStyle.WOOL, "block.minecraft.magenta_wool");
+    private static final RopeStyle PINK_WOOL = new RopeStyle("pink_wool", PrimitiveRopeStyle.WOOL, "block.minecraft.pink_wool");
+    private static final RopeStyle WHITE_WOOL = new RopeStyle("white_wool", PrimitiveRopeStyle.WOOL, "block.minecraft.white_wool");
 
     private static final RopeStyle ANDESITE = new RopeStyle("andesite", PrimitiveRopeStyle.OTHER, "block.create.andesite_casing");
     private static final RopeStyle BRASS = new RopeStyle("brass", PrimitiveRopeStyle.OTHER, "block.create.brass_casing");
@@ -82,14 +79,14 @@ public class VStuffRopeStyles {
     private static final RopeStyle MANGROVE_STRIPPED = new RopeStyle("stripped_mangrove", PrimitiveRopeStyle.LOG, "block.minecraft.stripped_mangrove_log");
 
     private static final RopeStyleCategory BASIC_STYLES = new RopeStyleCategory(
-            Component.translatable("vstuff.rope_category.normal"),
+            "vstuff.rope_category.normal",
             new RopeStyle[]{
-                    NORMAL, PLAIN, CHAIN, WOOL
+                    NORMAL, CHAIN
             }
     );
 
     private static final RopeStyleCategory COLORED_STYLES = new RopeStyleCategory(
-            Component.translatable("vstuff.rope_category.colored"),
+            "vstuff.rope_category.colored",
             new  RopeStyle[]{
                     LIGHT_GRAY, GRAY, BLACK, BROWN, RED, ORANGE, YELLOW, LIME,
                     GREEN, CYAN, LIGHT_BLUE, BLUE, PURPLE, MAGENTA, PINK, WHITE
@@ -97,7 +94,7 @@ public class VStuffRopeStyles {
     );
 
     private static final RopeStyleCategory COLORED_WOOL_STYLES = new RopeStyleCategory(
-            Component.translatable("vstuff.rope_category.colored_wool"),
+            "vstuff.rope_category.colored_wool",
             new  RopeStyle[]{
                     LIGHT_GRAY_WOOL, GRAY_WOOL, BLACK_WOOL, BROWN_WOOL, RED_WOOL, ORANGE_WOOL, YELLOW_WOOL, LIME_WOOL,
                     GREEN_WOOL, CYAN_WOOL, LIGHT_BLUE_WOOL, BLUE_WOOL, PURPLE_WOOL, MAGENTA_WOOL, PINK_WOOL, WHITE_WOOL
@@ -105,28 +102,27 @@ public class VStuffRopeStyles {
     );
 
     private static final RopeStyleCategory CASING_STYLES = new RopeStyleCategory(
-            Component.translatable("vstuff.rope_category.casing"),
+            "vstuff.rope_category.casing",
             new RopeStyle[]{
                     ANDESITE, BRASS, COPPER, TRAIN, INDUSTRIAL
             }
     );
 
     private static final RopeStyleCategory FLAGS = new RopeStyleCategory(
-            Component.translatable("vstuff.rope_category.pride_flags"),
+            "vstuff.rope_category.pride_flags",
             new RopeStyle[]{
                     PRIDE, GAY, LESBIAN, BISEXUAL, TRANSGENDER, NONBINARY, ASEXUAL
             }
     );
 
     private static final RopeStyleCategory LOGS = new RopeStyleCategory(
-            Component.translatable("vstuff.rope_category.logs"),
+            "vstuff.rope_category.logs",
             new RopeStyle[]{
                     OAK, OAK_STRIPPED, BIRCH, BIRCH_STRIPPED, SPRUCE, SPRUCE_STRIPPED, DARK_OAK, DARK_OAK_STRIPPED,
                     JUNGLE, JUNGLE_STRIPPED, ACACIA, ACACIA_STRIPPED, CHERRY, CHERRY_STRIPPED, MANGROVE,
                     MANGROVE_STRIPPED
             }
     );
-
 
     public static List<RopeStyleCategory> CATEGORIES = new ArrayList<>();
 

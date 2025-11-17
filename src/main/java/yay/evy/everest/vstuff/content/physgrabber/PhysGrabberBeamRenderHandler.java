@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.client;
+package yay.evy.everest.vstuff.content.physgrabber;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;

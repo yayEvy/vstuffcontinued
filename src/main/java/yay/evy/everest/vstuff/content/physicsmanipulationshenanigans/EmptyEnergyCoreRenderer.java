@@ -19,11 +19,11 @@ import yay.evy.everest.vstuff.rendering.EnergyCoreRenderTypes;
 
 public class EmptyEnergyCoreRenderer extends CustomRenderedItemModelRenderer {
 
-    private static final ResourceLocation EMPTY = VStuff.asTextureResource("block/empty.png");
-    private static final ResourceLocation TINT = VStuff.asTextureResource("block/blue_tint.png");
+    private static final ResourceLocation EMPTY = VStuff.asTextureResource("item/energy_core/empty.png");
+    private static final ResourceLocation TINT = VStuff.asTextureResource("item/energy_core/blue_tint.png");
 
-    private static final PartialModel CORE = PartialModel.of(VStuff.asResource("item/empty_energy_core/core"));
-    private static final PartialModel CORE_OUTER = PartialModel.of(VStuff.asResource("item/empty_energy_core/core_outer"));
+    private static final PartialModel CORE = PartialModel.of(VStuff.asResource("item/energy_core/core"));
+    private static final PartialModel CORE_OUTER = PartialModel.of(VStuff.asResource("item/energy_core/core_outer"));
 
 
     protected void render(ItemStack stack, CustomRenderedItemModel model, PartialItemModelRenderer renderer, ItemDisplayContext transformType, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {

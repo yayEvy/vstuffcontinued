@@ -28,19 +28,11 @@ public enum VStuffGuiTextures implements ScreenElement {
     public int width, height;
     public int startX, startY;
 
-    private VStuffGuiTextures(String location, int width, int height) {
-        this(location, 0, 0, width, height);
-    }
-
-    private VStuffGuiTextures(int startX, int startY) {
-        this("icons", startX * 16, startY * 16, 16, 16);
-    }
-
-    private VStuffGuiTextures(String location, int startX, int startY, int width, int height) {
+    VStuffGuiTextures(String location, int startX, int startY, int width, int height) {
         this(VStuff.MOD_ID, location, startX, startY, width, height);
     }
 
-    private VStuffGuiTextures(String namespace, String location, int startX, int startY, int width, int height) {
+    VStuffGuiTextures(String namespace, String location, int startX, int startY, int width, int height) {
         this.location = new ResourceLocation(namespace, "textures/gui/" + location + ".png");
         this.width = width;
         this.height = height;

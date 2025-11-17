@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class RopeStyles {
 
-    private static final Map<String, RopeStyle> STYLE_REGISTRY = new HashMap<>();
+    public static final Map<String, RopeStyle> STYLE_REGISTRY = new HashMap<>();
 
     public static void register(RopeStyle style) {
         STYLE_REGISTRY.put(style.getStyle(), style);
@@ -24,11 +24,11 @@ public class RopeStyles {
         return new ResourceLocation(VStuff.MOD_ID, "textures/entity/rope/rope_" + style + ".png");
     }
 
-    public static ResourceLocation getDyedRopeStyle(String color) {
-        return new ResourceLocation(VStuff.MOD_ID, "textures/entity/rope/ropedyed" + color + ".png");
+    public static ResourceLocation getDyedStyle(String color) {
+        return new ResourceLocation(VStuff.MOD_ID, "textures/entity/rope/dyed/rope_" + color + ".png");
     }
-    public static ResourceLocation getDyedWoolStyle(String color) {
-        return new ResourceLocation("vstuff", "textures/entity/rope/" + color + "_wool.png");
+    public static ResourceLocation getWoolStyle(String wool) {
+        return new ResourceLocation("minecraft", "textures/block/" + wool + ".png");
     }
 
     public static ResourceLocation getChainStyle() {
@@ -67,9 +67,10 @@ public class RopeStyles {
             this.renderStyle = (basicStyle == PrimitiveRopeStyle.CHAIN ? RenderStyle.CHAIN : RenderStyle.NORMAL);
 
             switch (basicStyle) {
-                case WOOL -> this.associatedTexture = getDyedWoolStyle(style);
+                case WOOL -> this.associatedTexture = getWoolStyle(style);
                 case CHAIN -> this.associatedTexture = getChainStyle();
                 case LOG -> this.associatedTexture = getLogStyle(style);
+                case DYED -> this.associatedTexture = getDyedStyle(style);
                 default -> this.associatedTexture = getRopeStyle(style);
             }
 
@@ -83,6 +84,7 @@ public class RopeStyles {
                         case "wool" -> PrimitiveRopeStyle.WOOL;
                         case "chain" -> PrimitiveRopeStyle.CHAIN;
                         case "log" -> PrimitiveRopeStyle.LOG;
+                        case "dyed" -> PrimitiveRopeStyle.DYED;
                         default -> PrimitiveRopeStyle.NORMAL;
                     },
                     langKey

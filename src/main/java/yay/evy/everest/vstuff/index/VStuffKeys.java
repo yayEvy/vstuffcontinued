@@ -24,7 +24,7 @@ public enum VStuffKeys {
     private int key;
     private boolean modifiable;
 
-    private VStuffKeys(String description, int defaultKey) {
+    VStuffKeys(String description, int defaultKey) {
         this.description = VStuff.MOD_ID + ".keyinfo." + description;
         this.key = defaultKey;
         this.modifiable = !description.isEmpty();
@@ -66,24 +66,6 @@ public enum VStuffKeys {
         return InputConstants.isKeyDown(Minecraft.getInstance()
                 .getWindow()
                 .getWindow(), key);
-    }
-
-    public static boolean isMouseButtonDown(int button) {
-        return GLFW.glfwGetMouseButton(Minecraft.getInstance()
-                .getWindow()
-                .getWindow(), button) == 1;
-    }
-
-    public static boolean ctrlDown() {
-        return Screen.hasControlDown();
-    }
-
-    public static boolean shiftDown() {
-        return Screen.hasShiftDown();
-    }
-
-    public static boolean altDown() {
-        return Screen.hasAltDown();
     }
 
 

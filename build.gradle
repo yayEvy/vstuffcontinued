@@ -199,6 +199,7 @@ repositories {
     maven { url = "https://maven.createmod.net" } // Create, Ponder, Flywheel
     maven { url = "https://maven.ithundxr.dev/mirror" } // Registrate
     maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // ForgeConfigAPIPort
+    maven { url = "https://maven.blamejared.com" } // JEI
 }
 
 dependencies {
@@ -215,6 +216,7 @@ dependencies {
     implementation 'thedarkcolour:kotlinforforge:4.10.0'
 
 
+    //implementation("mezz.jei:jei-$minecraft_version-forge:$jei_version")
 
     implementation(fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false })
     implementation(fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}"))

@@ -1,0 +1,28 @@
+{
+  "type": "create:mechanical_crafting",
+  "accept_mirrored": true,
+  "category": "misc",
+  "key": {
+    "S": {
+      "item": "create:sturdy_sheet"
+    },
+    "B": {
+      "item": "create:experience_block"
+    },
+    "E": {
+      "item": "vstuff:empty_energy_core"
+    },
+    "R": {
+      "item": "create:polished_rose_quartz"
+    }
+  },
+  "pattern": [
+    "SBBBS",
+    "SRERS",
+    "SBBBS"
+  ],
+  "result": {
+    "count": 1,
+    "item": "vstuff:energy_core"
+  }
+}

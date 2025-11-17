@@ -11,7 +11,6 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import yay.evy.everest.vstuff.client.PhysGrabberClientHandler;
 
 import java.util.function.Consumer;
 
@@ -29,9 +28,9 @@ public class PhysGrabberItem extends Item {
         return InteractionResultHolder.success(player.getItemInHand(hand));
     }
 
-//    @Override
-//    @OnlyIn(Dist.CLIENT)
-//    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-//        consumer.accept(SimpleCustomRenderer.create(this, new PhysGrabberItemRenderer()));
-//    }
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+        consumer.accept(SimpleCustomRenderer.create(this, new PhysGrabberItemRenderer()));
+    }
 }

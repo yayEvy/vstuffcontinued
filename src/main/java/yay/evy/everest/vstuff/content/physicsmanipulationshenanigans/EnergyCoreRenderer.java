@@ -19,8 +19,8 @@ import yay.evy.everest.vstuff.rendering.EnergyCoreRenderTypes;
 
 public class EnergyCoreRenderer extends CustomRenderedItemModelRenderer {
 
-    private static final ResourceLocation EMPTY = VStuff.asTextureResource("block/empty.png");
-    private static final ResourceLocation TINT = VStuff.asTextureResource("block/blue_tint.png");
+    private static final ResourceLocation EMPTY = VStuff.asTextureResource("item/energy_core/empty.png");
+    private static final ResourceLocation TINT = VStuff.asTextureResource("item/energy_core/blue_tint.png");
 
     private static final PartialModel CORE = PartialModel.of(VStuff.asResource("item/energy_core/core"));
     private static final PartialModel CORE_INNER = PartialModel.of(VStuff.asResource("item/energy_core/core_inner"));

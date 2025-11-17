@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.client;
+package yay.evy.everest.vstuff.content.physgrabber;
 
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;

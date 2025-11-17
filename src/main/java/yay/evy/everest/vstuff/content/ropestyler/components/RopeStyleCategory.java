@@ -11,20 +11,27 @@ import java.util.List;
 public class RopeStyleCategory {
 
     private final Component name;
+    private final String safeName;
     private final List<RopeStyles.RopeStyle> categoryStyles = new ArrayList<>();
 
-    public RopeStyleCategory(Component name, RopeStyles.RopeStyle[] initialContent) {
-        this.name = name;
+    public RopeStyleCategory(String name, RopeStyles.RopeStyle[] initialContent) {
+        this.name = Component.translatable(name);
+        this.safeName = name;
 
         this.categoryStyles.addAll(Arrays.stream(initialContent).toList());
     }
 
-    public RopeStyleCategory(Component name) {
-        this.name = name;
+    public RopeStyleCategory(String name) {
+        this.name = Component.translatable(name);
+        this.safeName = name;
     }
 
     public @NotNull Component getName() {
         return name;
+    }
+
+    public String getNameSafe() {
+        return safeName;
     }
 
     public @NotNull List<RopeStyles.RopeStyle> getCategoryStyles() {

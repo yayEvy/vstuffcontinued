@@ -1,6 +1,5 @@
 package yay.evy.everest.vstuff.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.createmod.catnip.outliner.Outliner;
 import net.createmod.catnip.outliner.Outline.OutlineParams;
 import net.minecraft.core.BlockPos;

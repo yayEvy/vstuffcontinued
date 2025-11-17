@@ -1,0 +1,30 @@
+{
+  "type": "create:mechanical_crafting",
+  "accept_mirrored": true,
+  "category": "misc",
+  "key": {
+    "T": {
+      "item": "minecraft:tinted_glass"
+    },
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "A": {
+      "item": "minecraft:amethyst_block"
+    },
+    "B": {
+      "item": "minecraft:diamond_block"
+    }
+  },
+  "pattern": [
+    "TTTTT",
+    "TBDBT",
+    "TDADT",
+    "TBDBT",
+    "TTTTT"
+  ],
+  "result": {
+    "count": 1,
+    "item": "vstuff:empty_energy_core"
+  }
+}
