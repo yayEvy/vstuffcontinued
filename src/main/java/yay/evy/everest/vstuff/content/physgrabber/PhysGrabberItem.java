@@ -1,7 +1,10 @@
 package yay.evy.everest.vstuff.content.physgrabber;
 
+import com.simibubi.create.foundation.item.CustomArmPoseItem;
 import com.simibubi.create.foundation.item.render.SimpleCustomRenderer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.HumanoidModel.ArmPose;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -14,7 +17,8 @@ import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 
 import java.util.function.Consumer;
 
-public class PhysGrabberItem extends Item {
+public class PhysGrabberItem extends Item implements CustomArmPoseItem {
+
     public PhysGrabberItem(Properties props) {
         super(props);
     }
@@ -33,4 +37,14 @@ public class PhysGrabberItem extends Item {
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
         consumer.accept(SimpleCustomRenderer.create(this, new PhysGrabberItemRenderer()));
     }
+
+    @Override
+    public ArmPose getArmPose(ItemStack stack, AbstractClientPlayer player, InteractionHand hand) {
+        if (PhysGrabberClientHandler.isGrabbing(player)) {
+            return ArmPose.CROSSBOW_HOLD;
+        }
+        return ArmPose.ITEM;
+    }
+
+
 }

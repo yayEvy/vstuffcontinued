@@ -142,7 +142,7 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
         thrusterData.setThrust(thrust);
         isThrustDirty = false;
 
-        System.out.println("[Thruster] speed=" + speed + ", obstruction=" + obstructionEffect + ", thrust=" + thrust);
+      //  System.out.println("[Thruster] speed=" + speed + ", obstruction=" + obstructionEffect + ", thrust=" + thrust);
     }
 
 
@@ -345,7 +345,7 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
                     ThrusterForceApplier applier = new ThrusterForceApplier(data);
                     attachment.addApplier(worldPosition, applier);
 
-                    System.out.println("[Thruster] onLoad: re-registered applier at " + worldPosition);
+                  //  System.out.println("[Thruster] onLoad: re-registered applier at " + worldPosition);
                 }
             });
         }

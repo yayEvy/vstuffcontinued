@@ -26,6 +26,7 @@ public class PhysGrabberItemRenderer extends CustomRenderedItemModelRenderer {
     private static final PartialModel CORE = PartialModel.of(VStuff.asResource("item/energy_core/core"));
     private static final PartialModel CORE_INNER = PartialModel.of(VStuff.asResource("item/energy_core/core_inner"));
     private static final PartialModel CORE_OUTER = PartialModel.of(VStuff.asResource("item/energy_core/core_outer"));
+    private static final Vector3f TIP_OFFSET = new Vector3f(0f, -0.55f, 0.7f); // tweak these to match your model's tip
 
     @Override
     protected void render(ItemStack stack, CustomRenderedItemModel model, PartialItemModelRenderer renderer, ItemDisplayContext transformType,
@@ -63,5 +64,9 @@ public class PhysGrabberItemRenderer extends CustomRenderedItemModelRenderer {
         renderer.render(model.get(), renderType, light);
 
         ms.popPose();
+    }
+
+    public static Vector3f getTipOffset() {
+        return TIP_OFFSET;
     }
 }

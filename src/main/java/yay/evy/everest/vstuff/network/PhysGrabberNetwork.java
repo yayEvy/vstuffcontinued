@@ -43,13 +43,12 @@ public class PhysGrabberNetwork {
                 Optional.of(NetworkDirection.PLAY_TO_SERVER)
         );
 
-        System.out.println("[PhysGrabberNetwork] Registered all packets");
+      //  System.out.println("[PhysGrabberNetwork] Registered all packets");
     }
 
-    public static void sendGrab(long shipId, Vec3 target) {
-        VStuff.LOGGER.info("[PhysGrabberNetwork] received grab");
+    public static void sendGrab(long shipId, Vec3 target, boolean creative) {
         CHANNEL.sendToServer(new PhysGrabberPackets.GrabPacket(
-                shipId, target.x, target.y, target.z
+                shipId, target.x, target.y, target.z, creative
         ));
     }
 
@@ -57,7 +56,9 @@ public class PhysGrabberNetwork {
         CHANNEL.sendToServer(new PhysGrabberPackets.ReleasePacket(shipId));
     }
 
-    public static void sendUpdate(long shipId, Vec3 target) {
-        CHANNEL.sendToServer(new PhysGrabberPackets.UpdatePacket(shipId, target.x, target.y, target.z));
+    public static void sendUpdate(long shipId, Vec3 target, boolean creative) {
+        CHANNEL.sendToServer(new PhysGrabberPackets.UpdatePacket(
+                shipId, target.x, target.y, target.z, creative
+        ));
     }
 }

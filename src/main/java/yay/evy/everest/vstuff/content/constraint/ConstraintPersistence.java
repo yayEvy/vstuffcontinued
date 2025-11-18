@@ -101,7 +101,7 @@ public class ConstraintPersistence extends SavedData {
             String id = constraintTag.getString("id");
 
             if (data.removedConstraints.contains(id)) {
-                System.out.println("Skipping removed constraint during load: " + id);
+               // System.out.println("Skipping removed constraint during load: " + id);
                 continue;
             }
 
@@ -155,10 +155,10 @@ public class ConstraintPersistence extends SavedData {
             RopeStyles.RopeStyle ropeStyle = new RopeStyles.RopeStyle(style, primitiveType, styleLKey);
 
 
-            System.out.println("LOADING FROM NBT - ID: " + id +
-                    ", shipA: " + shipA + ", shipB: " + shipB +
-                    ", shipAIsGround: " + shipAIsGround + ", shipBIsGround: " + shipBIsGround +
-                    ", constraintType: " + constraintType + ", sourceBlockPos: " + sourceBlockPos + ", style: " + style);
+         //   System.out.println("LOADING FROM NBT - ID: " + id +
+            //        ", shipA: " + shipA + ", shipB: " + shipB +
+             //       ", shipAIsGround: " + shipAIsGround + ", shipBIsGround: " + shipBIsGround +
+             //       ", constraintType: " + constraintType + ", sourceBlockPos: " + sourceBlockPos + ", style: " + style);
 
             data.persistedConstraints.put(id, new PersistedConstraintData(
                     shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce,
@@ -166,7 +166,7 @@ public class ConstraintPersistence extends SavedData {
             ));
         }
 
-        System.out.println("Loaded " + data.persistedConstraints.size() + " persisted constraints");
+       // System.out.println("Loaded " + data.persistedConstraints.size() + " persisted constraints");
         return data;
     }
 
@@ -186,7 +186,7 @@ public class ConstraintPersistence extends SavedData {
             String constraintId = entry.getKey();
 
             if (removedConstraints.contains(constraintId)) {
-                System.out.println("Skipping removed constraint during save: " + constraintId);
+              //  System.out.println("Skipping removed constraint during save: " + constraintId);
                 continue;
             }
 
@@ -277,7 +277,7 @@ public class ConstraintPersistence extends SavedData {
     public void removeConstraint(String id) {
         PersistedConstraintData data = persistedConstraints.get(id);
         if (data != null && (data.shipAIsGround || data.shipBIsGround)) {
-            System.out.println("Skipping removal of ground rope constraint: " + id);
+           // System.out.println("Skipping removal of ground rope constraint: " + id);
             return;
         }
 
@@ -403,7 +403,7 @@ public class ConstraintPersistence extends SavedData {
                 currentGroundBodyId = VSGameUtilsKt.getShipObjectWorld(level).getDimensionToGroundBodyIdImmutable()
                         .get(VSGameUtilsKt.getDimensionId(level));
             } catch (Exception e) {
-                System.err.println("Failed to get ground body ID: " + e.getMessage());
+              //  System.err.println("Failed to get ground body ID: " + e.getMessage());
                 return;
             }
 
@@ -433,7 +433,7 @@ public class ConstraintPersistence extends SavedData {
                 ConstraintTracker.syncAllConstraintsToPlayer(player);
             }
 
-            System.out.println("Restoration complete: " + successCount + " success, " + failCount + " failed, " + skipCount + " skipped");
+          //  System.out.println("Restoration complete: " + successCount + " success, " + failCount + " failed, " + skipCount + " skipped");
         });
     }
 
@@ -534,7 +534,7 @@ public class ConstraintPersistence extends SavedData {
         }
 
         if (restoredCount > 0) {
-            System.out.println("Restored " + restoredCount + " constraints for chunk " + chunkPos);
+          //  System.out.println("Restored " + restoredCount + " constraints for chunk " + chunkPos);
         }
     }
 

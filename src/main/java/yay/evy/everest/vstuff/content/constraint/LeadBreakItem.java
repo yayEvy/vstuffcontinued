@@ -38,7 +38,7 @@ public class LeadBreakItem extends Item {
             Integer targetConstraintId = RopeUtil.findTargetedLead(serverLevel, player);
             if (targetConstraintId != null) {
                 try {
-                    VStuff.LOGGER.info("Attempting to remove constraint: {}", targetConstraintId);
+                    //VStuff.LOGGER.info("Attempting to remove constraint: {}", targetConstraintId);
 
                     VSGameUtilsKt.getShipObjectWorld(serverLevel).removeConstraint(targetConstraintId);
                     ConstraintTracker.RopeConstraintData data = ConstraintTracker.getActiveConstraints().get(targetConstraintId);
@@ -80,10 +80,10 @@ public class LeadBreakItem extends Item {
                         ConstraintTracker.cleanupOrphanedConstraints(serverLevel, data.sourceBlockPos);
                     }
 
-                    VStuff.LOGGER.info("Removed constraint (1st attempt): {}", targetConstraintId);
+                   // VStuff.LOGGER.info("Removed constraint (1st attempt): {}", targetConstraintId);
 
                     if (ConstraintTracker.getActiveConstraints().containsKey(targetConstraintId)) {
-                        VStuff.LOGGER.warn("Constraint {} still present, retrying...", targetConstraintId);
+                       // VStuff.LOGGER.warn("Constraint {} still present, retrying...", targetConstraintId);
 
                         VSGameUtilsKt.getShipObjectWorld(serverLevel).removeConstraint(targetConstraintId);
                         ConstraintTracker.removeConstraintWithPersistence(serverLevel, targetConstraintId);
@@ -93,7 +93,7 @@ public class LeadBreakItem extends Item {
                         persistence.saveNow(serverLevel);
 
 
-                        VStuff.LOGGER.info("Removed constraint (2nd attempt): {}", targetConstraintId);
+                     //   VStuff.LOGGER.info("Removed constraint (2nd attempt): {}", targetConstraintId);
                     }
 
                     if (!player.getAbilities().instabuild) {
@@ -103,7 +103,7 @@ public class LeadBreakItem extends Item {
 
                     return InteractionResultHolder.success(itemStack);
                 } catch (Exception e) {
-                    VStuff.LOGGER.error("Error removing constraint: {}", e.getMessage());
+                    //VStuff.LOGGER.error("Error removing constraint: {}", e.getMessage());
                     e.printStackTrace();
                 }
             }

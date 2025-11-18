@@ -21,4 +21,4 @@ plugins {
     id 'org.gradle.toolchains.foojay-resolver-convention' version '0.5.0'
 }
 
-rootProject.name = 'vs_addon_template'
+rootProject.name = 'vstuff'

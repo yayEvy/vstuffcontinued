@@ -24,8 +24,8 @@ public class ThrusterForceAttachment implements ShipForcesInducer {
         PhysShipImpl ship = (PhysShipImpl) physicShip;
         appliersMapping.forEach((pos, applier) -> {
             float thrust = applier.data.getThrust(); // or expose a getter if private
-            System.out.println("[ThrusterForceAttachment] Applying thrust=" + thrust
-                    + " at " + pos + " to ship=" + ship.getId());
+           // System.out.println("[ThrusterForceAttachment] Applying thrust=" + thrust
+             //       + " at " + pos + " to ship=" + ship.getId());
             applier.applyForces(pos, ship);
         });
     }
@@ -33,7 +33,7 @@ public class ThrusterForceAttachment implements ShipForcesInducer {
 
     public void addApplier(BlockPos pos, ThrusterForceApplier applier){
         appliersMapping.put(pos, applier);
-        System.out.println("[ThrusterAttachment] addApplier at " + pos + " totalAppliers=" + appliersMapping.size());
+       // System.out.println("[ThrusterAttachment] addApplier at " + pos + " totalAppliers=" + appliersMapping.size());
     }
 
     public void removeApplier(ServerLevel level, BlockPos pos){

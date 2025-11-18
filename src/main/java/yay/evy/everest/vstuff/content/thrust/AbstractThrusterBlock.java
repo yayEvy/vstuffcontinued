@@ -80,16 +80,16 @@ public abstract class AbstractThrusterBlock extends DirectionalAxisKineticBlock 
         if (attachment != null) {
             ThrusterForceApplier applier = new ThrusterForceApplier(data);
             attachment.addApplier(pos, applier);
-            System.out.println("[Thruster] onPlace: added applier at " + pos);
+          //  System.out.println("[Thruster] onPlace: added applier at " + pos);
         } else {
             level.getServer().execute(() -> {
                 ThrusterForceAttachment deferredAttachment = ThrusterForceAttachment.get(level, pos);
                 if (deferredAttachment != null) {
                     ThrusterForceApplier applier = new ThrusterForceApplier(data);
                     deferredAttachment.addApplier(pos, applier);
-                    System.out.println("[Thruster] onPlace: deferred registration succeeded at " + pos);
+                  //  System.out.println("[Thruster] onPlace: deferred registration succeeded at " + pos);
                 } else {
-                    System.out.println("[Thruster] onPlace: deferred registration still null at " + pos);
+                  //  System.out.println("[Thruster] onPlace: deferred registration still null at " + pos);
                 }
             });
         }

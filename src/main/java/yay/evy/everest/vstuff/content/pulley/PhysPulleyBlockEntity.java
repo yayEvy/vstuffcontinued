@@ -193,7 +193,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
 
     private void onModeChanged(PulleyMode oldMode, PulleyMode newMode) {
-        System.out.println("Pulley mode changed from " + oldMode + " to " + newMode);
+      //  System.out.println("Pulley mode changed from " + oldMode + " to " + newMode);
 
         if (oldMode == PulleyMode.MANUAL && newMode == PulleyMode.AUTO) {
             if (waitingForTarget) {
@@ -268,7 +268,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
                 targetWorldPos = getWorldPosition(serverLevel, targetPos, targetShip);
                 localPosB = getLocalPosition(serverLevel, targetPos, targetShip, shipB);
             } else {
-                System.err.println("Pulley: No valid target for constraint creation");
+            //    System.err.println("Pulley: No valid target for constraint creation");
                 return false;
             }
 
@@ -405,7 +405,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
 
     public PhysifyResult physifyBlocksIntoShip(ServerLevel level, Set<BlockPos> blockPositions, @Nullable BlockPos pulleyAnchorWorldPos) {
-        System.out.println("Physify called with " + blockPositions.size() + " blocks");
+     //   System.out.println("Physify called with " + blockPositions.size() + " blocks");
         if (blockPositions.isEmpty())
             return null;
 

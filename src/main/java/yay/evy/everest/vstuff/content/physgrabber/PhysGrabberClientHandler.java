@@ -32,17 +32,21 @@ public class PhysGrabberClientHandler {
 
             if (ship != null) {
                 grabbedShip = ship;
-                System.out.println("[PhysGrabberClient] Grabbing ship " + ship.getId());
+               // System.out.println("[PhysGrabberClient] Grabbing ship " + ship.getId());
 
                 Vec3 target = player.getEyePosition(1.0F).add(player.getLookAngle().scale(5.0));
-                PhysGrabberNetwork.sendGrab(ship.getId(), target);
+
+                boolean creative = player.isCreative(); // determine gamemode
+                PhysGrabberNetwork.sendGrab(ship.getId(), target, creative);
+                PhysGrabberNetwork.sendUpdate(ship.getId(), target, creative);
             }
         } else {
-            System.out.println("[PhysGrabberClient] Releasing ship " + grabbedShip.getId());
+            //System.out.println("[PhysGrabberClient] Releasing ship " + grabbedShip.getId());
             PhysGrabberNetwork.sendRelease(grabbedShip.getId());
             grabbedShip = null;
         }
     }
+
 
     public static void tickClient(Minecraft mc, Player player) {
         if (grabbedShip == null) return;
@@ -54,8 +58,11 @@ public class PhysGrabberClientHandler {
 
         Vec3 lookDir = player.getLookAngle();
         Vec3 target = eyePos.add(lookDir.scale(5.0)).add(0, 0.5, 0);
-        PhysGrabberNetwork.sendUpdate(grabbedShip.getId(), target);
+
+        boolean creative = player.isCreative(); // get gamemode
+        PhysGrabberNetwork.sendUpdate(grabbedShip.getId(), target, creative);
     }
+
 
     public static Vec3 getGrabbedShipPos(float partialTicks) {
         if (grabbedShip == null) return null;
@@ -69,6 +76,10 @@ public class PhysGrabberClientHandler {
 
     public static LoadedShip getGrabbedShip() {
         return grabbedShip;
+    }
+
+    public static boolean isGrabbing(Player player) {
+        return grabbedShip != null;
     }
 
 }

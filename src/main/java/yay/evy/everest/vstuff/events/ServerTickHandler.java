@@ -17,7 +17,7 @@ public class ServerTickHandler {
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
         for (ServerLevel level : event.getServer().getAllLevels()) {
-            System.out.println("VStuff: Restoring constraints for dimension: " + level.dimension().location());
+          //  System.out.println("VStuff: Restoring constraints for dimension: " + level.dimension().location());
             ConstraintPersistence.get(level).restoreConstraintsInstance(level);
         }
     }

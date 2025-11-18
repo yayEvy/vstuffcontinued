@@ -16,49 +16,50 @@ public class PhysGrabberPackets {
     public static void handleGrabOnServer(ServerLevel level, long shipId, Vector3d initialTarget) {
         LoadedServerShip ship = VSGameUtilsKt.getShipObjectWorld(level).getLoadedShips().getById(shipId);
         if (ship == null) {
-            System.out.println("[PhysGrabber] handleGrab: ship " + shipId + " not found on server");
+            //System.out.println("[PhysGrabber] handleGrab: ship " + shipId + " not found on server");
             return;
         }
 
         PhysGrabberServerAttachment grabber = PhysGrabberServerAttachment.getOrCreate(ship);
         grabber.setTarget(initialTarget);
-        System.out.println("[PhysGrabber] handleGrab: attached grabber to ship " + shipId + " and activated");
+      //  System.out.println("[PhysGrabber] handleGrab: attached grabber to ship " + shipId + " and activated");
     }
 
 
     public static void handleReleaseOnServer(ServerLevel level, long shipId) {
         LoadedServerShip ship = VSGameUtilsKt.getShipObjectWorld(level).getLoadedShips().getById(shipId);
         if (ship == null) {
-            System.out.println("[PhysGrabber] handleRelease: ship " + shipId + " not found on server");
+         //   System.out.println("[PhysGrabber] handleRelease: ship " + shipId + " not found on server");
             return;
         }
         PhysGrabberServerAttachment grabber = PhysGrabberServerAttachment.getOrCreate(ship);
         grabber.release();
-        System.out.println("[PhysGrabber] handleRelease: released attachment on ship " + shipId);
+       // System.out.println("[PhysGrabber] handleRelease: released attachment on ship " + shipId);
     }
 
     public static void handleUpdateOnServer(ServerLevel level, long shipId, Vector3d target) {
         LoadedServerShip ship = VSGameUtilsKt.getShipObjectWorld(level).getLoadedShips().getById(shipId);
         if (ship == null) {
-            System.out.println("[PhysGrabber] handleUpdate: ship " + shipId + " not found on server");
+          //  System.out.println("[PhysGrabber] handleUpdate: ship " + shipId + " not found on server");
             return;
         }
         PhysGrabberServerAttachment grabber = PhysGrabberServerAttachment.getOrCreate(ship);
         grabber.setTarget(target);
-        System.out.println("[PhysGrabber] handleUpdate: set target " + target + " on ship " + shipId);
+    //    System.out.println("[PhysGrabber] handleUpdate: set target " + target + " on ship " + shipId);
     }
 
-    // ----------------------- packets -----------------------------
 
     public static class GrabPacket {
         private final long shipId;
         private final double x, y, z;
+        private final boolean creative; // NEW
 
-        public GrabPacket(long shipId, double x, double y, double z) {
+        public GrabPacket(long shipId, double x, double y, double z, boolean creative) {
             this.shipId = shipId;
             this.x = x;
             this.y = y;
             this.z = z;
+            this.creative = creative;
         }
 
         public static void encode(GrabPacket msg, FriendlyByteBuf buf) {
@@ -66,10 +67,17 @@ public class PhysGrabberPackets {
             buf.writeDouble(msg.x);
             buf.writeDouble(msg.y);
             buf.writeDouble(msg.z);
+            buf.writeBoolean(msg.creative); // NEW
         }
 
         public static GrabPacket decode(FriendlyByteBuf buf) {
-            return new GrabPacket(buf.readLong(), buf.readDouble(), buf.readDouble(), buf.readDouble());
+            return new GrabPacket(
+                    buf.readLong(),
+                    buf.readDouble(),
+                    buf.readDouble(),
+                    buf.readDouble(),
+                    buf.readBoolean() // NEW
+            );
         }
 
         public static void handle(GrabPacket msg, Supplier<NetworkEvent.Context> ctxSupplier) {
@@ -78,11 +86,17 @@ public class PhysGrabberPackets {
                 ServerPlayer sender = ctx.getSender();
                 if (sender == null) return;
                 ServerLevel level = sender.serverLevel();
-                handleGrabOnServer(level, msg.shipId, new Vector3d(msg.x, msg.y, msg.z));
+                LoadedServerShip ship = VSGameUtilsKt.getShipObjectWorld(level).getLoadedShips().getById(msg.shipId);
+                if (ship != null) {
+                    var grabber = PhysGrabberServerAttachment.getOrCreate(ship);
+                    grabber.setTarget(new Vector3d(msg.x, msg.y, msg.z));
+                    grabber.setCreative(msg.creative); // NEW
+                }
             });
             ctx.setPacketHandled(true);
         }
     }
+
 
 
     public static class ReleasePacket {
@@ -104,7 +118,7 @@ public class PhysGrabberPackets {
             ctx.enqueueWork(() -> {
                 ServerPlayer sender = ctx.getSender();
                 if (sender == null) {
-                    System.out.println("[PhysGrabber] ReleasePacket handler: sender is null!");
+                 //   System.out.println("[PhysGrabber] ReleasePacket handler: sender is null!");
                     return;
                 }
                 ServerLevel level = sender.serverLevel();
@@ -117,9 +131,14 @@ public class PhysGrabberPackets {
     public static class UpdatePacket {
         private final long shipId;
         private final double x, y, z;
+        private final boolean creative; // NEW
 
-        public UpdatePacket(long shipId, double x, double y, double z) {
-            this.shipId = shipId; this.x = x; this.y = y; this.z = z;
+        public UpdatePacket(long shipId, double x, double y, double z, boolean creative) {
+            this.shipId = shipId;
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.creative = creative;
         }
 
         public static void encode(UpdatePacket msg, FriendlyByteBuf buf) {
@@ -127,24 +146,34 @@ public class PhysGrabberPackets {
             buf.writeDouble(msg.x);
             buf.writeDouble(msg.y);
             buf.writeDouble(msg.z);
+            buf.writeBoolean(msg.creative); // NEW
         }
 
         public static UpdatePacket decode(FriendlyByteBuf buf) {
-            return new UpdatePacket(buf.readLong(), buf.readDouble(), buf.readDouble(), buf.readDouble());
+            return new UpdatePacket(
+                    buf.readLong(),
+                    buf.readDouble(),
+                    buf.readDouble(),
+                    buf.readDouble(),
+                    buf.readBoolean() // NEW
+            );
         }
 
         public static void handle(UpdatePacket msg, Supplier<NetworkEvent.Context> ctxSupplier) {
             NetworkEvent.Context ctx = ctxSupplier.get();
             ctx.enqueueWork(() -> {
                 ServerPlayer sender = ctx.getSender();
-                if (sender == null) {
-                    System.out.println("[PhysGrabber] UpdatePacket handler: sender is null!");
-                    return;
-                }
+                if (sender == null) return;
                 ServerLevel level = sender.serverLevel();
-                handleUpdateOnServer(level, msg.shipId, new Vector3d(msg.x, msg.y, msg.z));
+                LoadedServerShip ship = VSGameUtilsKt.getShipObjectWorld(level).getLoadedShips().getById(msg.shipId);
+                if (ship != null) {
+                    var grabber = PhysGrabberServerAttachment.getOrCreate(ship);
+                    grabber.setTarget(new Vector3d(msg.x, msg.y, msg.z));
+                    grabber.setCreative(msg.creative); // NEW
+                }
             });
             ctx.setPacketHandled(true);
         }
     }
+
 }

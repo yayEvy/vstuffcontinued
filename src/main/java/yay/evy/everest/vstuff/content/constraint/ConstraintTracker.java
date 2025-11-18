@@ -136,7 +136,7 @@ public class ConstraintTracker {
                             && existing.style == style); // check style too
 
             if (existingConstraintFound) {
-                System.out.println("Constraint already exists for rope pulley at " + sourceBlockPos + " with style " + style + ", skipping");
+               // System.out.println("Constraint already exists for rope pulley at " + sourceBlockPos + " with style " + style + ", skipping");
                 return;
             }
         }
@@ -234,7 +234,7 @@ public class ConstraintTracker {
                                               RopeConstraintData.ConstraintType constraintType,
                                               net.minecraft.core.BlockPos sourceBlockPos, RopeStyles.RopeStyle style) {
         if (activeConstraints.containsKey(constraintId)) {
-            System.out.println("Constraint " + constraintId + " already exists in tracker, skipping");
+          //  System.out.println("Constraint " + constraintId + " already exists in tracker, skipping");
             return;
         }
 
@@ -300,7 +300,7 @@ public class ConstraintTracker {
 
             // Update the last join time to delay the cleanup process
             lastJoinTime = System.currentTimeMillis();
-            System.out.println("Player joined, setting lastJoinTime for delayed cleanup.");
+            //System.out.println("Player joined, setting lastJoinTime for delayed cleanup.");
         }
     }
 
