@@ -40,7 +40,7 @@ public class VStuffItems {
                     .properties(p -> p
                             .stacksTo(1)
                             .rarity(Rarity.UNCOMMON)
-                            .durability(568))
+                            .durability(1096))
                     .model(AssetLookup.itemModelWithPartials())
                     .register();
 

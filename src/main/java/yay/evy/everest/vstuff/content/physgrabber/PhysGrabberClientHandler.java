@@ -17,10 +17,10 @@ public class PhysGrabberClientHandler {
 
     private static LoadedShip grabbedShip = null;
 
-    public static void tryGrabOrRelease(Minecraft mc, Player player) {
+    public static boolean tryGrabOrRelease(Minecraft mc, Player player) {
         if (grabbedShip == null) {
             HitResult hit = mc.hitResult;
-            if (hit == null || hit.getType() != HitResult.Type.BLOCK) return;
+            if (hit == null || hit.getType() != HitResult.Type.BLOCK) return false;
 
             ClientLevel level = (ClientLevel) player.level();
             BlockHitResult blockHit = (BlockHitResult) hit;
@@ -39,11 +39,14 @@ public class PhysGrabberClientHandler {
                 boolean creative = player.isCreative(); // determine gamemode
                 PhysGrabberNetwork.sendGrab(ship.getId(), target, creative);
                 PhysGrabberNetwork.sendUpdate(ship.getId(), target, creative);
+                return true;
             }
+            return false;
         } else {
             //System.out.println("[PhysGrabberClient] Releasing ship " + grabbedShip.getId());
             PhysGrabberNetwork.sendRelease(grabbedShip.getId());
             grabbedShip = null;
+            return true;
         }
     }
 

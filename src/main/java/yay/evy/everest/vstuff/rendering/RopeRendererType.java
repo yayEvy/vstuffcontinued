@@ -66,7 +66,7 @@ public class RopeRendererType extends RenderType {
                 CompositeState.builder()
                         .setShaderState(RenderStateShard.RENDERTYPE_ENTITY_TRANSLUCENT_CULL_SHADER)
                         .setTextureState(new TextureStateShard(texture, false, false))
-                        .setTransparencyState(NO_TRANSPARENCY)
+                        .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
                         .setCullState(NO_CULL)
                         .setLightmapState(LIGHTMAP)
                         .setOverlayState(OVERLAY)

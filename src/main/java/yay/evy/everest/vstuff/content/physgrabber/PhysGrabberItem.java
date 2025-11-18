@@ -25,11 +25,16 @@ public class PhysGrabberItem extends Item implements CustomArmPoseItem {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        ItemStack itemStack = player.getItemInHand(hand);
         if (level.isClientSide()) {
             Minecraft mc = Minecraft.getInstance();
-            PhysGrabberClientHandler.tryGrabOrRelease(mc, player);
+            boolean didGrab = PhysGrabberClientHandler.tryGrabOrRelease(mc, player);
+            if (didGrab) {
+                itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
+                return InteractionResultHolder.success(player.getItemInHand(hand));
+            }
         }
-        return InteractionResultHolder.success(player.getItemInHand(hand));
+        return InteractionResultHolder.fail(player.getItemInHand(hand));
     }
 
     @Override

@@ -1,6 +1,7 @@
 {
 	"format_version": "1.9.0",
 	"credit": "made evilly by yahaha",
+	"parent": "block/block",
 	"texture_size": [32, 32],
 	"textures": {
 		"0": "vstuff:block/rotational_thruster/thruster_nozzle",

@@ -1,6 +1,7 @@
 package yay.evy.everest.vstuff.index;
 
 import com.simibubi.create.api.stress.BlockStressValues;
+import com.simibubi.create.foundation.data.AssetLookup;
 import com.simibubi.create.foundation.data.BlockStateGen;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.BlockEntry;
@@ -32,7 +33,8 @@ public class VStuffBlocks  {
                     .transform(b -> b
                             .onRegister(block -> BlockStressValues.setGeneratorSpeed(32).accept(block)))
                     .item()
-                    .transform(customItemModel())
+                    .model(AssetLookup.itemModel("rotational_thruster.json"))
+                    .build()
                     .register();
 
     public static final BlockEntry<PhysPulleyBlock> PHYS_PULLEY =
@@ -40,11 +42,12 @@ public class VStuffBlocks  {
                     .initialProperties(() -> Blocks.IRON_BLOCK)
                     .properties(props -> BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK))
                     .transform(axeOrPickaxe())
-                    .blockstate(BlockStateGen.horizontalBlockProvider(false))
+                    .blockstate(BlockStateGen.horizontalBlockProvider(true))
                     .transform(b -> b
                             .onRegister(block -> BlockStressValues.setGeneratorSpeed(4).accept(block)))
                     .item()
-                    .transform(customItemModel())
+                    .model(AssetLookup.itemModel("phys_pulley.json"))
+                    .build()
                     .register();
 
     public static void register() {}
