@@ -6,6 +6,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextColor;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -31,17 +33,15 @@ public class PhysGrabberClientHandler {
             );
 
             if (ship != null) {
-                grabbedShip = ship;
-               // System.out.println("[PhysGrabberClient] Grabbing ship " + ship.getId());
-
                 Vec3 target = player.getEyePosition(1.0F).add(player.getLookAngle().scale(5.0));
+                boolean creative = player.isCreative();
 
-                boolean creative = player.isCreative(); // determine gamemode
                 PhysGrabberNetwork.sendGrab(ship.getId(), target, creative);
-                PhysGrabberNetwork.sendUpdate(ship.getId(), target, creative);
+
+                grabbedShip = ship;
             }
+
         } else {
-            //System.out.println("[PhysGrabberClient] Releasing ship " + grabbedShip.getId());
             PhysGrabberNetwork.sendRelease(grabbedShip.getId());
             grabbedShip = null;
         }
@@ -59,7 +59,7 @@ public class PhysGrabberClientHandler {
         Vec3 lookDir = player.getLookAngle();
         Vec3 target = eyePos.add(lookDir.scale(5.0)).add(0, 0.5, 0);
 
-        boolean creative = player.isCreative(); // get gamemode
+        boolean creative = player.isCreative();
         PhysGrabberNetwork.sendUpdate(grabbedShip.getId(), target, creative);
     }
 
