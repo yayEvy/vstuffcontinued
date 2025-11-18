@@ -8,8 +8,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.PhysShip;
-import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.ShipForcesInducer;
 import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 
@@ -40,7 +40,7 @@ public class ThrusterForceAttachment implements ShipForcesInducer {
         appliersMapping.remove(pos);
         //Remove attachment by using passing null as attachment instance in order to clean up after ourselves
         if (appliersMapping.isEmpty()) {
-            ServerShip ship = AttachmentUtils.getShipAt(level, pos);
+            LoadedServerShip ship = AttachmentUtils.getShipAt(level, pos);
             if (ship != null) {
                 // Remove attachment by passing null as the instance
                 ship.saveAttachment(ThrusterForceAttachment.class, null);
@@ -49,7 +49,7 @@ public class ThrusterForceAttachment implements ShipForcesInducer {
     }
 
     //Getters
-    public static ThrusterForceAttachment getOrCreateAsAttachment(ServerShip ship) {
+    public static ThrusterForceAttachment getOrCreateAsAttachment(LoadedServerShip ship) {
         return AttachmentUtils.getOrCreate(ship, ThrusterForceAttachment.class, ThrusterForceAttachment::new);
     }
 

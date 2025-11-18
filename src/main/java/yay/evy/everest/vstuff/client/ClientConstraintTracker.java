@@ -6,6 +6,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
@@ -47,7 +48,7 @@ public class ClientConstraintTracker {
 
 
                         try {
-                            ((org.valkyrienskies.core.api.ships.ClientShip) shipObject).getRenderTransform().getShipToWorld().transformPosition(localPosA, worldPos);
+                            ((ClientShip) shipObject).getRenderTransform().getShipToWorld().transformPosition(localPosA, worldPos);
                         } catch (Exception e) {
                             shipObject.getTransform().getShipToWorld().transformPosition(localPosA, worldPos);
                         }

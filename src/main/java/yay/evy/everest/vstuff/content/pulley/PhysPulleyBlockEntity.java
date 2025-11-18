@@ -35,7 +35,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 import org.joml.Vector3i;
-import org.valkyrienskies.core.api.ships.ServerShip;
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.api.ships.properties.ChunkClaim;
 import org.valkyrienskies.core.apigame.constraints.VSRopeConstraint;
@@ -420,8 +420,8 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
         var shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
         Ship ship = shipWorld.createNewShipAtBlock(VectorConversionsMCKt.toJOML(anchorPos), false, 1, VSGameUtilsKt.getDimensionId(level));
 
-        if (!(ship instanceof ServerShip serverShip)) {
-            System.err.println("Created ship is not a ServerShip!");
+        if (!(ship instanceof LoadedServerShip serverShip)) {
+            System.err.println("Created ship is not a LoadedServerShip!");
             return null;
         }
 
@@ -497,7 +497,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
     }
 
 
-    public Vector3i calculateInternalCenterPos(ServerShip ship, ServerLevel level) {
+    public Vector3i calculateInternalCenterPos(LoadedServerShip ship, ServerLevel level) {
         ChunkClaim claim = ship.getChunkClaim();
         return claim.getCenterBlockCoordinates(VSGameUtilsKt.getYRange(level), new Vector3i());
     }
@@ -542,7 +542,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             System.out.println("AUTO MODE: Found ship target at " + shipTarget);
             this.previewTargetPos = shipTarget;
             Ship targetShip = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, shipTarget);
-            if (targetShip instanceof ServerShip) {
+            if (targetShip instanceof LoadedServerShip) {
                 BlockPos anchorInShip = findPulleyAnchorInShip(serverLevel, targetShip);
                 if (anchorInShip != null) {
                     System.out.println("AUTO MODE: Found pulley anchor inside existing ship at " + anchorInShip);
