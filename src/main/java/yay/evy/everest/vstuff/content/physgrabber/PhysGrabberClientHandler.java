@@ -6,6 +6,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
+import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import org.valkyrienskies.core.api.ships.Ship;
@@ -13,7 +15,7 @@ import yay.evy.everest.vstuff.network.PhysGrabberNetwork;
 
 public class PhysGrabberClientHandler {
 
-    private static Ship grabbedShip = null;
+    private static LoadedShip grabbedShip = null;
 
     public static void tryGrabOrRelease(Minecraft mc, Player player) {
         if (grabbedShip == null) {
@@ -23,7 +25,7 @@ public class PhysGrabberClientHandler {
             ClientLevel level = (ClientLevel) player.level();
             BlockHitResult blockHit = (BlockHitResult) hit;
 
-            Ship ship = VSGameUtilsKt.getShipObjectManagingPos(
+            LoadedShip ship = VSGameUtilsKt.getShipObjectManagingPos(
                     level,
                     VectorConversionsMCKt.toJOMLD(blockHit.getBlockPos())
             );
@@ -65,7 +67,7 @@ public class PhysGrabberClientHandler {
         return new Vec3(shipWorldPos.x(), shipWorldPos.y(), shipWorldPos.z());
     }
 
-    public static Ship getGrabbedShip() {
+    public static LoadedShip getGrabbedShip() {
         return grabbedShip;
     }
 

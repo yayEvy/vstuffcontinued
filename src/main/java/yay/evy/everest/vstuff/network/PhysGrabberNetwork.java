@@ -47,6 +47,7 @@ public class PhysGrabberNetwork {
     }
 
     public static void sendGrab(long shipId, Vec3 target) {
+        VStuff.LOGGER.info("[PhysGrabberNetwork] received grab");
         CHANNEL.sendToServer(new PhysGrabberPackets.GrabPacket(
                 shipId, target.x, target.y, target.z
         ));

@@ -215,20 +215,15 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-annotations:2.13.3"
     implementation 'thedarkcolour:kotlinforforge:4.10.0'
 
-
-    //implementation("mezz.jei:jei-$minecraft_version-forge:$jei_version")
-
     implementation(fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false })
     implementation(fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}"))
     compileOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}"))
     runtimeOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}"))
     implementation(fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}"))
 
-
-
-
-
-
+    // just mods that are nice in the dev env
+    //implementation(fg.deobf("maven.modrinth:u6dRKJwZ:92XfryJj")) // jei
+    //implementation(fg.deobf("maven.modrinth:aC3cM3Vq:7JVXOe3K")) // mouse tweaks
 }
 
 

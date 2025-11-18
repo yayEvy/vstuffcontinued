@@ -1,33 +1,33 @@
 {
   "variants": {
     "facing=east,powered=false": {
-      "model": "vstuff:block/phys_pulley/block",
+      "model": "vstuff:block/phys_pulley",
       "y": 90
     },
     "facing=east,powered=true": {
-      "model": "vstuff:block/phys_pulley/block",
+      "model": "vstuff:block/phys_pulley",
       "y": 90
     },
     "facing=north,powered=false": {
-      "model": "vstuff:block/phys_pulley/block"
+      "model": "vstuff:block/phys_pulley"
     },
     "facing=north,powered=true": {
-      "model": "vstuff:block/phys_pulley/block"
+      "model": "vstuff:block/phys_pulley"
     },
     "facing=south,powered=false": {
-      "model": "vstuff:block/phys_pulley/block",
+      "model": "vstuff:block/phys_pulley",
       "y": 180
     },
     "facing=south,powered=true": {
-      "model": "vstuff:block/phys_pulley/block",
+      "model": "vstuff:block/phys_pulley",
       "y": 180
     },
     "facing=west,powered=false": {
-      "model": "vstuff:block/phys_pulley/block",
+      "model": "vstuff:block/phys_pulley",
       "y": 270
     },
     "facing=west,powered=true": {
-      "model": "vstuff:block/phys_pulley/block",
+      "model": "vstuff:block/phys_pulley",
       "y": 270
     }
   }

@@ -2,6 +2,7 @@ package yay.evy.everest.vstuff.content.physgrabber;
 
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.ShipForcesInducer;
@@ -63,7 +64,7 @@ public class PhysGrabberServerAttachment implements ShipForcesInducer {
         this.active = false;
     }
 
-    public static PhysGrabberServerAttachment getOrCreate(ServerShip ship) {
+    public static PhysGrabberServerAttachment getOrCreate(LoadedServerShip ship) {
         PhysGrabberServerAttachment grabber =
                 AttachmentUtils.getOrCreate(ship, PhysGrabberServerAttachment.class, PhysGrabberServerAttachment::new);
 
