@@ -6,25 +6,30 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.PacketDistributor;
 import org.joml.Vector3d;
-import org.valkyrienskies.core.apigame.constraints.VSRopeConstraint;
+import org.joml.Quaterniond;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
 import yay.evy.everest.vstuff.util.RopeStyles;
-import yay.evy.everest.vstuff.util.packet.RopeSoundPacket;
+import org.valkyrienskies.core.internal.joints.*;
 
-@Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class Rope {
 
-    public static RopeUtil.RopeInteractionReturn createNew(LeadConstraintItem ropeItem, ServerLevel level, BlockPos firstClickedPos,
-                                                           BlockPos secondClickedPos, Entity firstEntity, Long firstShipId,
-                                                           Long secondShipId, Player player) {
+    public static RopeUtil.RopeInteractionReturn createNew(
+            LeadConstraintItem ropeItem,
+            ServerLevel level,
+            BlockPos firstClickedPos,
+            BlockPos secondClickedPos,
+            Entity firstEntity,
+            Long firstShipId,
+            Long secondShipId,
+            Player player
+    ) {
         if (firstClickedPos == null && firstEntity == null) return RopeUtil.RopeInteractionReturn.FAIL;
 
         Vector3d firstWorldPos;
@@ -45,19 +50,31 @@ public class Rope {
         Long shipB = secondShipId != null ? secondShipId : RopeUtil.getGroundBodyId(level);
         Vector3d secondLocalPos = RopeUtil.getLocalPositionFixed(level, secondClickedPos, secondShipId, shipB);
 
-        return createNew(ropeItem, level, shipA, shipB, firstLocalPos, secondLocalPos, firstWorldPos, secondWorldPos, player);
+        return createNew(
+                ropeItem, level,
+                shipA, shipB,
+                firstLocalPos, secondLocalPos,
+                firstWorldPos, secondWorldPos,
+                player
+        );
     }
 
-    public static RopeUtil.RopeInteractionReturn createNew(LeadConstraintItem ropeItem, ServerLevel level,
-                                                           Long shipA, Long shipB,
-                                                           Vector3d localPosA, Vector3d localPosB,
-                                                           Vector3d worldPosA, Vector3d worldPosB,
-                                                           Player player) {
+    public static RopeUtil.RopeInteractionReturn createNew(
+            LeadConstraintItem ropeItem,
+            ServerLevel level,
+            Long shipA, Long shipB,
+            Vector3d localPosA, Vector3d localPosB,
+            Vector3d worldPosA, Vector3d worldPosB,
+            Player player
+    ) {
+        final Long groundBodyId = RopeUtil.getGroundBodyId(level);
 
-        Long groundBodyId = RopeUtil.getGroundBodyId(level);
-        Long finalShipA, finalShipB;
-        Vector3d finalLocalPosA, finalLocalPosB;
-        Vector3d finalWorldPosA, finalWorldPosB;
+        final Long finalShipA;
+        final Long finalShipB;
+        final Vector3d finalLocalPosA;
+        final Vector3d finalLocalPosB;
+        final Vector3d finalWorldPosA;
+        final Vector3d finalWorldPosB;
 
         boolean shipAIsWorld = shipA.equals(groundBodyId);
         boolean shipBIsWorld = shipB.equals(groundBodyId);
@@ -81,75 +98,83 @@ public class Rope {
         double distance = finalWorldPosA.distance(finalWorldPosB);
         double maxAllowedLength = VstuffConfig.MAX_ROPE_LENGTH.get();
 
-        if (distance > maxAllowedLength) {
-            if (player != null) {
-                player.displayClientMessage(
-                        Component.literal("§cRope too long! Max length is " + maxAllowedLength + " blocks."),
-                        true
-                );
-            }
+        if (distance > maxAllowedLength && player != null) {
+            player.displayClientMessage(
+                    Component.literal("§cRope too long! Max length is " + maxAllowedLength + " blocks."),
+                    true
+            );
             return RopeUtil.RopeInteractionReturn.FAIL;
         }
 
-        double maxLength = distance + 0.5;
-        double massA = RopeUtil.getMassForShip(level, finalShipA);
-        double massB = RopeUtil.getMassForShip(level, finalShipB);
+        final double maxLength = distance + 0.5;
+        final double massA = RopeUtil.getMassForShip(level, finalShipA);
+        final double massB = RopeUtil.getMassForShip(level, finalShipB);
         double effectiveMass = Math.min(massA, massB);
         if (effectiveMass < 100.0) effectiveMass = 100.0;
-        double compliance = 1e-12 / effectiveMass;
+        final double compliance = (shipAIsWorld || shipBIsWorld) ? 1e-12 / effectiveMass * 0.05 : 1e-12 / effectiveMass;
         double massRatio = Math.max(massA, massB) / Math.min(massA, massB);
-        double baseMaxForce = 50000000000000.0;
-        double maxForce = baseMaxForce * Math.min(massRatio, 20.0);
-
-        if (shipAIsWorld || shipBIsWorld) {
-            maxForce *= 10.0;
-            compliance *= 0.05;
-        }
-
-        VSRopeConstraint ropeConstraint = new VSRopeConstraint(
-                finalShipA, finalShipB,
-                compliance,
-                finalLocalPosA, finalLocalPosB,
-                maxForce,
-                maxLength
-        );
+        final double maxForce = (shipAIsWorld || shipBIsWorld)
+                ? 50000000000000.0 * Math.min(massRatio, 20.0) * 10.0
+                : 50000000000000.0 * Math.min(massRatio, 20.0);
 
         try {
-            Integer constraintId = VSGameUtilsKt.getShipObjectWorld(level).createNewConstraint(ropeConstraint);
-            if (constraintId != null) {
-                ropeItem.setActiveConstraintId(constraintId);
-                ConstraintTracker.addConstraintWithPersistence(level, constraintId, finalShipA, finalShipB,
-                        finalLocalPosA, finalLocalPosB, maxLength,
-                        compliance, maxForce, RopeStyleHandlerServer.getStyle(player.getUUID()));
+            String dimensionId = ValkyrienSkies.getDimensionId(level);
+            var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(dimensionId);
 
-                if (player instanceof ServerPlayer serverPlayer) {
-                    RopeStyles.RopeStyle ropeStyle = RopeStyleHandlerServer.getStyle(player.getUUID());
-                    NetworkHandler.INSTANCE.send(
-                            PacketDistributor.PLAYER.with(() -> serverPlayer),
-                            new RopeSoundPacket(false, ropeStyle.getBasicStyle())
-                    );
+            VSJoint ropeConstraint = new VSDistanceJoint(
+                    finalShipA,
+                    new VSJointPose(finalLocalPosA, new Quaterniond()),
+                    finalShipB,
+                    new VSJointPose(finalLocalPosB, new Quaterniond()),
+                    new VSJointMaxForceTorque((float) maxForce, (float) maxForce),
+                    0f,
+                    (float) maxLength,
+                    0f,
+                    1f,
+                    0.1f
+            );
 
+            final Player finalPlayer = player;
+
+            gtpa.addJoint(ropeConstraint, 0, newConstraintId -> {
+                RopeStyles.RopeStyle ropeStyle = null;
+                if (finalPlayer instanceof ServerPlayer serverPlayer) {
+                    ropeStyle = RopeStyleHandlerServer.getStyle(serverPlayer.getUUID());
+                }
+
+                if (ropeStyle == null) {
+                    ropeStyle = new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal");
+                }
+
+                ConstraintTracker.addConstraintToTracker(
+                        level,
+                        newConstraintId,
+                        finalShipA,
+                        finalShipB,
+                        finalLocalPosA,
+                        finalLocalPosB,
+                        maxLength,
+                        compliance,
+                        maxForce,
+                        ConstraintTracker.RopeConstraintData.ConstraintType.GENERIC,
+                        null,
+                        ropeStyle
+                );
+
+
+                ConstraintTracker.mapConstraintToPersistenceId(newConstraintId, "manual_rope");
+
+                if (finalPlayer instanceof ServerPlayer serverPlayer) {
                     ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);
                 }
+            });
 
-                if (player != null && !player.getAbilities().instabuild) {
-                    for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
-                        ItemStack stack = player.getInventory().getItem(i);
-                        if (stack.getItem() instanceof LeadConstraintItem) {
-                            stack.shrink(1);
-                            break;
-                        }
-                    }
-                }
-
-                return RopeUtil.RopeInteractionReturn.SUCCESS;
-            }
+            return RopeUtil.RopeInteractionReturn.SUCCESS;
         } catch (Exception e) {
-            VStuff.LOGGER.error("Error creating rope constraint: {}",  e.getMessage());
+            VStuff.LOGGER.error("Error creating rope constraint: {}", e.getMessage());
             e.printStackTrace();
         }
 
         return RopeUtil.RopeInteractionReturn.FAIL;
-
     }
 }

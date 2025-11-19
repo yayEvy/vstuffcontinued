@@ -12,7 +12,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
@@ -171,7 +173,8 @@ public class ConstraintTracker {
     public static void removeConstraintWithPersistence(ServerLevel level, Integer constraintId) {
         RopeConstraintData data = activeConstraints.remove(constraintId);
         if (data != null) {
-            VSGameUtilsKt.getShipObjectWorld(level).removeConstraint(constraintId);
+            var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(ValkyrienSkies.getDimensionId(level));
+            gtpa.removeJoint(constraintId);
 
             ConstraintPersistence persistence = ConstraintPersistence.get(level);
             String persistenceId = constraintToPersistenceId.remove(constraintId);
@@ -196,6 +199,7 @@ public class ConstraintTracker {
             }
         }
     }
+
 
 
     public static void syncAllConstraintsToPlayer(ServerPlayer player) {
@@ -305,9 +309,8 @@ public class ConstraintTracker {
     }
 
 
-    public static void cleanupOrphanedConstraints(ServerLevel level, net.minecraft.core.BlockPos sourceBlockPos) {
-        // System.out.println("Cleaning up orphaned constraints for block at " + sourceBlockPos);
 
+    public static void cleanupOrphanedConstraints(ServerLevel level, net.minecraft.core.BlockPos sourceBlockPos) {
         java.util.List<Integer> constraintsToRemove = new java.util.ArrayList<>();
 
         for (Map.Entry<Integer, RopeConstraintData> entry : activeConstraints.entrySet()) {
@@ -317,20 +320,17 @@ public class ConstraintTracker {
             if (data.constraintType == RopeConstraintData.ConstraintType.ROPE_PULLEY &&
                     data.sourceBlockPos != null &&
                     data.sourceBlockPos.equals(sourceBlockPos)) {
-
-                //   System.out.println("Found orphaned constraint " + constraintId + " for block " + sourceBlockPos);
                 constraintsToRemove.add(constraintId);
             }
         }
 
+        var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(ValkyrienSkies.getDimensionId(level));
+
         for (Integer constraintId : constraintsToRemove) {
             try {
-                VSGameUtilsKt.getShipObjectWorld(level).removeConstraint(constraintId);
+                gtpa.removeJoint(constraintId);
                 removeConstraintWithPersistence(level, constraintId);
-                //   System.out.println("Cleaned up orphaned constraint " + constraintId);
-            } catch (Exception e) {
-                //   System.err.println("Error cleaning up orphaned constraint " + constraintId + ": " + e.getMessage());
-            }
+            } catch (Exception ignored) {}
         }
     }
 
@@ -361,77 +361,7 @@ public class ConstraintTracker {
         }
     }
 
-    public static void validateAndCleanupConstraints(ServerLevel level) {
-        // Skip validation for 15 seconds after a player joins
-        if (System.currentTimeMillis() - lastJoinTime < 15000) return;
 
-        java.util.List<Integer> constraintsToRemove = new java.util.ArrayList<>();
-
-        Long groundBodyId;
-        try {
-            groundBodyId = VSGameUtilsKt.getShipObjectWorld(level)
-                    .getDimensionToGroundBodyIdImmutable()
-                    .get(VSGameUtilsKt.getDimensionId(level));
-        } catch (Exception e) {
-            return; // Cannot validate without ground body
-        }
-        if (groundBodyId == null) return;
-
-        long currentTime = System.currentTimeMillis();
-
-        java.util.List<Integer> delayedToProcess = new java.util.ArrayList<>();
-        for (Map.Entry<Integer, Long> entry : delayedValidations.entrySet()) {
-            if (currentTime >= entry.getValue()) delayedToProcess.add(entry.getKey());
-        }
-
-        for (Integer constraintId : delayedToProcess) {
-            delayedValidations.remove(constraintId);
-            RopeConstraintData data = activeConstraints.get(constraintId);
-            if (data == null) continue;
-
-            boolean shipAExists = isShipValid(level, data.shipA, groundBodyId);
-            boolean shipBExists = isShipValid(level, data.shipB, groundBodyId);
-
-            if (!shipAExists || !shipBExists) {
-                constraintsToRemove.add(constraintId);
-            }
-        }
-
-        for (Map.Entry<Integer, RopeConstraintData> entry : activeConstraints.entrySet()) {
-            Integer constraintId = entry.getKey();
-            RopeConstraintData data = entry.getValue();
-
-            // Skip if already scheduled for delayed validation
-            if (delayedValidations.containsKey(constraintId)) continue;
-
-            boolean shipAExists = isShipValid(level, data.shipA, groundBodyId);
-            boolean shipBExists = isShipValid(level, data.shipB, groundBodyId);
-
-            if (!shipAExists || !shipBExists) {
-                // Ship missing → schedule delayed validation instead of removing
-                scheduleDelayedValidation(level, constraintId, 5000);
-                continue;
-            }
-
-            // Skip validation if chunks are not loaded
-            if (!areAttachmentChunksLoaded(level, data, groundBodyId)) continue;
-
-            boolean validA = isValidAttachmentPoint(level, data.localPosA, data.shipA, groundBodyId, data.isShipA);
-            boolean validB = isValidAttachmentPoint(level, data.localPosB, data.shipB, groundBodyId, data.isShipB);
-
-            if (!validA || !validB) {
-                // Invalid attachment → schedule delayed validation
-                scheduleDelayedValidation(level, constraintId, 5000);
-            }
-        }
-
-        for (Integer constraintId : constraintsToRemove) {
-            try {
-                VSGameUtilsKt.getShipObjectWorld(level).removeConstraint(constraintId);
-                removeConstraintWithPersistence(level, constraintId);
-            } catch (Exception ignored) {}
-        }
-    }
     public static boolean constraintExists(ServerLevel level, Integer constraintId) {
         if (constraintId == null) return false;
 

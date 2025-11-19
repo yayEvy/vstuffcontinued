@@ -10,21 +10,17 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3d;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
+import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.index.VStuffItems;
-import yay.evy.everest.vstuff.sound.RopeSoundHandler;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public class LeadBreakItem extends Item {
     public LeadBreakItem(Properties pProperties) {
@@ -38,9 +34,9 @@ public class LeadBreakItem extends Item {
             Integer targetConstraintId = RopeUtil.findTargetedLead(serverLevel, player);
             if (targetConstraintId != null) {
                 try {
-                    //VStuff.LOGGER.info("Attempting to remove constraint: {}", targetConstraintId);
+                    var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(ValkyrienSkies.getDimensionId(serverLevel));
+                    gtpa.removeJoint(targetConstraintId);
 
-                    VSGameUtilsKt.getShipObjectWorld(serverLevel).removeConstraint(targetConstraintId);
                     ConstraintTracker.RopeConstraintData data = ConstraintTracker.getActiveConstraints().get(targetConstraintId);
                     ConstraintTracker.removeConstraintWithPersistence(serverLevel, targetConstraintId);
                     NetworkHandler.sendConstraintRemove(targetConstraintId);
@@ -56,9 +52,7 @@ public class LeadBreakItem extends Item {
 
                     player.displayClientMessage(notif, true);
 
-                    // config
                     if (VstuffConfig.ROPE_SOUNDS.get()) {
-
                         var sound = (style == RopeStyles.PrimitiveRopeStyle.CHAIN)
                                 ? SoundEvents.CHAIN_BREAK
                                 : SoundEvents.LEASH_KNOT_BREAK;
@@ -73,27 +67,17 @@ public class LeadBreakItem extends Item {
                         );
                     }
 
-
-
-
                     if (data != null && data.sourceBlockPos != null) {
                         ConstraintTracker.cleanupOrphanedConstraints(serverLevel, data.sourceBlockPos);
                     }
 
-                   // VStuff.LOGGER.info("Removed constraint (1st attempt): {}", targetConstraintId);
-
                     if (ConstraintTracker.getActiveConstraints().containsKey(targetConstraintId)) {
-                       // VStuff.LOGGER.warn("Constraint {} still present, retrying...", targetConstraintId);
-
-                        VSGameUtilsKt.getShipObjectWorld(serverLevel).removeConstraint(targetConstraintId);
+                        gtpa.removeJoint(targetConstraintId);
                         ConstraintTracker.removeConstraintWithPersistence(serverLevel, targetConstraintId);
                         NetworkHandler.sendConstraintRemove(targetConstraintId);
                         forceRemoveConstraint(serverLevel, targetConstraintId);
                         ConstraintPersistence persistence = ConstraintPersistence.get(serverLevel);
                         persistence.saveNow(serverLevel);
-
-
-                     //   VStuff.LOGGER.info("Removed constraint (2nd attempt): {}", targetConstraintId);
                     }
 
                     if (!player.getAbilities().instabuild) {
@@ -103,7 +87,6 @@ public class LeadBreakItem extends Item {
 
                     return InteractionResultHolder.success(itemStack);
                 } catch (Exception e) {
-                    //VStuff.LOGGER.error("Error removing constraint: {}", e.getMessage());
                     e.printStackTrace();
                 }
             }
@@ -115,13 +98,12 @@ public class LeadBreakItem extends Item {
         ConstraintTracker.RopeConstraintData data = ConstraintTracker.getActiveConstraints().get(id);
 
         try {
-            VSGameUtilsKt.getShipObjectWorld(level).removeConstraint(id);
+            var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(ValkyrienSkies.getDimensionId(level));
+            gtpa.removeJoint(id);
         } catch (Exception ignored) {}
 
         ConstraintPersistence persistence = ConstraintPersistence.get(level);
         persistence.saveNow(level);
-
-
 
         ConstraintTracker.removeConstraintWithPersistence(level, id);
         ConstraintTracker.getActiveConstraints().remove(id);

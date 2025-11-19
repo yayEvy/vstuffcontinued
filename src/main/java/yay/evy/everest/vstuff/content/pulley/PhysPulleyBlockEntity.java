@@ -33,13 +33,19 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import org.joml.Vector3i;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.api.ships.properties.ChunkClaim;
-import org.valkyrienskies.core.apigame.constraints.VSRopeConstraint;
+import org.valkyrienskies.core.internal.joints.VSDistanceJoint;
+import org.valkyrienskies.core.internal.joints.VSJoint;
+import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
+import org.valkyrienskies.core.internal.joints.VSJointPose;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.index.VStuffBlockEntities;
@@ -239,7 +245,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
         if (level.isClientSide) return false;
         if (!hasTarget || !hasRope() || constraintId != null) return false;
 
-
         this.setManualMode(false);
 
         try {
@@ -248,15 +253,17 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             Ship pulleyShip = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, getBlockPos());
             Ship targetShip = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, targetPos);
 
-            shipA = pulleyShip != null ? pulleyShip.getId() : getGroundBodyId(serverLevel);
-            shipB = targetShip != null ? targetShip.getId() : getGroundBodyId(serverLevel);
+            long shipA = pulleyShip != null ? pulleyShip.getId() : getGroundBodyId(serverLevel);
+            long shipB = targetShip != null ? targetShip.getId() : getGroundBodyId(serverLevel);
 
-            localPosA = getLocalPosition(serverLevel, getBlockPos(), pulleyShip, shipA);
-            pulleyWorldPos = getWorldPosition(serverLevel, getBlockPos(), pulleyShip);
+            Vector3d localPosA = getLocalPosition(serverLevel, getBlockPos(), pulleyShip, shipA);
+            Vector3d pulleyWorldPos = getWorldPosition(serverLevel, getBlockPos(), pulleyShip);
+
+            Vector3d localPosB;
+            Vector3d targetWorldPos;
 
             if (previewAttachVec != null) {
                 targetWorldPos = previewAttachVec;
-
                 if (targetShip != null) {
                     Vector3d local = new Vector3d();
                     targetShip.getTransform().getWorldToShip().transformPosition(previewAttachVec, local);
@@ -268,65 +275,65 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
                 targetWorldPos = getWorldPosition(serverLevel, targetPos, targetShip);
                 localPosB = getLocalPosition(serverLevel, targetPos, targetShip, shipB);
             } else {
-            //    System.err.println("Pulley: No valid target for constraint creation");
                 return false;
             }
 
-            if (targetWorldPos == null || pulleyWorldPos == null) {
-                System.err.println("Pulley: Cannot create constraint, world positions invalid");
-                return false;
-            }
+            if (targetWorldPos == null || pulleyWorldPos == null) return false;
 
             double distance = pulleyWorldPos.distance(targetWorldPos);
-
-            if (distance < 0.01) {
-                System.err.println("Pulley: Target too close to pulley, skipping constraint creation");
-                return false;
-            }
+            if (distance < 0.01) return false;
 
             targetRopeLength = Math.min(distance, getRawMaxRopeLength());
             targetRopeLength = Math.max(targetRopeLength, minRopeLength);
             currentRopeLength = targetRopeLength;
 
-            double compliance = 5e-9;
-            double maxForce = 2.0e7;
+            float compliance = 5e-9f;
+            float maxForce = 2.0e7f;
 
-            VSRopeConstraint constraint = new VSRopeConstraint(
-                    shipA, shipB,
-                    compliance,
-                    localPosA, localPosB,
-                    maxForce,
-                    currentRopeLength
+            VSJoint ropeConstraint = new VSDistanceJoint(
+                    shipA, new VSJointPose(localPosA, new Quaterniond()),
+                    shipB, new VSJointPose(localPosB, new Quaterniond()),
+                    new VSJointMaxForceTorque(maxForce, maxForce),
+                    0f,
+                    (float) currentRopeLength,
+                    0f,
+                    1f,
+                    0.1f
             );
 
-            Integer newConstraintId = VSGameUtilsKt.getShipObjectWorld(serverLevel).createNewConstraint(constraint);
-            if (newConstraintId != null) {
+            String dimensionId = ValkyrienSkies.getDimensionId(level);
+            var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(dimensionId);
+
+            gtpa.addJoint(ropeConstraint, 0, newConstraintId -> {
                 constraintId = newConstraintId;
                 consumedRopeLength = Math.max(0, currentRopeLength - baseRopeLength);
                 ropeStateInitialized = true;
                 isRopeRendering = true;
 
-                ConstraintTracker.addConstraintWithPersistence(
-                        serverLevel, constraintId, shipA, shipB,
+                ConstraintTracker.addConstraintToTracker(
+                        serverLevel, newConstraintId, shipA, shipB,
                         localPosA, localPosB, currentRopeLength,
                         compliance, maxForce,
-                        ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY, getBlockPos(), new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal")
+                        ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY,
+                        getBlockPos(),
+                        null
                 );
+                ConstraintTracker.mapConstraintToPersistenceId(newConstraintId, "pulley_constraint");
 
                 setChanged();
                 sendData();
 
                 previewAttachVec = null;
+            });
 
-                return true;
-            }
-
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         return false;
     }
+
 
 
 
@@ -1152,7 +1159,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
 
 
-
     private Integer createConstraintWithLength(double length) {
         if (level.isClientSide || !hasTarget || !hasRope() || constraintId != null) {
             return null;
@@ -1162,14 +1168,10 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             return null;
         }
 
-
-
         if (localPosA != null && localPosB != null) {
             double currentDist = localPosA.distance(localPosB);
-
             if (currentDist < 0.1) {
                 localPosB = new Vector3d(localPosA.x, localPosA.y - length, localPosA.z);
-                //  System.out.println("Adjusted localPosB to maintain rope length after cut: " + localPosB);
             }
         }
 
@@ -1180,33 +1182,27 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             Long groundShipId = shipWorld.getDimensionToGroundBodyIdImmutable()
                     .get(VSGameUtilsKt.getDimensionId(serverLevel));
 
-            Long realShipA = shipA;
-            if (realShipA == null || shipWorld.getAllShips().getById(realShipA) == null) {
-                // System.out.println("Ship A missing or invalid, using groundShipId instead");
-                realShipA = groundShipId;
-            }
+            Long realShipA = (shipA != null && shipWorld.getAllShips().getById(shipA) != null) ? shipA : groundShipId;
+            Long realShipB = (shipB != null && shipWorld.getAllShips().getById(shipB) != null) ? shipB : groundShipId;
 
-            Long realShipB = shipB;
-            if (realShipB == null || shipWorld.getAllShips().getById(realShipB) == null) {
-                //   System.out.println("Ship B missing or invalid, using groundShipId instead");
-                realShipB = groundShipId;
-            }
+            double compliance = 4e-11;
+            double maxForce = 3e11;
 
-            //   System.out.println("Creating constraint: shipA=" + realShipA + ", shipB=" + realShipB + ", length=" + length);
-
-            VSRopeConstraint constraint = new VSRopeConstraint(
-                    realShipA,
-                    realShipB,
-                    4e-11,
-                    localPosA,
-                    localPosB,
-                    3e11,
-                    length
+            VSJoint ropeConstraint = new VSDistanceJoint(
+                    realShipA, new VSJointPose(localPosA, new Quaterniond()),
+                    realShipB, new VSJointPose(localPosB, new Quaterniond()),
+                    new VSJointMaxForceTorque((float) maxForce, (float) maxForce),
+                    0f,
+                    (float) length,
+                    0f,
+                    1f,
+                    0.1f
             );
 
-            Integer newConstraintId = shipWorld.createNewConstraint(constraint);
+            String dimensionId = ValkyrienSkies.getDimensionId(serverLevel);
+            var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(dimensionId);
 
-            if (newConstraintId != null) {
+            gtpa.addJoint(ropeConstraint, 0, newConstraintId -> {
                 constraintId = newConstraintId;
                 consumedRopeLength = Math.max(0, length - baseRopeLength);
                 ropeStateInitialized = true;
@@ -1214,23 +1210,28 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
                 ConstraintTracker.cleanupOrphanedConstraints(serverLevel, getBlockPos());
 
-                ConstraintTracker.addConstraintWithPersistence(serverLevel, constraintId, realShipA, realShipB,
-                        localPosA, localPosB, length, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
-                        ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY, getBlockPos(),
-                        new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal"));
+                ConstraintTracker.addConstraintToTracker(
+                        serverLevel, newConstraintId, realShipA, realShipB,
+                        localPosA, localPosB, length,
+                        compliance, maxForce,
+                        ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY,
+                        getBlockPos(),
+                        null
+                );
 
-                //   System.out.println("Created constraint " + constraintId + " with length " + length);
-                return constraintId;
-            } else {
-                // System.err.println("Failed to create constraint");
-                return null;
-            }
+                ConstraintTracker.mapConstraintToPersistenceId(newConstraintId, "pulley_constraint");
+                setChanged();
+                sendData();
+            });
+
+            return constraintId;
+
         } catch (Exception e) {
-            // System.err.println("Error creating constraint: " + e.getMessage());
             e.printStackTrace();
             return null;
         }
     }
+
 
 
 
@@ -1284,7 +1285,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
     private void restoreConstraintAfterLoad(ServerLevel serverLevel) {
         try {
             if (targetPos == null || shipA == null || shipB == null || localPosA == null || localPosB == null) {
-                //     System.out.println("Missing constraint data, cannot restore. Clearing constraint ID.");
                 constraintId = null;
                 ropeStateInitialized = false;
                 setChanged();
@@ -1294,8 +1294,8 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             Ship pulleyShip = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, getBlockPos());
             Ship targetShip = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, targetPos);
 
-            Long newShipA = pulleyShip != null ? Long.valueOf(pulleyShip.getId()) : getGroundBodyId(serverLevel);
-            Long newShipB = targetShip != null ? Long.valueOf(targetShip.getId()) : getGroundBodyId(serverLevel);
+            Long newShipA = pulleyShip != null ? pulleyShip.getId() : getGroundBodyId(serverLevel);
+            Long newShipB = targetShip != null ? targetShip.getId() : getGroundBodyId(serverLevel);
 
             Vector3d newLocalPosA = getLocalPosition(serverLevel, getBlockPos(), pulleyShip, newShipA);
             Vector3d newLocalPosB = getLocalPosition(serverLevel, targetPos, targetShip, newShipB);
@@ -1310,60 +1310,62 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             localPosA = newLocalPosA;
             localPosB = newLocalPosB;
             consumedRopeLength = shouldBeConsumed;
-// f
-            //   System.out.println("Restoring constraint with updated data:");
-            //    System.out.println("  - ShipA: " + shipA + " -> " + newShipA);
-            //    System.out.println("  - ShipB: " + shipB + " -> " + newShipB);
-            //  System.out.println("  - Length: " + restoredLength);
-            //   System.out.println("  - Consumed: " + consumedRopeLength);
+
+            String dimensionId = ValkyrienSkies.getDimensionId(serverLevel);
+            var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(dimensionId);
 
             if (constraintId != null) {
                 try {
-                    VSGameUtilsKt.getShipObjectWorld(serverLevel).removeConstraint(constraintId);
+                    gtpa.removeJoint(constraintId);
                     ConstraintTracker.removeConstraintWithPersistence(serverLevel, constraintId);
-                } catch (Exception e) {
-                    //     System.out.println("Old constraint was already gone: " + e.getMessage());
-                }
+                } catch (Exception ignored) {}
             }
 
-            VSRopeConstraint restoredConstraint = new VSRopeConstraint(
-                    shipA.longValue(), shipB.longValue(),
-                    1e-9,
-                    localPosA, localPosB,
-                    900000000,
-                    restoredLength
+
+            double compliance = 1e-9;
+            double maxForce = 9e8;
+
+            VSJoint ropeConstraint = new VSDistanceJoint(
+                    shipA, new VSJointPose(localPosA, new Quaterniond()),
+                    shipB, new VSJointPose(localPosB, new Quaterniond()),
+                    new VSJointMaxForceTorque((float) maxForce, (float) maxForce),
+                    0f,
+                    (float) restoredLength,
+                    0f,
+                    1f,
+                    0.1f
             );
 
-            Integer newConstraintId = VSGameUtilsKt.getShipObjectWorld(serverLevel).createNewConstraint(restoredConstraint);
-            if (newConstraintId != null) {
+
+
+            gtpa.addJoint(ropeConstraint, 0, newConstraintId -> {
                 constraintId = newConstraintId;
                 currentRopeLength = restoredLength;
                 ropeStateInitialized = true;
                 isRopeRendering = true;
 
-                ConstraintTracker.addConstraintWithPersistence(serverLevel, constraintId, shipA, shipB,
-                        localPosA, localPosB, currentRopeLength, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
-                        ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY, getBlockPos(),
-                        new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal"));
+                ConstraintTracker.addConstraintToTracker(
+                        serverLevel, newConstraintId, shipA, shipB,
+                        localPosA, localPosB, currentRopeLength,
+                        compliance, maxForce,
+                        ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY,
+                        getBlockPos(),
+                        null
+                );
 
-                //   System.out.println("Successfully restored constraint " + constraintId + " with length " + currentRopeLength);
+                ConstraintTracker.mapConstraintToPersistenceId(newConstraintId, "pulley_constraint");
                 setChanged();
                 sendData();
+            });
 
-            } else {
-                //  System.err.println("Failed to restore constraint after world load");
-                constraintId = null;
-                ropeStateInitialized = false;
-                setChanged();
-            }
         } catch (Exception e) {
-            // System.err.println("Error restoring constraint after load: " + e.getMessage());
             e.printStackTrace();
             constraintId = null;
             ropeStateInitialized = false;
             setChanged();
         }
     }
+
 
     public void onBlockRemoved() {
         if (level instanceof ServerLevel serverLevel) {
@@ -1410,17 +1412,19 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
     public void cleanupAllConstraints(ServerLevel serverLevel) {
         if (constraintId != null) {
             try {
-                VSGameUtilsKt.getShipObjectWorld(serverLevel).removeConstraint(constraintId);
+                String dimensionId = ValkyrienSkies.getDimensionId(serverLevel);
+                var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(dimensionId);
+
+                gtpa.removeJoint(constraintId);
+
                 ConstraintTracker.removeConstraintWithPersistence(serverLevel, constraintId);
-                //    System.out.println("Cleaned up constraint " + constraintId);
+
             } catch (Exception e) {
-                //  System.out.println("Constraint " + constraintId + " was already gone");
             }
             constraintId = null;
         }
 
         isRopeRendering = false;
-
 
         ConstraintTracker.cleanupOrphanedConstraints(serverLevel, getBlockPos());
     }
@@ -1470,31 +1474,12 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
 
 
+
     public void createManualConstraint() {
-        if (level.isClientSide) {
-            // System.out.println("MANUAL MODE: Skipping constraint creation on client side");
-            return;
-        }
-
-
+        if (level.isClientSide) return;
+        if (!hasTarget || !hasRope() || constraintId != null) return;
 
         this.setManualMode(true);
-
-//
-        //   System.out.println("MANUAL MODE: Starting constraint creation");
-//
-        if (!hasTarget) {
-            //   System.out.println("MANUAL MODE: No target set, cannot create constraint");
-            return;
-        }
-        if (!hasRope()) {
-            //   System.out.println("MANUAL MODE: No rope available, cannot create constraint");
-            return;
-        }
-        if (constraintId != null) {
-            // System.out.println("MANUAL MODE: Constraint already exists with ID: " + constraintId);
-            return;
-        }
 
         try {
             ServerLevel serverLevel = (ServerLevel) level;
@@ -1502,89 +1487,72 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
             Ship pulleyShip = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, getBlockPos());
             Ship targetShip = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, targetPos);
 
-            if (pulleyShip == null) {
-                //     System.out.println("MANUAL MODE: pulleyShip is null");
-            } else {
-                //    System.out.println("MANUAL MODE: pulleyShip ID = " + pulleyShip.getId());
-            }
-
-            if (targetShip == null) {
-                //    System.out.println("MANUAL MODE: targetShip is null");
-            } else {
-                //    System.out.println("MANUAL MODE: targetShip ID = " + targetShip.getId());
-            }
-
             shipA = pulleyShip != null ? Long.valueOf(pulleyShip.getId()) : getGroundBodyId(serverLevel);
             shipB = targetShip != null ? Long.valueOf(targetShip.getId()) : getGroundBodyId(serverLevel);
-
-            System.out.println("MANUAL MODE: Using shipA ID = " + shipA);
-            System.out.println("MANUAL MODE: Using shipB ID = " + shipB);
 
             localPosA = getLocalPosition(serverLevel, getBlockPos(), pulleyShip, shipA);
             localPosB = getLocalPosition(serverLevel, targetPos, targetShip, shipB);
 
-            //  System.out.println("MANUAL MODE: localPosA = " + localPosA);
-            //    System.out.println("MANUAL MODE: localPosB = " + localPosB);
-
             Vector3d pulleyWorldPos = getWorldPosition(serverLevel, getBlockPos(), pulleyShip);
             Vector3d targetWorldPos = getWorldPosition(serverLevel, targetPos, targetShip);
 
-            // System.out.println("MANUAL MODE: pulleyWorldPos = " + pulleyWorldPos);
-            //  System.out.println("MANUAL MODE: targetWorldPos = " + targetWorldPos);
-
             double distance = pulleyWorldPos.distance(targetWorldPos);
-            // System.out.println("MANUAL MODE: Distance between pulley and target = " + distance);
-
             double maxAvailable = getRawMaxRopeLength();
-            // System.out.println("MANUAL MODE: maxAvailable rope length = " + maxAvailable);
-
-
             double targetLength = Math.min(distance + 1.0, maxAvailable);
             targetLength = Math.max(targetLength, minRopeLength);
-            //   System.out.println("MANUAL MODE: Calculated target rope length = " + targetLength);
 
             this.targetRopeLength = targetLength;
+            this.currentRopeLength = targetLength;
             this.isExtending = true;
 
+            String dimensionId = ValkyrienSkies.getDimensionId(serverLevel);
+            var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(dimensionId);
 
-            double initialLength = targetLength;
-            this.currentRopeLength = initialLength;
-
-            VSRopeConstraint constraint = new VSRopeConstraint(
-                    shipA.longValue(), shipB.longValue(),
-                    1e-9, localPosA, localPosB, Double.POSITIVE_INFINITY, initialLength
+            VSJoint ropeJoint = new VSDistanceJoint(
+                    shipA,
+                    new VSJointPose(localPosA, new Quaterniond()),
+                    shipB,
+                    new VSJointPose(localPosB, new Quaterniond()),
+                    new VSJointMaxForceTorque(1.5e7f, 1.5e7f),
+                    0f,
+                    (float) targetLength,
+                    0f,
+                    1f,
+                    0.1f
             );
 
+            double finalTargetLength = targetLength;
+            gtpa.addJoint(ropeJoint, 0, newJoint -> {
+                ConstraintTracker.addConstraintWithPersistence(
+                        serverLevel,
+                        newJoint,
+                        shipA,
+                        shipB,
+                        localPosA,
+                        localPosB,
+                        finalTargetLength,
+                        Double.POSITIVE_INFINITY,
+                        1.5e7,
+                        ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY,
+                        getBlockPos(),
+                        new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal")
+                );
+                ConstraintTracker.mapConstraintToPersistenceId(newJoint, "manual-" + getBlockPos().asLong());
+                constraintId = newJoint; // <-- assign directly, no getJointId()
+            });
 
 
+            ropeStateInitialized = true;
+            isRopeRendering = true;
+            consumedRopeLength = Math.max(0, currentRopeLength - baseRopeLength);
 
-
-
-            Integer newConstraintId = VSGameUtilsKt.getShipObjectWorld(serverLevel).createNewConstraint(constraint);
-
-            //  System.out.println("MANUAL MODE: createNewConstraint returned ID: " + newConstraintId);
-
-            if (newConstraintId != null) {
-                constraintId = newConstraintId;
-                consumedRopeLength = Math.max(0, currentRopeLength - baseRopeLength);
-                ropeStateInitialized = true;
-                isRopeRendering = true;
-
-                ConstraintTracker.addConstraintWithPersistence(serverLevel, constraintId, shipA, shipB,
-                        localPosA, localPosB, currentRopeLength, Double.POSITIVE_INFINITY, 15000000.0,
-                        ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY, getBlockPos(),
-                        new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal"));
-
-                setChanged();
-                sendData();
-
-                //    System.out.println("MANUAL MODE: Successfully created constraint with ID " + constraintId);
-            } else {
-                //   System.err.println("MANUAL MODE: Failed to create constraint (null ID returned)");
-            }
+            setChanged();
+            sendData();
         } catch (Exception e) {
-            //   System.err.println("MANUAL MODE: Exception while creating constraint: " + e.getMessage());
             e.printStackTrace();
+            constraintId = null;
+            ropeStateInitialized = false;
+            setChanged();
         }
     }
 
@@ -1873,8 +1841,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
     }
 
 
-
-
     private boolean createConstraintImmediate(ServerLevel serverLevel, Player player) {
         try {
             Ship pulleyShip = null;
@@ -1884,14 +1850,12 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
                 pulleyShip = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, getBlockPos());
                 targetShip = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, targetPos);
 
-                if (pulleyShip != null || targetShip != null) {
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
-                } else {
-                    break;
+                if (pulleyShip == null && targetShip == null) break;
+
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
             }
 
@@ -1903,59 +1867,69 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
 
             Vector3d pulleyWorldPos = getWorldPosition(serverLevel, getBlockPos(), pulleyShip);
             Vector3d targetWorldPos = getWorldPosition(serverLevel, targetPos, targetShip);
-            double distance = pulleyWorldPos.distance(targetWorldPos);
 
+            double distance = pulleyWorldPos.distance(targetWorldPos);
             double maxAvailable = getRawMaxRopeLength();
             double initialLength = Math.min(distance + 2.0, maxAvailable);
             initialLength = Math.max(initialLength, minRopeLength);
             currentRopeLength = initialLength;
 
             double compliance = (pulleyShip != null || targetShip != null) ? 1.2e-7 : 8e-8;
-            double maxForce = (pulleyShip != null || targetShip != null) ? 8000000.0 : 12000000.0;
+            double maxForce = (pulleyShip != null || targetShip != null) ? 8e6 : 1.2e7;
 
-            VSRopeConstraint constraint = new VSRopeConstraint(
-                    shipA.longValue(), shipB.longValue(),
-                    compliance,
-                    localPosA, localPosB,
-                    maxForce,
-                    currentRopeLength
+            String dimensionId = ValkyrienSkies.getDimensionId(serverLevel);
+            var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(dimensionId);
+
+            VSJoint ropeJoint = new VSDistanceJoint(
+                    shipA,
+                    new VSJointPose(localPosA, new Quaterniond()),
+                    shipB,
+                    new VSJointPose(localPosB, new Quaterniond()),
+                    new VSJointMaxForceTorque((float) maxForce, (float) maxForce),
+                    0f,
+                    (float) initialLength,
+                    0f,
+                    1f,
+                    0.1f
             );
 
-            constraintId = VSGameUtilsKt.getShipObjectWorld(serverLevel).createNewConstraint(constraint);
+            gtpa.addJoint(ropeJoint, 0, newConstraintId -> {
+                ConstraintTracker.addConstraintWithPersistence(
+                        serverLevel,
+                        newConstraintId,
+                        shipA,
+                        shipB,
+                        localPosA,
+                        localPosB,
+                        currentRopeLength,
+                        compliance,
+                        maxForce,
+                        ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY,
+                        getBlockPos(),
+                        new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal")
+                );
+                ConstraintTracker.mapConstraintToPersistenceId(newConstraintId, "immediate-" + getBlockPos().asLong());
+                constraintId = newConstraintId; // <-- assign directly, no getJointId()
+            });
 
-            if (constraintId != null) {
-                consumedRopeLength = 0.0;
-                ropeStateInitialized = true;
 
-                ConstraintTracker.addConstraintWithPersistence(serverLevel, constraintId, shipA, shipB,
-                        localPosA, localPosB, currentRopeLength, compliance, maxForce,
-                        ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY, getBlockPos(),
-                        new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal"));
+            consumedRopeLength = 0.0;
+            ropeStateInitialized = true;
+            setChanged();
+            sendData();
 
-                setChanged();
-                sendData();
+            forceConstraintRefresh(player);
+            return true;
 
-                String pulleyType = pulleyShip != null ? "ship" : "ground";
-                String targetType = targetShip != null ? "ship" : "ground";
-
-                //    player.sendSystemMessage(Component.literal("§aConstraint created! " + pulleyType + " to " + targetType +
-                //            " - Length: " + String.format("%.1f", currentRopeLength)));
-
-                //   //  System.out.println("Created rope pulley constraint " + constraintId +
-                //         " (" + pulleyType + " to " + targetType + ") with length " + currentRopeLength);
-                forceConstraintRefresh(player);
-
-                return true;
-            } else {
-                player.sendSystemMessage(Component.literal("§cFailed to create constraint!"));
-                return false;
-            }
         } catch (Exception e) {
             System.err.println("Error in immediate constraint creation: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
     }
+
+
+
 
     private double calculateWorldDistance(BlockPos pos1, BlockPos pos2) {
         if (level == null) return Double.MAX_VALUE;
