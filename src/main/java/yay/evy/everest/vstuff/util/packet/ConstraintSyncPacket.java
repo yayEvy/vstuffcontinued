@@ -34,6 +34,10 @@ public class ConstraintSyncPacket {
         this.localPosA = localPosA != null ? new Vector3d(localPosA) : new Vector3d();
         this.localPosB = localPosB != null ? new Vector3d(localPosB) : new Vector3d();
         this.maxLength = maxLength;
+
+        if (ropeStyle == null) {
+            ropeStyle = new RopeStyles.RopeStyle("none", RopeStyles.PrimitiveRopeStyle.NORMAL, "none");
+        }
         this.ropeStyle = ropeStyle;
         this.style = ropeStyle.getStyle();
         this.basicStyle = ropeStyle.getBasicStyle();
@@ -81,12 +85,10 @@ public class ConstraintSyncPacket {
                 this.localPosB = new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
                 this.maxLength = buf.readDouble();
 
-                // Read style components from the buffer
                 this.style = buf.readUtf();
                 this.basicStyle = buf.readEnum(RopeStyles.PrimitiveRopeStyle.class);
                 this.styleLKey = buf.readUtf();
 
-                // CRITICAL FIX: Construct ropeStyle using the variables just read
                 this.ropeStyle = new RopeStyles.RopeStyle(this.style, this.basicStyle, this.styleLKey);
                 break;
             case REMOVE:

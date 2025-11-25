@@ -129,9 +129,9 @@ public class Rope {
                     new VSJointMaxForceTorque((float) maxForce, (float) maxForce),
                     0f,
                     (float) maxLength,
-                    0f,
-                    1f,
-                    0.1f
+                    null,
+                    null,
+                    null
             );
 
             final Player finalPlayer = player;

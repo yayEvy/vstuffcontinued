@@ -20,7 +20,6 @@ import org.joml.Quaternionf;
 import org.joml.Vector3d;
 import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.rendering.RopeRendererType;
-import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
 import java.util.Map;

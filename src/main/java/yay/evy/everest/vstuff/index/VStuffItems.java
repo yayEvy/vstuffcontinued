@@ -20,6 +20,7 @@ public class VStuffItems {
         REGISTRATE.setCreativeTab(VStuffCreativeModeTabs.VSTUFF_MAIN);
     }
 
+
     public static final ItemEntry<LeadConstraintItem> LEAD_CONSTRAINT_ITEM =
             REGISTRATE.item("lead_constraint_item", LeadConstraintItem::new)
                     .properties(p -> p
@@ -34,6 +35,8 @@ public class VStuffItems {
                             .durability(238))
                     .defaultModel()
                     .register();
+
+
 
     public static final ItemEntry<PhysGrabberItem> PHYS_GRABBER =
             REGISTRATE.item("phys_grabber", PhysGrabberItem::new)

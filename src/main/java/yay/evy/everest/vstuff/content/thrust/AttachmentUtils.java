@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
+import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import net.minecraft.core.BlockPos;
@@ -16,18 +17,23 @@ public class AttachmentUtils {
 
     @Nullable
     public static LoadedServerShip getShipAt(ServerLevel serverLevel, BlockPos pos) {
-        LoadedServerShip ship = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, pos);
-        if (ship == null) {
-            ship = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, pos);
+        Ship s = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, pos);
+        if (s instanceof LoadedServerShip loadedShip) {
+            return loadedShip;
         }
-        return ship;
+        return null;
     }
 
-    public static <T> T getOrCreate(LoadedServerShip ship, Class<T> attachmentClass, Supplier<T> factory) {
-        T attachment = ship.getAttachment(attachmentClass);
+    @Nullable
+    public static <T> T getOrCreate(Ship ship, Class<T> attachmentClass, Supplier<T> factory) {
+        if (!(ship instanceof LoadedServerShip loadedShip)) {
+            return null;
+        }
+
+        T attachment = loadedShip.getAttachment(attachmentClass);
         if (attachment == null) {
             attachment = factory.get();
-            ship.saveAttachment(attachmentClass, attachment);
+            loadedShip.saveAttachment(attachmentClass, attachment);
         }
         return attachment;
     }
@@ -35,10 +41,9 @@ public class AttachmentUtils {
     @Nullable
     public static <T> T get(Level level, BlockPos pos, Class<T> attachmentClass, Supplier<T> factory) {
         if (!(level instanceof ServerLevel serverLevel)) {
-            return null; // Can only get ships on the server
+            return null;
         }
         LoadedServerShip ship = getShipAt(serverLevel, pos);
         return ship != null ? getOrCreate(ship, attachmentClass, factory) : null;
     }
-
 }

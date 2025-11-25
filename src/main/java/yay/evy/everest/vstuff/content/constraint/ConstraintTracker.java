@@ -53,7 +53,7 @@ public class ConstraintTracker {
             GENERIC
         }
 
-        // This is the primary constructor. Keep this one.
+
         public RopeConstraintData(ServerLevel level, Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
                                   double maxLength, double compliance, double maxForce,
                                   ConstraintType constraintType, net.minecraft.core.BlockPos sourceBlockPos, RopeStyles.RopeStyle style) {
@@ -75,7 +75,7 @@ public class ConstraintTracker {
             this.isShipB = !shipB.equals(groundBodyId);
         }
 
-        // This is the old constructor, which now calls the main constructor
+
         public RopeConstraintData(ServerLevel level, Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
                                   double maxLength, double compliance, double maxForce, RopeStyles.RopeStyle style) {
             this(level, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, ConstraintType.GENERIC, null, style);
@@ -135,17 +135,17 @@ public class ConstraintTracker {
                     .anyMatch(existing -> existing.constraintType == RopeConstraintData.ConstraintType.ROPE_PULLEY
                             && existing.sourceBlockPos != null
                             && existing.sourceBlockPos.equals(sourceBlockPos)
-                            && existing.style == style); // check style too
+                            && existing.style == style);
 
             if (existingConstraintFound) {
-               // System.out.println("Constraint already exists for rope pulley at " + sourceBlockPos + " with style " + style + ", skipping");
+                // System.out.println("Constraint already exists for rope pulley at " + sourceBlockPos + " with style " + style + ", skipping");
                 return;
             }
         }
 
         RopeConstraintData data = new RopeConstraintData(level, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, constraintType, sourceBlockPos, style);
         activeConstraints.put(constraintId, data);
-       // System.out.println("Added " + constraintType + " constraint " + constraintId + " with style " + style);
+        // System.out.println("Added " + constraintType + " constraint " + constraintId + " with style " + style);
 
         ConstraintPersistence persistence = ConstraintPersistence.get(level);
         String persistenceId = java.util.UUID.randomUUID().toString();
@@ -238,7 +238,7 @@ public class ConstraintTracker {
                                               RopeConstraintData.ConstraintType constraintType,
                                               net.minecraft.core.BlockPos sourceBlockPos, RopeStyles.RopeStyle style) {
         if (activeConstraints.containsKey(constraintId)) {
-          //  System.out.println("Constraint " + constraintId + " already exists in tracker, skipping");
+            //  System.out.println("Constraint " + constraintId + " already exists in tracker, skipping");
             return;
         }
 
@@ -247,43 +247,6 @@ public class ConstraintTracker {
 
         NetworkHandler.sendConstraintAdd(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
         //System.out.println("Added " + constraintType + " constraint " + constraintId + " to tracker (restoration) with source block " + sourceBlockPos);
-    }
-
-
-
-
-    private static boolean isShipValid(ServerLevel level, Long shipId, Long groundBodyId) {
-        if (shipId == null) return false;
-
-        if (shipId.equals(groundBodyId)) {
-            return true;
-        }
-
-        try {
-            var shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
-            var ship = shipWorld.getAllShips().getById(shipId);
-            boolean exists = ship != null;
-
-            if (!exists) {
-                //  System.out.println("Ship " + shipId + " not found in ship world");
-                // Try alternative lookup methods
-                var allShips = shipWorld.getAllShips();
-                //System.out.println("Available ships: " + allShips.stream().map(s -> s.getId()).toList());
-            }
-
-            return exists;
-        } catch (Exception e) {
-            System.err.println("Exception checking ship validity for " + shipId + ": " + e.getMessage());
-            return false;
-        }
-    }
-
-
-    private static final Map<Integer, Long> delayedValidations = new ConcurrentHashMap<>();
-
-    private static void scheduleDelayedValidation(ServerLevel level, Integer constraintId, long delayMs) {
-        delayedValidations.put(constraintId, System.currentTimeMillis() + delayMs);
-        //  System.out.println("Scheduled delayed validation for constraint " + constraintId + " in " + (delayMs/1000) + " seconds");
     }
 
 
@@ -298,11 +261,9 @@ public class ConstraintTracker {
                 NetworkHandler.sendConstraintAddToPlayer(player, constraintId, data.shipA, data.shipB,
                         data.localPosA, data.localPosB, data.maxLength, data.style);
             }
-            // Sync all constraints to player
             NetworkHandler.sendClearAllConstraintsToPlayer(player);
             syncAllConstraintsToPlayer(player);
 
-            // Update the last join time to delay the cleanup process
             lastJoinTime = System.currentTimeMillis();
             //System.out.println("Player joined, setting lastJoinTime for delayed cleanup.");
         }
@@ -384,7 +345,6 @@ public class ConstraintTracker {
     ) {
         try {
             if (!isShip) {
-                // Ground block
                 BlockPos blockPos = BlockPos.containing(localPos.x, localPos.y, localPos.z);
 
                 if (!level.isLoaded(blockPos)) return false;
@@ -392,7 +352,6 @@ public class ConstraintTracker {
                 BlockState state = level.getBlockState(blockPos);
                 return !state.isAir();
             } else {
-                // Ship block
                 Ship ship = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
                 if (ship == null) return false;
 
@@ -407,7 +366,6 @@ public class ConstraintTracker {
                 return !state.isAir();
             }
         } catch (Exception e) {
-            // If anything fails, treat it as invalid so we don't keep ghost ropes
             return false;
         }
     }
@@ -498,7 +456,6 @@ public class ConstraintTracker {
         for (Map.Entry<Integer, FluidConverterLink> entry : fluidConstraints.entrySet()) {
             FluidConverterLink data = entry.getValue();
 
-            // Skip constraints from other dimensions
             if (!data.level().equals(level.dimension())) continue;
 
             Vector3d worldPosA = data.shipA().equals(groundId)
@@ -512,7 +469,6 @@ public class ConstraintTracker {
                     .getTransform().getShipToWorld().transformPosition(data.localB(), new Vector3d());
 
 
-            // Convert to BlockPos for block checks
             BlockPos posA = new BlockPos(
                     (int) Math.floor(worldPosA.x),
                     (int) Math.floor(worldPosA.y),

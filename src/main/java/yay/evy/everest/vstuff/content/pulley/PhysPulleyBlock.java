@@ -75,13 +75,6 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
 
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!state.is(newState.getBlock())) {
-            BlockEntity blockEntity = level.getBlockEntity(pos);
-            if (blockEntity instanceof PhysPulleyBlockEntity pulleyEntity) {
-                pulleyEntity.removeExistingConstraint();
-                pulleyEntity.onBlockRemoved();
-            }
-        }
         super.onRemove(state, level, pos, newState, isMoving);
     }
 
@@ -177,14 +170,6 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
         if (currentlyPowered != previouslyPowered) {
             level.setBlock(pos, state.setValue(POWERED, currentlyPowered), 3);
 
-            if (currentlyPowered) {
-                BlockEntity be = level.getBlockEntity(pos);
-                if (be instanceof PhysPulleyBlockEntity pulley) {
-                    pulley.removeExistingConstraint(true);
-                    pulley.setChanged();
-                    level.sendBlockUpdated(pos, state, state, 3);
-                }
-            }
         }
     }
 
