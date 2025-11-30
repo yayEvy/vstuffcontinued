@@ -47,6 +47,7 @@ public class PhysGrabberItem extends Item implements CustomArmPoseItem {
     }
 
     @Override
+    @OnlyIn(Dist.CLIENT)
     public ArmPose getArmPose(ItemStack stack, AbstractClientPlayer player, InteractionHand hand) {
         if (PhysGrabberClientHandler.isGrabbing(player)) {
             return ArmPose.CROSSBOW_HOLD;
