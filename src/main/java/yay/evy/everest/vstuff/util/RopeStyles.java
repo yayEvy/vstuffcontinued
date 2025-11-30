@@ -50,7 +50,7 @@ public class RopeStyles {
         CHAIN,
         OTHER,
         LOG,
-        DYED
+        DYE
     }
 
     public static class RopeStyle {
@@ -70,7 +70,7 @@ public class RopeStyles {
                 case WOOL -> this.associatedTexture = getWoolStyle(style);
                 case CHAIN -> this.associatedTexture = getChainStyle();
                 case LOG -> this.associatedTexture = getLogStyle(style);
-                case DYED -> this.associatedTexture = getDyedStyle(style);
+                case DYE -> this.associatedTexture = getDyedStyle(style);
                 default -> this.associatedTexture = getRopeStyle(style);
             }
 
@@ -84,7 +84,7 @@ public class RopeStyles {
                         case "wool" -> PrimitiveRopeStyle.WOOL;
                         case "chain" -> PrimitiveRopeStyle.CHAIN;
                         case "log" -> PrimitiveRopeStyle.LOG;
-                        case "dyed" -> PrimitiveRopeStyle.DYED;
+                        case "dye" -> PrimitiveRopeStyle.DYE;
                         default -> PrimitiveRopeStyle.NORMAL;
                     },
                     langKey

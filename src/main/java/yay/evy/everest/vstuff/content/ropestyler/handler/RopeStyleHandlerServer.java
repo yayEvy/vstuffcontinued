@@ -2,6 +2,7 @@ package yay.evy.everest.vstuff.content.ropestyler.handler;
 
 import org.jetbrains.annotations.Nullable;
 
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
 import java.util.HashMap;
@@ -25,15 +26,14 @@ public class RopeStyleHandlerServer {
     public static void addStyle(UUID uuid, RopeStyles.RopeStyle style) {
         selectedStyles.put(uuid, style);
 
-        System.out.println("Set " + uuid + "style to " + style.asString());
+        VStuff.LOGGER.info("Set {} style to {}", uuid, style.asString());
     }
 
     public static RopeStyles.RopeStyle getStyle(UUID uuid) {
         if (selectedStyles.containsKey(uuid)) {
-            System.out.println("successfully got style for uuid" + uuid);
+            VStuff.LOGGER.info("Successfully got style for uuid {}", uuid);
             return selectedStyles.get(uuid);
         }
-      //  System.out.println("defaulting to normal rope style");
         return new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal");
     }
 
