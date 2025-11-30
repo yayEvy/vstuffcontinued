@@ -17,6 +17,7 @@ public class VstuffConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> MAX_ROPE_LENGTH;
     public static final ForgeConfigSpec.ConfigValue<Double> PULLEY_SPEED;
     public static final ForgeConfigSpec.ConfigValue<Double> ROPE_THICKNESS;
+    public static final ForgeConfigSpec.ConfigValue<Double> PHYS_GRABBER_MAX_MASS;
     public static final ForgeConfigSpec.BooleanValue ROPE_SOUNDS;
     public static final ForgeConfigSpec.BooleanValue ROPE_ONLY_FULL_BLOCKS;
 
@@ -52,6 +53,9 @@ public class VstuffConfig {
         ROPE_ONLY_FULL_BLOCKS = serverBuilder
                 .comment("Whether ropes can only connect to full blocks ONLY (default: true)")
                 .define("ropeOnlyFullBlocks", true);
+        PHYS_GRABBER_MAX_MASS = serverBuilder
+                .comment("The maximum weight the Phys Grabber can grab. (default: 20000.0)")
+                .define("grabber_max_mass", 20000.0);
         serverBuilder.pop();
 // woooooooo
         SERVER_CONFIG = serverBuilder.build();

@@ -29,6 +29,7 @@
   "vstuff.message.rope_first": "§aFirst position selected.",
   "vstuff.message.rope_break": "§aRope broken!",
   "vstuff.message.chain_break": "§aChain broken!",
+  "vstuff.message.grabber_limit": "§cShip is too heavy!",
 
   "vstuff.ponder.phys_pulley.text_1": "The Phys Pulley can lift and lower objects, but first it needs a rope.",
   "vstuff.ponder.phys_pulley.text_2": "The amount of rope you provide determines the pulley's maximum length.",
