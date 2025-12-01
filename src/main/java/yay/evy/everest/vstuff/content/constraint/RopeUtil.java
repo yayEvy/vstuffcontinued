@@ -6,11 +6,42 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.core.internal.joints.VSDistanceJoint;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import yay.evy.everest.vstuff.util.RopeStyles;
 
+import javax.annotation.Nullable;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class RopeUtil {
+
+    /**
+    to store levels in rope objects, we store an id for each differing level
+    so we can get levels even after loading from a CompoundTag, and we don't
+    store the levels by constraint id to save space (or smthn idk it's better)
+     */
+    private final static Map<String, ServerLevel> ropeLevels = new HashMap<>();
+
+
+    public static String registerLevel(ServerLevel level) {
+        String levelId = null;
+        if (ropeLevels.containsValue(level)) { // return the existing key for the level
+            for (Map.Entry<String, ServerLevel> entry: ropeLevels.entrySet()) {
+                if (entry.getValue() == level) levelId = entry.getKey();
+            }
+        } else {
+            levelId = UUID.randomUUID().toString();
+            ropeLevels.put(levelId, level);
+        }
+
+        return levelId;
+    }
+
+    public static ServerLevel getRegisteredLevel(String id) {
+        return ropeLevels.get(id);
+    }
 
     public static Vector3d convertWorldToLocal(ServerLevel level, Vector3d worldPos, Long shipId) {
         if (shipId != null && !shipId.equals(getGroundBodyId(level))) {
@@ -22,11 +53,6 @@ public class RopeUtil {
             }
         }
         return new Vector3d(worldPos);
-    }
-
-    public static Long getShipIdAtPos(ServerLevel level, BlockPos pos) {
-        Ship shipObject = VSGameUtilsKt.getShipObjectManagingPos(level, pos);
-        return shipObject != null ? shipObject.getId() : null;
     }
 
     public static Long getGroundBodyId(ServerLevel level) {
@@ -161,4 +187,14 @@ public class RopeUtil {
         FAIL,
         RESET
     }
+
+    public enum ConstraintType {
+        GENERIC,
+        PULLEY
+    }
+
+    public record RopeReturn(RopeInteractionReturn result, @Nullable Rope rope){
+        static RopeReturn FAIL = new RopeReturn(RopeInteractionReturn.FAIL, null);
+    }
+
 }

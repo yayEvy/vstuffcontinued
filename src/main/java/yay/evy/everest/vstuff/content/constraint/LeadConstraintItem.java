@@ -53,21 +53,21 @@ public class LeadConstraintItem extends Item {
         }
 
 
-        PhysPulleyBlockEntity pulley = PhysPulleyItem.getWaitingPulley(player);
-        if (pulley != null) {
-            pulley.targetPos = clickedPos;
-            pulley.hasTarget = true;
-            pulley.waitingForTarget = false;
-            pulley.setChanged();
-            pulley.sendData();
-
-            pulley.createManualConstraint();
-
-            player.sendSystemMessage(Component.literal("§aPulley target set and constraint created!"));
-            PhysPulleyItem.clearWaitingPulley(player);
-
-            return InteractionResult.SUCCESS;
-        }
+//        PhysPulleyBlockEntity pulley = PhysPulleyItem.getWaitingPulley(player);
+//        if (pulley != null) {
+//            pulley.targetPos = clickedPos;
+//            pulley.hasTarget = true;
+//            pulley.waitingForTarget = false;
+//            pulley.setChanged();
+//            pulley.sendData();
+//
+//            pulley.createManualConstraint();
+//
+//            player.sendSystemMessage(Component.literal("§aPulley target set and constraint created!"));
+//            PhysPulleyItem.clearWaitingPulley(player);
+//
+//            return InteractionResult.SUCCESS;
+//        }
 
 
         if (firstClickedPos == null && firstEntity == null) {
@@ -100,9 +100,9 @@ public class LeadConstraintItem extends Item {
             }
 
             Long secondShipId = getShipIdAtPos(serverLevel, clickedPos);
-            RopeUtil.RopeInteractionReturn result = Rope.createNew(this, serverLevel, firstClickedPos, clickedPos, firstEntity, firstShipId, secondShipId, player);
+            RopeUtil.RopeReturn ropeReturn = Rope.createNew(this, serverLevel, firstClickedPos, clickedPos, firstEntity, firstShipId, secondShipId, player);
 
-            if (result == RopeUtil.RopeInteractionReturn.SUCCESS) {
+            if (ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS) {
                 // ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer); Rope.createNew does constraint syncing
 
                 Component notif = RopeStyleHandlerServer.getStyle(player.getUUID()).getBasicStyle() == RopeStyles.PrimitiveRopeStyle.CHAIN
@@ -113,7 +113,7 @@ public class LeadConstraintItem extends Item {
             }
 
             resetState();
-            return result == RopeUtil.RopeInteractionReturn.SUCCESS ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+            return ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS ? InteractionResult.SUCCESS : InteractionResult.FAIL;
         }
     }
 
