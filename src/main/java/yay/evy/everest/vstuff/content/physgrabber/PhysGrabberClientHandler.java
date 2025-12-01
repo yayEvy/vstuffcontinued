@@ -85,4 +85,8 @@ public class PhysGrabberClientHandler {
         return grabbedShip != null;
     }
 
+    public static boolean isGrabbing() {
+        return grabbedShip != null;
+    }
+
 }

@@ -32,9 +32,12 @@ public class PhysGrabberItem extends Item implements CustomArmPoseItem {
             if (didGrab) {
                 itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
                 return InteractionResultHolder.success(player.getItemInHand(hand));
+            } else {
+                return InteractionResultHolder.fail(player.getItemInHand(hand));
             }
+        } else {
+            return InteractionResultHolder.fail(player.getItemInHand(hand));
         }
-        return InteractionResultHolder.fail(player.getItemInHand(hand));
     }
 
     @Override
@@ -44,6 +47,7 @@ public class PhysGrabberItem extends Item implements CustomArmPoseItem {
     }
 
     @Override
+    @OnlyIn(Dist.CLIENT)
     public ArmPose getArmPose(ItemStack stack, AbstractClientPlayer player, InteractionHand hand) {
         if (PhysGrabberClientHandler.isGrabbing(player)) {
             return ArmPose.CROSSBOW_HOLD;

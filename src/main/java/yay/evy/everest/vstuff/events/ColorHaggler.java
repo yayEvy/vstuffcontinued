@@ -43,7 +43,7 @@ public class ColorHaggler {
                                 ConstraintTracker.RopeConstraintData newData = data;
                                 ConstraintPersistence constraintPersistence = ConstraintPersistence.get(serverLevel);
 
-                                newData.style = RopeStyles.fromString(item.toString());
+                                newData.style = getDyedStyle(item.toString(), getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(serverLevel, player));
 
                                 ConstraintTracker.getActiveConstraints().put(targetConstraintId, newData);
 
@@ -56,7 +56,10 @@ public class ColorHaggler {
 
                                 ConstraintPersistence.get(serverLevel).saveNow(serverLevel);
 
-                                itemStack.shrink(1);
+
+                                if (!player.isCreative()) {
+                                    itemStack.shrink(1);
+                                }
                             }
                         }
                     }
@@ -70,15 +73,21 @@ public class ColorHaggler {
     }
 
     private boolean ropeIsColorable(ServerLevel serverLevel, Player player){
-        return findRopesBasicStyle(serverLevel, player).equals("DYED") || findRopesBasicStyle(serverLevel, player).equals("WOOL");
+        return getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(serverLevel, player).toString().equals("DYE")
+                || getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(serverLevel, player).toString().equals("WOOL");
     }
 
-    private String findRopesBasicStyle(ServerLevel level, Player player) {
+    private RopeStyles.PrimitiveRopeStyle getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(ServerLevel level, Player player) {
         Integer targetConstraintId = RopeUtil.findTargetedLead(level, player);
 
         ConstraintTracker.RopeConstraintData wizardsWorstKeptSecret = ConstraintTracker.getActiveConstraints().get(targetConstraintId);
 
-        return wizardsWorstKeptSecret.style.getBasicStyle().toString();
+        return wizardsWorstKeptSecret.style.getBasicStyle();
+    }
+
+    private RopeStyles.RopeStyle getDyedStyle(String dyeItem, RopeStyles.PrimitiveRopeStyle type) {
+        String color = dyeItem.split("_")[0]; // splits purple_dye into { purple, dye }, then we just get the first element, therefore only getting the desired color of the rope
+        return RopeStyles.fromString(color + "_" + type.toString().toLowerCase());
     }
 
 }
