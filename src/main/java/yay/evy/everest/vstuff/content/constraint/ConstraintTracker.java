@@ -60,8 +60,7 @@ public class ConstraintTracker {
 
         Rope data = activeRopes.remove(constraintId);
         if (data != null) {
-            var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(ValkyrienSkies.getDimensionId(level));
-            gtpa.removeJoint(constraintId);
+            data.removeJoint(level);
 
             ConstraintPersistence persistence = ConstraintPersistence.get(level);
                 persistence.markConstraintAsRemoved(constraintId);

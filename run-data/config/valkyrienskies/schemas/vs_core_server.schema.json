@@ -9,7 +9,7 @@
     "physics" : {
       "type" : "object",
       "properties" : {
-        "iterations" : {
+        "krunchIterations" : {
           "type" : "integer",
           "format" : "int32",
           "description" : "Sets number of iterations per sub-steps used by Krunch"
@@ -17,27 +17,41 @@
         "lodDetail" : {
           "type" : "integer",
           "format" : "int32",
-          "description" : "The detail of the collision LOD of ships, higher values are more detailed but heavier to compute"
+          "description" : "The detail of the collision LOD of ships, higher values are more detailed but heavier to compute. Setting this to 0 disables Lod, but may cause instability!"
         },
         "maxDePenetrationSpeed" : {
           "type" : "number",
           "format" : "double",
           "description" : "Limit the max collision de-penetration speed so that rigid bodies don't go flying apart when they overlap"
         },
+        "physicsBackend" : {
+          "type" : "string"
+        },
         "physicsSpeed" : {
           "type" : "number",
           "format" : "double",
           "description" : "How fast the physics is running. 1.0 is full speed, 0.5 is 50% speed, etc."
         },
-        "solver" : {
-          "type" : "string",
-          "enum" : [ "GAUSS_SEIDEL", "JACOBI" ],
-          "description" : "Sets the constraint solver used by Krunch"
-        },
-        "subSteps" : {
+        "physicsSubSteps" : {
           "type" : "integer",
           "format" : "int32",
           "description" : "Sets number of sub-steps used by Krunch"
+        },
+        "positionIterations" : {
+          "type" : "integer",
+          "format" : "int32",
+          "description" : "The maximum number of iterations used by the PhysX to resolve positions. Higher values are more accurate but heavier to compute",
+          "default" : "8",
+          "minimum" : 1,
+          "maximum" : 3E+1
+        },
+        "velocityIterations" : {
+          "type" : "integer",
+          "format" : "int32",
+          "description" : "The maximum number of iterations used by PhysX to resolve velocity. Higher values are more accurate but heavier to compute",
+          "default" : "2",
+          "minimum" : 1,
+          "maximum" : 3E+1
         }
       },
       "additionalProperties" : false,
@@ -87,6 +101,37 @@
       "type" : "number",
       "format" : "double",
       "description" : "Ship unload distance in blocks"
+    },
+    "sp" : {
+      "type" : "object",
+      "properties" : {
+        "enableBlockCornerConnectivity" : {
+          "type" : "boolean",
+          "description" : "Enable/Disable Block Corner Connectivity (WARNING! May significantly increase memory usage)"
+        },
+        "enableBlockEdgeConnectivity" : {
+          "type" : "boolean",
+          "description" : "Enable/Disable Block Edge Connectivity (WARNING! May significantly increase memory usage)"
+        },
+        "enableConnectivity" : {
+          "type" : "boolean",
+          "description" : "Enable/Disable Connectivity (May reduce memory usage. Use [enableSplitting] instead if you just want to disable ship splitting.)"
+        },
+        "enableSplitting" : {
+          "type" : "boolean",
+          "description" : "Enable/Disable Splitting (Disabling this setting will not prevent the use of Air Pockets.)"
+        },
+        "enableWorldConnectivity" : {
+          "type" : "boolean",
+          "description" : "Enable/Disable World Connectivity (Experimental!)"
+        },
+        "verboseConnectivityLogging" : {
+          "type" : "boolean",
+          "description" : "Enable verbose logging of connectivity (May result in very large log files)"
+        }
+      },
+      "additionalProperties" : false,
+      "title" : "Connectivity Settings (Experimental)"
     },
     "udpPort" : {
       "type" : "integer",

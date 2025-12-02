@@ -225,7 +225,7 @@ public class ConstraintPersistence extends SavedData {
                 currentGroundBodyId = VSGameUtilsKt.getShipObjectWorld(level).getDimensionToGroundBodyIdImmutable()
                         .get(VSGameUtilsKt.getDimensionId(level));
             } catch (Exception e) {
-                //  System.err.println("Failed to get ground body ID: " + e.getMessage());
+                VStuff.LOGGER.error("Failed to get ground body id: {}", e.getMessage());
                 return;
             }
 
@@ -341,7 +341,7 @@ public class ConstraintPersistence extends SavedData {
     private boolean validateShipsAndCreateConstraint(ServerLevel level, Integer persistenceId, Rope rope,
                                                      Long actualShipA, Long actualShipB) {
         try {
-            rope.restoreJoint();
+            rope.restoreJoint(level);
 
             return true;
         } catch (Exception e) {

@@ -29,10 +29,10 @@ public class LeadBreakItem extends Item {
             Integer targetConstraintId = RopeUtil.findTargetedLead(serverLevel, player);
             if (targetConstraintId != null) {
                 try {
-                    var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(ValkyrienSkies.getDimensionId(serverLevel));
-                    gtpa.removeJoint(targetConstraintId);
-
                     Rope data = ConstraintTracker.getActiveRopes().get(targetConstraintId);
+
+                    data.removeJoint(serverLevel);
+
                     ConstraintTracker.removeConstraintWithPersistence(serverLevel, targetConstraintId);
                     forceRemoveConstraint(serverLevel, targetConstraintId);
 
@@ -66,9 +66,7 @@ public class LeadBreakItem extends Item {
                     }
 
                     if (ConstraintTracker.getActiveRopes().containsKey(targetConstraintId)) {
-                        gtpa.removeJoint(targetConstraintId);
-                        ConstraintTracker.removeConstraintWithPersistence(serverLevel, targetConstraintId);
-                        NetworkHandler.sendConstraintRemove(targetConstraintId);
+                        data.removeJoint(serverLevel);
                         forceRemoveConstraint(serverLevel, targetConstraintId);
                         ConstraintPersistence persistence = ConstraintPersistence.get(serverLevel);
                         persistence.saveNow(serverLevel);

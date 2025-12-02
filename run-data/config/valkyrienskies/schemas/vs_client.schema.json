@@ -27,6 +27,11 @@
       },
       "additionalProperties" : false
     },
+    "defaultRenderer" : {
+      "type" : "string",
+      "enum" : [ "VANILLA", "FLYWHEEL" ],
+      "description" : "The way ships are rendered by default"
+    },
     "recommendSlugsInMcCommands" : {
       "type" : "boolean",
       "description" : "Recommend ship slugs in mc commands where player names could be used ex. /tp ship-name wich could pollute user autocomplete"

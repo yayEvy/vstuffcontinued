@@ -17,15 +17,20 @@ import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.rendering.EnergyCoreRenderTypes;
 
 
-public class EnergyCoreRenderer extends CustomRenderedItemModelRenderer {
+public class CorelikeItemRenderer extends CustomRenderedItemModelRenderer {
 
     private static final ResourceLocation EMPTY = VStuff.asTextureResource("item/energy_core/empty.png");
-    private static final ResourceLocation TINT = VStuff.asTextureResource("item/energy_core/blue_tint.png");
+    private final ResourceLocation TINT;
 
     private static final PartialModel CORE = PartialModel.of(VStuff.asResource("item/energy_core/core"));
     private static final PartialModel CORE_INNER = PartialModel.of(VStuff.asResource("item/energy_core/core_inner"));
     private static final PartialModel CORE_OUTER = PartialModel.of(VStuff.asResource("item/energy_core/core_outer"));
 
+
+
+    public CorelikeItemRenderer(String colorTint) {
+        TINT = VStuff.asTextureResource(colorTint);
+    }
 
     protected void render(ItemStack stack, CustomRenderedItemModel model, PartialItemModelRenderer renderer, ItemDisplayContext transformType, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
         ms.pushPose();

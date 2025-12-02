@@ -17,6 +17,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.VstuffConfig;
+import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
 import yay.evy.everest.vstuff.util.RopeStyles;
 import org.valkyrienskies.core.internal.joints.*;
@@ -206,12 +207,21 @@ public class Rope {
 
     // methods for join creation / deletion / editing
 
-    public boolean removeJoint() {
+    /**
+     * Removes a Rope's joint and sets its id and constraint to null.
+     * This method calls ConstraintTracker.removeConstraintWithPersistence
+     * and NetworkHandler.sendConstraintRemove, so it is not needed to be done outside
+     * of this method
+     * @param level the ServerLevel to remove the joint from
+     * @return if the method succeeded
+     */
+    public boolean removeJoint(ServerLevel level) {
         if (!hasPhysicalImpact) {
             VStuff.LOGGER.info("nuh uh [not removing joint for rope without joint]");
             return false;
         }
-        level = getLevel();
+        this.level = level;
+        this.levelId = RopeUtil.registerLevel(level);
 
         if (constraint == null) {
             VStuff.LOGGER.warn("Cannot remove an already null joint!");
@@ -225,6 +235,8 @@ public class Rope {
 
             gtpa.removeJoint(ID);
             this.constraint = null;
+            ConstraintTracker.removeConstraintWithPersistence(level, ID);
+            NetworkHandler.sendConstraintRemove(ID);
             return true;
         } catch (Exception e) {
             VStuff.LOGGER.error("Error removing joint for constraint {}: {}", ID, e.getMessage());
@@ -268,15 +280,22 @@ public class Rope {
         }
         return false;
     }
-
-    public boolean restoreJoint() {
+    /**
+     * Restores a Rope's joint and sets its id and constraint.
+     * This method calls ConstraintTracker.addConstraintWithPersistence.
+     * @param level the ServerLevel to restore the joint to
+     * @return if the method succeeded
+     */
+    public boolean restoreJoint(ServerLevel level) {
         if (!hasPhysicalImpact) {
             VStuff.LOGGER.info("nuh uh [not restoring joint for rope without joint]");
             return false;
         }
-        level = getLevel();
+        this.level = level;
+        this.levelId = RopeUtil.registerLevel(level);
 
         Long currentGroundBodyId;
+
         try {
             currentGroundBodyId = VSGameUtilsKt.getShipObjectWorld(level).getDimensionToGroundBodyIdImmutable()
                     .get(VSGameUtilsKt.getDimensionId(level));
@@ -346,6 +365,19 @@ public class Rope {
 
     // static methods for object creation
 
+    /**
+     * Creates a new rope object and a new VSDistanceJoint.
+     * Adds itself to persistence and syncs constraints.
+     * @param ropeItem the LeadConstraintItem being used.
+     * @param level the Serverlevel to create the joint in
+     * @param firstClickedPos the first clicked BlockPos to create the rope from
+     * @param secondClickedPos the second clicked BlockPos to create the rope to
+     * @param firstEntity idk
+     * @param firstShipId the id of the body that firstClickedPos belongs to
+     * @param secondShipId the id of the body that secondClickedPos belongs to
+     * @param player player
+     * @return yes
+     */
     public static RopeReturn createNew(
             LeadConstraintItem ropeItem,
             ServerLevel level,
