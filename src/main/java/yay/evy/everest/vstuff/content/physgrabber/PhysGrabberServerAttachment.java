@@ -1,5 +1,6 @@
 package yay.evy.everest.vstuff.content.physgrabber;
 
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
@@ -9,7 +10,7 @@ import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 
 import yay.evy.everest.vstuff.content.thrust.AttachmentUtils;
 
-public class PhysGrabberServerAttachment implements ShipPhysicsListener {
+public final class PhysGrabberServerAttachment implements ShipPhysicsListener {
 
     private final Vector3d targetPos = new Vector3d();
     private boolean active = false;
@@ -18,7 +19,7 @@ public class PhysGrabberServerAttachment implements ShipPhysicsListener {
     private static final double MAX_SPEED = 20.0;
 
     @Override
-    public void physTick(PhysShip physShip, PhysLevel physLevel) {
+    public void physTick(@NotNull PhysShip physShip, @NotNull PhysLevel physLevel) {
         if (!active) return;
 
         PhysShipImpl ship = (PhysShipImpl) physShip;
@@ -47,11 +48,6 @@ public class PhysGrabberServerAttachment implements ShipPhysicsListener {
         force.z = Math.max(Math.min(force.z, maxForce), -maxForce);
 
         ship.applyInvariantForce(force);
-    }
-
-    @Override
-    public void physTick(PhysShip physShip, PhysLevel physLevel, double delta) {
-        physTick(physShip, physLevel);
     }
 
     public void setTarget(Vector3d newTarget) {
