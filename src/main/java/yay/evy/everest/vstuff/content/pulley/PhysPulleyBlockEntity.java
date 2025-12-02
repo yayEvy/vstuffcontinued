@@ -24,15 +24,20 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
+import org.valkyrienskies.core.api.ships.PhysShip;
+import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.index.VStuffBlockEntities;
 import yay.evy.everest.vstuff.index.VStuffItems;
 
+import org.valkyrienskies.mod.api.BlockEntityPhysicsListener;
 
 import java.util.*;
 
-public class PhysPulleyBlockEntity extends KineticBlockEntity {
+public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEntityPhysicsListener {
 
     private ItemStackHandler ropeInventory = new ItemStackHandler(1) {
         @Override
@@ -106,6 +111,22 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity {
     @Override
     public void tick() {
         if (level == null || level.isClientSide) return;
+
+    }
+
+
+    @Override
+    public @NotNull String getDimension() {
+        return "";
+    }
+
+    @Override
+    public void physTick(@Nullable PhysShip physShip, @NotNull PhysLevel physLevel) {
+
+    }
+
+    @Override
+    public void setDimension(@NotNull String s) {
 
     }
 
