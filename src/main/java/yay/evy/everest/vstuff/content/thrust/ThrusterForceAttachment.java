@@ -13,26 +13,14 @@ import org.valkyrienskies.core.api.ships.*;
 import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 
+
 @SuppressWarnings("deprecation")
-public class ThrusterForceAttachment implements ShipPhysicsListener {
+public final class ThrusterForceAttachment implements ShipPhysicsListener {
 
     public Map<BlockPos, ThrusterForceApplier> appliersMapping = new ConcurrentHashMap<>();
 
     public ThrusterForceAttachment() {}
 
-    @Override
-    public void physTick(@NotNull PhysShip physShip, @NotNull PhysLevel physLevel) {
-        PhysShipImpl ship = (PhysShipImpl) physShip;
-
-        appliersMapping.forEach((pos, applier) -> {
-            applier.applyForces(pos, ship);
-        });
-    }
-
-    @Override
-    public void physTick(@NotNull PhysShip physShip, @NotNull PhysLevel physLevel, double delta) {
-        physTick(physShip, physLevel);
-    }
 
     public void addApplier(BlockPos pos, ThrusterForceApplier applier) {
         appliersMapping.put(pos, applier);
@@ -44,7 +32,7 @@ public class ThrusterForceAttachment implements ShipPhysicsListener {
         if (appliersMapping.isEmpty()) {
             LoadedServerShip ship = AttachmentUtils.getShipAt(level, pos);
             if (ship != null) {
-                ship.saveAttachment(ThrusterForceAttachment.class, null);
+                ship.setAttachment(ThrusterForceAttachment.class, null);
             }
         }
     }
@@ -56,4 +44,15 @@ public class ThrusterForceAttachment implements ShipPhysicsListener {
     public static ThrusterForceAttachment get(Level level, BlockPos pos) {
         return AttachmentUtils.get(level, pos, ThrusterForceAttachment.class, ThrusterForceAttachment::new);
     }
+
+    @Override
+    public void physTick(@NotNull PhysShip physShip, @NotNull PhysLevel physLevel) {
+        PhysShipImpl ship = (PhysShipImpl) physShip;
+
+        appliersMapping.forEach((pos, applier) -> {
+            applier.applyForces(pos, ship);
+        });
+    }
+
+
 }

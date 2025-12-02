@@ -10,6 +10,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -331,25 +333,34 @@ public abstract class AbstractThrusterBlockEntity extends KineticBlockEntity {
     @Override
     public void onLoad() {
         super.onLoad();
-        if (!level.isClientSide) {
-            level.getServer().execute(() -> {
-                // Recalculate
+
+        if (level instanceof ServerLevel serverLevel) {
+            MinecraftServer server = serverLevel.getServer();
+
+            server.execute(() -> {
+
+                if (!server.isSameThread())
+                    return;
+
+
                 recalcThruster();
 
-                // Re-register applier with the attachment
-                ThrusterForceAttachment attachment = ThrusterForceAttachment.get(level, worldPosition);
+                ThrusterForceAttachment attachment =
+                        ThrusterForceAttachment.get(serverLevel, worldPosition);
+
                 if (attachment != null) {
                     ThrusterData data = getThrusterData();
-                    data.setDirection(VectorConversionsMCKt.toJOMLD(getBlockState().getValue(AbstractThrusterBlock.FACING).getNormal()));
+                    data.setDirection(VectorConversionsMCKt.toJOMLD(
+                            getBlockState().getValue(AbstractThrusterBlock.FACING).getNormal()
+                    ));
 
                     ThrusterForceApplier applier = new ThrusterForceApplier(data);
                     attachment.addApplier(worldPosition, applier);
-
-                  //  System.out.println("[Thruster] onLoad: re-registered applier at " + worldPosition);
                 }
             });
         }
     }
+
 
     private void recalcThruster() {
         calculateObstruction(level, worldPosition, getBlockState().getValue(AbstractThrusterBlock.FACING));

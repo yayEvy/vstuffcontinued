@@ -52,8 +52,8 @@ public class ThrusterForceApplier {
         worldForceDirection.normalize();
         worldForce.set(worldForceDirection).mul(thrust);
 
-       // System.out.println(
-       //         "[ThrusterForceApplier] thrust=" + thrust +
+        // System.out.println(
+        //         "[ThrusterForceApplier] thrust=" + thrust +
         //                " dir=" + thrusterDir +
         //                " worldForce=" + worldForce +
         //                " relPos=" + relativePos
@@ -64,9 +64,9 @@ public class ThrusterForceApplier {
         if (linearVelocity.lengthSquared() >= maxSpeed * maxSpeed) {
             double dot = worldForce.dot(linearVelocity);
             if (dot > 0) {
-            //    System.out.println(
-             //           "[ThrusterForceApplier] capped by velocity, dot=" + dot +
-            //                    " linearVel=" + linearVelocity
+                //    System.out.println(
+                //           "[ThrusterForceApplier] capped by velocity, dot=" + dot +
+                //                    " linearVel=" + linearVelocity
 
                 double forceLengthSq = worldForce.lengthSquared();
                 if (forceLengthSq > 1e-9) {
