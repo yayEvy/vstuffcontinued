@@ -13,15 +13,21 @@ import net.minecraftforge.fml.DistExecutor; // Import the DistExecutor class
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
+import org.valkyrienskies.core.api.attachment.AttachmentRegistration;
+import org.valkyrienskies.mod.api.VsApi;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.client.VStuffClient;
+import yay.evy.everest.vstuff.content.thrust.ThrusterForceAttachment;
 import yay.evy.everest.vstuff.events.ColorHaggler;
 import yay.evy.everest.vstuff.index.*;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.network.PhysGrabberNetwork;
 import yay.evy.everest.vstuff.particles.ParticleTypes;
+import org.valkyrienskies.core.api.VsBeta;
+import kotlin.Unit;
 
 @Mod(VStuff.MOD_ID)
 public class VStuff {
@@ -52,16 +58,33 @@ public class VStuff {
         PhysGrabberNetwork.register();
         MinecraftForge.EVENT_BUS.register(new ColorHaggler());
 
+        modEventBus.addListener(this::commonSetup);
+
 
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> VStuffClient::initialize);
 
 
         LOGGER.info("VStuff mod initialized");
     }
+    @VsBeta
+    private void commonSetup(final FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> {
+            registerAttachments();
+        });
+    }
+    public static void registerAttachments() {
+        LOGGER.info("Registering vstuff attachments...");
+
+        ValkyrienSkiesMod.getApi().registerAttachment(
+                ThrusterForceAttachment.class, builder -> {
+                    builder.build();
+                    return null;
+                }
+        );
 
 
-
-
+        // Add other attachments when needed :3
+    }
     public static CreateRegistrate registrate() {
         return REGISTRATE;
     }

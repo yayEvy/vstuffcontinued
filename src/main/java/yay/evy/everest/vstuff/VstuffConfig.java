@@ -26,8 +26,8 @@ public class VstuffConfig {
 
         serverBuilder.push("thruster");
         THRUSTER_THRUST_MULTIPLIER = serverBuilder
-                .comment("Multiplier for thruster thrust (default: 1.0)")
-                .define("thrustMultiplier", 1.0);
+                .comment("Multiplier for thruster thrust (default: 0.5)")
+                .define("thrustMultiplier", 0.5);
         THRUSTER_MAX_SPEED = serverBuilder
                 .comment("Maximum speed thrusters can push to (default: 20)")
                 .define("maxSpeed", 20);
