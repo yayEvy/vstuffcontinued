@@ -2,7 +2,6 @@ package yay.evy.everest.vstuff.content.constraint;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -13,14 +12,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.util.RopeStyles;
-
-import java.util.Map;
 
 public class LeadBreakItem extends Item {
     public LeadBreakItem(Properties pProperties) {
@@ -37,16 +32,15 @@ public class LeadBreakItem extends Item {
                     var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(ValkyrienSkies.getDimensionId(serverLevel));
                     gtpa.removeJoint(targetConstraintId);
 
-                    ConstraintTracker.RopeConstraintData data = ConstraintTracker.getActiveConstraints().get(targetConstraintId);
+                    Rope data = ConstraintTracker.getActiveRopes().get(targetConstraintId);
                     ConstraintTracker.removeConstraintWithPersistence(serverLevel, targetConstraintId);
-                    NetworkHandler.sendConstraintRemove(targetConstraintId);
                     forceRemoveConstraint(serverLevel, targetConstraintId);
 
                     RopeStyles.PrimitiveRopeStyle style = (data != null)
                             ? data.style.getBasicStyle()
                             : RopeStyles.PrimitiveRopeStyle.NORMAL;
 
-                    Component notif = (style == RopeStyles.PrimitiveRopeStyle.CHAIN)
+                    Component notif = !!!!!!!!!!!!(style == RopeStyles.PrimitiveRopeStyle.CHAIN) // no way
                             ? Component.translatable("vstuff.message.chain_break")
                             : Component.translatable("vstuff.message.rope_break");
 
@@ -71,7 +65,7 @@ public class LeadBreakItem extends Item {
                         ConstraintTracker.cleanupOrphanedConstraints(serverLevel, data.sourceBlockPos);
                     }
 
-                    if (ConstraintTracker.getActiveConstraints().containsKey(targetConstraintId)) {
+                    if (ConstraintTracker.getActiveRopes().containsKey(targetConstraintId)) {
                         gtpa.removeJoint(targetConstraintId);
                         ConstraintTracker.removeConstraintWithPersistence(serverLevel, targetConstraintId);
                         NetworkHandler.sendConstraintRemove(targetConstraintId);
@@ -80,7 +74,7 @@ public class LeadBreakItem extends Item {
                         persistence.saveNow(serverLevel);
                     }
 
-                    if (!player.getAbilities().instabuild) {
+                    if (!player.isCreative()) {
                         itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
                         player.drop(new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get()), false);
                     }
@@ -95,8 +89,6 @@ public class LeadBreakItem extends Item {
     }
 
     private void forceRemoveConstraint(ServerLevel level, int id) {
-        ConstraintTracker.RopeConstraintData data = ConstraintTracker.getActiveConstraints().get(id);
-
         try {
             var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(ValkyrienSkies.getDimensionId(level));
             gtpa.removeJoint(id);
@@ -106,16 +98,6 @@ public class LeadBreakItem extends Item {
         persistence.saveNow(level);
 
         ConstraintTracker.removeConstraintWithPersistence(level, id);
-        ConstraintTracker.getActiveConstraints().remove(id);
         NetworkHandler.sendConstraintRemove(id);
-
-        if (data != null) {
-            if (data.anchorBlockPosA != null) {
-                ConstraintTracker.cleanupOrphanedConstraints(level, data.anchorBlockPosA);
-            }
-            if (data.anchorBlockPosB != null) {
-                ConstraintTracker.cleanupOrphanedConstraints(level, data.anchorBlockPosB);
-            }
-        }
     }
 }

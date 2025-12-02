@@ -17,120 +17,114 @@ import java.util.Map;
 public class ClientConstraintTracker {
     private static final Map<Integer, ClientRopeData> clientConstraints = new HashMap<>();
 
-    public static class ClientRopeData {
-        public final Long shipA;
-        public final Long shipB;
-        public final Vector3d localPosA;
-        public final Vector3d localPosB;
-        public final double maxLength;
-        public final RopeStyles.RopeStyle style;
+    public record ClientRopeData(Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB, double maxLength,
+                                 RopeStyles.RopeStyle style) {
+            public ClientRopeData(Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle style) {
+                this.shipA = shipA;
+                this.shipB = shipB;
+                this.localPosA = new Vector3d(localPosA);
+                this.localPosB = new Vector3d(localPosB);
+                this.maxLength = maxLength;
+                this.style = style;
+            }
 
-        public ClientRopeData(Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle style) {
-            this.shipA = shipA;
-            this.shipB = shipB;
-            this.localPosA = new Vector3d(localPosA);
-            this.localPosB = new Vector3d(localPosB);
-            this.maxLength = maxLength;
-            this.style = style;
-        }
+            public Vector3d getWorldPosA(Level level, float partialTick) {
+                try {
+                    Minecraft mc = Minecraft.getInstance();
+                    if (mc.level == null) return new Vector3d(localPosA);
 
-        public Vector3d getWorldPosA(Level level, float partialTick) {
-            try {
-                Minecraft mc = Minecraft.getInstance();
-                if (mc.level == null) return new Vector3d(localPosA);
+                    if (shipA == null || shipA == 0L) {
+                        return new Vector3d(localPosA);
+                    } else {
+                        Ship shipObject = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipA);
+                        if (shipObject != null) {
+                            Vector3d worldPos = new Vector3d();
 
-                if (shipA == null || shipA == 0L) {
+
+                            try {
+                                ((ClientShip) shipObject).getRenderTransform().getShipToWorld().transformPosition(localPosA, worldPos);
+                            } catch (Exception e) {
+                                shipObject.getTransform().getShipToWorld().transformPosition(localPosA, worldPos);
+                            }
+
+                            return worldPos;
+                        }
+                    }
                     return new Vector3d(localPosA);
-                } else {
-                    Ship shipObject = VSGameUtilsKt.getShipObjectWorld(mc.level).getAllShips().getById(shipA);
-                    if (shipObject != null) {
-                        Vector3d worldPos = new Vector3d();
+                } catch (Exception e) {
+                    return new Vector3d(localPosA);
+                }
+            }
 
+            public Vector3d getWorldPosB(Level level, float partialTick) {
+                try {
+                    Minecraft mc = Minecraft.getInstance();
+                    if (mc.level == null) return new Vector3d(localPosB);
 
-                        try {
-                            ((ClientShip) shipObject).getRenderTransform().getShipToWorld().transformPosition(localPosA, worldPos);
-                        } catch (Exception e) {
+                    if (shipB == null || shipB == 0L) {
+                        return new Vector3d(localPosB);
+                    } else {
+                        Ship shipObject = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipB);
+                        if (shipObject != null) {
+                            Vector3d worldPos = new Vector3d();
+
+                            try {
+                                ((ClientShip) shipObject).getRenderTransform().getShipToWorld().transformPosition(localPosB, worldPos);
+                            } catch (Exception e) {
+                                shipObject.getTransform().getShipToWorld().transformPosition(localPosB, worldPos);
+                            }
+
+                            return worldPos;
+                        }
+                    }
+                    return new Vector3d(localPosB);
+                } catch (Exception e) {
+                    return new Vector3d(localPosB);
+                }
+            }
+
+            public Vector3d getRawWorldPosA(Level level) {
+                try {
+                    Minecraft mc = Minecraft.getInstance();
+                    if (mc.level == null) return new Vector3d(localPosA);
+
+                    if (shipA == null || shipA == 0L) {
+                        return new Vector3d(localPosA);
+                    } else {
+                        Ship shipObject = VSGameUtilsKt.getShipObjectWorld(mc.level).getAllShips().getById(shipA);
+                        if (shipObject != null) {
+                            Vector3d worldPos = new Vector3d();
                             shipObject.getTransform().getShipToWorld().transformPosition(localPosA, worldPos);
+                            return worldPos;
                         }
-
-                        return worldPos;
                     }
-                }
-                return new Vector3d(localPosA);
-            } catch (Exception e) {
-                return new Vector3d(localPosA);
-            }
-        }
-
-        public Vector3d getWorldPosB(Level level, float partialTick) {
-            try {
-                Minecraft mc = Minecraft.getInstance();
-                if (mc.level == null) return new Vector3d(localPosB);
-
-                if (shipB == null || shipB == 0L) {
-                    return new Vector3d(localPosB);
-                } else {
-                    Ship shipObject = VSGameUtilsKt.getShipObjectWorld(mc.level).getAllShips().getById(shipB);
-                    if (shipObject != null) {
-                        Vector3d worldPos = new Vector3d();
-
-                        try {
-                            ((org.valkyrienskies.core.api.ships.ClientShip) shipObject).getRenderTransform().getShipToWorld().transformPosition(localPosB, worldPos);
-                        } catch (Exception e) {
-                            shipObject.getTransform().getShipToWorld().transformPosition(localPosB, worldPos);
-                        }
-
-                        return worldPos;
-                    }
-                }
-                return new Vector3d(localPosB);
-            } catch (Exception e) {
-                return new Vector3d(localPosB);
-            }
-        }
-
-        public Vector3d getRawWorldPosA(Level level) {
-            try {
-                Minecraft mc = Minecraft.getInstance();
-                if (mc.level == null) return new Vector3d(localPosA);
-
-                if (shipA == null || shipA == 0L) {
                     return new Vector3d(localPosA);
-                } else {
-                    Ship shipObject = VSGameUtilsKt.getShipObjectWorld(mc.level).getAllShips().getById(shipA);
-                    if (shipObject != null) {
-                        Vector3d worldPos = new Vector3d();
-                        shipObject.getTransform().getShipToWorld().transformPosition(localPosA, worldPos);
-                        return worldPos;
-                    }
+                } catch (Exception e) {
+                    return new Vector3d(localPosA);
                 }
-                return new Vector3d(localPosA);
-            } catch (Exception e) {
-                return new Vector3d(localPosA);
             }
-        }
 
-        public Vector3d getRawWorldPosB(Level level) {
-            try {
-                Minecraft mc = Minecraft.getInstance();
-                if (mc.level == null) return new Vector3d(localPosB);
+            public Vector3d getRawWorldPosB(Level level) {
+                try {
+                    Minecraft mc = Minecraft.getInstance();
+                    if (mc.level == null) return new Vector3d(localPosB);
 
-                if (shipB == null || shipB == 0L) {
+                    if (shipB == null || shipB == 0L) {
+                        return new Vector3d(localPosB);
+                    } else {
+                        Ship shipObject = VSGameUtilsKt.getShipObjectWorld(mc.level).getAllShips().getById(shipB);
+                        if (shipObject != null) {
+                            Vector3d worldPos = new Vector3d();
+                            shipObject.getTransform().getShipToWorld().transformPosition(localPosB, worldPos);
+                            return worldPos;
+                        }
+                    }
                     return new Vector3d(localPosB);
-                } else {
-                    Ship shipObject = VSGameUtilsKt.getShipObjectWorld(mc.level).getAllShips().getById(shipB);
-                    if (shipObject != null) {
-                        Vector3d worldPos = new Vector3d();
-                        shipObject.getTransform().getShipToWorld().transformPosition(localPosB, worldPos);
-                        return worldPos;
-                    }
+                } catch (Exception e) {
+                    return new Vector3d(localPosB);
                 }
-                return new Vector3d(localPosB);
-            } catch (Exception e) {
-                return new Vector3d(localPosB);
             }
         }
-    }
 
     public static void addClientConstraint(Integer constraintId, Long shipA, Long shipB,
                                            Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle style) {

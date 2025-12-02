@@ -103,7 +103,6 @@ public class LeadConstraintItem extends Item {
             RopeUtil.RopeReturn ropeReturn = Rope.createNew(this, serverLevel, firstClickedPos, clickedPos, firstEntity, firstShipId, secondShipId, player);
 
             if (ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS) {
-                // ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer); Rope.createNew does constraint syncing
 
                 Component notif = RopeStyleHandlerServer.getStyle(player.getUUID()).getBasicStyle() == RopeStyles.PrimitiveRopeStyle.CHAIN
                         ? Component.translatable("vstuff.message.chain_created")

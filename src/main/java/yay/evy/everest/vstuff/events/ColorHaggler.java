@@ -14,6 +14,7 @@ import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.constraint.ConstraintPersistence;
 import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
+import yay.evy.everest.vstuff.content.constraint.Rope;
 import yay.evy.everest.vstuff.content.constraint.RopeUtil;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
@@ -38,28 +39,19 @@ public class ColorHaggler {
 
                             if (ropeIsColorable(serverLevel, player)) {
 
-                                String persistenceId = ConstraintTracker.persistanceIdViaConstraintId(targetConstraintId);
-                                ConstraintTracker.RopeConstraintData data = ConstraintTracker.getActiveConstraints().get(targetConstraintId);
-                                ConstraintTracker.RopeConstraintData newData = data;
+                                Rope rope = ConstraintTracker.getActiveRopes().get(targetConstraintId);
                                 ConstraintPersistence constraintPersistence = ConstraintPersistence.get(serverLevel);
 
-                                newData.style = getDyedStyle(item.toString(), getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(serverLevel, player));
+                                rope.style = getDyedStyle(item.toString(), getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(serverLevel, player));
 
-                                ConstraintTracker.getActiveConstraints().put(targetConstraintId, newData);
+                                ConstraintTracker.replaceConstraint(rope.ID, rope);
 
-                                NetworkHandler.sendConstraintRerender( targetConstraintId, newData.shipA, newData.shipB
-                                        , newData.localPosA, newData.localPosB, newData.maxLength, newData.style);
-                                constraintPersistence.addConstraint(persistenceId, newData.shipA, newData.shipB
-                                        , newData.localPosA, newData.localPosB, newData.maxLength, newData.compliance, newData.maxForce, serverLevel, newData.constraintType, null, newData.style);
+                                NetworkHandler.sendConstraintRerender(targetConstraintId, rope.shipA, rope.shipB,
+                                        rope.localPosA, rope.localPosB, rope.maxLength, rope.style);
+                                constraintPersistence.addConstraint(rope);
                                 ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);
 
-
                                 ConstraintPersistence.get(serverLevel).saveNow(serverLevel);
-
-
-                                if (!player.isCreative()) {
-                                    itemStack.shrink(1);
-                                }
                             }
                         }
                     }
@@ -80,7 +72,7 @@ public class ColorHaggler {
     private RopeStyles.PrimitiveRopeStyle getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(ServerLevel level, Player player) {
         Integer targetConstraintId = RopeUtil.findTargetedLead(level, player);
 
-        ConstraintTracker.RopeConstraintData wizardsWorstKeptSecret = ConstraintTracker.getActiveConstraints().get(targetConstraintId);
+        Rope wizardsWorstKeptSecret = ConstraintTracker.getActiveRopes().get(targetConstraintId);
 
         return wizardsWorstKeptSecret.style.getBasicStyle();
     }

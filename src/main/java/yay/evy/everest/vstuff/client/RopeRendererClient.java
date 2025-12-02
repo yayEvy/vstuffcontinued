@@ -6,7 +6,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
@@ -16,7 +15,6 @@ import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.joml.Vector3d;
 import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.rendering.RopeRendererType;
@@ -117,7 +115,7 @@ public class RopeRendererClient {
                             level,
                             cameraPos,
                             partialTick,
-                            entry.getValue().style
+                            entry.getValue().style()
                     );
                     renderedAny = true;
                 } catch (Exception e) {
@@ -153,7 +151,7 @@ public class RopeRendererClient {
 
         if (startPos != null && endPos != null) {
             double actualRopeLength = startPos.distance(endPos);
-            double maxRopeLength = ropeData.maxLength;
+            double maxRopeLength = ropeData.maxLength();
 
             renderRope(poseStack, bufferSource, startPos, endPos,
                     actualRopeLength, maxRopeLength, cameraPos, partialTick, level, style);

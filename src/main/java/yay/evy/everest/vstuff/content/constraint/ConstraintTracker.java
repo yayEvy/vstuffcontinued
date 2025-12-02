@@ -5,18 +5,18 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.NetworkHandler;
-import yay.evy.everest.vstuff.util.RopeStyles;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,161 +27,45 @@ import java.util.concurrent.ConcurrentHashMap;
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ConstraintTracker {
 
-    public static final Map<Integer, RopeConstraintData> activeConstraints = new ConcurrentHashMap<>();
-    private static final Map<Integer, String> constraintToPersistenceId = new ConcurrentHashMap<>();
+    public static final Map<Integer, Rope> activeRopes = new ConcurrentHashMap<>();
     private static long lastJoinTime = 0L;
 
 
-    public static class RopeConstraintData {
-        public final Long shipA;
-        public final Long shipB;
-        public final Vector3d localPosA;
-        public final Vector3d localPosB;
-        public final double maxLength;
-        public final double compliance;
-        public final double maxForce;
-        public final ConstraintType constraintType;
-        public final net.minecraft.core.BlockPos sourceBlockPos;
-        public final BlockPos anchorBlockPosA;
-        public final BlockPos anchorBlockPosB;
-        public final boolean isShipA;
-        public final boolean isShipB;
-        public RopeStyles.RopeStyle style;
+    public static void addConstraintWithPersistence(Rope rope) {
 
-        public enum ConstraintType {
-            ROPE_PULLEY,
-            GENERIC
-        }
-
-
-        public RopeConstraintData(ServerLevel level, Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
-                                  double maxLength, double compliance, double maxForce,
-                                  ConstraintType constraintType, net.minecraft.core.BlockPos sourceBlockPos, RopeStyles.RopeStyle style) {
-            this.shipA = shipA;
-            this.shipB = shipB;
-            this.localPosA = new Vector3d(localPosA);
-            this.localPosB = new Vector3d(localPosB);
-            this.maxLength = maxLength;
-            this.compliance = compliance;
-            this.maxForce = maxForce;
-            this.constraintType = constraintType;
-            this.sourceBlockPos = sourceBlockPos;
-            this.anchorBlockPosA = null;
-            this.anchorBlockPosB = null;
-            this.style = style;
-
-            Long groundBodyId = VSGameUtilsKt.getShipObjectWorld(level).getDimensionToGroundBodyIdImmutable().get(VSGameUtilsKt.getDimensionId(level));
-            this.isShipA = !shipA.equals(groundBodyId);
-            this.isShipB = !shipB.equals(groundBodyId);
-        }
-
-
-        public RopeConstraintData(ServerLevel level, Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB,
-                                  double maxLength, double compliance, double maxForce, RopeStyles.RopeStyle style) {
-            this(level, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, ConstraintType.GENERIC, null, style);
-        }
-
-        public Vector3d getWorldPosA(ServerLevel level, float partialTick) {
-            try {
-                Long groundBodyId = VSGameUtilsKt.getShipObjectWorld(level)
-                        .getDimensionToGroundBodyIdImmutable()
-                        .get(VSGameUtilsKt.getDimensionId(level));
-                if (shipA.equals(groundBodyId)) {
-                    return new Vector3d(localPosA);
-                } else {
-                    Ship shipObject = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipA);
-                    if (shipObject != null) {
-                        Vector3d worldPos = new Vector3d();
-                        shipObject.getTransform().getShipToWorld().transformPosition(localPosA, worldPos);
-                        return worldPos;
-                    }
-                }
-                return new Vector3d(localPosA);
-            } catch (Exception e) {
-                return new Vector3d(localPosA);
-            }
-        }
-
-        public Vector3d getWorldPosB(ServerLevel level, float partialTick) {
-            try {
-                Long groundBodyId = VSGameUtilsKt.getShipObjectWorld(level)
-                        .getDimensionToGroundBodyIdImmutable()
-                        .get(VSGameUtilsKt.getDimensionId(level));
-                if (shipB.equals(groundBodyId)) {
-                    return new Vector3d(localPosB);
-                } else {
-                    Ship shipObject = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipB);
-                    if (shipObject != null) {
-                        Vector3d worldPos = new Vector3d();
-                        shipObject.getTransform().getShipToWorld().transformPosition(localPosB, worldPos);
-                        return worldPos;
-                    }
-                }
-                return new Vector3d(localPosB);
-            } catch (Exception e) {
-                return new Vector3d(localPosB);
-            }
-        }
-    }
-
-    public static void addConstraintWithPersistence(ServerLevel level, Integer constraintId, Long shipA, Long shipB,
-                                                    Vector3d localPosA, Vector3d localPosB, double maxLength,
-                                                    double compliance, double maxForce,
-                                                    RopeConstraintData.ConstraintType constraintType,
-                                                    net.minecraft.core.BlockPos sourceBlockPos, RopeStyles.RopeStyle style) {
-
-        if (constraintType == RopeConstraintData.ConstraintType.ROPE_PULLEY && sourceBlockPos != null) {
-            boolean existingConstraintFound = activeConstraints.values().stream()
-                    .anyMatch(existing -> existing.constraintType == RopeConstraintData.ConstraintType.ROPE_PULLEY
+        if (rope.constraintType == RopeUtil.ConstraintType.PULLEY && rope.sourceBlockPos != null) {
+            boolean existingConstraintFound = activeRopes.values().stream()
+                    .anyMatch(existing -> existing.constraintType == RopeUtil.ConstraintType.PULLEY
                             && existing.sourceBlockPos != null
-                            && existing.sourceBlockPos.equals(sourceBlockPos)
-                            && existing.style == style);
+                            && existing.sourceBlockPos.equals(rope.sourceBlockPos)
+                            && existing.style == rope.style);
 
-            if (existingConstraintFound) {
-                // System.out.println("Constraint already exists for rope pulley at " + sourceBlockPos + " with style " + style + ", skipping");
-                return;
-            }
+            if (existingConstraintFound) return;
         }
 
-        RopeConstraintData data = new RopeConstraintData(level, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, constraintType, sourceBlockPos, style);
-        activeConstraints.put(constraintId, data);
-        // System.out.println("Added " + constraintType + " constraint " + constraintId + " with style " + style);
 
-        ConstraintPersistence persistence = ConstraintPersistence.get(level);
-        String persistenceId = java.util.UUID.randomUUID().toString();
-        constraintToPersistenceId.put(constraintId, persistenceId);
+        activeRopes.put(rope.ID, rope);
 
-        persistence.addConstraint(persistenceId, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, level, constraintType, sourceBlockPos, style);
-        NetworkHandler.sendConstraintAdd(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
+        ConstraintPersistence persistence = ConstraintPersistence.get(rope.getLevel());
+
+        persistence.addConstraint(rope);
+        NetworkHandler.sendConstraintAdd(rope.ID, rope.shipA, rope.shipB, rope.localPosA, rope.localPosB, rope.maxLength, rope.style);
     }
 
-
-
-    public static void addConstraintWithPersistence(ServerLevel level, Integer constraintId, Long shipA, Long shipB,
-                                                    Vector3d localPosA, Vector3d localPosB, double maxLength,
-                                                    double compliance, double maxForce, RopeStyles.RopeStyle style) {
-        addConstraintWithPersistence(level, constraintId, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce,
-                RopeConstraintData.ConstraintType.GENERIC, null, style);
+    public static void replaceConstraint(Integer id, Rope rope) {
+        activeRopes.put(id, rope);
     }
-    public static String persistanceIdViaConstraintId (Integer constraintId){
-
-        return constraintToPersistenceId.get(constraintId);
-    }
-
-
 
     public static void removeConstraintWithPersistence(ServerLevel level, Integer constraintId) {
-        RopeConstraintData data = activeConstraints.remove(constraintId);
+
+        Rope data = activeRopes.remove(constraintId);
         if (data != null) {
             var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(ValkyrienSkies.getDimensionId(level));
             gtpa.removeJoint(constraintId);
 
             ConstraintPersistence persistence = ConstraintPersistence.get(level);
-            String persistenceId = constraintToPersistenceId.remove(constraintId);
-            if (persistenceId != null) {
-                persistence.markConstraintAsRemoved(persistenceId);
+                persistence.markConstraintAsRemoved(constraintId);
                 persistence.setDirty();
-            }
 
             if (level.getServer() != null) {
                 for (ServerPlayer player : level.getServer().getPlayerList().getPlayers()) {
@@ -194,7 +78,7 @@ public class ConstraintTracker {
 
             NetworkHandler.sendConstraintRemove(constraintId);
 
-            if (data.constraintType == RopeConstraintData.ConstraintType.ROPE_PULLEY && data.sourceBlockPos != null) {
+            if (data.constraintType == RopeUtil.ConstraintType.GENERIC && data.sourceBlockPos != null) {
                 cleanupOrphanedConstraints(level, data.sourceBlockPos);
             }
         }
@@ -204,9 +88,10 @@ public class ConstraintTracker {
 
     public static void syncAllConstraintsToPlayer(ServerPlayer player) {
         NetworkHandler.sendClearAllConstraintsToPlayer(player);
+        VStuff.LOGGER.info("Attempting to sync all constraints to player {}", player.getName());
 
-        for (Map.Entry<Integer, RopeConstraintData> entry : activeConstraints.entrySet()) {
-            RopeConstraintData data = entry.getValue();
+        for (Map.Entry<Integer, Rope> entry : activeRopes.entrySet()) {
+            Rope data = entry.getValue();
             NetworkHandler.sendConstraintAddToPlayer(
                     player,
                     entry.getKey(),
@@ -221,32 +106,19 @@ public class ConstraintTracker {
     }
 
 
-
-    public static void mapConstraintToPersistenceId(Integer constraintId, String persistenceId) {
-        constraintToPersistenceId.put(constraintId, persistenceId);
-        //   System.out.println("Mapped constraint " + constraintId + " to persistence ID " + persistenceId);
-    }
-
-    public static Map<Integer, RopeConstraintData> getActiveConstraints() {
-        return new HashMap<>(activeConstraints);
+    public static Map<Integer, Rope> getActiveRopes() {
+        return new HashMap<>(activeRopes);
     }
 
 
-    public static void addConstraintToTracker(ServerLevel level, Integer constraintId, Long shipA, Long shipB,
-                                              Vector3d localPosA, Vector3d localPosB, double maxLength,
-                                              double compliance, double maxForce,
-                                              RopeConstraintData.ConstraintType constraintType,
-                                              net.minecraft.core.BlockPos sourceBlockPos, RopeStyles.RopeStyle style) {
-        if (activeConstraints.containsKey(constraintId)) {
-            //  System.out.println("Constraint " + constraintId + " already exists in tracker, skipping");
-            return;
-        }
+    public static void addConstraintToTracker(Rope rope) {
+        if (activeRopes.containsKey(rope.ID)) return;
 
-        RopeConstraintData data = new RopeConstraintData(level, shipA, shipB, localPosA, localPosB, maxLength, compliance, maxForce, constraintType, sourceBlockPos, style);
-        activeConstraints.put(constraintId, data);
+        activeRopes.put(rope.ID, rope);
+        VStuff.LOGGER.info("Adding constraint {} to activeRopes", rope.ID);
 
-        NetworkHandler.sendConstraintAdd(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
-        //System.out.println("Added " + constraintType + " constraint " + constraintId + " to tracker (restoration) with source block " + sourceBlockPos);
+
+        NetworkHandler.sendConstraintAdd(rope.ID, rope.shipA, rope.shipB, rope.localPosA, rope.localPosB, rope.maxLength, rope.style);
     }
 
 
@@ -254,36 +126,24 @@ public class ConstraintTracker {
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
-            for (Map.Entry<Integer, RopeConstraintData> entry : activeConstraints.entrySet()) {
+            for (Map.Entry<Integer, Rope> entry : activeRopes.entrySet()) {
                 Integer constraintId = entry.getKey();
-                RopeConstraintData data = entry.getValue();
+                Rope rope = entry.getValue();
 
-                NetworkHandler.sendConstraintAddToPlayer(player, constraintId, data.shipA, data.shipB,
-                        data.localPosA, data.localPosB, data.maxLength, data.style);
+                NetworkHandler.sendConstraintAddToPlayer(player, constraintId, rope.shipA, rope.shipB,
+                        rope.localPosA, rope.localPosB, rope.maxLength, rope.style);
             }
             NetworkHandler.sendClearAllConstraintsToPlayer(player);
             syncAllConstraintsToPlayer(player);
 
             lastJoinTime = System.currentTimeMillis();
-            //System.out.println("Player joined, setting lastJoinTime for delayed cleanup.");
         }
     }
 
 
 
-    public static void cleanupOrphanedConstraints(ServerLevel level, net.minecraft.core.BlockPos sourceBlockPos) {
-        java.util.List<Integer> constraintsToRemove = new java.util.ArrayList<>();
-
-        for (Map.Entry<Integer, RopeConstraintData> entry : activeConstraints.entrySet()) {
-            Integer constraintId = entry.getKey();
-            RopeConstraintData data = entry.getValue();
-
-            if (data.constraintType == RopeConstraintData.ConstraintType.ROPE_PULLEY &&
-                    data.sourceBlockPos != null &&
-                    data.sourceBlockPos.equals(sourceBlockPos)) {
-                constraintsToRemove.add(constraintId);
-            }
-        }
+    public static void cleanupOrphanedConstraints(ServerLevel level, BlockPos sourceBlockPos) {
+        List<Integer> constraintsToRemove = getIDsToRemove(sourceBlockPos);
 
         var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(ValkyrienSkies.getDimensionId(level));
 
@@ -295,18 +155,34 @@ public class ConstraintTracker {
         }
     }
 
+    private static @NotNull List<Integer> getIDsToRemove(BlockPos sourceBlockPos) {
+        List<Integer> constraintsToRemove = new java.util.ArrayList<>();
 
-    private static boolean areAttachmentChunksLoaded(ServerLevel level, RopeConstraintData data, Long groundBodyId) {
+        for (Map.Entry<Integer, Rope> entry : activeRopes.entrySet()) {
+            Integer constraintId = entry.getKey();
+            Rope rope = entry.getValue();
+
+            if (rope.constraintType == RopeUtil.ConstraintType.PULLEY &&
+                    rope.sourceBlockPos != null &&
+                    rope.sourceBlockPos.equals(sourceBlockPos)) {
+                constraintsToRemove.add(constraintId);
+            }
+        }
+        return constraintsToRemove;
+    }
+
+
+    private static boolean areAttachmentChunksLoaded(ServerLevel level, Rope rope, Long groundBodyId) {
         try {
-            Vector3d worldPosA = data.getWorldPosA(level, 0.0f);
-            net.minecraft.core.BlockPos blockPosA = new net.minecraft.core.BlockPos(
+            Vector3d worldPosA = rope.getWorldPosA(level);
+            BlockPos blockPosA = new BlockPos(
                     (int) Math.floor(worldPosA.x),
                     (int) Math.floor(worldPosA.y),
                     (int) Math.floor(worldPosA.z)
             );
 
-            Vector3d worldPosB = data.getWorldPosB(level, 0.0f);
-            net.minecraft.core.BlockPos blockPosB = new net.minecraft.core.BlockPos(
+            Vector3d worldPosB = rope.getWorldPosB(level);
+            BlockPos blockPosB = new BlockPos(
                     (int) Math.floor(worldPosB.x),
                     (int) Math.floor(worldPosB.y),
                     (int) Math.floor(worldPosB.z)
@@ -329,7 +205,7 @@ public class ConstraintTracker {
         try {
             var shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
 
-            return getActiveConstraints().containsKey(constraintId);
+            return getActiveRopes().containsKey(constraintId);
         } catch (Exception e) {
             return false;
         }
@@ -449,7 +325,7 @@ public class ConstraintTracker {
     }
 
     public static void validateFluidConstraints(ServerLevel level) {
-        java.util.List<Integer> toRemove = new java.util.ArrayList<>();
+        List<Integer> toRemove = new java.util.ArrayList<>();
         Long groundId = VSGameUtilsKt.getShipObjectWorld(level).getDimensionToGroundBodyIdImmutable()
                 .get(VSGameUtilsKt.getDimensionId(level));
 

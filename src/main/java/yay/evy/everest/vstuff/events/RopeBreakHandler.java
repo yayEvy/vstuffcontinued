@@ -8,7 +8,8 @@ import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
-import yay.evy.everest.vstuff.content.constraint.ConstraintTracker.RopeConstraintData;
+import yay.evy.everest.vstuff.content.constraint.Rope;
+import yay.evy.everest.vstuff.content.constraint.RopeUtil;
 import yay.evy.everest.vstuff.index.VStuffItems;
 
 import java.util.ArrayList;
@@ -25,36 +26,36 @@ public class RopeBreakHandler {
         BlockPos brokenPos = event.getPos();
         List<Integer> constraintsToRemove = new ArrayList<>();
 
-        for (Map.Entry<Integer, RopeConstraintData> entry : ConstraintTracker.getActiveConstraints().entrySet()) {
+        for (Map.Entry<Integer, Rope> entry : ConstraintTracker.getActiveRopes().entrySet()) {
             Integer id = entry.getKey();
-            RopeConstraintData data = entry.getValue();
+            Rope rope = entry.getValue();
 
-            if (data.constraintType == RopeConstraintData.ConstraintType.ROPE_PULLEY) continue;
+            if (rope.constraintType == RopeUtil.ConstraintType.PULLEY) continue;
 
             try {
                 BlockPos dropPos = null;
                 boolean remove = false;
 
-                if (!data.isShipA) {
-                    BlockPos posA = BlockPos.containing(data.localPosA.x, data.localPosA.y, data.localPosA.z);
+                if (!rope.shipAIsGround) {
+                    BlockPos posA = BlockPos.containing(rope.localPosA.x, rope.localPosA.y, rope.localPosA.z);
                     if (brokenPos.equals(posA)) {
                         remove = true;
                         dropPos = posA;
                     }
                 }
-                if (!remove && !data.isShipB) {
-                    BlockPos posB = BlockPos.containing(data.localPosB.x, data.localPosB.y, data.localPosB.z);
+                if (!remove && !rope.shipBIsGround) {
+                    BlockPos posB = BlockPos.containing(rope.localPosB.x, rope.localPosB.y, rope.localPosB.z);
                     if (brokenPos.equals(posB)) {
                         remove = true;
                         dropPos = posB;
                     }
                 }
 
-                if (!remove && data.isShipA) {
+                if (!remove && rope.shipAIsGround) {
                     BlockPos worldPosA = BlockPos.containing(
-                            data.getWorldPosA(level, 0).x,
-                            data.getWorldPosA(level, 0).y,
-                            data.getWorldPosA(level, 0).z
+                            rope.getWorldPosA(level).x,
+                            rope.getWorldPosA(level).y,
+                            rope.getWorldPosA(level).z
                     );
                     if (brokenPos.equals(worldPosA)) {
                         remove = true;
@@ -62,11 +63,11 @@ public class RopeBreakHandler {
                     }
                 }
 
-                if (!remove && data.isShipB) {
+                if (!remove && rope.shipBIsGround) {
                     BlockPos worldPosB = BlockPos.containing(
-                            data.getWorldPosB(level, 0).x,
-                            data.getWorldPosB(level, 0).y,
-                            data.getWorldPosB(level, 0).z
+                            rope.getWorldPosB(level).x,
+                            rope.getWorldPosB(level).y,
+                            rope.getWorldPosB(level).z
                     );
                     if (brokenPos.equals(worldPosB)) {
                         remove = true;

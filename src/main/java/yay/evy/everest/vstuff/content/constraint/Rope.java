@@ -23,26 +23,26 @@ import org.valkyrienskies.core.internal.joints.*;
 import yay.evy.everest.vstuff.content.constraint.RopeUtil.*;
 
 import javax.annotation.Nullable;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.UUID;
 
 public class Rope {
 
     private @Nullable ServerLevel level;
     String levelId;
-    Integer ID;
-    Long shipA;
-    Long shipB;
-    boolean shipAIsGround;
-    boolean shipBIsGround;
-    Vector3d localPosA;
-    Vector3d localPosB;
-    double maxLength;
-    double compliance;
-    double maxForce;
-    ConstraintType constraintType;
-    net.minecraft.core.BlockPos sourceBlockPos;
-    RopeStyles.RopeStyle style;
+    public Integer ID;
+    public Long shipA;
+    public Long shipB;
+    public boolean shipAIsGround;
+    public boolean shipBIsGround;
+    public Vector3d localPosA;
+    public Vector3d localPosB;
+    public double maxLength;
+    public double compliance;
+    public double maxForce;
+    public ConstraintType constraintType;
+    public net.minecraft.core.BlockPos sourceBlockPos;
+    public RopeStyles.RopeStyle style;
+    boolean hasPhysicalImpact = true;
 
     @Nullable VSDistanceJoint constraint;
 
@@ -83,6 +83,50 @@ public class Rope {
             this.shipBIsGround = shipB != null && shipB.equals(currentGroundBodyId);
         } catch (Exception e) {
             VStuff.LOGGER.error("Rope creation failed to check ground body ID: {}", e.getMessage());
+        }
+
+        if (shipAIsGround && shipBIsGround) {
+            this.hasPhysicalImpact = false;
+            this.constraint = null;
+        }
+    }
+
+    private Rope(@Nullable ServerLevel level, Long shipA, Long shipB, Vector3d localPosA,
+                 Vector3d localPosB, double maxLength, double compliance, double maxForce, ConstraintType constraintType,
+                 net.minecraft.core.BlockPos sourceBlockPos, @Nullable VSDistanceJoint constraint) {
+        this.level = level;
+        this.levelId = RopeUtil.registerLevel(level);
+
+
+        this.shipA = shipA;
+        this.shipB = shipB;
+
+        this.localPosA = localPosA;
+        this.localPosB = localPosB;
+
+        this.maxLength = maxLength;
+        this.maxForce = maxForce;
+        this.compliance = compliance;
+
+        this.constraintType = constraintType;
+
+        this.sourceBlockPos = sourceBlockPos;
+        this.constraint = constraint;
+
+        try {
+            Long currentGroundBodyId = VSGameUtilsKt.getShipObjectWorld(level)
+                    .getDimensionToGroundBodyIdImmutable()
+                    .get(VSGameUtilsKt.getDimensionId(level));
+
+            this.shipAIsGround = shipA != null && shipA.equals(currentGroundBodyId);
+            this.shipBIsGround = shipB != null && shipB.equals(currentGroundBodyId);
+        } catch (Exception e) {
+            VStuff.LOGGER.error("Rope creation (without ID or style) failed to check ground body ID: {}", e.getMessage());
+        }
+
+        if (shipAIsGround && shipBIsGround) {
+            this.hasPhysicalImpact = false;
+            this.constraint = null;
         }
     }
 
@@ -162,7 +206,74 @@ public class Rope {
 
     // methods for join creation / deletion / editing
 
-    public boolean createJoint() {
+    public boolean removeJoint() {
+        if (!hasPhysicalImpact) {
+            VStuff.LOGGER.info("nuh uh [not removing joint for rope without joint]");
+            return false;
+        }
+        level = getLevel();
+
+        if (constraint == null) {
+            VStuff.LOGGER.warn("Cannot remove an already null joint!");
+            return false;
+        }
+
+        try {
+            String dimensionId = ValkyrienSkies.getDimensionId(level);
+            var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(dimensionId);
+
+
+            gtpa.removeJoint(ID);
+            this.constraint = null;
+            return true;
+        } catch (Exception e) {
+            VStuff.LOGGER.error("Error removing joint for constraint {}: {}", ID, e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean setJointLength(float newLength) {
+        if (!hasPhysicalImpact) {
+            VStuff.LOGGER.info("nuh uh [not settings joint length for rope without joint]");
+            return false;
+        }
+        level = getLevel();
+
+        if (constraint == null) {
+            VStuff.LOGGER.warn("Cannot change the length of a null joint!");
+            return false;
+        }
+
+        try {
+            String dimensionId = ValkyrienSkies.getDimensionId(level);
+            var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(dimensionId);
+
+            VSDistanceJoint newConstraint = constraint.copy(
+                    constraint.getShipId0(),
+                    constraint.getPose0(),
+                    constraint.getShipId1(),
+                    constraint.getPose1(),
+                    constraint.getMaxForceTorque(),
+                    constraint.getMinDistance(),
+                    newLength,
+                    constraint.getTolerance(),
+                    constraint.getStiffness(),
+                    constraint.getDamping()
+            );
+
+            gtpa.updateJoint(new VSJointAndId(ID, newConstraint));
+            this.constraint = newConstraint;
+        } catch (Exception e) {
+            VStuff.LOGGER.error("Error updating joint for constraint {}: {}", ID, e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean restoreJoint() {
+        if (!hasPhysicalImpact) {
+            VStuff.LOGGER.info("nuh uh [not restoring joint for rope without joint]");
+            return false;
+        }
         level = getLevel();
 
         Long currentGroundBodyId;
@@ -192,16 +303,21 @@ public class Rope {
 
             VSJoint ropeConstraint = makeDistanceJoint(actualShipA, actualShipB);
 
-            gtpa.addJoint(ropeConstraint, 0, newConstraint -> {
-                NewConstraintTracker.addConstraintToTracker(this);
+            gtpa.addJoint(ropeConstraint, 0, newConstraintId -> {
+                ConstraintTracker.addConstraintToTracker(this);
+
+                ID = newConstraintId;
             });
+
+
 
             return true;
         } catch (Exception e) {
-            VStuff.LOGGER.error("Error creating joint for constraint {}: {}", ID, e.getMessage());
+            VStuff.LOGGER.error("Error restoring joint for constraint {}: {}", ID, e.getMessage());
         }
         return false;
     }
+
 
     private @NotNull VSJoint makeDistanceJoint(Long actualShipA, Long actualShipB, double maxLength) {
         VSJointPose poseA = new VSJointPose(localPosA, new Quaterniond());
@@ -345,9 +461,9 @@ public class Rope {
             );
 
             final Player finalPlayer = player;
-            AtomicReference<Rope> rope = new AtomicReference<>();
+            final Rope[] rope = new Rope[1];
 
-            gtpa.addJoint(ropeConstraint, 0, newConstraintId -> {
+            if (shipAIsWorld && shipBIsWorld) {
                 RopeStyles.RopeStyle ropeStyle = null;
                 if (finalPlayer instanceof ServerPlayer serverPlayer) {
                     ropeStyle = RopeStyleHandlerServer.getStyle(serverPlayer.getUUID());
@@ -357,20 +473,45 @@ public class Rope {
                     ropeStyle = new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal");
                 }
 
-                rope.set(new Rope(
-                        level, newConstraintId, finalShipA, finalShipB,
+                rope[0] = new Rope(
+                        level, UUID.randomUUID().hashCode(), finalShipA, finalShipB,
                         finalLocalPosA, finalLocalPosB, maxLength, compliance, maxForce,
-                        ConstraintType.GENERIC, null, ropeStyle, ropeConstraint
-                ));
+                        ConstraintType.GENERIC, null, ropeStyle, null
+                );
+                rope[0].hasPhysicalImpact = false;
 
-                NewConstraintTracker.addConstraintToTracker(rope.get());
+                ConstraintTracker.addConstraintWithPersistence(rope[0]);
 
                 if (finalPlayer instanceof ServerPlayer serverPlayer) {
-                    NewConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);
+                    ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);
                 }
-            });
+            }
+            else {
+                gtpa.addJoint(ropeConstraint, 0, newConstraintId -> {
+                    RopeStyles.RopeStyle ropeStyle = null;
+                    if (finalPlayer instanceof ServerPlayer serverPlayer) {
+                        ropeStyle = RopeStyleHandlerServer.getStyle(serverPlayer.getUUID());
+                    }
 
-            return new RopeReturn(RopeInteractionReturn.SUCCESS, rope.get());
+                    if (ropeStyle == null) {
+                        ropeStyle = new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal");
+                    }
+
+                    rope[0] = new Rope(
+                            level, newConstraintId, finalShipA, finalShipB,
+                            finalLocalPosA, finalLocalPosB, maxLength, compliance, maxForce,
+                            ConstraintType.GENERIC, null, ropeStyle, ropeConstraint
+                    );
+
+                    ConstraintTracker.addConstraintWithPersistence(rope[0]);
+
+                    if (finalPlayer instanceof ServerPlayer serverPlayer) {
+                        ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);
+                    }
+                });
+            }
+
+            return new RopeReturn(RopeInteractionReturn.SUCCESS, rope[0]);
         } catch (Exception e) {
             VStuff.LOGGER.error("Error creating rope constraint: {}", e.getMessage());
             e.printStackTrace();
@@ -416,8 +557,10 @@ public class Rope {
 
         RopeStyles.RopeStyle ropeStyle = new RopeStyles.RopeStyle(style, primitiveType, styleLKey);
 
+        String levelId = tag.getString("levelId");
+
         return new Rope(
-                null,
+                RopeUtil.getRegisteredLevel(levelId),
                 tag.getInt("id"),
                 shipA,
                 shipB,
@@ -443,6 +586,7 @@ public class Rope {
         CompoundTag constraintTag = new CompoundTag();
 
         constraintTag.putInt("id", ID);
+        constraintTag.putString("levelId", levelId);
         constraintTag.putLong("shipA", shipA != null ? shipA : 0L);
         constraintTag.putLong("shipB", shipB != null ? shipB : 0L);
         constraintTag.putBoolean("shipAIsGround", shipAIsGround);

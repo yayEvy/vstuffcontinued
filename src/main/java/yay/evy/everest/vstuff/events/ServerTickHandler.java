@@ -1,18 +1,16 @@
 package yay.evy.everest.vstuff.events;
 
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.fml.common.Mod;
 import yay.evy.everest.vstuff.content.constraint.ConstraintPersistence;
-import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
 
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ServerTickHandler {
 
     private static int tickCounter = 0;
-    private static final int TICKS_PER_SECOND = 5;
+    private static final int TICKS_PER_SECOND = 5; // probably astro's fault
 
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {

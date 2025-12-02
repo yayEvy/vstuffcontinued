@@ -6,9 +6,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.internal.joints.VSDistanceJoint;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import yay.evy.everest.vstuff.util.RopeStyles;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -164,13 +162,13 @@ public class RopeUtil {
         double minDistance = Double.MAX_VALUE;
         Integer closestConstraintId = null;
 
-        for (Map.Entry<Integer, ConstraintTracker.RopeConstraintData> entry : ConstraintTracker.getActiveConstraints().entrySet()) {
+        for (Map.Entry<Integer, Rope> entry : ConstraintTracker.getActiveRopes().entrySet()) {
             Integer constraintId = entry.getKey();
 
-            ConstraintTracker.RopeConstraintData constraint = entry.getValue();
+            Rope rope = entry.getValue();
 
-            Vector3d worldPosA = constraint.getWorldPosA(level, 1.0f);
-            Vector3d worldPosB = constraint.getWorldPosB(level, 1.0f);
+            Vector3d worldPosA = rope.getWorldPosA(level);
+            Vector3d worldPosB = rope.getWorldPosB(level);
 
             double distance = getDistanceToRope(eyePos, lookVec, worldPosA, worldPosB, maxDistance);
             if (distance < minDistance && distance <= 1.0) {
