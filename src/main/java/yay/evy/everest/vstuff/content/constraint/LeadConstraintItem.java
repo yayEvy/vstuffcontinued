@@ -61,7 +61,7 @@ public class LeadConstraintItem extends Item {
             pulley.setChanged();
             pulley.sendData();
 
-            pulley.createManualConstraint();
+            //pulley.createManualConstraint();
 
             player.sendSystemMessage(Component.literal("§aPulley target set and constraint created!"));
             PhysPulleyItem.clearWaitingPulley(player);

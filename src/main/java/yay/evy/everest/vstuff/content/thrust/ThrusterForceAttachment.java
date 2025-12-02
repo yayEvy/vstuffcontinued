@@ -44,7 +44,7 @@ public class ThrusterForceAttachment implements ShipPhysicsListener {
         if (appliersMapping.isEmpty()) {
             LoadedServerShip ship = AttachmentUtils.getShipAt(level, pos);
             if (ship != null) {
-                ship.saveAttachment(ThrusterForceAttachment.class, null);
+                ship.setAttachment(ThrusterForceAttachment.class, null);
             }
         }
     }

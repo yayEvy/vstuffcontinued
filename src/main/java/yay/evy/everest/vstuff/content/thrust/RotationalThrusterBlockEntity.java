@@ -27,7 +27,6 @@ public class RotationalThrusterBlockEntity extends AbstractThrusterBlockEntity {
 
     @Override
     protected boolean isWorking() {
-        // Only generate thrust if there is rotational input
         return getRpm() != 0;
     }
 
@@ -36,7 +35,6 @@ public class RotationalThrusterBlockEntity extends AbstractThrusterBlockEntity {
         if (level != null) {
             BlockEntity be = level.getBlockEntity(worldPosition);
             if (be instanceof KineticBlockEntity kineticBE) {
-                // Use the kinetic network's speed
                 return kineticBE.getSpeed();
             }
         }
@@ -45,7 +43,7 @@ public class RotationalThrusterBlockEntity extends AbstractThrusterBlockEntity {
 
     @Override
     protected Direction getFluidCapSide() {
-        return null; // No fluid capability
+        return null;
     }
 
     @Override
