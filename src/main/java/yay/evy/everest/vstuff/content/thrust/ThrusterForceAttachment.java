@@ -17,17 +17,17 @@ import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 @SuppressWarnings("deprecation")
 public final class ThrusterForceAttachment implements ShipPhysicsListener {
 
-    public Map<BlockPos, ThrusterForceApplier> appliersMapping = new ConcurrentHashMap<>();
+    public Map<Long, ThrusterForceApplier> appliersMapping = new ConcurrentHashMap<>();
 
     public ThrusterForceAttachment() {}
 
 
     public void addApplier(BlockPos pos, ThrusterForceApplier applier) {
-        appliersMapping.put(pos, applier);
+        appliersMapping.put(pos.asLong(), applier);
     }
 
     public void removeApplier(ServerLevel level, BlockPos pos) {
-        appliersMapping.remove(pos);
+        appliersMapping.remove(pos.asLong());
 
         if (appliersMapping.isEmpty()) {
             LoadedServerShip ship = AttachmentUtils.getShipAt(level, pos);
@@ -50,7 +50,7 @@ public final class ThrusterForceAttachment implements ShipPhysicsListener {
         PhysShipImpl ship = (PhysShipImpl) physShip;
 
         appliersMapping.forEach((pos, applier) -> {
-            applier.applyForces(pos, ship);
+            applier.applyForces(BlockPos.of(pos), ship);
         });
     }
 

@@ -20,6 +20,7 @@ import org.valkyrienskies.core.api.attachment.AttachmentRegistration;
 import org.valkyrienskies.mod.api.VsApi;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.client.VStuffClient;
+import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberServerAttachment;
 import yay.evy.everest.vstuff.content.thrust.ThrusterForceAttachment;
 import yay.evy.everest.vstuff.events.ColorHaggler;
 import yay.evy.everest.vstuff.index.*;
@@ -77,6 +78,14 @@ public class VStuff {
 
         ValkyrienSkiesMod.getApi().registerAttachment(
                 ThrusterForceAttachment.class, builder -> {
+                    builder.build();
+                    return null;
+                }
+        );
+
+
+        ValkyrienSkiesMod.getApi().registerAttachment(
+                PhysGrabberServerAttachment.class, builder -> {
                     builder.build();
                     return null;
                 }

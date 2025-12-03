@@ -14,6 +14,10 @@ import yay.evy.everest.vstuff.VstuffConfig;
 public class ThrusterForceApplier {
     ThrusterData data;
 
+    public ThrusterForceApplier() {
+
+    }
+
     public ThrusterForceApplier(ThrusterData data){
         this.data = data;
     }
