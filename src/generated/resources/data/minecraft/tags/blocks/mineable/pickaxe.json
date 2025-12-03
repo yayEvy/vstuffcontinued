@@ -1,6 +1,7 @@
 {
   "values": [
     "vstuff:rotational_thruster",
-    "vstuff:phys_pulley"
+    "vstuff:phys_pulley",
+    "vstuff:pulley_anchor"
   ]
 }

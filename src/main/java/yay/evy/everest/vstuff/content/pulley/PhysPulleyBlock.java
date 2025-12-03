@@ -1,16 +1,16 @@
 package yay.evy.everest.vstuff.content.pulley;
 
+import com.simibubi.create.AllItems;
+import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.content.kinetics.base.HorizontalKineticBlock;
 import com.simibubi.create.foundation.block.IBE;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TieredItem;
@@ -24,21 +24,14 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
-import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
 import yay.evy.everest.vstuff.index.VStuffBlockEntities;
-import com.simibubi.create.content.equipment.wrench.IWrenchable;
-import com.simibubi.create.AllItems;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import yay.evy.everest.vstuff.index.VStuffShapes;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -46,7 +39,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysPulleyBlockEntity>, IWrenchable {
-    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
     public PhysPulleyBlock(Properties properties) {
         super(properties.strength(3.0f).requiresCorrectToolForDrops());
@@ -78,13 +70,9 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
         super.onRemove(state, level, pos, newState, isMoving);
     }
 
-
-// a
-
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(POWERED);
     }
     @Override
     public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
@@ -98,8 +86,7 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
         Direction facing = context.getHorizontalDirection().getOpposite();
         boolean powered = context.getLevel().hasNeighborSignal(context.getClickedPos());
         return this.defaultBlockState()
-                .setValue(HORIZONTAL_FACING, facing)
-                .setValue(POWERED, powered);
+                .setValue(HORIZONTAL_FACING, facing);
     }
 
     @Override
@@ -160,20 +147,6 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block,
-                                BlockPos fromPos, boolean isMoving) {
-        if (level.isClientSide) return;
-
-        boolean currentlyPowered = level.hasNeighborSignal(pos);
-        boolean previouslyPowered = state.getValue(POWERED);
-
-        if (currentlyPowered != previouslyPowered) {
-            level.setBlock(pos, state.setValue(POWERED, currentlyPowered), 3);
-
-        }
-    }
-
-    @Override
     @ParametersAreNonnullByDefault
     public @NotNull VoxelShape getShape(BlockState state, BlockGetter p_220053_2_, BlockPos p_220053_3_,
                                         CollisionContext p_220053_4_) {
@@ -195,6 +168,6 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
 
     @Override
     public BlockEntityType<? extends PhysPulleyBlockEntity> getBlockEntityType() {
-        return VStuffBlockEntities.PHYS_PULLEY_BE.get();
+        return VStuffBlockEntities.PHYS_PULLEY_BE.get(); // change later
     }
 }

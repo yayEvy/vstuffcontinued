@@ -11,10 +11,12 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlock;
+import yay.evy.everest.vstuff.content.pulley.PulleyAnchorBlock;
 import yay.evy.everest.vstuff.content.thrust.RotationalThrusterBlock;
 
 import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
 import static com.simibubi.create.foundation.data.TagGen.axeOrPickaxe;
+import static com.simibubi.create.foundation.data.TagGen.pickaxeOnly;
 
 public class VStuffBlocks  {
 
@@ -47,6 +49,16 @@ public class VStuffBlocks  {
                             .onRegister(block -> BlockStressValues.setGeneratorSpeed(4).accept(block)))
                     .item()
                     .model(AssetLookup.itemModel("phys_pulley.json"))
+                    .build()
+                    .register();
+
+    public static final BlockEntry<PulleyAnchorBlock> PULLEY_ANCHOR =
+            REGISTRATE.block("pulley_anchor", PulleyAnchorBlock::new)
+                    .initialProperties(() -> Blocks.IRON_BLOCK)
+                    .transform(pickaxeOnly())
+                    .blockstate(BlockStateGen.horizontalBlockProvider(true))
+                    .item()
+                    .model(AssetLookup.itemModel("pulley_anchor.json"))
                     .build()
                     .register();
 

@@ -16,6 +16,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.rendering.RopeRendererType;
 import yay.evy.everest.vstuff.util.RopeStyles;
@@ -142,7 +143,7 @@ public class RopeRendererClient {
                                          Integer constraintId, ClientConstraintTracker.ClientRopeData ropeData,
                                          Level level, Vec3 cameraPos, float partialTick, RopeStyles.RopeStyle style) {
         if (!level.isClientSide) {
-            System.err.println("Warning: Client renderer called on server side!");
+            VStuff.LOGGER.error("Client renderer called on server side!");
             return;
         }
 

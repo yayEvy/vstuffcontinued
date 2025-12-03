@@ -7,6 +7,7 @@ import com.simibubi.create.content.kinetics.base.ShaftRenderer;
 
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
+import yay.evy.everest.vstuff.content.pulley.PulleyAnchorBlockEntity;
 import yay.evy.everest.vstuff.content.thrust.RotationalThrusterBlockEntity;
 
 public class VStuffBlockEntities {
@@ -25,6 +26,11 @@ public class VStuffBlockEntities {
                     .visual(() -> SingleAxisRotatingVisual::shaft, false)
                     .validBlocks(VStuffBlocks.PHYS_PULLEY)
                     .renderer(() -> ShaftRenderer::new)
+                    .register();
+
+    public static final BlockEntityEntry<PulleyAnchorBlockEntity> PULLEY_ANCHOR_BE =
+            REGISTRATE.blockEntity("pulley_anchor", PulleyAnchorBlockEntity::new)
+                    .validBlocks(VStuffBlocks.PULLEY_ANCHOR)
                     .register();
 
     public static void register() {}

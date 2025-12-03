@@ -191,7 +191,7 @@ public class RopeUtil {
         PULLEY
     }
 
-    public record RopeReturn(RopeInteractionReturn result, @Nullable Rope rope){
+    public record RopeReturn(RopeInteractionReturn result, Rope rope){
         static RopeReturn FAIL = new RopeReturn(RopeInteractionReturn.FAIL, null);
     }
 

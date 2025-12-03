@@ -1,0 +1,25 @@
+{
+	"format_version": "1.9.0",
+	"credit": "Made with Blockbench",
+	"texture_size": [32, 32],
+	"parent": "block/block",
+	"textures": {
+		"0": "vstuff:block/pulley_anchor",
+		"particle": "vstuff:block/pulley_anchor"
+	},
+	"elements": [
+		{
+			"from": [1, 0, 3],
+			"to": [15, 3, 13],
+			"rotation": {"angle": 0, "axis": "y", "origin": [1, 0, 3]},
+			"faces": {
+				"north": {"uv": [7, 0, 14, 1.5], "texture": "#0"},
+				"east": {"uv": [7, 3, 12, 4.5], "texture": "#0"},
+				"south": {"uv": [7, 1.5, 14, 3], "texture": "#0"},
+				"west": {"uv": [7, 4.5, 12, 6], "texture": "#0"},
+				"up": {"uv": [7, 5, 0, 0], "texture": "#0"},
+				"down": {"uv": [7, 5, 0, 10], "texture": "#0"}
+			}
+		}
+	]
+}

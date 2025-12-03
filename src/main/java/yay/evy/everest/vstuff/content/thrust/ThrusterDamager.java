@@ -24,9 +24,9 @@ public class ThrusterDamager {
     private static final int TICKS_PER_ENTITY_CHECK = 5;
     private static final int LOWEST_POWER_THRSHOLD = 5;
 
-    private final AbstractThrusterBlockEntity thruster;
+    private final RotationalThrusterBlockEntity thruster;
 
-    public ThrusterDamager(AbstractThrusterBlockEntity thruster) {
+    public ThrusterDamager(RotationalThrusterBlockEntity thruster) {
         this.thruster = thruster;
     }
 
@@ -47,7 +47,7 @@ public class ThrusterDamager {
     private void doEntityDamageCheck() {
         //Broad phase
         float distanceByPower = Math.lerp(0.55f,1.5f, 1f);
-        Direction plumeDirection = thruster.getBlockState().getValue(AbstractThrusterBlock.FACING).getOpposite();
+        Direction plumeDirection = thruster.getBlockState().getValue(RotationalThrusterBlock.FACING).getOpposite();
         AABB plumeAABB = calculateAabb(plumeDirection, distanceByPower);
         List<Entity> damageCandidates = thruster.getLevel().getEntities(null, plumeAABB);
 
