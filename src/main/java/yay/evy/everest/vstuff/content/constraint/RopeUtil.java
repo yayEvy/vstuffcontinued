@@ -158,7 +158,7 @@ public class RopeUtil {
     public static Integer findTargetedLead(ServerLevel level, Player player) {
         Vec3 eyePos = player.getEyePosition();
         Vec3 lookVec = player.getViewVector(1.0f);
-        double maxDistance = 10.0;
+        double maxDistance = player.getBlockReach();
         double minDistance = Double.MAX_VALUE;
         Integer closestConstraintId = null;
 

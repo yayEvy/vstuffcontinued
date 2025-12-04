@@ -202,6 +202,7 @@ public class Rope {
             this.constraint = null;
             ConstraintTracker.removeConstraintWithPersistence(level, ID);
             NetworkHandler.sendConstraintRemove(ID);
+            VStuff.LOGGER.info("Successfully removed joint with id {}", ID);
             return true;
         } catch (Exception e) {
             VStuff.LOGGER.error("Error removing joint for constraint {}: {}", ID, e.getMessage());
@@ -472,9 +473,6 @@ public class Rope {
 
                 return new RopeReturn(RopeInteractionReturn.SUCCESS, rope);
             } else {
-                AtomicInteger newId = new AtomicInteger();
-                gtpa.addJoint(ropeConstraint, 0, newId::set);
-
                 RopeStyles.RopeStyle ropeStyle = null;
                 if (finalPlayer instanceof ServerPlayer serverPlayer) {
                     ropeStyle = RopeStyleHandlerServer.getStyle(serverPlayer.getUUID());
@@ -484,15 +482,13 @@ public class Rope {
                     ropeStyle = new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal");
                 }
 
-                if (newId == null) {
-                    System.out.println("what");
-                }
-
                 Rope rope = new Rope(
-                        level, newId.get(), finalShipA, finalShipB,
+                        level, -1, finalShipA, finalShipB, // id is temporary
                         finalLocalPosA, finalLocalPosB, maxLength, compliance, maxForce,
                         ConstraintType.GENERIC, null, ropeStyle, ropeConstraint
                 );
+
+                gtpa.addJoint(ropeConstraint, 0, newConstraintId -> rope.ID = newConstraintId);
 
                 ConstraintTracker.addConstraintWithPersistence(rope);
 
