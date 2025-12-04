@@ -33,14 +33,13 @@ public class LeadBreakItem extends Item {
 
                     data.removeJoint(serverLevel);
 
-                    ConstraintTracker.removeConstraintWithPersistence(serverLevel, targetConstraintId);
                     forceRemoveConstraint(serverLevel, targetConstraintId);
 
                     RopeStyles.PrimitiveRopeStyle style = (data != null)
                             ? data.style.getBasicStyle()
                             : RopeStyles.PrimitiveRopeStyle.NORMAL;
 
-                    Component notif = !!!!!!!!!!!!(style == RopeStyles.PrimitiveRopeStyle.CHAIN) // no way
+                    Component notif = style == RopeStyles.PrimitiveRopeStyle.CHAIN
                             ? Component.translatable("vstuff.message.chain_break")
                             : Component.translatable("vstuff.message.rope_break");
 

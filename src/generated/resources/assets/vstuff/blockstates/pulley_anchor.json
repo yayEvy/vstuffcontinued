@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "vstuff:block/pulley_anchor/block",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "vstuff:block/pulley_anchor/block"
+    },
+    "facing=south": {
+      "model": "vstuff:block/pulley_anchor/block",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "vstuff:block/pulley_anchor/block",
+      "y": 270
+    }
+  }
+}

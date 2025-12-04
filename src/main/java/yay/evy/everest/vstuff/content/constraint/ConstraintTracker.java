@@ -2,6 +2,7 @@ package yay.evy.everest.vstuff.content.constraint;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
@@ -60,7 +61,6 @@ public class ConstraintTracker {
 
         Rope data = activeRopes.remove(constraintId);
         if (data != null) {
-            data.removeJoint(level);
 
             ConstraintPersistence persistence = ConstraintPersistence.get(level);
                 persistence.markConstraintAsRemoved(constraintId);
@@ -69,9 +69,12 @@ public class ConstraintTracker {
             if (level.getServer() != null) {
                 for (ServerPlayer player : level.getServer().getPlayerList().getPlayers()) {
                     NetworkHandler.sendConstraintRemoveToPlayer(player, constraintId);
-                    level.getServer().tell(new net.minecraft.server.TickTask(0, () -> {
-                        NetworkHandler.sendConstraintRemoveToPlayer(player, constraintId);
-                    }));
+                    level.getServer().tell(
+                            new TickTask(
+                                0,
+                                () -> NetworkHandler.sendConstraintRemoveToPlayer(player, constraintId)
+                            )
+                    );
                 }
             }
 
