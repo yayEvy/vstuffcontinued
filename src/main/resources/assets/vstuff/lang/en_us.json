@@ -90,6 +90,7 @@
   "vstuff.rope_category.colored":"Colors",
   "vstuff.rope_category.colored_wool": "Colored Wools",
 
-  "vstuff.keyinfo.rope_menu_open": "Open Rope Styler"
+  "vstuff.keyinfo.rope_menu_open": "Open Rope Styler",
 
+  "vstuff.message.grabber_limit": "§cShip is too heavy!"
 }
