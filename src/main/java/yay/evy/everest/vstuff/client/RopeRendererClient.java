@@ -31,7 +31,8 @@ public class RopeRendererClient {
     }
     private static final int ROPE_CURVE_SEGMENTS = 32;
     private static final float ROPE_SAG_FACTOR = 1.02f;
-    //private static final double MAX_RENDER_DISTANCE = 300.0;
+    private static final float NORMAL_ROPE_V_SCALE = 2.5f;
+    private static final float CHAIN_ROPE_V_SCALE = 0.5f;
     private static final float WIND_STRENGTH = 0.02f;
     private static final Map<Integer, RopePositionCache> positionCache = new ConcurrentHashMap<>();
 
@@ -274,7 +275,7 @@ public class RopeRendererClient {
             bottomRightStrip[i] = center.add(right.scale(halfWidth)).add(up.scale(-halfWidth));
         }
 
-        double textureScale = 0.28 / getRopeWidth();
+        double textureScale = NORMAL_ROPE_V_SCALE;
 
         renderRopeFaceWithGapFilling(vertexConsumer, matrix, topLeftStrip, topRightStrip, up, curvePoints, totalCurveLength, level, cameraPos, textureScale);
         renderRopeFaceWithGapFilling(vertexConsumer, matrix, topRightStrip, bottomRightStrip, right, curvePoints, totalCurveLength, level, cameraPos, textureScale);
@@ -298,9 +299,11 @@ public class RopeRendererClient {
             cumulativeDistances[i + 1] = cumulativeDistances[i] + segmentLength;
         }
 
+        double vUnitPerWorldBlock = textureScale;
+
         for (int i = 0; i < ROPE_CURVE_SEGMENTS; i++) {
-            float vStart = (float) (cumulativeDistances[i] * textureScale);
-            float vEnd = (float) (cumulativeDistances[i + 1] * textureScale);
+            float vStart = (float) (cumulativeDistances[i] * vUnitPerWorldBlock);
+            float vEnd = (float) (cumulativeDistances[i + 1] * vUnitPerWorldBlock);
 
             Vec3 p1 = strip1[i];
             Vec3 p2 = strip2[i];
@@ -358,9 +361,6 @@ public class RopeRendererClient {
             cumulativeDistances[i + 1] = totalCurveLength;
         }
 
-        double repeatInterval = 1;
-        double textureScale = 1 / repeatInterval;
-
         Vec3 overallDirection = end.subtract(start).normalize();
         Vec3 worldUp = new Vec3(0, 1, 0);
         Vec3 right = Math.abs(overallDirection.dot(worldUp)) > 0.9
@@ -383,21 +383,23 @@ public class RopeRendererClient {
         }
 
         renderRopeFaceWithRepeatingUVs(vertexConsumer, matrix, topLeftStrip, bottomRightStrip,
-                right.add(up).normalize(), curvePoints, cumulativeDistances, textureScale, level, cameraPos);
+                right.add(up).normalize(), curvePoints, cumulativeDistances, CHAIN_ROPE_V_SCALE, level, cameraPos);
 
         renderRopeFaceWithRepeatingUVs(vertexConsumer, matrix, topRightStrip, bottomLeftStrip,
-                right.subtract(up).normalize(), curvePoints, cumulativeDistances, textureScale, level, cameraPos);
+                right.subtract(up).normalize(), curvePoints, cumulativeDistances, CHAIN_ROPE_V_SCALE, level, cameraPos);
     }
 
 
     private static void renderRopeFaceWithRepeatingUVs(VertexConsumer vertexConsumer, Matrix4f matrix,
                                                        Vec3[] strip1, Vec3[] strip2, Vec3 normal,
                                                        Vec3[] curvePoints, double[] cumulativeDistances,
-                                                       double textureScale, Level level, Vec3 cameraPos) {
-        double linkLength = 1;
+                                                       double textureRepeatScale, Level level, Vec3 cameraPos) {
         double ropeLength = cumulativeDistances[ROPE_CURVE_SEGMENTS];
-        double textureScalePerBlock = 0.5 / linkLength;
 
+        double textureScalePerBlock = textureRepeatScale;
+
+
+        double linkLength = 1.0;
         double leftover = ropeLength % linkLength;
         double uvOffset = -(leftover * 0.5 * textureScalePerBlock);
 
