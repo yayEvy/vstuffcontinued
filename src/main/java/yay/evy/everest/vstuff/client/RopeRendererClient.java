@@ -236,14 +236,13 @@ public class RopeRendererClient {
         double stretchFactor = Math.min(currentDistance / Math.max(maxRopeLength, 0.1), 1.0);
         double sagAmount = ROPE_SAG_FACTOR * (1.0 - stretchFactor * stretchFactor) * currentDistance * 0.35;
 
-        long currentTimeNanos = System.nanoTime();
-        float gameTime = (currentTimeNanos % 100_000_000_000L) / 1_000_000_000.0f;
-        float windOffset = (float) (Math.sin(gameTime * 0.8) * 0.3 + Math.sin(gameTime * 1.3) * 0.2) * WIND_STRENGTH;
+        float stableGameTime = getStableRenderTime(level, partialTick) / 20.0f;
+        float windOffset = (float) (Math.sin(stableGameTime * 0.8) * 0.3 + Math.sin(stableGameTime * 1.3) * 0.2) * WIND_STRENGTH;
 
         Vec3[] curvePoints = new Vec3[ROPE_CURVE_SEGMENTS + 1];
         for (int i = 0; i <= ROPE_CURVE_SEGMENTS; i++) {
             float t = (float) i / ROPE_CURVE_SEGMENTS;
-            curvePoints[i] = calculateCatenaryPosition(start, end, t, sagAmount, windOffset, gameTime);
+            curvePoints[i] = calculateCatenaryPosition(start, end, t, sagAmount, windOffset, stableGameTime);
         }
 
         double totalCurveLength = 0;
@@ -310,20 +309,23 @@ public class RopeRendererClient {
             Vec3 p3 = strip2[i + 1];
             Vec3 p4 = strip1[i + 1];
 
-            int light = calculateDynamicLighting(level, p1, p2, cameraPos);
+            int light = MAX_LIGHT;
 
             addRopeVertex(vertexConsumer, matrix, p1, 0.0f, vStart, light, normal);
             addRopeVertex(vertexConsumer, matrix, p2, 1.0f, vStart, light, normal);
             addRopeVertex(vertexConsumer, matrix, p4, 0.0f, vEnd, light, normal);
+
             addRopeVertex(vertexConsumer, matrix, p2, 1.0f, vStart, light, normal);
             addRopeVertex(vertexConsumer, matrix, p3, 1.0f, vEnd, light, normal);
             addRopeVertex(vertexConsumer, matrix, p4, 0.0f, vEnd, light, normal);
 
             Vec3 center1 = p1.add(p2).scale(0.5);
             Vec3 center2 = p3.add(p4).scale(0.5);
+
             addRopeVertexWithAlpha(vertexConsumer, matrix, center1, 0.5f, vStart, light, normal, 128);
             addRopeVertexWithAlpha(vertexConsumer, matrix, p2, 1.0f, vStart, light, normal, 128);
             addRopeVertexWithAlpha(vertexConsumer, matrix, center2, 0.5f, vEnd, light, normal, 128);
+
             addRopeVertexWithAlpha(vertexConsumer, matrix, p1, 0.0f, vStart, light, normal, 128);
             addRopeVertexWithAlpha(vertexConsumer, matrix, center1, 0.5f, vStart, light, normal, 128);
             addRopeVertexWithAlpha(vertexConsumer, matrix, center2, 0.5f, vEnd, light, normal, 128);
@@ -342,14 +344,13 @@ public class RopeRendererClient {
         double stretchFactor = Math.min(actualRopeLength / Math.max(maxRopeLength, 0.1), 1.0);
         double sagAmount = ROPE_SAG_FACTOR * (1.0 - stretchFactor * stretchFactor) * actualRopeLength * 0.35;
 
-        long currentTimeNanos = System.nanoTime();
-        float gameTime = (currentTimeNanos % 100_000_000_000L) / 1_000_000_000.0f;
-        float windOffset = (float) (Math.sin(gameTime * 0.8) * 0.3 + Math.sin(gameTime * 1.3) * 0.2) * WIND_STRENGTH;
+        float stableGameTime = getStableRenderTime(level, partialTick) / 20.0f;
+        float windOffset = (float) (Math.sin(stableGameTime * 0.8) * 0.3 + Math.sin(stableGameTime * 1.3) * 0.2) * WIND_STRENGTH;
 
         Vec3[] curvePoints = new Vec3[ROPE_CURVE_SEGMENTS + 1];
         for (int i = 0; i <= ROPE_CURVE_SEGMENTS; i++) {
             float t = (float) i / ROPE_CURVE_SEGMENTS;
-            curvePoints[i] = calculateCatenaryPosition(start, end, t, sagAmount, windOffset, gameTime);
+            curvePoints[i] = calculateCatenaryPosition(start, end, t, sagAmount, windOffset, stableGameTime);
         }
 
         double totalCurveLength = 0;
@@ -412,11 +413,13 @@ public class RopeRendererClient {
             Vec3 p3 = strip2[i + 1];
             Vec3 p4 = strip1[i + 1];
 
-            int light = calculateDynamicLighting(level, p1, p2, cameraPos);
+            int light = MAX_LIGHT;
 
             addRopeVertex(vertexConsumer, matrix, p1, 0.0f, vStart, light, normal);
             addRopeVertex(vertexConsumer, matrix, p2, 1.0f, vStart, light, normal);
             addRopeVertex(vertexConsumer, matrix, p4, 0.0f, vEnd,   light, normal);
+
+
             addRopeVertex(vertexConsumer, matrix, p2, 1.0f, vStart, light, normal);
             addRopeVertex(vertexConsumer, matrix, p3, 1.0f, vEnd,   light, normal);
             addRopeVertex(vertexConsumer, matrix, p4, 0.0f, vEnd,   light, normal);
@@ -464,23 +467,10 @@ public class RopeRendererClient {
         return linearPos.add(windSway, -sagCurve, windSwayZ);
     }
 
-    private static int calculateDynamicLighting(Level level, Vec3 pos1, Vec3 pos2, Vec3 cameraPos) {
-        Vec3 worldPos1 = pos1.add(cameraPos);
-        Vec3 worldPos2 = pos2.add(cameraPos);
-        Vec3 midPoint = worldPos1.add(worldPos2).scale(0.5);
-
-        BlockPos blockPos = new BlockPos((int)midPoint.x, (int)midPoint.y, (int)midPoint.z);
-
-        try {
-            int blockLight = level.getBrightness(LightLayer.BLOCK, blockPos);
-            int skyLight = level.getBrightness(LightLayer.SKY, blockPos);
-
-            blockLight = Math.max(2, Math.min(15, blockLight));
-            skyLight = Math.max(2, Math.min(15, skyLight));
-
-            return (skyLight << 20) | (blockLight << 4);
-        } catch (Exception e) {
-            return (8 << 20) | (8 << 4);
-        }
+    private static float getStableRenderTime(Level level, float partialTick) {
+        return (level.getGameTime() + partialTick);
     }
+
+    private static final int MAX_LIGHT = (15 << 20) | (15 << 4);
+
 }
