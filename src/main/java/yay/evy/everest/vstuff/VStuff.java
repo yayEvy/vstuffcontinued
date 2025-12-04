@@ -76,6 +76,7 @@ public class VStuff {
     public static void registerAttachments() {
         LOGGER.info("Registering vstuff attachments...");
 
+        // thruster attachment !
         ValkyrienSkiesMod.getApi().registerAttachment(
                 ThrusterForceAttachment.class, builder -> {
                     builder.build();
@@ -83,7 +84,7 @@ public class VStuff {
                 }
         );
 
-
+// Phy Grabber (idk its bein silly rn :c)
         ValkyrienSkiesMod.getApi().registerAttachment(
                 PhysGrabberServerAttachment.class, builder -> {
                     builder.build();
