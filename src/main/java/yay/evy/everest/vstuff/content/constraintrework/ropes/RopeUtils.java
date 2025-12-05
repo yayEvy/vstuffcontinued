@@ -1,48 +1,25 @@
-package yay.evy.everest.vstuff.content.constraint;
+package yay.evy.everest.vstuff.content.constraintrework.ropes;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
+import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
+import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
+import yay.evy.everest.vstuff.util.GetterUtils;
 
-import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
-public class RopeUtil {
-
-    /**
-    to store levels in rope objects, we store an id for each differing level
-    so we can get levels even after loading from a CompoundTag, and we don't
-    store the levels by constraint id to save space (or smthn idk it's better)
-     */
-    private final static Map<String, ServerLevel> ropeLevels = new HashMap<>();
-
-
-    public static String registerLevel(ServerLevel level) {
-        String levelId = null;
-        if (ropeLevels.containsValue(level)) { // return the existing key for the level
-            for (Map.Entry<String, ServerLevel> entry: ropeLevels.entrySet()) {
-                if (entry.getValue() == level) levelId = entry.getKey();
-            }
-        } else {
-            levelId = UUID.randomUUID().toString();
-            ropeLevels.put(levelId, level);
-        }
-
-        return levelId;
-    }
-
-    public static ServerLevel getRegisteredLevel(String id) {
-        return ropeLevels.get(id);
-    }
+public class RopeUtils {
 
     public static Vector3d convertWorldToLocal(ServerLevel level, Vector3d worldPos, Long shipId) {
-        if (shipId != null && !shipId.equals(getGroundBodyId(level))) {
+        if (shipId != null && !shipId.equals(GetterUtils.getGroundBodyId(level))) {
             Ship shipObject = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
             if (shipObject != null) {
                 Vector3d localPos = new Vector3d();
@@ -53,9 +30,25 @@ public class RopeUtil {
         return new Vector3d(worldPos);
     }
 
-    public static Long getGroundBodyId(ServerLevel level) {
-        return VSGameUtilsKt.getShipObjectWorld(level).getDimensionToGroundBodyIdImmutable()
-                .get(VSGameUtilsKt.getDimensionId(level));
+    public static Vector3d convertLocalToWorld(ServerLevel level, Vector3d localPos, Long shipId) {
+        try {
+            Long groundBodyId = VSGameUtilsKt.getShipObjectWorld(level)
+                    .getDimensionToGroundBodyIdImmutable()
+                    .get(VSGameUtilsKt.getDimensionId(level));
+            if (shipId.equals(groundBodyId)) {
+                return new Vector3d(localPos);
+            } else {
+                Ship shipObject = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
+                if (shipObject != null) {
+                    Vector3d worldPos = new Vector3d();
+                    shipObject.getTransform().getShipToWorld().transformPosition(localPos, worldPos);
+                    return worldPos;
+                }
+            }
+            return new Vector3d(localPos);
+        } catch (Exception e) {
+            return new Vector3d(localPos);
+        }
     }
 
     public static Vector3d getWorldPosition(ServerLevel level, BlockPos pos, Long shipId) {
@@ -78,7 +71,7 @@ public class RopeUtil {
             return blockPos;
         }
 
-        if (targetShipId.equals(getGroundBodyId(level))) {
+        if (targetShipId.equals(GetterUtils.getGroundBodyId(level))) {
             if (clickedShipId != null) {
                 Ship clickedShip = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(clickedShipId);
                 if (clickedShip != null) {
@@ -108,7 +101,7 @@ public class RopeUtil {
     }
 
     public static Double getMassForShip(ServerLevel level, Long shipId) {
-        Long groundBodyId = getGroundBodyId(level);
+        Long groundBodyId = GetterUtils.getGroundBodyId(level);
         if (shipId.equals(groundBodyId)) {
             return 1e12;
         }
@@ -130,31 +123,6 @@ public class RopeUtil {
             }
         }
         return 1000.0;
-    }
-
-    public static Float getFMassForShip(ServerLevel level, Long shipId) {
-        Long groundBodyId = getGroundBodyId(level);
-        if (shipId.equals(groundBodyId)) {
-            return 1e12f;
-        }
-
-        Ship shipObject = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
-        if (shipObject != null) {
-            try {
-                float mass = 1000f;
-                var bounds = shipObject.getShipAABB();
-                if (bounds != null) {
-                    float volume = (bounds.maxX() - bounds.minX()) *
-                            (bounds.maxY() - bounds.minY()) *
-                            (bounds.maxZ() - bounds.minZ());
-                    mass = Math.max(volume * 10f, 1000f);
-                }
-                return Math.min(mass, 1e9f);
-            } catch (Exception e) {
-                return 1000f;
-            }
-        }
-        return 1000f;
     }
 
     public static double getDistanceToRope(Vec3 eyePos, Vec3 lookVec, Vector3d ropeStart, Vector3d ropeEnd, double maxDistance) {
@@ -192,8 +160,8 @@ public class RopeUtil {
 
             Rope rope = entry.getValue();
 
-            Vector3d worldPosA = rope.getWorldPosA(level);
-            Vector3d worldPosB = rope.getWorldPosB(level);
+            Vector3d worldPosA = rope.worldPos0;
+            Vector3d worldPosB = rope.worldPos1;
 
             double distance = getDistanceToRope(eyePos, lookVec, worldPosA, worldPosB, maxDistance);
             if (distance < minDistance && distance <= 1.0) {
@@ -205,19 +173,27 @@ public class RopeUtil {
         return closestConstraintId;
     }
 
-    public enum RopeInteractionReturn {
-        SUCCESS,
-        FAIL,
-        RESET
+    public static AbstractRope fromTag(CompoundTag tag) {
+        String type = tag.getString("type");
+
+        switch (type) {
+            case "NORMAL" -> {
+                return Rope.fromTag(tag);
+            }
+            case "WORLDTOWORLD" -> {
+                return WorldToWorldRope.fromTag(tag);
+            }
+            case "PULLEY" -> {
+                return PulleyRope.fromTag(tag);
+            }
+            default -> throw new IllegalStateException("Rope type " + type + " is not a valid rope type!");
+        }
     }
 
-    public enum ConstraintType {
-        GENERIC,
+    public enum RopeType {
+        WORLDTOWORLD,
+        NORMAL,
         PULLEY
-    }
-
-    public record RopeReturn(RopeInteractionReturn result, Rope rope){
-        static RopeReturn FAIL = new RopeReturn(RopeInteractionReturn.FAIL, null);
     }
 
 }
