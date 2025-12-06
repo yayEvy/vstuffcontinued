@@ -1,6 +1,6 @@
 VStuff!
 
-features as of v0.2.3
+features as of v0.2.3-fix2
 
 - ropes (world to world, ship to ship, ship to world)
 - rope item, crafted with a lead surrounded by string, is consumed if in survival
