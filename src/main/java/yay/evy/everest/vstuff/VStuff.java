@@ -16,8 +16,6 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
-import org.valkyrienskies.core.api.attachment.AttachmentRegistration;
-import org.valkyrienskies.mod.api.VsApi;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.client.VStuffClient;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberServerAttachment;
@@ -25,10 +23,10 @@ import yay.evy.everest.vstuff.content.thrust.ThrusterForceAttachment;
 import yay.evy.everest.vstuff.events.ColorHaggler;
 import yay.evy.everest.vstuff.index.*;
 import yay.evy.everest.vstuff.client.NetworkHandler;
+import yay.evy.everest.vstuff.network.HandlePackets;
 import yay.evy.everest.vstuff.network.PhysGrabberNetwork;
 import yay.evy.everest.vstuff.particles.ParticleTypes;
 import org.valkyrienskies.core.api.VsBeta;
-import kotlin.Unit;
 
 @Mod(VStuff.MOD_ID)
 public class VStuff {
@@ -55,11 +53,10 @@ public class VStuff {
         VStuffItems.register();
 
         MinecraftForge.EVENT_BUS.register(this);
-        NetworkHandler.registerPackets();
-        PhysGrabberNetwork.register();
         MinecraftForge.EVENT_BUS.register(new ColorHaggler());
 
         modEventBus.addListener(this::commonSetup);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
 
 
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> VStuffClient::initialize);
@@ -67,6 +64,12 @@ public class VStuff {
 
         LOGGER.info("VStuff mod initialized");
     }
+    private void setup(final FMLCommonSetupEvent event) {
+        HandlePackets.register();
+        NetworkHandler.registerPackets();
+        PhysGrabberNetwork.register();
+    }
+
     @VsBeta
     private void commonSetup(final FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
@@ -91,6 +94,7 @@ public class VStuff {
                     return null;
                 }
         );
+
 
 
         // Add other attachments when needed :3

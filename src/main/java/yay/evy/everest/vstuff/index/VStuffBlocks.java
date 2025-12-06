@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import net.minecraft.world.level.material.MapColor;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.content.handle.HandleBlock;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlock;
 import yay.evy.everest.vstuff.content.pulley.PulleyAnchorBlock;
 import yay.evy.everest.vstuff.content.thrust.RotationalThrusterBlock;
@@ -61,6 +62,17 @@ public class VStuffBlocks  {
                     .model(AssetLookup.itemModel("pulley_anchor.json"))
                     .build()
                     .register();
+
+    public static final BlockEntry<HandleBlock> HANDLE =
+            REGISTRATE.block("handle_block", HandleBlock::new)
+                    .initialProperties(() -> Blocks.IRON_BLOCK)
+                    .transform(pickaxeOnly())
+                    .blockstate(BlockStateGen.horizontalBlockProvider(true))
+                    .item()
+                    .model(AssetLookup.itemModel("handle_block"))
+                    .build()
+                    .register();
+
 
     public static void register() {}
 }
