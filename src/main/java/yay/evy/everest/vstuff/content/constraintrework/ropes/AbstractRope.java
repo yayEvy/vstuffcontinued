@@ -8,6 +8,7 @@ import org.joml.Vector3d;
 import org.valkyrienskies.core.internal.joints.VSDistanceJoint;
 import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
 import org.valkyrienskies.core.internal.joints.VSJointPose;
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.constraint.RopeUtil;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
@@ -64,7 +65,6 @@ public abstract class AbstractRope {
                         float minLength, float maxLength, float maxForce, float maxTorque, float tolerance,
                         float stiffness, float damping, BlockPos blockPos0, BlockPos blockPos1,
                         RopeStyles.RopeStyle style, RopeUtils.RopeType type) {
-
     }
 
     public abstract boolean createJoint(ServerLevel level);
@@ -134,8 +134,6 @@ public abstract class AbstractRope {
         tag.putString("type", type.name());
 
         tag.putString("style", style.getStyle());
-        tag.putString("primitiveStyle", style.getBasicStyle().name().toLowerCase());
-        tag.putString("styleLKey", style.getLangKey());
 
         return tag;
     }
@@ -167,5 +165,10 @@ public abstract class AbstractRope {
                 fromTag.getDouble(pKey + "_x"),
                 fromTag.getDouble(pKey + "_x")
         );
+    }
+
+    public static <T extends AbstractRope> T fromTag(CompoundTag tag) {
+        VStuff.LOGGER.warn("AbstractRope fromTag called!");
+        return null;
     }
 }

@@ -6,12 +6,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
-import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
-import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
+import yay.evy.everest.vstuff.content.constraintrework.RopeManager;
 import yay.evy.everest.vstuff.util.GetterUtils;
 
 import java.util.Map;
@@ -148,17 +145,17 @@ public class RopeUtils {
         return minDistanceToRope;
     }
 
-    public static Integer findTargetedLead(ServerLevel level, Player player) {
+    public static Integer findRope(ServerLevel level, Player player) {
         Vec3 eyePos = player.getEyePosition();
         Vec3 lookVec = player.getViewVector(1.0f);
         double maxDistance = player.getBlockReach();
         double minDistance = Double.MAX_VALUE;
         Integer closestConstraintId = null;
 
-        for (Map.Entry<Integer, Rope> entry : ConstraintTracker.getActiveRopes().entrySet()) {
+        for (Map.Entry<Integer, AbstractRope> entry : RopeManager.getActiveRopes().entrySet()) {
             Integer constraintId = entry.getKey();
 
-            Rope rope = entry.getValue();
+            AbstractRope rope = entry.getValue();
 
             Vector3d worldPosA = rope.worldPos0;
             Vector3d worldPosB = rope.worldPos1;
@@ -173,20 +170,14 @@ public class RopeUtils {
         return closestConstraintId;
     }
 
-    public static AbstractRope fromTag(CompoundTag tag) {
+    public static <T extends AbstractRope> T fromTag(CompoundTag tag) {
         String type = tag.getString("type");
 
-        switch (type) {
-            case "NORMAL" -> {
-                return Rope.fromTag(tag);
-            }
-            case "WORLDTOWORLD" -> {
-                return WorldToWorldRope.fromTag(tag);
-            }
-            case "PULLEY" -> {
-                return PulleyRope.fromTag(tag);
-            }
-            default -> throw new IllegalStateException("Rope type " + type + " is not a valid rope type!");
+        try {
+            RopeType.valueOf(type);
+            return T.fromTag(tag);
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Invalid rope type!");
         }
     }
 

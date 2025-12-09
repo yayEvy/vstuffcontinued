@@ -28,8 +28,11 @@ public class RopeManager {
         NetworkHandler.sendConstraintAdd(rope.ID, rope.ship0, rope.ship1, rope.localPos0, rope.localPos1, rope.maxLength, rope.style);
     }
 
-    public static void putOrReplaceRope(Integer id, AbstractRope rope) {
+    public static void PUT(Integer id, AbstractRope rope) {
         activeRopes.put(id, rope);
+    }
+    public static void REPLACE(AbstractRope oldRope, AbstractRope newRope) {
+        PUT(oldRope.ID, newRope);
     }
 
     public static void REMOVE(ServerLevel level, Integer ropeId) {

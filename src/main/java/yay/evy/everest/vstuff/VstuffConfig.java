@@ -2,6 +2,11 @@ package yay.evy.everest.vstuff;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
+
 public class VstuffConfig {
 
     public static final ForgeConfigSpec SERVER_CONFIG;
@@ -18,6 +23,7 @@ public class VstuffConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> ROPE_THICKNESS;
     public static final ForgeConfigSpec.BooleanValue ROPE_SOUNDS;
     public static final ForgeConfigSpec.BooleanValue ROPE_ONLY_FULL_BLOCKS;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ROPE_BLACKLIST;
 
     public static final ForgeConfigSpec.ConfigValue<Double> PHYS_GRABBER_MAX_MASS;
 
@@ -49,9 +55,21 @@ public class VstuffConfig {
 
         serverBuilder.push("phys grabber");
         PHYS_GRABBER_MAX_MASS = serverBuilder
-                .comment("The maximum weight the Phys Grabber can grab. (default: 20000.0)")
-                .define("grabber_max_mass", 20000.0);
+                .comment("The maximum weight the Phys Grabber can grab. (default: 89120.0)")
+                .define("grabber_max_mass", 89120.0);
         serverBuilder.pop();
+
+        List<String> blacklist = List.of(new String[]{
+                "minecraft:vines",
+                "minecraft:bedrock",
+                "minecraft:end_portal",
+                "minecraft:end_gateway",
+                "minecraft:air"
+        });
+
+        ROPE_BLACKLIST = serverBuilder
+                .comment("List of blocks that ropes cannot connect to.")
+                .defineList("rope_blacklist", blacklist, block -> true);
 
         SERVER_CONFIG = serverBuilder.build();
 

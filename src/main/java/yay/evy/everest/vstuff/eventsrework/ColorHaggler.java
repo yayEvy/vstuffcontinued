@@ -32,7 +32,7 @@ public class ColorHaggler {
 
 
             if (level instanceof ServerLevel serverLevel) {
-                Integer targetConstraintId = RopeUtils.findTargetedLead(serverLevel, player);
+                Integer targetConstraintId = RopeUtils.findRope(serverLevel, player);
                 if (player instanceof ServerPlayer serverPlayer) {
                     if (itemStack.is(Tags.Items.DYES)) {
                         if (!event.getLevel().isClientSide) {
@@ -44,7 +44,7 @@ public class ColorHaggler {
 
                                 rope.style = getDyedStyle(item.toString(), getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(serverLevel, player));
 
-                                RopeManager.putOrReplaceRope(rope.ID, rope);
+                                RopeManager.PUT(rope.ID, rope);
 
                                 NetworkHandler.sendConstraintRerender(targetConstraintId, rope.ship0, rope.ship1,
                                         rope.localPos0, rope.localPos1, rope.maxLength, rope.style);
@@ -71,7 +71,7 @@ public class ColorHaggler {
     }
 
     private RopeStyles.PrimitiveRopeStyle getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(ServerLevel level, Player player) {
-        Integer targetConstraintId = RopeUtils.findTargetedLead(level, player);
+        Integer targetConstraintId = RopeUtils.findRope(level, player);
 
         AbstractRope wizardsWorstKeptSecret = RopeManager.getActiveRopes().get(targetConstraintId);
 

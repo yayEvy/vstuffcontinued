@@ -76,7 +76,7 @@ public class RopePersistenceYesItWorksNowIPromise3dsmile extends SavedData {
     }
 
     public static void restoreConstraints(ServerLevel level) {
-        ConstraintPersistence persistence = ConstraintPersistence.get(level);
+        RopePersistenceYesItWorksNowIPromise3dsmile persistence = RopePersistenceYesItWorksNowIPromise3dsmile.get(level);
         persistence.restoreConstraintsInstance(level);
     }
 
@@ -117,7 +117,7 @@ public class RopePersistenceYesItWorksNowIPromise3dsmile extends SavedData {
             VStuff.LOGGER.info("ConstraintPersistence successfully restored {} constraints, failed to restore {} constraints", successCount, failCount);
 
             for (ServerPlayer player : level.getServer().getPlayerList().getPlayers()) {
-                ConstraintTracker.syncAllConstraintsToPlayer(player);
+                RopeManager.syncAllConstraintsToPlayer(player);
             }
         });
     }

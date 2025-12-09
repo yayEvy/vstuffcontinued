@@ -1,5 +1,6 @@
 package yay.evy.everest.vstuff.content.physgrabber;
 
+import com.simibubi.create.AllItems;
 import com.simibubi.create.foundation.item.CustomArmPoseItem;
 import com.simibubi.create.foundation.item.render.SimpleCustomRenderer;
 import net.minecraft.client.Minecraft;
@@ -10,11 +11,14 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class PhysGrabberItem extends Item implements CustomArmPoseItem {
@@ -30,14 +34,10 @@ public class PhysGrabberItem extends Item implements CustomArmPoseItem {
             Minecraft mc = Minecraft.getInstance();
             boolean didGrab = PhysGrabberClientHandler.tryGrabOrRelease(mc, player);
             if (didGrab) {
-                itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
-                return InteractionResultHolder.success(player.getItemInHand(hand));
-            } else {
-                return InteractionResultHolder.fail(player.getItemInHand(hand));
+                return InteractionResultHolder.success(itemStack);
             }
-        } else {
-            return InteractionResultHolder.fail(player.getItemInHand(hand));
         }
+        return InteractionResultHolder.fail(player.getItemInHand(hand));
     }
 
     @Override
@@ -55,5 +55,19 @@ public class PhysGrabberItem extends Item implements CustomArmPoseItem {
         return ArmPose.ITEM;
     }
 
+    @Override
+    public boolean isBookEnchantable(ItemStack stack, ItemStack book) {
+        Map<Enchantment, Integer> enchants = book.getAllEnchantments();
+        for (Enchantment enchant : enchants.keySet()) {
+            if (enchant != Enchantments.UNBREAKING || enchant != Enchantments.MENDING) {
+                return false;
+            }
+        }
+        return true;
+    }
 
+    @Override
+    public boolean isValidRepairItem(ItemStack pStack, ItemStack pRepairCandidate) {
+        return pRepairCandidate.getItem() == AllItems.BRASS_SHEET.get();
+    }
 }
