@@ -65,11 +65,11 @@ public final class PhysGrabberServerAttachment implements ShipPhysicsListener {
         this.isCreative = creative;
     }
 
+
     public static PhysGrabberServerAttachment getOrCreate(LoadedServerShip ship) {
-        return AttachmentUtils.getOrCreate(
-                ship,
-                PhysGrabberServerAttachment.class,
-                PhysGrabberServerAttachment::new
-        );
+        PhysGrabberServerAttachment grabber =
+                AttachmentUtils.getOrCreate(ship, PhysGrabberServerAttachment.class, PhysGrabberServerAttachment::new);
+        ship.setAttachment(PhysGrabberServerAttachment.class, grabber);
+        return grabber;
     }
 }

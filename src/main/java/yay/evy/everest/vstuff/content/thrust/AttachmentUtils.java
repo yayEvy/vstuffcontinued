@@ -17,26 +17,23 @@ public class AttachmentUtils {
 
 
     @Nullable
-    public static LoadedServerShip getShipAt(ServerLevel serverLevel, BlockPos pos) {
-        Ship s = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, pos);
+    public static LoadedServerShip getShipAt(ServerLevel level, BlockPos pos) {
+        Ship s = VSGameUtilsKt.getShipObjectManagingPos(level, pos);
         if (s instanceof LoadedServerShip loadedShip) {
             return loadedShip;
         }
         return null;
     }
 
-    @Nullable
-    public static <T> T getOrCreate(LoadedServerShip loadedServerShip, Class<T> attachmentClass, Supplier<T> factory) {
 
-        T attachment = loadedServerShip.getAttachment(attachmentClass);
+    public static <T> T getOrCreate(LoadedServerShip ship, Class<T> attachmentClass, Supplier<T> factory) {
+        T attachment = ship.getAttachment(attachmentClass);
         if (attachment == null) {
             attachment = factory.get();
-            loadedServerShip.setAttachment(attachmentClass, attachment);
+            ship.setAttachment(attachmentClass, attachment);
         }
-
         return attachment;
     }
-
 
     @Nullable
     public static <T> T get(Level level, BlockPos pos, Class<T> attachmentClass, Supplier<T> factory) {
