@@ -2,17 +2,21 @@ package yay.evy.everest.vstuff;
 
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
+import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.api.distmarker.Dist; // Import the Dist class
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor; // Import the DistExecutor class
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
@@ -52,7 +56,8 @@ public class VStuff {
         VStuffRopeStyles.register();
         VStuffBlocks.register();
         VStuffBlockEntities.register();
-        VStuffItems.register();
+        VStuffEntities.register(modEventBus);
+        VStuffItems.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
         NetworkHandler.registerPackets();
@@ -109,6 +114,14 @@ public class VStuff {
 
     public static ResourceLocation asModelResource(String path) {
         return new ResourceLocation(MOD_ID, "models/" + path);
+    }
+
+    @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value =  Dist.CLIENT)
+    public static class ClientModEvents {
+        @SubscribeEvent
+        public static void onClientSetup(FMLClientSetupEvent event) {
+            EntityRenderers.register(VStuffEntities.ROPE_THROWER.get(), ThrownItemRenderer::new);
+        }
     }
 
     @SubscribeEvent

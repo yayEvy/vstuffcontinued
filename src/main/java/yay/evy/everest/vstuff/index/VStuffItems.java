@@ -3,13 +3,18 @@ package yay.evy.everest.vstuff.index;
 import com.simibubi.create.foundation.data.AssetLookup;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.ItemEntry;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.constraint.LeadBreakItem;
 import yay.evy.everest.vstuff.content.constraint.LeadConstraintItem;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberItem;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.EmptyEnergyCoreItem;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.EnergyCoreItem;
+import yay.evy.everest.vstuff.content.ropethrower.RopeThrowerItem;
 
 
 public class VStuffItems {
@@ -19,6 +24,9 @@ public class VStuffItems {
     static {
         REGISTRATE.setCreativeTab(VStuffCreativeModeTabs.VSTUFF_MAIN);
     }
+
+    public static final DeferredRegister<Item> ITEMS =
+            DeferredRegister.create(ForgeRegistries.ITEMS, VStuff.MOD_ID);
 
 
     public static final ItemEntry<LeadConstraintItem> LEAD_CONSTRAINT_ITEM =
@@ -61,6 +69,15 @@ public class VStuffItems {
                             .rarity(Rarity.UNCOMMON))
                     .model(AssetLookup.itemModelWithPartials())
                     .register();
-    
-    public static void register() {}
+
+    public static final ItemEntry<RopeThrowerItem> ROPE_THROWER_ITEM =
+            REGISTRATE.item("rope_thrower", RopeThrowerItem::new)
+                    .properties(p -> p
+                    .stacksTo(1))
+                    .defaultModel()
+                    .register();
+
+    public static void register(IEventBus eventBus) {
+        ITEMS.register(eventBus);
+    }
 }
