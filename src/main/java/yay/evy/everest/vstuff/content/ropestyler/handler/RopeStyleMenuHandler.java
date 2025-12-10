@@ -34,8 +34,12 @@ public class RopeStyleMenuHandler {
         if (player == null)
             return;
 
-        if (!EntityUtils.isHolding(player, VStuffItems.LEAD_CONSTRAINT_ITEM::isIn))
+        boolean holdingLead = EntityUtils.isHolding(player, VStuffItems.LEAD_CONSTRAINT_ITEM::isIn);
+        boolean holdingThrower = EntityUtils.isHolding(player, VStuffItems.ROPE_THROWER_ITEM::isIn);
+
+        if (!holdingLead && !holdingThrower)
             return;
+
 
         ScreenOpener.open(new RopeStylerScreen(player));
     }

@@ -16,9 +16,9 @@ import java.util.UUID;
 public class RopeUtil {
 
     /**
-    to store levels in rope objects, we store an id for each differing level
-    so we can get levels even after loading from a CompoundTag, and we don't
-    store the levels by constraint id to save space (or smthn idk it's better)
+     to store levels in rope objects, we store an id for each differing level
+     so we can get levels even after loading from a CompoundTag, and we don't
+     store the levels by constraint id to save space (or smthn idk it's better)
      */
     private final static Map<String, ServerLevel> ropeLevels = new HashMap<>();
 
