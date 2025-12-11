@@ -49,7 +49,6 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
     }
 
 
-
     @Override
     protected void onHitBlock(BlockHitResult result) {
         if (!this.level().isClientSide()) { // Checks For Server
@@ -84,11 +83,22 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
                         );
                     }
                 }
+
+                serverLevel.playSound(
+                        null,
+                        firstPos,
+                        net.minecraft.sounds.SoundEvents.LEASH_KNOT_PLACE,
+                        net.minecraft.sounds.SoundSource.PLAYERS,
+                        1.0F,
+                        1.0F
+                );
+
                 this.discard();  // Discord??????????
             }
             super.onHitBlock(result);
         }
     }
+
 
 
     private Long getShipIdAtPos(ServerLevel level, BlockPos pos) {
