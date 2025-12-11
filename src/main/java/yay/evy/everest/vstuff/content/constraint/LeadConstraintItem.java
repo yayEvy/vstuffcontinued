@@ -121,6 +121,16 @@ public class LeadConstraintItem extends Item {
 
             if (ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS) {
 
+                serverLevel.playSound(
+                        null,
+                        clickedPos,
+                        net.minecraft.sounds.SoundEvents.LEASH_KNOT_PLACE,
+                        net.minecraft.sounds.SoundSource.PLAYERS,
+                        1.0F,
+                        1.0F
+                );
+
+
                 if (RopeStyleHandlerServer.getStyle(player.getUUID()).getBasicStyle() == RopeStyles.PrimitiveRopeStyle.CHAIN) {
                     resetStateWithMessage(player, "chain_created");
                 } else {
