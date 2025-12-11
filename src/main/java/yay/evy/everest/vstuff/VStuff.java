@@ -4,15 +4,25 @@ import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.BlockSource;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Position;
+import net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.api.distmarker.Dist; // Import the Dist class
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor; // Import the DistExecutor class
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -25,6 +35,7 @@ import org.valkyrienskies.mod.api.VsApi;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.client.VStuffClient;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberServerAttachment;
+import yay.evy.everest.vstuff.content.ropethrower.RopeThrowerEntity;
 import yay.evy.everest.vstuff.content.thrust.ThrusterForceAttachment;
 import yay.evy.everest.vstuff.events.ColorHaggler;
 import yay.evy.everest.vstuff.index.*;
@@ -76,6 +87,7 @@ public class VStuff {
     private void commonSetup(final FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
             registerAttachments();
+            registerDispenserBehaviors();
         });
     }
     public static void registerAttachments() {
@@ -100,6 +112,50 @@ public class VStuff {
 
         // Add other attachments when needed :3
     }
+
+
+    public static void registerDispenserBehaviors() {
+        DispenserBlock.registerBehavior(VStuffItems.ROPE_THROWER_ITEM.get(), new AbstractProjectileDispenseBehavior() {
+            @Override
+            public ItemStack execute(BlockSource source, ItemStack stack) {
+                Level level = source.getLevel();
+                if (!(level instanceof ServerLevel serverLevel)) return stack;
+
+                BlockPos dispenserPos = source.getPos();
+
+                Direction direction = source.getBlockState().getValue(DispenserBlock.FACING);
+                Position position = DispenserBlock.getDispensePosition(source);
+
+                RopeThrowerEntity rope = new RopeThrowerEntity(serverLevel);
+                rope.setPos(position.x(), position.y(), position.z());
+
+                rope.setOwnerBlockPos(dispenserPos);
+                rope.setDispenserShot(true);
+
+                net.minecraftforge.common.util.FakePlayer fakePlayer =
+                        net.minecraftforge.common.util.FakePlayerFactory.get(
+                                serverLevel,
+                                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "RopeDispenser")
+                        );
+                fakePlayer.setPos(dispenserPos.getX(), dispenserPos.getY(), dispenserPos.getZ());
+                rope.setOwner(fakePlayer);
+
+                rope.shoot(direction.getStepX(), direction.getStepY(), direction.getStepZ(), 1.1F, 6.0F);
+
+                serverLevel.addFreshEntity(rope);
+                stack.shrink(1);
+
+                return stack;
+            }
+
+            @Override
+            protected Projectile getProjectile(Level level, Position position, ItemStack stack) {
+                return null;
+            }
+        });
+    }
+
+
     public static CreateRegistrate registrate() {
         return REGISTRATE;
     }
