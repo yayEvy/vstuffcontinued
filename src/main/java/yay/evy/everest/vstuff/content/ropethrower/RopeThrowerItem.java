@@ -10,6 +10,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import net.minecraft.world.level.Level;
+import yay.evy.everest.vstuff.index.VStuffSounds;
 
 import static net.minecraft.world.level.block.entity.BeaconBlockEntity.playSound;
 
@@ -21,7 +22,7 @@ public class RopeThrowerItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
         level.playSound((Player) null, player.getX(), player.getY(), player.getZ(),
-                SoundEvents.SNOWBALL_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
+                VStuffSounds.ROPE_THROW.get(), SoundSource.NEUTRAL, 1F, 1F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
 
         if (!level.isClientSide) {
             RopeThrowerEntity ropeThrower = new RopeThrowerEntity(level,player);

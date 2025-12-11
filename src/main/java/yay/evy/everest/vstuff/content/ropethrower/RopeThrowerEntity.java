@@ -2,6 +2,7 @@ package yay.evy.everest.vstuff.content.ropethrower;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -16,6 +17,7 @@ import yay.evy.everest.vstuff.content.constraint.Rope;
 import yay.evy.everest.vstuff.content.constraint.RopeUtil;
 import yay.evy.everest.vstuff.index.VStuffEntities;
 import yay.evy.everest.vstuff.index.VStuffItems;
+import yay.evy.everest.vstuff.index.VStuffSounds;
 
 public class RopeThrowerEntity extends ThrowableItemProjectile {
 
@@ -87,6 +89,7 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
                 serverLevel.playSound(
                         null,
                         firstPos,
+
                         net.minecraft.sounds.SoundEvents.LEASH_KNOT_PLACE,
                         net.minecraft.sounds.SoundSource.PLAYERS,
                         1.0F,

@@ -14,5 +14,13 @@
         "stream": false
       }
     ]
+  },
+  "rope_throw": {
+    "sounds": [
+      {
+        "name": "vstuff:rope_throw",
+        "stream": false
+      }
+    ]
   }
 }

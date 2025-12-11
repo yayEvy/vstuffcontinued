@@ -12,11 +12,11 @@ public class VStuffSounds {
     public static final DeferredRegister<SoundEvent> SOUND_EVENTS =
             DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, VStuff.MOD_ID);
 
-    public static final RegistryObject<SoundEvent> ROPE_CREATE = easySoundRegister("rope_create");
-    public static final RegistryObject<SoundEvent> ROPE_BREAK = easySoundRegister("rope_break");
+    public static final RegistryObject<SoundEvent> ROPE_CREATE = evilSoundRegister("rope_create");
+    public static final RegistryObject<SoundEvent> ROPE_BREAK = evilSoundRegister("rope_break");
+    public static final RegistryObject<SoundEvent> ROPE_THROW = evilSoundRegister("rope_throw");
 
-
-    private static RegistryObject<SoundEvent> easySoundRegister(String name) {
+    private static RegistryObject<SoundEvent> evilSoundRegister(String name) {
         ResourceLocation id = new ResourceLocation(VStuff.MOD_ID, name);
 
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(id));
