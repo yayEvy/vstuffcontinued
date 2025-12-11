@@ -19,8 +19,8 @@ public class RopeThrowerItem extends Item {
         super(pProperties);
     }
 
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        ItemStack itemStack = player.getItemInHand(hand);
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) { //Use (it uses)
+        ItemStack itemStack = player.getItemInHand(hand); //gets item
         level.playSound((Player) null, player.getX(), player.getY(), player.getZ(),
                 VStuffSounds.ROPE_THROW.get(), SoundSource.NEUTRAL, 1F, 1F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
 
@@ -39,7 +39,18 @@ public class RopeThrowerItem extends Item {
     return InteractionResultHolder.sidedSuccess(itemStack, level.isClientSide());
     }
 
+/* sound time, and story time too!
 
+                It all started today,yes today at the time of this commit on december eleventh two thousand and twenty five,
+  I was messing around with the rope thrower and thought to myself, " I stole too much damn snowball code, holy shit what am i going to do??
+  then I did nothing for two hours as I stared blankly at the wall in front of me. It's my favorite wall, although i havent brought upon
+  myself to name it yet. I then messed around with it a bit more and realized where my newfound fear was coming from, the sound.
+  before this commit the sound was the normal snowball throwing sound, one of much vapidity in my opinon, so I went to the one place i knew
+  would have the best, most fitting sound effects, Youtube.com. I looked for hours upon hours, even though it was the first thing I found
+  searching rope throwing sound effect, and found it. all i had to do now was trim it down and fit it to match the throwing action.
+
+  - Bry (12/11/25)
+  */
 
 
 
