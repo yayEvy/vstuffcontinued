@@ -19,7 +19,7 @@ import org.joml.Vector3d;
 
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.VstuffConfig;
-import yay.evy.everest.vstuff.content.constraintrework.ropes.RopeUtils;
+import yay.evy.everest.vstuff.content.constraint.ropes.RopeUtils;
 import yay.evy.everest.vstuff.rendering.RopeRendererType;
 import yay.evy.everest.vstuff.util.RopeStyles;
 

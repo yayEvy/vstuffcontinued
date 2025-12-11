@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.createmod.catnip.gui.AbstractSimiScreen;
 import net.minecraft.world.entity.player.Player;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.client.NetworkHandler;
+import yay.evy.everest.vstuff.client.NetworkManager;
 import yay.evy.everest.vstuff.content.ropestyler.components.RopeStyleCategory;
 import yay.evy.everest.vstuff.index.VStuffRopeStyles;
 import yay.evy.everest.vstuff.util.RopeStyles.RopeStyle;
@@ -305,7 +305,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
 
         VStuff.LOGGER.info("Attempting to set player [{}] selected rope style to {}", player.getName(), selectedStyle.asString());
 
-        NetworkHandler.INSTANCE.sendToServer(new RopeStyleSelectPacket(style.asString()));
+        NetworkManager.CHANNEL.sendToServer(new RopeStyleSelectPacket(style.asString()));
 
         onClose();
     }

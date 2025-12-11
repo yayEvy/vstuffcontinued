@@ -1,10 +1,9 @@
-package yay.evy.everest.vstuff.content.constraintrework.items;
+package yay.evy.everest.vstuff.content.constraint.items;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -17,17 +16,16 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.fml.common.Mod;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.client.ClientRopeUtil;
 import yay.evy.everest.vstuff.client.NetworkManager;
-import yay.evy.everest.vstuff.content.constraintrework.MasterOfRopes;
-import yay.evy.everest.vstuff.content.constraintrework.ropes.JointlessRope;
-import yay.evy.everest.vstuff.content.constraintrework.ropes.PulleyRope;
-import yay.evy.everest.vstuff.content.constraintrework.ropes.Rope;
-import yay.evy.everest.vstuff.content.constraintrework.ropes.RopeUtils;
+import yay.evy.everest.vstuff.content.constraint.MasterOfRopes;
+import yay.evy.everest.vstuff.content.constraint.ropes.JointlessRope;
+import yay.evy.everest.vstuff.content.constraint.ropes.PulleyRope;
+import yay.evy.everest.vstuff.content.constraint.ropes.Rope;
+import yay.evy.everest.vstuff.content.constraint.ropes.RopeUtils;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.content.pulley.PulleyAnchorBlockEntity;
-import yay.evy.everest.vstuff.eventsrework.RopeBreakHandler;
+import yay.evy.everest.vstuff.events.RopeBreakHandler;
 import yay.evy.everest.vstuff.util.GetterUtils;
 
 import java.util.List;

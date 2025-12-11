@@ -1,35 +1,20 @@
-package yay.evy.everest.vstuff.content.constraintrework.ropes;
+package yay.evy.everest.vstuff.content.constraint.ropes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import org.joml.Quaterniond;
 import org.joml.Vector3d;
-import org.valkyrienskies.core.internal.joints.VSDistanceJoint;
 import org.valkyrienskies.core.internal.joints.VSJoint;
-import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
-import org.valkyrienskies.core.internal.joints.VSJointPose;
 import org.valkyrienskies.core.internal.world.VsiServerShipWorld;
-import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.VstuffConfig;
-import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
-import yay.evy.everest.vstuff.content.constraint.RopeUtil;
-import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
 import yay.evy.everest.vstuff.util.GetterUtils;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
-import java.util.UUID;
-
-import static yay.evy.everest.vstuff.content.constraintrework.ropes.RopeUtils.*;
+import static yay.evy.everest.vstuff.content.constraint.ropes.RopeUtils.*;
 
 public class Rope extends AbstractRope {
 

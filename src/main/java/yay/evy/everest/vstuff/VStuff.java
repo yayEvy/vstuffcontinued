@@ -16,19 +16,16 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
-import org.valkyrienskies.core.api.attachment.AttachmentRegistration;
-import org.valkyrienskies.mod.api.VsApi;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
+import yay.evy.everest.vstuff.client.NetworkManager;
 import yay.evy.everest.vstuff.client.VStuffClient;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberServerAttachment;
 import yay.evy.everest.vstuff.content.thrust.ThrusterForceAttachment;
 import yay.evy.everest.vstuff.events.ColorHaggler;
 import yay.evy.everest.vstuff.index.*;
-import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.network.PhysGrabberNetwork;
 import yay.evy.everest.vstuff.particles.ParticleTypes;
 import org.valkyrienskies.core.api.VsBeta;
-import kotlin.Unit;
 
 @Mod(VStuff.MOD_ID)
 public class VStuff {
@@ -55,7 +52,8 @@ public class VStuff {
         VStuffItems.register();
 
         MinecraftForge.EVENT_BUS.register(this);
-        NetworkHandler.registerPackets();
+        NetworkManager.registerPackets();
+
         PhysGrabberNetwork.register();
         MinecraftForge.EVENT_BUS.register(new ColorHaggler());
 
@@ -113,7 +111,7 @@ public class VStuff {
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
-            NetworkHandler.sendClearAllConstraintsToPlayer(player);
+            NetworkManager.sendClearAllConstraintsToPlayer(player);
         }
     }
 

@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.constraintrework;
+package yay.evy.everest.vstuff.content.constraint;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -7,8 +7,8 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.constraintrework.ropes.AbstractRope;
-import yay.evy.everest.vstuff.content.constraintrework.ropes.RopeUtils;
+import yay.evy.everest.vstuff.content.constraint.ropes.AbstractRope;
+import yay.evy.everest.vstuff.content.constraint.ropes.RopeUtils;
 import yay.evy.everest.vstuff.util.GetterUtils;
 
 import java.util.HashMap;

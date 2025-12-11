@@ -2,13 +2,10 @@ package yay.evy.everest.vstuff.util.packet;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
-import org.joml.Vector3d;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.client.ClientConstraintTracker;
 import yay.evy.everest.vstuff.client.ClientRopeManager;
-import yay.evy.everest.vstuff.content.constraintrework.ropes.AbstractRope;
-import yay.evy.everest.vstuff.content.constraintrework.ropes.RopeUtils;
-import yay.evy.everest.vstuff.util.RopeStyles;
+import yay.evy.everest.vstuff.content.constraint.ropes.AbstractRope;
+import yay.evy.everest.vstuff.content.constraint.ropes.RopeUtils;
 
 import java.util.function.Supplier;
 

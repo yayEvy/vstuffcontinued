@@ -30,10 +30,10 @@ import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.mod.api.BlockEntityPhysicsListener;
 
 
-import yay.evy.everest.vstuff.content.constraintrework.MasterOfRopes;
-import yay.evy.everest.vstuff.content.constraintrework.items.RopeItem;
-import yay.evy.everest.vstuff.content.constraintrework.ropes.PulleyRope;
-import yay.evy.everest.vstuff.content.constraintrework.ropes.RopeUtils;
+import yay.evy.everest.vstuff.content.constraint.MasterOfRopes;
+import yay.evy.everest.vstuff.content.constraint.items.RopeItem;
+import yay.evy.everest.vstuff.content.constraint.ropes.PulleyRope;
+import yay.evy.everest.vstuff.content.constraint.ropes.RopeUtils;
 import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
 import yay.evy.everest.vstuff.index.VStuffBlockEntities;
 import yay.evy.everest.vstuff.index.VStuffBlocks;
@@ -42,7 +42,7 @@ import yay.evy.everest.vstuff.util.RopeStyles;
 
 import java.util.List;
 
-import static yay.evy.everest.vstuff.content.constraintrework.ropes.RopeUtils.*;
+import static yay.evy.everest.vstuff.content.constraint.ropes.RopeUtils.*;
 
 public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEntityPhysicsListener {
 
@@ -80,7 +80,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) { // cannot put items in inventory if the pulley is already extended
-            if (slot == 0) return acceptsInv() && stack.getItem() == VStuffItems.LEAD_CONSTRAINT_ITEM.get();
+            if (slot == 0) return acceptsInv() && stack.getItem() == VStuffItems.ROPE_ITEM.get();
             else if (slot == 1) return acceptsInv() && stack.getItem() == VStuffBlocks.PULLEY_ANCHOR.asItem();
             else return false;
         }
@@ -221,7 +221,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     }
 
     public InteractionResult useRopeItem(ServerLevel level, BlockPos pos, Player player, InteractionHand hand) {
-        if (player.getItemInHand(hand).getItem() == VStuffItems.LEAD_CONSTRAINT_ITEM.asItem()) {
+        if (player.getItemInHand(hand).getItem() == VStuffItems.ROPE_ITEM.asItem()) {
             this.attachedStyle = RopeStyleHandlerServer.getStyle(player.getUUID());
             return insertRope(player, hand);
         }
@@ -294,7 +294,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
             @Override
             public boolean isItemValid(int slot, ItemStack stack) { // cannot put items in inventory if the pulley is already extended
-                if (slot == 0) return acceptsInv() && stack.getItem() == VStuffItems.LEAD_CONSTRAINT_ITEM.get();
+                if (slot == 0) return acceptsInv() && stack.getItem() == VStuffItems.ROPE_ITEM.get();
                 else if (slot == 1) return acceptsInv() && stack.getItem() == VStuffBlocks.PULLEY_ANCHOR.asItem();
                 else return false;
             }

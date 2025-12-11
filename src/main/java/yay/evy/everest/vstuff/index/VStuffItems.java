@@ -5,10 +5,8 @@ import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import net.minecraft.world.item.Rarity;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.constraint.LeadBreakItem;
-import yay.evy.everest.vstuff.content.constraint.LeadConstraintItem;
-import yay.evy.everest.vstuff.content.constraintrework.items.RopeCutterItem;
-import yay.evy.everest.vstuff.content.constraintrework.items.RopeItem;
+import yay.evy.everest.vstuff.content.constraint.items.RopeCutterItem;
+import yay.evy.everest.vstuff.content.constraint.items.RopeItem;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberItem;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.EmptyEnergyCoreItem;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.EnergyCoreItem;
@@ -23,14 +21,14 @@ public class VStuffItems {
     }
 
 
-    public static final ItemEntry<RopeItem> LEAD_CONSTRAINT_ITEM =
+    public static final ItemEntry<RopeItem> ROPE_ITEM =
             REGISTRATE.item("rope", RopeItem::new)
                     .properties(p -> p
                             .stacksTo(64))
                     .defaultModel()
                     .register();
 
-    public static final ItemEntry<RopeCutterItem> LEAD_BREAK_ITEM =
+    public static final ItemEntry<RopeCutterItem> ROPE_CUTTER_ITEM =
             REGISTRATE.item("rope_cutter", RopeCutterItem::new)
                     .properties(p -> p
                             .stacksTo(1)

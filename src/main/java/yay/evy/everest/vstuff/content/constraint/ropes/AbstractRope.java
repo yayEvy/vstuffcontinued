@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.constraintrework.ropes;
+package yay.evy.everest.vstuff.content.constraint.ropes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -6,16 +6,14 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
-import org.joml.Vector3f;
 import org.valkyrienskies.core.internal.joints.VSDistanceJoint;
 import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
 import org.valkyrienskies.core.internal.joints.VSJointPose;
 
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.constraint.RopeUtil;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
-import static yay.evy.everest.vstuff.content.constraintrework.ropes.RopeUtils.*;
+import static yay.evy.everest.vstuff.content.constraint.ropes.RopeUtils.*;
 
 public abstract class AbstractRope {
 
@@ -95,8 +93,8 @@ public abstract class AbstractRope {
     public abstract boolean removeJoint(ServerLevel level);
 
     public float calcMaxForce(ServerLevel level) {
-        final float massA = RopeUtil.getFMassForShip(level, ship0);
-        final float massB = RopeUtil.getFMassForShip(level, ship1);
+        final float massA = RopeUtils.getMassForShip(level, ship0);
+        final float massB = RopeUtils.getMassForShip(level, ship1);
         float massRatio = Math.max(massA, massB) / Math.min(massA, massB);
         return (ship0IsGround || ship1IsGround)
                 ? 50000000000000f * Math.min(massRatio, 20f) * 10f
@@ -104,8 +102,8 @@ public abstract class AbstractRope {
     }
 
     public float calcMaxTorque(ServerLevel level) {
-        final float massA = RopeUtil.getFMassForShip(level, ship0);
-        final float massB = RopeUtil.getFMassForShip(level, ship1);
+        final float massA = RopeUtils.getMassForShip(level, ship0);
+        final float massB = RopeUtils.getMassForShip(level, ship1);
         float massRatio = Math.max(massA, massB) / Math.min(massA, massB);
         return (ship0IsGround || ship1IsGround)
                 ? 50000000000000f * Math.min(massRatio, 20f) * 10f

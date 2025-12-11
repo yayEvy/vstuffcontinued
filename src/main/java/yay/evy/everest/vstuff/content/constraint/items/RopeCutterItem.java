@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.constraintrework.items;
+package yay.evy.everest.vstuff.content.constraint.items;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -12,9 +12,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 import yay.evy.everest.vstuff.VstuffConfig;
-import yay.evy.everest.vstuff.content.constraintrework.MasterOfRopes;
-import yay.evy.everest.vstuff.content.constraintrework.ropes.AbstractRope;
-import yay.evy.everest.vstuff.content.constraintrework.ropes.RopeUtils;
+import yay.evy.everest.vstuff.content.constraint.MasterOfRopes;
+import yay.evy.everest.vstuff.content.constraint.ropes.AbstractRope;
+import yay.evy.everest.vstuff.content.constraint.ropes.RopeUtils;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
@@ -61,7 +61,7 @@ public class RopeCutterItem extends Item {
 
                 if (!player.isCreative()) {
                     heldStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(useHand));
-                    player.drop(new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get()), false);
+                    player.drop(new ItemStack(VStuffItems.ROPE_ITEM.get()), false);
                 }
 
                 return InteractionResultHolder.success(heldStack);

@@ -7,7 +7,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.constraintrework.ropes.AbstractRope;
+import yay.evy.everest.vstuff.content.constraint.ropes.AbstractRope;
 import yay.evy.everest.vstuff.util.packet.*;
 
 public class NetworkManager {
@@ -19,8 +19,6 @@ public class NetworkManager {
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals
     );
-
-    private static int packetId = 0;
 
     public static void registerPackets() {
         int pktId = 0;

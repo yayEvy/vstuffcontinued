@@ -19,7 +19,7 @@ public class PhysPulleyPonder {
         scene.setSceneOffsetY(0);
         scene.removeShadow();
 
-        ItemStack ropeItem = new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get());
+        ItemStack ropeItem = new ItemStack(VStuffItems.ROPE_ITEM.get());
 
         BlockPos baseStart = util.grid().at(0, 0, 0);
         BlockPos baseEnd = util.grid().at(4, 0, 4);

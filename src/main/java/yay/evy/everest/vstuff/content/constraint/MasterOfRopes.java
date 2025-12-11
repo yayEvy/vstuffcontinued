@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.constraintrework;
+package yay.evy.everest.vstuff.content.constraint;
 
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
@@ -8,10 +8,10 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.NetworkManager;
-import yay.evy.everest.vstuff.content.constraintrework.ropes.AbstractRope;
-import yay.evy.everest.vstuff.content.constraintrework.ropes.PulleyRope;
-import yay.evy.everest.vstuff.content.constraintrework.ropes.Rope;
-import yay.evy.everest.vstuff.content.constraintrework.ropes.JointlessRope;
+import yay.evy.everest.vstuff.content.constraint.ropes.AbstractRope;
+import yay.evy.everest.vstuff.content.constraint.ropes.PulleyRope;
+import yay.evy.everest.vstuff.content.constraint.ropes.Rope;
+import yay.evy.everest.vstuff.content.constraint.ropes.JointlessRope;
 
 import java.util.HashMap;
 import java.util.Map;
