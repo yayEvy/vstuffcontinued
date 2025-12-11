@@ -1,25 +1,36 @@
 package yay.evy.everest.vstuff.eventsrework;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
-import yay.evy.everest.vstuff.content.constraint.Rope;
-import yay.evy.everest.vstuff.content.constraint.RopeUtil;
-import yay.evy.everest.vstuff.content.constraintrework.RopeManager;
+import org.joml.Vector3d;
+import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.content.constraintrework.MasterOfRopes;
+import yay.evy.everest.vstuff.content.constraintrework.items.RopeItem;
 import yay.evy.everest.vstuff.content.constraintrework.ropes.AbstractRope;
+import yay.evy.everest.vstuff.content.constraintrework.ropes.RopeUtils;
 import yay.evy.everest.vstuff.index.VStuffItems;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 @Mod.EventBusSubscriber(modid = "vstuff")
 public class RopeBreakHandler {
+
+    static Map<BlockPos, ItemStack> ropeItems = new HashMap<>();
+
+    public static void addRopeItemTo(ItemStack ropeItem) {
+        ropeItems.put(NbtUtils.readBlockPos(ropeItem.getTag().getCompound("pos")), ropeItem);
+    }
+
+    public static void removeRopeItem(BlockPos pos) {
+        ropeItems.remove(pos);
+    }
 
     @SubscribeEvent
     public static void onBlockBreak(BlockEvent.BreakEvent event) {
@@ -27,7 +38,14 @@ public class RopeBreakHandler {
 
         BlockPos brokenPos = event.getPos();
 
-        for (Map.Entry<Integer, AbstractRope> entry : RopeManager.getActiveRopes().entrySet()) {
+        for (Map.Entry<BlockPos, ItemStack> ropeItem : ropeItems.entrySet()) {
+            if (ropeItem.getKey() == brokenPos) {
+                RopeItem rope = (RopeItem) ropeItem.getValue().getItem();
+                rope.reset(ropeItem.getValue());
+            }
+        }
+
+        for (Map.Entry<Integer, AbstractRope> entry : MasterOfRopes.getAllActiveRopes().entrySet()) {
             Integer id = entry.getKey();
             AbstractRope rope = entry.getValue();
 
@@ -43,7 +61,8 @@ public class RopeBreakHandler {
                         dropPos = posA;
                     }
                 } else {
-                    BlockPos worldPosA = BlockPos.containing(rope.worldPos0.x, rope.worldPos0.y, rope.worldPos0.z);
+                    Vector3d worldPos0 = RopeUtils.convertLocalToWorld(level, rope.localPos0, rope.ship0);
+                    BlockPos worldPosA = BlockPos.containing(worldPos0.x, worldPos0.y, worldPos0.z);
                     if (brokenPos.equals(worldPosA)) {
                         remove = true;
                         dropPos = worldPosA;
@@ -58,7 +77,8 @@ public class RopeBreakHandler {
                             dropPos = posB;
                         }
                     } else {
-                        BlockPos worldPosB = BlockPos.containing(rope.worldPos1.x, rope.worldPos1.y, rope.worldPos1.z);
+                        Vector3d worldPos1 = RopeUtils.convertLocalToWorld(level, rope.localPos0, rope.ship0);
+                        BlockPos worldPosB = BlockPos.containing(worldPos1.x, worldPos1.y, worldPos1.z);
                         if (brokenPos.equals(worldPosB)) {
                             remove = true;
                             dropPos = worldPosB;
@@ -68,7 +88,7 @@ public class RopeBreakHandler {
 
 
                 if (remove) {
-                    RopeManager.REMOVE(level, id);
+                    MasterOfRopes.REMOVE(level, id);
 
                     ItemStack ropeDrop = new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get());
                     ItemEntity itemEntity = new ItemEntity(
@@ -82,7 +102,7 @@ public class RopeBreakHandler {
                 }
 
             } catch (Exception e) {
-                System.err.println("[RopeBreakHandler] Failed checking constraint " + id + ": " + e.getMessage());
+                VStuff.LOGGER.error("[RopeBreakHandler] Failed checking constraint {}: {}", id, e.getMessage());
             }
         }
     }

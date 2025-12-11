@@ -28,20 +28,48 @@ import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.mod.api.BlockEntityPhysicsListener;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import yay.evy.everest.vstuff.content.constraint.LeadConstraintItem;
-import yay.evy.everest.vstuff.content.constraint.Rope;
+
+
+import yay.evy.everest.vstuff.content.constraintrework.MasterOfRopes;
+import yay.evy.everest.vstuff.content.constraintrework.items.RopeItem;
+import yay.evy.everest.vstuff.content.constraintrework.ropes.PulleyRope;
+import yay.evy.everest.vstuff.content.constraintrework.ropes.RopeUtils;
+import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
 import yay.evy.everest.vstuff.index.VStuffBlockEntities;
 import yay.evy.everest.vstuff.index.VStuffBlocks;
 import yay.evy.everest.vstuff.index.VStuffItems;
+import yay.evy.everest.vstuff.util.RopeStyles;
 
 import java.util.List;
 
+import static yay.evy.everest.vstuff.content.constraintrework.ropes.RopeUtils.*;
+
 public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEntityPhysicsListener {
 
-    public boolean isExtended = false;
-    public boolean hasWaitingRope = false;
-    public boolean canAttachManualConstraint = true;
+    public int physticks = 0;
+
+    public enum PulleyState {
+        /**
+         * the pulley has nothing in the inventory, is not extended, and does not have a waiting rope
+         */
+        OPEN,
+        /**
+         * the pulley has one of the two needed items in inventory
+         */
+        WAITING_INV,
+        /**
+         * a RopeItem has the pulley as the firstClickedPos
+         */
+        WAITING_MANUAL_ANCHOR,
+        /**
+         * the pulley inventory has both the rope and anchor
+         */
+        FULL_INV,
+        /**
+         * the pulley is extended, either by inventory or manual
+         */
+        EXTENDED
+    }
 
     private ItemStackHandler pulleyInventory = new ItemStackHandler(2) {
         @Override
@@ -52,8 +80,8 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) { // cannot put items in inventory if the pulley is already extended
-            if (slot == 0) return !hasWaitingRope && isExtended && stack.getItem() == VStuffItems.LEAD_CONSTRAINT_ITEM.get();
-            else if (slot == 1) return isExtended && stack.getItem() == VStuffBlocks.PULLEY_ANCHOR.asItem();
+            if (slot == 0) return acceptsInv() && stack.getItem() == VStuffItems.LEAD_CONSTRAINT_ITEM.get();
+            else if (slot == 1) return acceptsInv() && stack.getItem() == VStuffBlocks.PULLEY_ANCHOR.asItem();
             else return false;
         }
 
@@ -65,13 +93,15 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
     private LazyOptional<IItemHandler> pulleyInventoryOpt = LazyOptional.of(() -> pulleyInventory);
 
-    private Integer constraintId = null;
-    private Rope attachedRope = null;
+    private Integer ropeId = null;
+    private RopeStyles.RopeStyle attachedStyle = RopeStyles.fromString("normal");
+    private PulleyRope attachedRope = null;
     private BlockPos anchorPos = null;
     private double currentRopeLength = 0.0;
     private float minRopeLength = 0.25f;
     private float RPT = 0.1f; // rope per tick, aka how much to extend / retract by each tick
     private float DIR = 1f; // 1 for extend, -1 for retract
+    public PulleyState state = PulleyState.OPEN;
 
     private Long shipA = null;
     private Long shipB = null;
@@ -80,54 +110,53 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
     private boolean ropeStateInitialized = false;
 
-    private boolean manualMode = false;
-    private LeadConstraintItem waitingConstraintItem;
+    private RopeItem waitingConstraintItem;
 
+    public boolean acceptsInv() {
+        return (state == PulleyState.OPEN || state == PulleyState.WAITING_INV);
+    }
+
+    public boolean acceptsManual() {
+        return state == PulleyState.OPEN;
+    }
 
     public PhysPulleyBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
     }
 
-    public void attachRopeAndAnchor(Rope rope, PulleyAnchorBlockEntity anchor) {
-        canAttachManualConstraint = false;
-        hasWaitingRope = false;
-        isExtended = true;
+    public void attachRopeAndAnchor(PulleyRope rope, PulleyAnchorBlockEntity anchor) {
+        this.state = PulleyState.EXTENDED;
         anchorPos = anchor.getBlockPos();
         attachedRope = rope;
+        attachedStyle = rope.style;
         currentRopeLength = rope.maxLength;
-        constraintId = rope.ID;
-        System.out.println(constraintId);
+        ropeId = rope.ID;
+        System.out.println(ropeId);
         System.out.println(currentRopeLength);
 
         clearWaitingLeadConstraintItem();
     }
 
-    public void setWaitingLeadConstraintItem(LeadConstraintItem item) {
-        hasWaitingRope = true;
+    public void setWaitingLeadConstraintItem(RopeItem item) {
         waitingConstraintItem = item;
-        item.waitingPulley = this;
+        this.state = PulleyState.WAITING_MANUAL_ANCHOR;
     }
 
     public void clearWaitingLeadConstraintItem() {
-        hasWaitingRope = false;
-        waitingConstraintItem.waitingPulley = null;
+        if (waitingConstraintItem == null) return;
+
         waitingConstraintItem = null;
     }
 
     private void resetSelf() {
-        isExtended = false;
-        hasWaitingRope = false;
-        canAttachManualConstraint = true;
         attachedRope = null;
         anchorPos = null;
-        constraintId = null;
+        ropeId = null;
+        this.state = PulleyState.OPEN;
     }
     public static PhysPulleyBlockEntity create(BlockPos pos, BlockState state) {
         return new PhysPulleyBlockEntity(VStuffBlockEntities.PHYS_PULLEY_BE.get(), pos, state);
     }
-
-    public void setManualMode(boolean manualMode) { this.manualMode = manualMode; }
-    public boolean isManualMode() { return manualMode; }
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
@@ -162,15 +191,19 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
     @Override
     public void physTick(@Nullable PhysShip physShip, @NotNull PhysLevel physLevel) {
-        System.out.println("phystick");
+        physticks++;
+        if (physticks == 20) {
+            System.out.println("phystick");
+            physticks = 0;
+        }
+
         if (!(level instanceof ServerLevel serverLevel)) {
             return;
         }
 
-        if (isExtended && getSpeed() != 0f) {
+        if (state == PulleyState.EXTENDED && getSpeed() != 0f) {
             if (attachedRope.maxLength > minRopeLength) {
-                float changeSpeed = 0.0005f;
-                attachedRope.setJointLength(serverLevel, Math.max(changeSpeed * getSpeed(), minRopeLength));
+                attachedRope.shiftJointLength(serverLevel, Math.max(0.001f * getSpeed(), minRopeLength));
             }
             currentRopeLength = attachedRope.maxLength;
         }
@@ -187,6 +220,19 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         }
     }
 
+    public InteractionResult useRopeItem(ServerLevel level, BlockPos pos, Player player, InteractionHand hand) {
+        if (player.getItemInHand(hand).getItem() == VStuffItems.LEAD_CONSTRAINT_ITEM.asItem()) {
+            this.attachedStyle = RopeStyleHandlerServer.getStyle(player.getUUID());
+            return insertRope(player, hand);
+        }
+
+        if (hasAnchor() && hasRope()) {
+            this.state = PulleyState.FULL_INV;
+        }
+
+        return InteractionResult.PASS;
+    }
+
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
@@ -194,6 +240,10 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
         if (player.getItemInHand(hand).getItem() == VStuffBlocks.PULLEY_ANCHOR.asItem()) {
             return insertAnchor(player, hand);
+        }
+
+        if (hasAnchor() && hasRope()) {
+            this.state = PulleyState.FULL_INV;
         }
 
         return InteractionResult.PASS;
@@ -206,8 +256,8 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         if (remainder.getCount() != heldItem.getCount()) {
             if (!player.getAbilities().instabuild) {
                 player.setItemInHand(hand, remainder);
-                canAttachManualConstraint = false;
             }
+            this.state = PulleyState.WAITING_INV;
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;
@@ -221,15 +271,18 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
             if (!player.getAbilities().instabuild) {
                 player.setItemInHand(hand, remainder);
             }
+            this.state = PulleyState.WAITING_INV;
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;
     }
 
     private void initializeRopeInventory() {
-        ItemStack existingStack = ItemStack.EMPTY;
+        ItemStack existingRope = ItemStack.EMPTY;
+        ItemStack existingAnchor = ItemStack.EMPTY;
         if (pulleyInventory != null) {
-            existingStack = pulleyInventory.getStackInSlot(0);
+            existingRope = pulleyInventory.getStackInSlot(0);
+            existingAnchor = pulleyInventory.getStackInSlot(1);
         }
 
         pulleyInventory = new ItemStackHandler(2) {
@@ -241,8 +294,8 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
             @Override
             public boolean isItemValid(int slot, ItemStack stack) { // cannot put items in inventory if the pulley is already extended
-                if (slot == 0) return !hasWaitingRope && isExtended && stack.getItem() == VStuffItems.LEAD_CONSTRAINT_ITEM.get();
-                else if (slot == 1) return isExtended && stack.getItem() == VStuffBlocks.PULLEY_ANCHOR.asItem();
+                if (slot == 0) return acceptsInv() && stack.getItem() == VStuffItems.LEAD_CONSTRAINT_ITEM.get();
+                else if (slot == 1) return acceptsInv() && stack.getItem() == VStuffBlocks.PULLEY_ANCHOR.asItem();
                 else return false;
             }
 
@@ -252,8 +305,12 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
             }
         };
 
-        if (!existingStack.isEmpty()) {
-            pulleyInventory.setStackInSlot(0, existingStack);
+        if (!existingRope.isEmpty()) {
+            pulleyInventory.setStackInSlot(0, existingRope);
+        }
+
+        if (!existingAnchor.isEmpty()) {
+            pulleyInventory.setStackInSlot(0, existingAnchor);
         }
 
         if (pulleyInventoryOpt != null) {
@@ -270,11 +327,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     private boolean hasAnchor() {
         ItemStack anchorStack = pulleyInventory.getStackInSlot(1);
         return !anchorStack.isEmpty();
-    }
-
-    private Long getGroundBodyId(ServerLevel level) {
-        return VSGameUtilsKt.getShipObjectWorld(level).getDimensionToGroundBodyIdImmutable()
-                .get(VSGameUtilsKt.getDimensionId(level));
     }
 
     @Override
@@ -299,7 +351,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
                     .withStyle(ChatFormatting.RED));
         }
 
-        if (constraintId != null) {
+        if (ropeId != null) {
             tooltip.add(Component.literal("Length: " + String.format("%.1f", currentRopeLength) + " blocks")
                     .withStyle(ChatFormatting.BLUE));
             float speed = getSpeed();
@@ -316,7 +368,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
             if (hasAnchor() && hasRope()) {
                 tooltip.add(Component.literal("Ready - Pulley is able to extend")
                         .withStyle(ChatFormatting.YELLOW));
-            } else if (isExtended) {
+            } else if (state == PulleyState.EXTENDED) {
                 tooltip.add(Component.literal("Extended - ")
                         .withStyle(ChatFormatting.YELLOW));
             }
@@ -329,68 +381,57 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         super.write(tag, clientPacket);
         tag.put("pulleyInventory", pulleyInventory.serializeNBT());
 
-        tag.putBoolean("RopeStateInitialized", ropeStateInitialized);
+        tag.putBoolean("ropeStateInit", ropeStateInitialized);
 
-        if (constraintId != null) {
-            tag.putInt("ConstraintId", constraintId);
+        if (ropeId != null) {
+            tag.putInt("ropeId", ropeId);
         }
 
-        tag.putDouble("CurrentRopeLength", currentRopeLength);
-        tag.putFloat("MinRopeLength", minRopeLength);
+        if (anchorPos != null) {
+            putBlockPos("anchorPos", anchorPos, tag);
+        }
 
-        tag.putBoolean("ManualMode", isManualMode());
+        tag.putDouble("currentLength", currentRopeLength);
+        tag.putFloat("minLength", minRopeLength);
 
         if (shipA != null && shipB != null && localPosA != null && localPosB != null) {
-            tag.putLong("ShipA", shipA);
-            tag.putLong("ShipB", shipB);
-            tag.putDouble("LocalPosAX", localPosA.x);
-            tag.putDouble("LocalPosAY", localPosA.y);
-            tag.putDouble("LocalPosAZ", localPosA.z);
-            tag.putDouble("LocalPosBX", localPosB.x);
-            tag.putDouble("LocalPosBY", localPosB.y);
-            tag.putDouble("LocalPosBZ", localPosB.z);
+            tag.putLong("ship0", shipA);
+            tag.putLong("ship1", shipB);
+            putVector3d("localPos0", localPosA, tag);
+            putVector3d("localPos1", localPosB, tag);
         }
-
-        tag.putBoolean("DataSavedProperly", true);
     }
 
     @Override
     protected void read(CompoundTag tag, boolean clientPacket) {
         super.read(tag, clientPacket);
-        pulleyInventory.deserializeNBT(tag.getCompound("RopeInventory"));
+        pulleyInventory.deserializeNBT(tag.getCompound("pulleyInventory"));
 
+        ropeStateInitialized = tag.getBoolean("ropeStateInit");
 
-
-        manualMode = tag.getBoolean("ManualMode");
-
-
-        ropeStateInitialized = tag.getBoolean("RopeStateInitialized");
-
-        if (tag.contains("ConstraintId")) {
-            constraintId = tag.getInt("ConstraintId");
+        if (tag.contains("ropeId")) {
+            ropeId = tag.getInt("ropeId");
+            attachedRope = (PulleyRope) MasterOfRopes.GET(ropeId);
         } else {
-            constraintId = null;
+            ropeId = null;
+            attachedRope = null;
         }
 
-        currentRopeLength = tag.contains("CurrentRopeLength") ?
-                Math.max(tag.getDouble("CurrentRopeLength"), minRopeLength) : minRopeLength;
+        if (tag.contains("anchorPos_x")) {
+            anchorPos = RopeUtils.getBlockPos("anchorPos", tag);
+        }
 
-        minRopeLength = tag.contains("MinRopeLength") ?
-                Math.max(tag.getFloat("MinRopeLength"), 0.1f) : 0.1f;
+        currentRopeLength = tag.contains("currentLength") ?
+                Math.max(tag.getDouble("currentLength"), minRopeLength) : minRopeLength;
 
-        if (tag.contains("ShipA")) {
-            shipA = tag.getLong("ShipA");
-            shipB = tag.getLong("ShipB");
-            localPosA = new Vector3d(
-                    tag.getDouble("LocalPosAX"),
-                    tag.getDouble("LocalPosAY"),
-                    tag.getDouble("LocalPosAZ")
-            );
-            localPosB = new Vector3d(
-                    tag.getDouble("LocalPosBX"),
-                    tag.getDouble("LocalPosBY"),
-                    tag.getDouble("LocalPosBZ")
-            );
+        minRopeLength = tag.contains("minLength") ?
+                Math.max(tag.getFloat("minLength"), 0.1f) : 0.1f;
+
+        if (tag.contains("ship0")) {
+            shipA = tag.getLong("ship0");
+            shipB = tag.getLong("ship1");
+            localPosA = getVector3d("localPos0", tag);
+            localPosB = getVector3d("localPos1", tag);
         }
 
     }
@@ -398,14 +439,14 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     @Override
     public @NotNull CompoundTag getUpdateTag() {
         CompoundTag tag = super.getUpdateTag();
-        tag.putBoolean("is_extended", isExtended);
+        tag.putString("state", this.state.name());
         return tag;
     }
 
     @Override
     public void handleUpdateTag(CompoundTag tag) {
         super.handleUpdateTag(tag);
-        isExtended = tag.getBoolean("is_extended");
+        this.state = PulleyState.valueOf(tag.getString("state"));
     }
 
     @Override

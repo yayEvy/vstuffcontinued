@@ -2,6 +2,7 @@ package yay.evy.everest.vstuff.client;
 
 import net.createmod.catnip.outliner.Outliner;
 import net.createmod.catnip.outliner.Outline.OutlineParams;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -9,9 +10,14 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class ClientRopeUtil {
-    private static final Object FAIL_OUTLINE_KEY = new Object();
 
-    public static void drawOutline(Level level, BlockPos pos) {
+    public static final class Colors {
+        public static final int GREEN = 0x77DD77;
+        public static final int YELLOW = 0xFDFD96;
+        public static final int RED = 0xFF6961;
+    }
+
+    public static void drawOutline(ClientLevel level, BlockPos pos, int color) {
         if (!level.isClientSide())
             return;
 
@@ -26,24 +32,7 @@ public class ClientRopeUtil {
         Outliner outliner = Outliner.getInstance();
         OutlineParams params = outliner.showAABB(pos, bb);
 
-        params.colored(0x77DD77)
+        params.colored(color)
                 .lineWidth(1 / 16f);
-    }
-
-
-    public static void drawFailOutline(Level level, BlockPos pos) {
-        if (!level.isClientSide()) return;
-
-        var state = level.getBlockState(pos);
-        var shape = state.getShape(level, pos);
-        if (shape.isEmpty()) return;
-
-        var bb = shape.bounds().move(pos.getX(), pos.getY(), pos.getZ());
-
-        Outliner outliner = Outliner.getInstance();
-        OutlineParams params = outliner.showAABB(FAIL_OUTLINE_KEY, bb);
-
-        params.colored(0xFF6961)
-                .lineWidth(0.1f);
     }
 }

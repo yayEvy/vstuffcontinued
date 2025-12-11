@@ -5,11 +5,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
+
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.constraint.ConstraintPersistence;
-import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
-import yay.evy.everest.vstuff.content.constraint.Rope;
 import yay.evy.everest.vstuff.content.constraintrework.ropes.AbstractRope;
 import yay.evy.everest.vstuff.content.constraintrework.ropes.RopeUtils;
 import yay.evy.everest.vstuff.util.GetterUtils;
@@ -117,7 +114,7 @@ public class RopePersistenceYesItWorksNowIPromise3dsmile extends SavedData {
             VStuff.LOGGER.info("ConstraintPersistence successfully restored {} constraints, failed to restore {} constraints", successCount, failCount);
 
             for (ServerPlayer player : level.getServer().getPlayerList().getPlayers()) {
-                RopeManager.syncAllConstraintsToPlayer(player);
+                MasterOfRopes.syncAllConstraintsToPlayer(player);
             }
         });
     }

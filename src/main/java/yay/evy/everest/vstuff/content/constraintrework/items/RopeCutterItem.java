@@ -10,8 +10,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+
 import yay.evy.everest.vstuff.VstuffConfig;
-import yay.evy.everest.vstuff.content.constraintrework.RopeManager;
+import yay.evy.everest.vstuff.content.constraintrework.MasterOfRopes;
 import yay.evy.everest.vstuff.content.constraintrework.ropes.AbstractRope;
 import yay.evy.everest.vstuff.content.constraintrework.ropes.RopeUtils;
 import yay.evy.everest.vstuff.index.VStuffItems;
@@ -23,17 +24,17 @@ public class RopeCutterItem extends Item {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
-        ItemStack heldStack = pPlayer.getItemInHand(pUsedHand);
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand useHand) {
+        ItemStack heldStack = player.getItemInHand(useHand);
 
-        if (pLevel instanceof ServerLevel serverLevel) {
-            Integer targetRopeId = RopeUtils.findRope(serverLevel, pPlayer);
+        if (level instanceof ServerLevel serverLevel) {
+            Integer targetRopeId = RopeUtils.findRope(serverLevel, player);
             if (targetRopeId != null) {
-                AbstractRope rope = RopeManager.getActiveRopes().get(targetRopeId);
+                AbstractRope rope = MasterOfRopes.getAllActiveRopes().get(targetRopeId);
 
                 rope.removeJoint(serverLevel);
 
-                RopeManager.REMOVE(serverLevel, targetRopeId);
+                MasterOfRopes.REMOVE(serverLevel, targetRopeId);
 
                 boolean isChain = rope.style.getBasicStyle() == RopeStyles.PrimitiveRopeStyle.CHAIN;
 
@@ -41,7 +42,7 @@ public class RopeCutterItem extends Item {
                         ? Component.translatable("vstuff.message.chain_break")
                         : Component.translatable("vstuff.message.rope_break");
 
-                pPlayer.displayClientMessage(notif, true);
+                player.displayClientMessage(notif, true);
 
                 if (VstuffConfig.ROPE_SOUNDS.get()) {
                     var sound = isChain
@@ -50,7 +51,7 @@ public class RopeCutterItem extends Item {
 
                     serverLevel.playSound(
                             null,
-                            pPlayer.blockPosition(),
+                            player.blockPosition(),
                             sound,
                             SoundSource.PLAYERS,
                             1.0F,
@@ -58,9 +59,9 @@ public class RopeCutterItem extends Item {
                     );
                 }
 
-                if (!pPlayer.isCreative()) {
-                    heldStack.hurtAndBreak(1, pPlayer, (p) -> p.broadcastBreakEvent(pUsedHand));
-                    pPlayer.drop(new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get()), false);
+                if (!player.isCreative()) {
+                    heldStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(useHand));
+                    player.drop(new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get()), false);
                 }
 
                 return InteractionResultHolder.success(heldStack);

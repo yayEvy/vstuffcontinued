@@ -2,15 +2,20 @@ package yay.evy.everest.vstuff.content.constraintrework.ropes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
+import org.joml.Vector3f;
 import org.valkyrienskies.core.internal.joints.VSDistanceJoint;
 import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
 import org.valkyrienskies.core.internal.joints.VSJointPose;
+
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.constraint.RopeUtil;
 import yay.evy.everest.vstuff.util.RopeStyles;
+
+import static yay.evy.everest.vstuff.content.constraintrework.ropes.RopeUtils.*;
 
 public abstract class AbstractRope {
 
@@ -23,8 +28,6 @@ public abstract class AbstractRope {
 
     public Vector3d localPos0;
     public Vector3d localPos1;
-    public Vector3d worldPos0;
-    public Vector3d worldPos1;
 
     public float minLength = 0f;
     public float maxLength;
@@ -39,32 +42,52 @@ public abstract class AbstractRope {
     public BlockPos blockPos0;
     public BlockPos blockPos1;
 
-    public RopeStyles.RopeStyle style;
+    public RopeStyles.RopeStyle style = RopeStyles.fromString("normal");
     public RopeUtils.RopeType type;
 
     public VSDistanceJoint constraint;
 
-    public AbstractRope(ServerLevel level, Integer ropeId, Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1) {
+    AbstractRope(ServerLevel level, Integer ropeId, Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1) {
         this.ID = ropeId;
         this.ship0 = ship0;
         this.ship1 = ship1;
         this.localPos0 = localPos0;
         this.localPos1 = localPos1;
 
-        this.worldPos0 = RopeUtils.convertLocalToWorld(level, localPos0, ship0);
-        this.worldPos1 = RopeUtils.convertLocalToWorld(level, localPos1, ship1);
-
         this.maxForce = calcMaxForce(level);
         this.maxTorque = calcMaxTorque(level);
 
-        this.maxLength = (float) worldPos0.distance(worldPos1);
+        this.maxLength = (float) RopeUtils.convertLocalToWorld(level, localPos0, ship0).distance(RopeUtils.convertLocalToWorld(level, localPos0, ship1));
+    }
+
+    public AbstractRope(ServerLevel level, Integer ropeId, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1) {
+        this(level, ropeId, ship0, ship1, RopeUtils.getLocalPosition(blockPos0), RopeUtils.getLocalPosition(blockPos1));
+        this.blockPos0 = blockPos0;
+        this.blockPos1 = blockPos1;
     }
 
     public AbstractRope(Integer ropeId, Long ship0, Long ship1, boolean ship0IsGround, boolean ship1IsGround,
-                        Vector3d localPos0, Vector3d localPos1, Vector3d worldPos0, Vector3d worldPos1,
-                        float minLength, float maxLength, float maxForce, float maxTorque, float tolerance,
-                        float stiffness, float damping, BlockPos blockPos0, BlockPos blockPos1,
-                        RopeStyles.RopeStyle style, RopeUtils.RopeType type) {
+                        Vector3d localPos0, Vector3d localPos1, float minLength, float maxLength, float maxForce,
+                        float maxTorque, float tolerance, float stiffness, float damping, BlockPos blockPos0,
+                        BlockPos blockPos1, RopeStyles.RopeStyle style, RopeUtils.RopeType type) {
+        this.ID = ropeId;
+        this.ship0 = ship0;
+        this.ship1 = ship1;
+        this.ship0IsGround = ship0IsGround;
+        this.ship1IsGround = ship1IsGround;
+        this.localPos0 = localPos0;
+        this.localPos1 = localPos1;
+        this.minLength = minLength;
+        this.maxLength = maxLength;
+        this.maxForce = maxForce;
+        this.maxTorque = maxTorque;
+        this.tolerance = tolerance;
+        this.stiffness = stiffness;
+        this.damping = damping;
+        this.blockPos0 = blockPos0;
+        this.blockPos1 = blockPos1;
+        this.style = style;
+        this.type = type;
     }
 
     public abstract boolean createJoint(ServerLevel level);
@@ -115,8 +138,6 @@ public abstract class AbstractRope {
 
         putVector3d("localPos0", localPos0, tag);
         putVector3d("localPos1", localPos1, tag);
-        putVector3d("worldPos0", worldPos0, tag);
-        putVector3d("worldPos1", worldPos1, tag);
 
         tag.putFloat("minLength", minLength);
         tag.putFloat("maxLength", maxLength);
@@ -131,44 +152,49 @@ public abstract class AbstractRope {
         putBlockPos("blockPos0", blockPos0, tag);
         putBlockPos("blockPos1", blockPos1, tag);
 
-        tag.putString("type", type.name());
-
         tag.putString("style", style.getStyle());
+
+        tag.putString("type", type.name());
 
         return tag;
     }
 
+    public void addToBuf(FriendlyByteBuf buf) {
+        buf.writeInt(ID);
+        buf.writeLong(ship0);
+        buf.writeLong(ship1);
+        buf.writeBoolean(ship0IsGround);
+        buf.writeBoolean(ship1IsGround);
 
-    protected static void putBlockPos(String pKey, BlockPos blockPos, CompoundTag toTag) {
-        toTag.putInt(pKey + "_x", blockPos.getX());
-        toTag.putInt(pKey + "_y", blockPos.getY());
-        toTag.putInt(pKey + "_z", blockPos.getZ());
+        buf.writeVector3f(v3dToV3f(localPos0));
+        buf.writeVector3f(v3dToV3f(localPos1));
+
+        buf.writeFloat(minLength);
+        buf.writeFloat(maxLength);
+
+        buf.writeFloat(maxForce);
+        buf.writeFloat(maxTorque);
+
+        buf.writeFloat(tolerance);
+        buf.writeFloat(stiffness);
+        buf.writeFloat(damping);
+        buf.writeBlockPos(blockPos0);
+        buf.writeBlockPos(blockPos1);
+
+        buf.writeUtf(style.getStyle());
+
+        buf.writeEnum(type);
     }
 
-    protected static void putVector3d(String pKey, Vector3d vec3d, CompoundTag toTag) {
-        toTag.putDouble(pKey + "_x", vec3d.x);
-        toTag.putDouble(pKey + "_y", vec3d.y);
-        toTag.putDouble(pKey + "_z", vec3d.z);
-    }
 
-    protected static BlockPos getBlockPos(String pKey, CompoundTag fromTag) {
-        return new BlockPos(
-                fromTag.getInt(pKey + "_x"),
-                fromTag.getInt(pKey + "_x"),
-                fromTag.getInt(pKey + "_x")
-        );
-    }
-
-    protected static Vector3d getVector3d(String pKey, CompoundTag fromTag) {
-        return new Vector3d(
-                fromTag.getDouble(pKey + "_x"),
-                fromTag.getDouble(pKey + "_x"),
-                fromTag.getDouble(pKey + "_x")
-        );
-    }
 
     public static <T extends AbstractRope> T fromTag(CompoundTag tag) {
         VStuff.LOGGER.warn("AbstractRope fromTag called!");
+        return null;
+    }
+
+    public static <T extends AbstractRope> T fromBuf(FriendlyByteBuf buf) {
+        VStuff.LOGGER.warn("AbstractRope fromBuf called!");
         return null;
     }
 }

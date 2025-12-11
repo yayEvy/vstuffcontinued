@@ -1,6 +1,7 @@
 package yay.evy.everest.vstuff.content.constraint;
 
 
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -41,8 +42,8 @@ public class LeadConstraintItem extends Item {
         Player player = context.getPlayer();
 
 
-        if (level.isClientSide()) {
-            ClientRopeUtil.drawOutline(level, clickedPos);
+        if (level instanceof ClientLevel clientLevel) {
+            ClientRopeUtil.drawOutline(clientLevel, clickedPos, ClientRopeUtil.Colors.GREEN);
 
             return InteractionResult.SUCCESS;
         }

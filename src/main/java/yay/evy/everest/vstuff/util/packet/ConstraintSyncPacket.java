@@ -154,7 +154,7 @@ public class ConstraintSyncPacket {
                 break;
             case REMOVE:
                 if (constraintId == null) {
-                    throw new IllegalStateException("Cannot encode REMOVE packet with null constraintId");
+                    throw new IllegalStateException("Cannot encode removeRope packet with null constraintId");
                 }
                 buf.writeInt(constraintId);
                 break;

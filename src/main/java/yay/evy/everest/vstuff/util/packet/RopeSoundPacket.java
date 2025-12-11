@@ -20,9 +20,9 @@ public class RopeSoundPacket {
         this.style = style;
     }
 
-    public static void encode(RopeSoundPacket msg, FriendlyByteBuf buf) {
-        buf.writeBoolean(msg.breakSound);
-        buf.writeEnum(msg.style);
+    public static void encode(RopeSoundPacket pkt, FriendlyByteBuf buf) {
+        buf.writeBoolean(pkt.breakSound);
+        buf.writeEnum(pkt.style);
     }
 
     public static RopeSoundPacket decode(FriendlyByteBuf buf) {
@@ -32,16 +32,16 @@ public class RopeSoundPacket {
         );
     }
 
-    public static void handle(RopeSoundPacket msg, Supplier<NetworkEvent.Context> ctx) {
+    public static void handle(RopeSoundPacket pkt, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             if (RopeSoundHandler.isEnabled()) {
                 Minecraft mc = Minecraft.getInstance();
                 if (mc.player != null && mc.level != null) {
-                    var sound = msg.breakSound
-                            ? (msg.style == RopeStyles.PrimitiveRopeStyle.CHAIN
+                    var sound = pkt.breakSound
+                            ? (pkt.style == RopeStyles.PrimitiveRopeStyle.CHAIN
                             ? SoundEvents.CHAIN_BREAK
                             : SoundEvents.LEASH_KNOT_BREAK)
-                            : (msg.style == RopeStyles.PrimitiveRopeStyle.CHAIN
+                            : (pkt.style == RopeStyles.PrimitiveRopeStyle.CHAIN
                             ? SoundEvents.CHAIN_PLACE
                             : SoundEvents.LEASH_KNOT_PLACE);
 

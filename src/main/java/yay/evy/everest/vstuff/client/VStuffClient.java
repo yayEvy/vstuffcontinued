@@ -6,10 +6,7 @@ import yay.evy.everest.vstuff.index.VStuffPonders;
 
 public class VStuffClient {
 
-
     public static void initialize() {
         PonderIndex.addPlugin(new VStuffPonders());
-
-
     }
 }

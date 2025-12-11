@@ -11,9 +11,9 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.client.NetworkHandler;
+import yay.evy.everest.vstuff.client.NetworkManager;
 import yay.evy.everest.vstuff.content.constraintrework.RopePersistenceYesItWorksNowIPromise3dsmile;
-import yay.evy.everest.vstuff.content.constraintrework.RopeManager;
+import yay.evy.everest.vstuff.content.constraintrework.MasterOfRopes;
 import yay.evy.everest.vstuff.content.constraintrework.ropes.AbstractRope;
 import yay.evy.everest.vstuff.content.constraintrework.ropes.RopeUtils;
 import yay.evy.everest.vstuff.util.RopeStyles;
@@ -39,18 +39,17 @@ public class ColorHaggler {
 
                             if (ropeIsColorable(serverLevel, player)) {
 
-                                AbstractRope rope = RopeManager.getActiveRopes().get(targetConstraintId);
+                                AbstractRope rope = MasterOfRopes.getAllActiveRopes().get(targetConstraintId);
                                 RopePersistenceYesItWorksNowIPromise3dsmile ropePersistence = RopePersistenceYesItWorksNowIPromise3dsmile.get(serverLevel);
 
                                 rope.style = getDyedStyle(item.toString(), getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(serverLevel, player));
 
-                                RopeManager.PUT(rope.ID, rope);
+                                MasterOfRopes.PUT(rope.ID, rope);
 
-                                NetworkHandler.sendConstraintRerender(targetConstraintId, rope.ship0, rope.ship1,
-                                        rope.localPos0, rope.localPos1, rope.maxLength, rope.style);
+                                NetworkManager.sendConstraintRerender(rope);
 
                                 ropePersistence.addRope(rope);
-                                RopeManager.syncAllConstraintsToPlayer(serverPlayer);
+                                MasterOfRopes.syncAllConstraintsToPlayer(serverPlayer);
 
                                 RopePersistenceYesItWorksNowIPromise3dsmile.get(serverLevel).saveNow(serverLevel);
                             }
@@ -73,7 +72,7 @@ public class ColorHaggler {
     private RopeStyles.PrimitiveRopeStyle getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(ServerLevel level, Player player) {
         Integer targetConstraintId = RopeUtils.findRope(level, player);
 
-        AbstractRope wizardsWorstKeptSecret = RopeManager.getActiveRopes().get(targetConstraintId);
+        AbstractRope wizardsWorstKeptSecret = MasterOfRopes.getAllActiveRopes().get(targetConstraintId);
 
         return wizardsWorstKeptSecret.style.getBasicStyle();
     }
