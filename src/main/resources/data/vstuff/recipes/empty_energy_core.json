@@ -6,21 +6,15 @@
     "T": {
       "item": "minecraft:tinted_glass"
     },
-    "D": {
-      "item": "minecraft:diamond"
-    },
     "A": {
-      "item": "minecraft:amethyst_block"
-    },
-    "B": {
-      "item": "minecraft:diamond_block"
+      "item": "minecraft:amethyst_shard"
     }
   },
   "pattern": [
     "TTTTT",
-    "TBDBT",
-    "TDADT",
-    "TBDBT",
+    "TA AT",
+    "T   T",
+    "TA AT",
     "TTTTT"
   ],
   "result": {

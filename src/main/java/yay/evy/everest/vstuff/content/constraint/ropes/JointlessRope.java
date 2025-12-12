@@ -7,18 +7,16 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Vector3d;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
 import static yay.evy.everest.vstuff.content.constraint.ropes.RopeUtils.*;
 
 public class JointlessRope extends AbstractRope {
 
-    public RopeUtils.RopeType type = RopeUtils.RopeType.WORLDTOWORLD;
-
-    public JointlessRope(ServerLevel level, Integer ropeId, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1) {
-        super(level, ropeId, ship0, ship1, RopeUtils.getLocalPosition(blockPos0), RopeUtils.getLocalPosition(blockPos1));
-        this.blockPos0 = blockPos0;
-        this.blockPos1 = blockPos1;
+    public JointlessRope(ServerLevel level, Integer ropeId, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1, RopeStyles.RopeStyle style) {
+        super(level, ropeId, ship0, ship1, blockPos0, blockPos1, style);
+        this.type = RopeType.WORLDTOWORLD;
     }
 
     public JointlessRope(Integer ropeId, Long ship0, Long ship1, boolean ship0IsGround, boolean ship1IsGround,
@@ -31,17 +29,11 @@ public class JointlessRope extends AbstractRope {
     }
 
     public static JointlessRope create(ServerLevel level, Player player, BlockPos firstPos, BlockPos secondPos, Long firstShip, Long secondShip) {
-        return new JointlessRope(level, -1, firstShip, secondShip, firstPos, secondPos); // -1 is a temp id
+        return new JointlessRope(level, RopeUtils.createTempId(), firstShip, secondShip, firstPos, secondPos, RopeStyleHandlerServer.getStyle(player.getUUID()));
     }
     @Override
     public boolean createJoint(ServerLevel level) {
         VStuff.LOGGER.info("Not creating joint for a jointless rope");
-        return true;
-    }
-
-    @Override
-    public boolean editJoint(ServerLevel level) {
-        VStuff.LOGGER.info("Not editing joint for a jointless rope");
         return true;
     }
 

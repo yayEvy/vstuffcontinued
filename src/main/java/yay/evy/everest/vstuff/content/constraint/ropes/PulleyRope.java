@@ -6,18 +6,24 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Vector3d;
+import org.valkyrienskies.core.internal.joints.VSDistanceJoint;
+import org.valkyrienskies.core.internal.joints.VSJoint;
+import org.valkyrienskies.core.internal.joints.VSJointAndId;
+import org.valkyrienskies.core.internal.world.VsiServerShipWorld;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
+import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
+import yay.evy.everest.vstuff.util.GetterUtils;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
 import static yay.evy.everest.vstuff.content.constraint.ropes.RopeUtils.*;
 
 public class PulleyRope extends AbstractRope {
 
-    public RopeUtils.RopeType type = RopeUtils.RopeType.PULLEY;
-
-    public PulleyRope(ServerLevel level, Integer ropeId, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1) {
-        super(level, ropeId, ship0, ship1, RopeUtils.getLocalPosition(blockPos0), RopeUtils.getLocalPosition(blockPos1));
-        this.blockPos0 = blockPos0;
-        this.blockPos1 = blockPos1;
+    public PulleyRope(ServerLevel level, Integer ropeId, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1, RopeStyles.RopeStyle style) {
+        super(level, ropeId, ship0, ship1, blockPos0, blockPos1, style);
+        this.type = RopeType.PULLEY;
     }
 
     public PulleyRope(Integer ropeId, Long ship0, Long ship1, boolean ship0IsGround, boolean ship1IsGround,
@@ -29,31 +35,109 @@ public class PulleyRope extends AbstractRope {
     }
 
     public static PulleyRope create(ServerLevel level, Player player, BlockPos firstPos, BlockPos secondPos, Long firstShip, Long secondShip) {
-        return new PulleyRope(level, -1, firstShip, secondShip, firstPos, secondPos); // -1 is a temp id
+        return new PulleyRope(level, RopeUtils.createTempId(), firstShip, secondShip, firstPos, secondPos, RopeStyleHandlerServer.getStyle(player.getUUID()));
     }
 
 
     @Override
     public boolean createJoint(ServerLevel level) {
-        return false;
-    }
+        Long currentGroundBodyId;
 
-    @Override
-    public boolean editJoint(ServerLevel level) {
+        try {
+            currentGroundBodyId = VSGameUtilsKt.getShipObjectWorld(level).getDimensionToGroundBodyIdImmutable()
+                    .get(VSGameUtilsKt.getDimensionId(level));
+        } catch (Exception e) {
+            VStuff.LOGGER.warn("Exception occurred while trying to get ground body id: {}", e.getMessage());
+            return false;
+        }
+
+        Long actualShipA = ship0IsGround ? currentGroundBodyId : ship0;
+        Long actualShipB = ship1IsGround ? currentGroundBodyId : ship1;
+
+        try {
+            GameToPhysicsAdapter gtpa = GetterUtils.getGTPA(level);
+
+            VsiServerShipWorld shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
+
+            boolean shipAValid = ship0IsGround ||
+                    (actualShipA != null && shipWorld.getAllShips().getById(actualShipA) != null);
+            boolean shipBValid = ship1IsGround ||
+                    (actualShipB != null && shipWorld.getAllShips().getById(actualShipB) != null);
+
+            if (!shipAValid || !shipBValid) return false;
+
+            VSJoint ropeConstraint = makeDistanceJoint();
+
+            gtpa.addJoint(ropeConstraint, 0, newConstraintId -> this.ID = newConstraintId);
+
+            return true;
+        } catch (Exception e) {
+            VStuff.LOGGER.error("Error restoring joint for constraint {}: {}", ID, e.getMessage());
+        }
         return false;
     }
 
     @Override
     public boolean removeJoint(ServerLevel level) {
-        return false;
+        if (constraint == null) {
+            VStuff.LOGGER.warn("Cannot remove an already null constraint");
+            return false;
+        }
+
+        try {
+            GameToPhysicsAdapter gtpa = GetterUtils.getGTPA(level);
+
+            gtpa.removeJoint(ID);
+
+            this.constraint = null;
+            this.ID = RopeUtils.createTempId();
+            return true;
+        } catch (Exception e) {
+            VStuff.LOGGER.error("Error removing joint for id {}: {}", ID, e.getMessage());
+            return false;
+        }
     }
 
     public boolean setJointLength(ServerLevel level, float newlength) {
-        return false;
+        if (constraint == null) {
+            VStuff.LOGGER.warn("Cannot set the length of a null joint!");
+            return false;
+        }
+
+        try {
+            GameToPhysicsAdapter gtpa = GetterUtils.getGTPA(level);
+            VSDistanceJoint newJoint = constraint.copy(
+                    constraint.getShipId0(),
+                    constraint.getPose0(),
+                    constraint.getShipId1(),
+                    constraint.getPose1(),
+                    constraint.getMaxForceTorque(),
+                    constraint.getMinDistance(),
+                    newlength,
+                    constraint.getTolerance(),
+                    constraint.getStiffness(),
+                    constraint.getDamping()
+            );
+
+            gtpa.updateJoint(new VSJointAndId(ID, newJoint));
+            constraint = newJoint;
+            maxLength = newlength;
+            VStuff.LOGGER.info("Set joint id {} to length {}", ID, newlength);
+            return true;
+        } catch (Exception e) {
+            VStuff.LOGGER.error("Error setting length of joint {}: {}", ID, e.getMessage());
+            return false;
+        }
     }
 
     public boolean shiftJointLength(ServerLevel level, float shift) {
-        return false;
+        if (constraint == null) {
+            VStuff.LOGGER.warn("Cannot change the length of a null joint!");
+            return false;
+        }
+
+        float newLength = constraint.getMaxDistance() + shift;
+        return setJointLength(level, newLength);
     }
 
 

@@ -58,10 +58,11 @@ public abstract class AbstractRope {
         this.maxLength = (float) RopeUtils.convertLocalToWorld(level, localPos0, ship0).distance(RopeUtils.convertLocalToWorld(level, localPos0, ship1));
     }
 
-    public AbstractRope(ServerLevel level, Integer ropeId, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1) {
+    public AbstractRope(ServerLevel level, Integer ropeId, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1, RopeStyles.RopeStyle style) {
         this(level, ropeId, ship0, ship1, RopeUtils.getLocalPosition(blockPos0), RopeUtils.getLocalPosition(blockPos1));
         this.blockPos0 = blockPos0;
         this.blockPos1 = blockPos1;
+        this.style = style;
     }
 
     public AbstractRope(Integer ropeId, Long ship0, Long ship1, boolean ship0IsGround, boolean ship1IsGround,
@@ -89,7 +90,6 @@ public abstract class AbstractRope {
     }
 
     public abstract boolean createJoint(ServerLevel level);
-    public abstract boolean editJoint(ServerLevel level);
     public abstract boolean removeJoint(ServerLevel level);
 
     public float calcMaxForce(ServerLevel level) {

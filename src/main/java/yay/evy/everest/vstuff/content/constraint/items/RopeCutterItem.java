@@ -30,9 +30,7 @@ public class RopeCutterItem extends Item {
         if (level instanceof ServerLevel serverLevel) {
             Integer targetRopeId = RopeUtils.findRope(serverLevel, player);
             if (targetRopeId != null) {
-                AbstractRope rope = MasterOfRopes.getAllActiveRopes().get(targetRopeId);
-
-                rope.removeJoint(serverLevel);
+                AbstractRope rope = MasterOfRopes.GET(targetRopeId);
 
                 MasterOfRopes.REMOVE(serverLevel, targetRopeId);
 

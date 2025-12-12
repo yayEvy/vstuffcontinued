@@ -121,7 +121,7 @@ public class RopePersistenceYesItWorksNowIPromise3dsmile extends SavedData {
 
     private boolean tryRopeRestore(ServerLevel level, AbstractRope rope) {
         try {
-            rope.createJoint(level);
+            MasterOfRopes.ADD(level, rope);
         } catch (Exception e) {
             VStuff.LOGGER.error("Error restoring constraint {}: {}", rope.ID, e.getMessage());
         }

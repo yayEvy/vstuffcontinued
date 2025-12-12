@@ -5,6 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -61,28 +62,28 @@ public class RopeItem extends Item {
         Player player = ctx.getPlayer();
         ItemStack heldItem = ctx.getItemInHand();
 
-        if (level instanceof ServerLevel serverLevel && player != null) {
+        if (level instanceof ServerLevel serverLevel && player instanceof ServerPlayer serverPlayer) {
             if (!isFoil(heldItem)) {
-                return firstSelect(serverLevel, clickedPos, player, ctx.getHand(), heldItem);
+                return firstSelect(serverLevel, clickedPos, serverPlayer, ctx.getHand(), heldItem);
             } else {
-                return secondSelect(serverLevel, clickedPos, player, ctx.getHand(), heldItem);
+                return secondSelect(serverLevel, clickedPos, serverPlayer, ctx.getHand(), heldItem);
             }
         }
 
         else return InteractionResult.PASS;
     }
 
-    public InteractionResult firstSelect(ServerLevel serverLevel, BlockPos firstClickedPos, Player player, InteractionHand hand, ItemStack heldItem) {
+    public InteractionResult firstSelect(ServerLevel serverLevel, BlockPos firstClickedPos, ServerPlayer player, InteractionHand hand, ItemStack heldItem) {
         ConnectionType type = ConnectionType.NORMAL;
         if (player.isShiftKeyDown()) {
             if (serverLevel.getBlockEntity(firstClickedPos) instanceof PhysPulleyBlockEntity pulleyBE) {
                 if (!pulleyBE.acceptsInv()) {
                     resetWithMessage(heldItem, player, "pulley_not_accepting");
-                    NetworkManager.sendOutline(firstClickedPos, ClientRopeUtil.Colors.RED);
+                    NetworkManager.sendOutlineToPlayer(player, firstClickedPos, ClientRopeUtil.Colors.RED);
                     return InteractionResult.FAIL;
                 }
                 resetWithMessage(heldItem, player, "pulley_inserted");
-                NetworkManager.sendOutline(firstClickedPos, ClientRopeUtil.Colors.YELLOW);
+                NetworkManager.sendOutlineToPlayer(player, firstClickedPos, ClientRopeUtil.Colors.YELLOW);
                 return pulleyBE.useRopeItem(serverLevel, firstClickedPos, player, hand);
             }
             return InteractionResult.PASS;
@@ -93,7 +94,7 @@ public class RopeItem extends Item {
         if (serverLevel.getBlockEntity(firstClickedPos) instanceof PhysPulleyBlockEntity pulleyBE) {
             if (!pulleyBE.acceptsManual()) {
                 resetWithMessage(heldItem, player, "pulley_not_manual");
-                NetworkManager.sendOutline(firstClickedPos, ClientRopeUtil.Colors.RED);
+                NetworkManager.sendOutlineToPlayer(player, firstClickedPos, ClientRopeUtil.Colors.RED);
                 return InteractionResult.FAIL;
             }
             type = ConnectionType.PULLEY;
@@ -108,25 +109,27 @@ public class RopeItem extends Item {
         compoundTag.putLong("shipId", shipId);
         compoundTag.putString("dimension", serverLevel.dimension().location().toString());
         compoundTag.putString("type", type.name());
+        System.out.println(compoundTag);
         sendRopeMessage(player, msg);
-        RopeBreakHandler.addRopeItemTo(heldItem);
-        NetworkManager.sendOutline(firstClickedPos, ClientRopeUtil.Colors.GREEN);
+        //RopeBreakHandler.addRopeItemTo(heldItem);
+        NetworkManager.sendOutlineToPlayer(player, firstClickedPos, ClientRopeUtil.Colors.GREEN);
         return InteractionResult.SUCCESS;
     }
 
-    public InteractionResult secondSelect(ServerLevel serverLevel, BlockPos secondClickedPos, Player player, InteractionHand hand, ItemStack heldItem) {
+    public InteractionResult secondSelect(ServerLevel serverLevel, BlockPos secondClickedPos, ServerPlayer player, InteractionHand hand, ItemStack heldItem) {
         if (!isFoil(heldItem)) {
             VStuff.LOGGER.warn("[RopeItem] secondSelect should not be called when there is no tag!");
             reset(heldItem);
             return InteractionResult.FAIL;
         }
         if (player.isShiftKeyDown()) {
-            NetworkManager.sendOutline(secondClickedPos, ClientRopeUtil.Colors.GREEN);
+            NetworkManager.sendOutlineToPlayer(player, secondClickedPos, ClientRopeUtil.Colors.GREEN);
             resetWithMessage(heldItem, player, "rope_reset");
             return InteractionResult.SUCCESS;
         }
 
-        CompoundTag tag = heldItem.getTag();
+        CompoundTag tag = heldItem.getTag().getCompound("connectsFrom");
+        System.out.println(tag);
         ConnectionType type = ConnectionType.valueOf(tag.getString("type"));
 
         Long id = RopeUtils.getShipIdAtPos(serverLevel, secondClickedPos);
@@ -134,20 +137,20 @@ public class RopeItem extends Item {
 
         if (!tag.getString("dimension").equals(serverLevel.dimension().location().toString())) {
             resetWithMessage(heldItem, player, "rope_dimensional_fail");
-            NetworkManager.sendOutline(secondClickedPos, ClientRopeUtil.Colors.RED);
+            NetworkManager.sendOutlineToPlayer(player, secondClickedPos, ClientRopeUtil.Colors.RED);
             return InteractionResult.PASS;
         }
 
         if (!RopeUtils.allowedRopeLength(serverLevel, NbtUtils.readBlockPos(tag.getCompound("pos")), secondClickedPos, tag.getLong("shipId"), shipId)) {
             resetWithMessage(heldItem, player, "rope_too_long");
-            NetworkManager.sendOutline(secondClickedPos, ClientRopeUtil.Colors.RED);
+            NetworkManager.sendOutlineToPlayer(player, secondClickedPos, ClientRopeUtil.Colors.RED);
             return InteractionResult.PASS;
         }
 
         if (type == ConnectionType.PULLEY) {
             if (serverLevel.getBlockEntity(secondClickedPos) instanceof PulleyAnchorBlockEntity pulleyAnchorBE) {
                 if (tag.getLong("shipId") == shipId) {
-                    NetworkManager.sendOutline(secondClickedPos, ClientRopeUtil.Colors.RED);
+                    NetworkManager.sendOutlineToPlayer(player, secondClickedPos, ClientRopeUtil.Colors.RED);
                     resetWithMessage(heldItem, player, "pulley_body_fail");
                     return InteractionResult.PASS;
                 }
@@ -158,11 +161,11 @@ public class RopeItem extends Item {
                 MasterOfRopes.ADD(serverLevel, pulleyRope);
                 pulleyBE.attachRopeAndAnchor(pulleyRope, pulleyAnchorBE);
                 resetWithMessage(heldItem, player, "pulley_attached");
-                NetworkManager.sendOutline(secondClickedPos, ClientRopeUtil.Colors.GREEN);
+                NetworkManager.sendOutlineToPlayer(player, secondClickedPos, ClientRopeUtil.Colors.GREEN);
                 return InteractionResult.SUCCESS;
             } else {
                 resetWithMessage(heldItem, player, "anchor_fail");
-                NetworkManager.sendOutline(secondClickedPos, ClientRopeUtil.Colors.RED);
+                NetworkManager.sendOutlineToPlayer(player, secondClickedPos, ClientRopeUtil.Colors.RED);
                 return InteractionResult.PASS;
             }
         } else {
@@ -172,18 +175,18 @@ public class RopeItem extends Item {
                             NbtUtils.readBlockPos(tag.getCompound("pos")),
                             secondClickedPos, tag.getLong("shipId"), shipId);
                     MasterOfRopes.ADD(serverLevel, jointlessRope);
-                    NetworkManager.sendOutline(secondClickedPos, ClientRopeUtil.Colors.GREEN);
+                    NetworkManager.sendOutlineToPlayer(player, secondClickedPos, ClientRopeUtil.Colors.GREEN);
                     return InteractionResult.SUCCESS;
                 }
                 Rope rope = Rope.create(serverLevel, player,
                         NbtUtils.readBlockPos(tag.getCompound("pos")),
                         secondClickedPos, tag.getLong("shipId"), shipId);
                 MasterOfRopes.ADD(serverLevel, rope);
-                NetworkManager.sendOutline(secondClickedPos, ClientRopeUtil.Colors.GREEN);
+                NetworkManager.sendOutlineToPlayer(player, secondClickedPos, ClientRopeUtil.Colors.GREEN);
                 return InteractionResult.SUCCESS;
             } else {
                 resetWithMessage(heldItem, player, "rope_invalid");
-                NetworkManager.sendOutline(secondClickedPos, ClientRopeUtil.Colors.RED);
+                NetworkManager.sendOutlineToPlayer(player, secondClickedPos, ClientRopeUtil.Colors.RED);
                 return InteractionResult.PASS;
             }
         }
@@ -206,6 +209,7 @@ public class RopeItem extends Item {
 
 
     public void reset(ItemStack heldItem) {
+        System.out.println("resetting rope");
         RopeBreakHandler.removeRopeItem(NbtUtils.readBlockPos(heldItem.getTag().getCompound("pos")));
         heldItem.setTag(null);
     }

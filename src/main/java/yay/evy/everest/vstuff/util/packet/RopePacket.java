@@ -25,7 +25,9 @@ public class RopePacket {
     }
 
     public RopePacket() {
-        this(Action.CLEAR_ALL, null);
+        this.action = Action.CLEAR_ALL;
+        this.constraintId = null;
+        this.rope = null;
     }
 
     public static RopePacket decode(FriendlyByteBuf buf) {

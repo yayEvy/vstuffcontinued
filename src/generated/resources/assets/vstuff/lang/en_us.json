@@ -4,7 +4,7 @@
   "block.vstuff.rotational_thruster": "Rotational Thruster",
   "item.vstuff.empty_energy_core": "Empty Energy Core",
   "item.vstuff.energy_core": "Energy Core",
-  "item.vstuff.lead_break_item": "Lead Break Item",
-  "item.vstuff.lead_constraint_item": "Lead Constraint Item",
-  "item.vstuff.phys_grabber": "Phys Grabber"
+  "item.vstuff.phys_grabber": "Phys Grabber",
+  "item.vstuff.rope": "Rope",
+  "item.vstuff.rope_cutter": "Rope Cutter"
 }

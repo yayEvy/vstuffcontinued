@@ -11,6 +11,7 @@ import org.valkyrienskies.core.internal.world.VsiServerShipWorld;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
 import yay.evy.everest.vstuff.util.GetterUtils;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
@@ -18,12 +19,9 @@ import static yay.evy.everest.vstuff.content.constraint.ropes.RopeUtils.*;
 
 public class Rope extends AbstractRope {
 
-    public RopeUtils.RopeType type = RopeUtils.RopeType.NORMAL;
-
-    public Rope(ServerLevel level, Integer ropeId, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1) {
-        super(level, ropeId, ship0, ship1, RopeUtils.getLocalPosition(blockPos0), RopeUtils.getLocalPosition(blockPos1));
-        this.blockPos0 = blockPos0;
-        this.blockPos1 = blockPos1;
+    public Rope(ServerLevel level, Integer ropeId, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1, RopeStyles.RopeStyle style) {
+        super(level, ropeId, ship0, ship1, blockPos0, blockPos1, style);
+        this.type = RopeType.NORMAL;
     }
 
     private Rope(Integer ropeId, Long ship0, Long ship1, boolean ship0IsGround, boolean ship1IsGround,
@@ -35,7 +33,7 @@ public class Rope extends AbstractRope {
     }
 
     public static Rope create(ServerLevel level, Player player, BlockPos firstPos, BlockPos secondPos, Long firstShip, Long secondShip) {
-        return new Rope(level, -1, firstShip, secondShip, firstPos, secondPos); // -1 is a temp id
+        return new Rope(level, RopeUtils.createTempId(), firstShip, secondShip, firstPos, secondPos, RopeStyleHandlerServer.getStyle(player.getUUID()));
     }
 
     @Override
@@ -77,13 +75,24 @@ public class Rope extends AbstractRope {
     }
 
     @Override
-    public boolean editJoint(ServerLevel level) {
-        return false;
-    }
-
-    @Override
     public boolean removeJoint(ServerLevel level) {
-        return false;
+        if (constraint == null) {
+            VStuff.LOGGER.warn("Cannot remove an already null constraint");
+            return false;
+        }
+
+        try {
+            GameToPhysicsAdapter gtpa = GetterUtils.getGTPA(level);
+
+            gtpa.removeJoint(ID);
+
+            this.constraint = null;
+            this.ID = RopeUtils.createTempId();
+            return true;
+        } catch (Exception e) {
+            VStuff.LOGGER.error("Error removing joint for id {}: {}", ID, e.getMessage());
+            return false;
+        }
     }
 
     @Override

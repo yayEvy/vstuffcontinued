@@ -39,7 +39,7 @@ public class ColorHaggler {
 
                             if (ropeIsColorable(serverLevel, player)) {
 
-                                AbstractRope rope = MasterOfRopes.getAllActiveRopes().get(targetConstraintId);
+                                AbstractRope rope = MasterOfRopes.GET(targetConstraintId);
                                 RopePersistenceYesItWorksNowIPromise3dsmile ropePersistence = RopePersistenceYesItWorksNowIPromise3dsmile.get(serverLevel);
 
                                 rope.style = getDyedStyle(item.toString(), getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(serverLevel, player));
@@ -65,14 +65,14 @@ public class ColorHaggler {
     }
 
     private boolean ropeIsColorable(ServerLevel serverLevel, Player player){
-        return getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(serverLevel, player).toString().equals("DYE")
-                || getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(serverLevel, player).toString().equals("WOOL");
+        String styleStr = getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(serverLevel, player).toString();
+        return styleStr.equals("DYE") || styleStr.equals("WOOL");
     }
 
     private RopeStyles.PrimitiveRopeStyle getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(ServerLevel level, Player player) {
         Integer targetConstraintId = RopeUtils.findRope(level, player);
 
-        AbstractRope wizardsWorstKeptSecret = MasterOfRopes.getAllActiveRopes().get(targetConstraintId);
+        AbstractRope wizardsWorstKeptSecret = MasterOfRopes.GET(targetConstraintId);
 
         return wizardsWorstKeptSecret.style.getBasicStyle();
     }

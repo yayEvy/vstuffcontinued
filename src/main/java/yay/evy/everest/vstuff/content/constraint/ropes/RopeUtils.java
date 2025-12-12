@@ -19,6 +19,7 @@ import yay.evy.everest.vstuff.content.constraint.MasterOfRopes;
 import yay.evy.everest.vstuff.util.GetterUtils;
 
 import java.util.Map;
+import java.util.UUID;
 
 public class RopeUtils {
 
@@ -242,7 +243,7 @@ public class RopeUtils {
                 case WORLDTOWORLD -> JointlessRope.fromTag(tag);
             };
         } catch (IllegalArgumentException ex) {
-            throw new IllegalArgumentException("Invalid rope type!");
+            throw new IllegalArgumentException("Invalid rope type " + type + "!");
         }
     }
 
@@ -252,6 +253,10 @@ public class RopeUtils {
             case PULLEY -> PulleyRope.fromBuf(buf);
             case WORLDTOWORLD -> JointlessRope.fromBuf(buf);
         };
+    }
+
+    public static Integer createTempId() {
+        return UUID.randomUUID().hashCode();
     }
 
     public enum RopeType {
