@@ -17,5 +17,6 @@ features as of v0.2.3
 PLANNED 0.3.0:
 - Rope Anchor
 - Rope Grappler
+- Rope Thrower (name TBD)
 
   
