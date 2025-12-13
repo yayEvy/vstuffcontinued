@@ -37,6 +37,7 @@
   "vstuff.ponder.phys_pulley.text_5": "The rope is now attached, and the pulley is ready to operate!",
   "vstuff.ponder.phys_pulley.title": "The Phys Pulley",
   "vstuff.ponder.phys_pulley.header": "Phys Pulley",
+  "vstuff.ponder.phys_pulley.text_rope": "Sneak and right-click the Phys Pulley with Rope to insert it.",
 
   "vstuff.ponder.rotational_thruster.text_1": "This is the Rotational Thruster!",
   "vstuff.ponder.rotational_thruster.text_2": "By giving it rotational force...",
