@@ -5,8 +5,11 @@
   "item.vstuff.lead_break_item.tooltip": "Look at a rope and right-click to cut it.",
   "item.vstuff.phys_grabber": "Phys Grabber",
   "item.vstuff.phys_grabber.tooltip": "A method of dragging ships around!.",
+  "block.vstuff.pulley_anchor": "Pulley Anchor",
   "item.vstuff.empty_energy_core": "Empty Energy Core",
   "item.vstuff.energy_core": "Energy Core",
+  "item.vstuff.rope_thrower": "Rope Thrower",
+  "item.vstuff.rope_thrower.tooltip": "Creates a rope by throwing it, then attatching it to the block below you",
 
   "block.vstuff.phys_pulley": "Phys Pulley",
   "block.vstuff.rotational_thruster": "Rotational Thruster",
@@ -50,6 +53,9 @@
   "vstuff.lead_constraint_item.tooltip.condition2": "When Used on any block while Sneaking",
   "vstuff.lead_constraint_item.tooltip.behavior2": "_Resets_ the selected position.",
 
+  "vstuff.rope_thrower.tooltip.summary": "A _Throwable_ rope! Press the _Open Rope Styler_ key (default _ALT_) to change the rope texture.",
+  "vstuff.rope_thrower.tooltip.condition1": "When Thrown",
+  "vstuff.rope_thrower.tooltip.behavior1": "Creates a rope between the block you stand on and the block you hit.",
 
   "vstuff.lead_break_item.tooltip.summary": "Cuts the rope you are looking at.",
   "vstuff.phys_grabber.tooltip.summary": "A method of dragging ships around!",
