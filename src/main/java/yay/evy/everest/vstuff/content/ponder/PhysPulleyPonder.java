@@ -20,27 +20,53 @@ public class PhysPulleyPonder {
         scene.scaleSceneView(0.7f);
         scene.setSceneOffsetY(-1);
 
-
-        // whatd yal have for breakfast, cuz i had bricks
         Selection all = util.select().fromTo(0, 0, 0, 4, 6, 4);
         scene.world().showSection(all, Direction.DOWN);
-        scene.idle(20);
+        scene.idle(10);
 
-        BlockPos pulleyPos = util.grid().at(2, 6, 3);
+        BlockPos pulleyPos = util.grid().at(3, 6, 2);
+        BlockPos anchorPos = util.grid().at(2, 2, 2);
 
-        scene.overlay().showText(90)
+
+        scene.overlay().showText(30)
                 .text("vstuff.ponder.phys_pulley.text_rope")
+                .pointAt(util.vector().centerOf(pulleyPos))
                 .placeNearTarget();
 
         scene.overlay().showControls(
                         util.vector().topOf(pulleyPos),
                         Pointing.DOWN,
-                        60
-                ).withItem(new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get()))
-                .rightClick()
-                .whileSneaking();
+                        40
+                )
+                .withItem(new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get()))
+                .rightClick();
 
-        scene.idle(120);
+        scene.idle(30);
+
+
+        scene.overlay().showOutline(
+                PonderPalette.GREEN,
+                "anchor",
+                util.select().position(anchorPos),
+                50
+        );
+
+        scene.overlay().showText(30)
+                .text("vstuff.ponder.phys_pulley.text_anchor")
+                .pointAt(util.vector().topOf(anchorPos))
+                .placeNearTarget();
+
+        scene.idle(10);
+
+        scene.overlay().showControls(
+                        util.vector().topOf(anchorPos),
+                        Pointing.DOWN,
+                        40
+                )
+                .withItem(new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get()))
+                .rightClick();
+
+        scene.idle(30);
         scene.markAsFinished();
     }
 

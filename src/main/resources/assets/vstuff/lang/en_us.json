@@ -33,14 +33,14 @@
   "vstuff.message.rope_break": "§aRope broken!",
   "vstuff.message.chain_break": "§aChain broken!",
 
-  "vstuff.ponder.phys_pulley.text_1": "The Phys Pulley can lift and lower objects, but first it needs a rope.",
-  "vstuff.ponder.phys_pulley.text_2": "The amount of rope you provide determines the pulley's maximum length.",
+
   "vstuff.ponder.phys_pulley.text_3": "First, shift-right-click the pulley to start defining the rope's path.",
   "vstuff.ponder.phys_pulley.text_4": "Then, right-click another block to set the rope's anchor point and length.",
   "vstuff.ponder.phys_pulley.text_5": "The rope is now attached, and the pulley is ready to operate!",
   "vstuff.ponder.phys_pulley.title": "The Phys Pulley",
   "vstuff.ponder.phys_pulley.header": "Phys Pulley",
-  "vstuff.ponder.phys_pulley.text_rope": "Sneak and right-click the Phys Pulley with Rope to insert it.",
+  "vstuff.ponder.phys_pulley.text_1": "Right click your first position with the rope, as normal",
+  "vstuff.ponder.phys_pulley.text_2": "Right click an Anchor (as the second position) to connect the Rope",
 
   "vstuff.ponder.rotational_thruster.text_1": "This is the Rotational Thruster!",
   "vstuff.ponder.rotational_thruster.text_2": "By giving it rotational force...",
