@@ -41,6 +41,7 @@ public class VstuffConfig {
         serverBuilder.push("rope");
         MAX_ROPE_LENGTH = serverBuilder.define("max_rope_length", 200.0);
         ROPE_ONLY_FULL_BLOCKS = serverBuilder.define("ropeOnlyFullBlocks", true);
+        ROPE_SOUNDS = serverBuilder.define("ropeSounds", true);
         serverBuilder.pop();
 
         serverBuilder.push("pulley");
@@ -60,7 +61,6 @@ public class VstuffConfig {
 
         clientBuilder.push("rope_client");
         ROPE_THICKNESS = clientBuilder.defineInRange("thickness", 0.28, 0.01, 1.0);
-        ROPE_SOUNDS = clientBuilder.define("ropeSounds", true);
         clientBuilder.pop();
 
         CLIENT_CONFIG = clientBuilder.build();

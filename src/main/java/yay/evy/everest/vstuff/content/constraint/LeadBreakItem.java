@@ -1,5 +1,6 @@
 package yay.evy.everest.vstuff.content.constraint;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -31,13 +32,12 @@ public class LeadBreakItem extends Item {
                 try {
                     Rope data = ConstraintTracker.getActiveRopes().get(targetConstraintId);
 
-                    data.removeJoint(serverLevel);
+                    if (data == null) {
+                        return InteractionResultHolder.pass(itemStack);
+                    }
 
-                    forceRemoveConstraint(serverLevel, targetConstraintId);
-
-                    RopeStyles.PrimitiveRopeStyle style = (data != null)
-                            ? data.style.getBasicStyle()
-                            : RopeStyles.PrimitiveRopeStyle.NORMAL;
+                    RopeStyles.PrimitiveRopeStyle style = data.style.getBasicStyle();
+                    BlockPos soundPos = data.sourceBlockPos;
 
                     Component notif = style == RopeStyles.PrimitiveRopeStyle.CHAIN
                             ? Component.translatable("vstuff.message.chain_break")
@@ -60,15 +60,11 @@ public class LeadBreakItem extends Item {
                         );
                     }
 
-                    if (data != null && data.sourceBlockPos != null) {
-                        ConstraintTracker.cleanupOrphanedConstraints(serverLevel, data.sourceBlockPos);
-                    }
+                    data.removeJoint(serverLevel);
+                    forceRemoveConstraint(serverLevel, targetConstraintId);
 
-                    if (ConstraintTracker.getActiveRopes().containsKey(targetConstraintId)) {
-                        data.removeJoint(serverLevel);
-                        forceRemoveConstraint(serverLevel, targetConstraintId);
-                        ConstraintPersistence persistence = ConstraintPersistence.get(serverLevel);
-                        persistence.saveNow(serverLevel);
+                    if (soundPos != null) {
+                        ConstraintTracker.cleanupOrphanedConstraints(serverLevel, soundPos);
                     }
 
                     if (!player.isCreative()) {
@@ -84,7 +80,6 @@ public class LeadBreakItem extends Item {
         }
         return InteractionResultHolder.pass(itemStack);
     }
-
     private void forceRemoveConstraint(ServerLevel level, int id) {
         try {
             var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(ValkyrienSkies.getDimensionId(level));

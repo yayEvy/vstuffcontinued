@@ -60,14 +60,20 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
 
                 BlockPos firstPos = result.getBlockPos();
                 BlockPos secondPos;
+                boolean playSound = false; // Flag to control sound
 
                 if (entity instanceof Player player) {  // ^^^
                     if (isDispenserShot && ownerBlockPos != null) {   // all of this is for the rope making, mostly stuff i stole from the rope item (I am evil muahahahahahahhahah)
                         secondPos = ownerBlockPos;
+                        playSound = true;
                     } else if (player instanceof net.minecraftforge.common.util.FakePlayer) {
                         secondPos = player.blockPosition();
+                        playSound = true;
                     } else {
                         secondPos = player.getOnPos();
+                        if (isDispenserShot || !level().getBlockState(secondPos).isAir()) {
+                            playSound = true;
+                        }
                     }
 
                     if (isDispenserShot || !level().getBlockState(secondPos).isAir()) { // checks to make sure you arent flying because it looks wrong and evil when you dont check for it
@@ -83,18 +89,22 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
                                 secondShipId,
                                 player
                         );
+                    } else {
+                        // If rope creation fails due to not being on a block (i.e., flying), do not play sound.
+                        playSound = false;
                     }
                 }
 
-                serverLevel.playSound(
-                        null,
-                        firstPos,
-
-                        net.minecraft.sounds.SoundEvents.LEASH_KNOT_PLACE,
-                        net.minecraft.sounds.SoundSource.PLAYERS,
-                        1.0F,
-                        1.0F
-                );
+                if (playSound) {
+                    serverLevel.playSound(
+                            null,
+                            firstPos,
+                            net.minecraft.sounds.SoundEvents.LEASH_KNOT_PLACE,
+                            net.minecraft.sounds.SoundSource.PLAYERS,
+                            1.0F,
+                            1.0F
+                    );
+                }
 
                 this.discard();  // Discord??????????
             }
