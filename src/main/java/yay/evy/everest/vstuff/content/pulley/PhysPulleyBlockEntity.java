@@ -162,19 +162,21 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
     @Override
     public void physTick(@Nullable PhysShip physShip, @NotNull PhysLevel physLevel) {
-        System.out.println("phystick");
-        if (!(level instanceof ServerLevel serverLevel)) {
-            return;
-        }
+        if (!(level instanceof ServerLevel serverLevel)) return;
+        if (!isExtended || attachedRope == null) return;
 
-        if (isExtended && getSpeed() != 0f) {
-            if (attachedRope.maxLength > minRopeLength) {
-                float changeSpeed = 0.0005f;
-                attachedRope.setJointLength(serverLevel, Math.max(changeSpeed * getSpeed(), minRopeLength));
-            }
-            currentRopeLength = attachedRope.maxLength;
-        }
+        float speed = getSpeed();
+        if (speed == 0) return;
+
+        float ropeDelta = speed * 0.0005f;
+
+        float newLength = (float) attachedRope.maxLength + ropeDelta;
+        newLength = Math.max(newLength, minRopeLength);
+
+        attachedRope.setJointLength(serverLevel, newLength);
+        currentRopeLength = newLength;
     }
+
 
     @Override
     public void setDimension(@NotNull String s) {
