@@ -4,7 +4,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Vector3d;
+import org.joml.Vector3f;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
@@ -72,7 +74,8 @@ public class RopeUtil {
     }
 
     public static Vector3d getLocalPositionFixed(ServerLevel level, BlockPos pos, Long clickedShipId, Long targetShipId) {
-        Vector3d blockPos = new Vector3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+        VoxelShape shape = level.getBlockState(pos).getShape(level, pos);
+        Vector3d blockPos = new Vector3d(shape.bounds().getCenter().add(Vec3.atLowerCornerOf(pos)).toVector3f());
 
         if (clickedShipId != null && clickedShipId.equals(targetShipId)) {
             return blockPos;
