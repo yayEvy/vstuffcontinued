@@ -121,21 +121,23 @@ public class LeadConstraintItem extends Item {
 
             if (ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS) {
 
+                boolean isChain =
+                        RopeStyleHandlerServer.getStyle(player.getUUID())
+                                        .getBasicStyle() == RopeStyles.PrimitiveRopeStyle.CHAIN;
+
                 serverLevel.playSound(
                         null,
                         clickedPos,
-                        net.minecraft.sounds.SoundEvents.LEASH_KNOT_PLACE,
+                        isChain
+                                ? net.minecraft.sounds.SoundEvents.CHAIN_PLACE
+                                : net.minecraft.sounds.SoundEvents.LEASH_KNOT_PLACE,
                         net.minecraft.sounds.SoundSource.PLAYERS,
                         1.0F,
                         1.0F
                 );
 
+                resetStateWithMessage(player, isChain ? "chain_created" : "rope_created");
 
-                if (RopeStyleHandlerServer.getStyle(player.getUUID()).getBasicStyle() == RopeStyles.PrimitiveRopeStyle.CHAIN) {
-                    resetStateWithMessage(player, "chain_created");
-                } else {
-                    resetStateWithMessage(player, "rope_created");
-                }
             }
 
             return ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS ? InteractionResult.SUCCESS : InteractionResult.FAIL;

@@ -234,8 +234,8 @@ public class Rope {
                     constraint.getMinDistance(),
                     newLength,
                     constraint.getTolerance(),
-                    constraint.getStiffness(),
-                    constraint.getDamping()
+                    1e10f,
+                    1000f
             );
 
             gtpa.updateJoint(new VSJointAndId(ID, newConstraint));
