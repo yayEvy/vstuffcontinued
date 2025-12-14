@@ -74,8 +74,7 @@ public class RopeUtil {
     }
 
     public static Vector3d getLocalPositionFixed(ServerLevel level, BlockPos pos, Long clickedShipId, Long targetShipId) {
-        VoxelShape shape = level.getBlockState(pos).getShape(level, pos);
-        Vector3d blockPos = new Vector3d(shape.bounds().getCenter().add(Vec3.atLowerCornerOf(pos)).toVector3f());
+        Vector3d blockPos = new Vector3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
 
         if (clickedShipId != null && clickedShipId.equals(targetShipId)) {
             return blockPos;
