@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "LLL",
+    "LIL",
+    "LLL"
+  ],
+  "key": {
+    "L": {
+      "item": "vstuff:lead_constraint_item"
+    },
+    "I": {
+      "item": "minecraft:iron_pickaxe"
+    }
+  },
+  "result": {
+    "item": "vstuff:rope_thrower",
+    "count": 8
+  }
+}

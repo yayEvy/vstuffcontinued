@@ -73,7 +73,7 @@ public class VStuffItems {
     public static final ItemEntry<RopeThrowerItem> ROPE_THROWER_ITEM =
             REGISTRATE.item("rope_thrower", RopeThrowerItem::new)
                     .properties(p -> p
-                    .stacksTo(1))
+                    .stacksTo(64))
                     .defaultModel()
                     .register();
 
