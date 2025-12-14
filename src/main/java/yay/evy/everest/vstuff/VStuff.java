@@ -31,9 +31,12 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 import org.valkyrienskies.core.api.attachment.AttachmentRegistration;
+import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.api.VsApi;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.client.VStuffClient;
+import yay.evy.everest.vstuff.content.constraint.RopeConnectionType;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberServerAttachment;
 import yay.evy.everest.vstuff.content.ropethrower.RopeThrowerEntity;
 import yay.evy.everest.vstuff.content.thrust.ThrusterForceAttachment;
@@ -115,44 +118,60 @@ public class VStuff {
 
 
     public static void registerDispenserBehaviors() {
-        DispenserBlock.registerBehavior(VStuffItems.ROPE_THROWER_ITEM.get(), new AbstractProjectileDispenseBehavior() {
-            @Override
-            public ItemStack execute(BlockSource source, ItemStack stack) {
-                Level level = source.getLevel();
-                if (!(level instanceof ServerLevel serverLevel)) return stack;
+        DispenserBlock.registerBehavior(
+                VStuffItems.ROPE_THROWER_ITEM.get(),
+                new AbstractProjectileDispenseBehavior() {
 
-                BlockPos dispenserPos = source.getPos();
+                    @Override
+                    public ItemStack execute(BlockSource source, ItemStack stack) {
+                        Level level = source.getLevel();
+                        if (!(level instanceof ServerLevel serverLevel)) {
+                            return stack;
+                        }
 
-                Direction direction = source.getBlockState().getValue(DispenserBlock.FACING);
-                Position position = DispenserBlock.getDispensePosition(source);
+                        BlockPos dispenserPos = source.getPos();
+                        Direction direction = source.getBlockState().getValue(DispenserBlock.FACING);
 
-                RopeThrowerEntity rope = new RopeThrowerEntity(serverLevel);
-                rope.setPos(position.x(), position.y(), position.z());
+                        BlockPos startPos = dispenserPos;
+                        Long startShipId = getShipIdAtPos(serverLevel, startPos);
 
-                rope.setOwnerBlockPos(dispenserPos);
-                rope.setDispenserShot(true);
+                        Position dispensePos = DispenserBlock.getDispensePosition(source);
 
-                net.minecraftforge.common.util.FakePlayer fakePlayer =
-                        net.minecraftforge.common.util.FakePlayerFactory.get(
-                                serverLevel,
-                                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "RopeDispenser")
+                        RopeThrowerEntity rope = new RopeThrowerEntity(serverLevel);
+                        rope.setPos(dispensePos.x(), dispensePos.y(), dispensePos.z());
+
+                        rope.setStartData(
+                                startPos,
+                                startShipId,
+                                serverLevel.dimension(),
+                                RopeConnectionType.NORMAL,
+                                null
                         );
-                fakePlayer.setPos(dispenserPos.getX(), dispenserPos.getY(), dispenserPos.getZ());
-                rope.setOwner(fakePlayer);
 
-                rope.shoot(direction.getStepX(), direction.getStepY(), direction.getStepZ(), 1.1F, 6.0F);
+                        rope.shoot(
+                                direction.getStepX(),
+                                direction.getStepY(),
+                                direction.getStepZ(),
+                                1.1F,
+                                6.0F
+                        );
 
-                serverLevel.addFreshEntity(rope);
-                stack.shrink(1);
+                        serverLevel.addFreshEntity(rope);
+                        stack.shrink(1);
+                        return stack;
+                    }
 
-                return stack;
-            }
+                    @Override
+                    protected Projectile getProjectile(Level level, Position position, ItemStack stack) {
+                        return null;
+                    }
 
-            @Override
-            protected Projectile getProjectile(Level level, Position position, ItemStack stack) {
-                return null;
-            }
-        });
+                    private Long getShipIdAtPos(ServerLevel level, BlockPos pos) {
+                        LoadedShip ship = VSGameUtilsKt.getLoadedShipManagingPos(level, pos);
+                        return ship != null ? ship.getId() : null;
+                    }
+                }
+        );
     }
 
 

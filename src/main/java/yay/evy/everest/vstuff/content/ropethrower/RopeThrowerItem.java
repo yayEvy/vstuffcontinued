@@ -17,6 +17,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import yay.evy.everest.vstuff.client.ClientRopeUtil;
 import yay.evy.everest.vstuff.content.constraint.RopeConnectionType;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.index.VStuffItems;
@@ -42,12 +43,23 @@ public class RopeThrowerItem extends Item {
         ItemStack stack = player.getItemInHand(hand);
 
         if (level.isClientSide) {
+            BlockHitResult hit = Item.getPlayerPOVHitResult(
+                    level,
+                    player,
+                    net.minecraft.world.level.ClipContext.Fluid.NONE
+            );
+
+            if (hit.getType() == net.minecraft.world.phys.HitResult.Type.BLOCK) {
+                ClientRopeUtil.drawOutline(level, hit.getBlockPos());
+            }
+
             return InteractionResultHolder.success(stack);
         }
 
         if (!(level instanceof ServerLevel serverLevel)) {
             return InteractionResultHolder.pass(stack);
         }
+
 
         if (!hasFirst) {
 
