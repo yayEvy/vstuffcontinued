@@ -20,6 +20,7 @@ import java.util.function.Function;
 
 import net.minecraftforge.registries.ForgeRegistries;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.index.VStuffBlocks;
 import yay.evy.everest.vstuff.index.VStuffItems;
 
 @Mod.EventBusSubscriber(modid = VStuff.MOD_ID, value = Dist.CLIENT)
@@ -78,6 +79,9 @@ public class TooltipHandler {
                 (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
 
         tooltipModifications.put(VStuffItems.ROPE_THROWER_ITEM.get(),
+                (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
+
+        tooltipModifications.put(VStuffBlocks.PULLEY_ANCHOR.asItem(),
                 (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
     }
 
