@@ -1,5 +1,9 @@
 package yay.evy.everest.vstuff.content.ropethrower;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -10,34 +14,138 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import org.valkyrienskies.core.api.ships.LoadedShip;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import yay.evy.everest.vstuff.content.constraint.RopeConnectionType;
+import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
+import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.index.VStuffSounds;
 
 import static net.minecraft.world.level.block.entity.BeaconBlockEntity.playSound;
 
 public class RopeThrowerItem extends Item {
-    public RopeThrowerItem(Properties pProperties) {
-        super(pProperties);
+
+    private BlockPos firstClickedPos;
+    private Long firstShipId;
+    private ResourceKey<Level> firstClickDimension;
+    private boolean hasFirst = false;
+    private RopeConnectionType connectionType;
+    private PhysPulleyBlockEntity waitingPulley;
+
+    public RopeThrowerItem(Properties properties) {
+        super(properties);
     }
 
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) { //Use (it uses)
-        ItemStack itemStack = player.getItemInHand(hand); //gets item
-        level.playSound((Player) null, player.getX(), player.getY(), player.getZ(),
-                VStuffSounds.ROPE_THROW.get(), SoundSource.NEUTRAL, 1F, 1F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
 
-        if (!level.isClientSide) {
-            RopeThrowerEntity ropeThrower = new RopeThrowerEntity(level,player);
-            ropeThrower.setItem(itemStack);
-            ropeThrower.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 1.5F, 1.0F);
-            level.addFreshEntity(ropeThrower);
-
+        if (level.isClientSide) {
+            return InteractionResultHolder.success(stack);
         }
-        player.awardStat(Stats.ITEM_USED.get(this));
+
+        if (!(level instanceof ServerLevel serverLevel)) {
+            return InteractionResultHolder.pass(stack);
+        }
+
+        if (!hasFirst) {
+
+            BlockHitResult hit = Item.getPlayerPOVHitResult(
+                    level,
+                    player,
+                    net.minecraft.world.level.ClipContext.Fluid.NONE
+            );
+
+            if (hit.getType() != net.minecraft.world.phys.HitResult.Type.BLOCK) {
+                player.displayClientMessage(
+                        Component.translatable("vstuff.message.rope_thrower_no_block"),
+                        true
+                );
+                return InteractionResultHolder.fail(stack);
+            }
+
+            BlockPos clickedPos = hit.getBlockPos().immutable();
+
+            firstClickedPos = clickedPos;
+            firstShipId = getShipIdAtPos(serverLevel, clickedPos);
+            firstClickDimension = serverLevel.dimension();
+
+            if (serverLevel.getBlockEntity(clickedPos) instanceof PhysPulleyBlockEntity pulley) {
+                if (!pulley.canAttachManualConstraint) {
+                    player.displayClientMessage(
+                            Component.translatable("vstuff.message.pulley_attach_fail"),
+                            true
+                    );
+                    resetState();
+                    return InteractionResultHolder.fail(stack);
+                }
+
+                pulley.setWaitingLeadConstraintItem(
+                        VStuffItems.LEAD_CONSTRAINT_ITEM.get()
+                );
+                waitingPulley = pulley;
+                connectionType = RopeConnectionType.PULLEY;
+
+                player.displayClientMessage(
+                        Component.translatable("vstuff.message.pulley_first"),
+                        true
+                );
+            } else {
+                connectionType = RopeConnectionType.NORMAL;
+                player.displayClientMessage(
+                        Component.translatable("vstuff.message.rope_first"),
+                        true
+                );
+            }
+
+            hasFirst = true;
+            return InteractionResultHolder.success(stack);
+        }
+
+        level.playSound(
+                null,
+                player.getX(), player.getY(), player.getZ(),
+                VStuffSounds.ROPE_THROW.get(),
+                SoundSource.NEUTRAL,
+                1.0F,
+                1.0F
+        );
+
+        RopeThrowerEntity entity = new RopeThrowerEntity(level, player);
+        entity.setItem(stack);
+        entity.setStartData(
+                firstClickedPos,
+                firstShipId,
+                firstClickDimension,
+                connectionType,
+                waitingPulley
+        );
+
+        entity.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 1.5F, 1.0F);
+        level.addFreshEntity(entity);
+
+        resetState();
+
         if (!player.getAbilities().instabuild) {
-            itemStack.shrink(1);
+            stack.shrink(1);
         }
 
-    return InteractionResultHolder.sidedSuccess(itemStack, level.isClientSide());
+        return InteractionResultHolder.success(stack);
     }
+
+    private void resetState() {
+        firstClickedPos = null;
+        firstShipId = null;
+        firstClickDimension = null;
+        hasFirst = false;
+    }
+
+    private Long getShipIdAtPos(ServerLevel level, BlockPos pos) {
+        LoadedShip ship = VSGameUtilsKt.getLoadedShipManagingPos(level, pos);
+        return ship != null ? ship.getId() : null;
+    }
+}
 
 /* sound time, and story time too!
 
@@ -58,4 +166,3 @@ public class RopeThrowerItem extends Item {
 
 
 
-}

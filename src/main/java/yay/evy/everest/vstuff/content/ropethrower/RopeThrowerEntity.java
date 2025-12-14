@@ -1,6 +1,7 @@
 package yay.evy.everest.vstuff.content.ropethrower;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
@@ -11,10 +12,14 @@ import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.network.ConnectionType;
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.content.constraint.Rope;
+import yay.evy.everest.vstuff.content.constraint.RopeConnectionType;
 import yay.evy.everest.vstuff.content.constraint.RopeUtil;
+import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
+import yay.evy.everest.vstuff.content.pulley.PulleyAnchorBlockEntity;
 import yay.evy.everest.vstuff.index.VStuffEntities;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.index.VStuffSounds;
@@ -37,6 +42,26 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
 
     }
 
+    private BlockPos startPos;
+    private Long startShipId;
+    private ResourceKey<Level> startDimension;
+    private RopeConnectionType connectionType;
+    private PhysPulleyBlockEntity waitingPulley;
+
+    public void setStartData(
+            BlockPos pos,
+            Long shipId,
+            ResourceKey<Level> dimension,
+            RopeConnectionType type,
+            PhysPulleyBlockEntity pulley
+    ) {
+        this.startPos = pos;
+        this.startShipId = shipId;
+        this.startDimension = dimension;
+        this.connectionType = type;
+        this.waitingPulley = pulley;
+    }
+
     public RopeThrowerEntity(Level level) {
         super(VStuffEntities.ROPE_THROWER.get(), level);
     }
@@ -53,63 +78,49 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
 
     @Override
     protected void onHitBlock(BlockHitResult result) {
-        if (!this.level().isClientSide()) { // Checks For Server
-            this.level().broadcastEntityEvent(this, ((byte) 3));   //IDFK
-            if (this.level() instanceof ServerLevel serverLevel) {  // I just wanted the server level :sob:
-                Entity entity = this.getOwner();      // gets the player from entity  (slavery? i thought we abolished that)
-
-                BlockPos firstPos = result.getBlockPos();
-                BlockPos secondPos;
-                boolean playSound = false; // Flag to control sound
-
-                if (entity instanceof Player player) {  // ^^^
-                    if (isDispenserShot && ownerBlockPos != null) {   // all of this is for the rope making, mostly stuff i stole from the rope item (I am evil muahahahahahahhahah)
-                        secondPos = ownerBlockPos;
-                        playSound = true;
-                    } else if (player instanceof net.minecraftforge.common.util.FakePlayer) {
-                        secondPos = player.blockPosition();
-                        playSound = true;
-                    } else {
-                        secondPos = player.getOnPos();
-                        if (isDispenserShot || !level().getBlockState(secondPos).isAir()) {
-                            playSound = true;
-                        }
-                    }
-
-                    if (isDispenserShot || !level().getBlockState(secondPos).isAir()) { // checks to make sure you arent flying because it looks wrong and evil when you dont check for it
-                        Long firstShipId = getShipIdAtPos(serverLevel, firstPos);
-                        Long secondShipId = getShipIdAtPos(serverLevel, secondPos);
-
-                        RopeUtil.RopeReturn ropeReturn = Rope.createNew(  // creates the rope, the rope constraint really just pulls from the LeadConstraintItem class because why reinvent the wheel amiright? ( I will see myself out)
-                                VStuffItems.LEAD_CONSTRAINT_ITEM.get(),
-                                serverLevel,
-                                firstPos,
-                                secondPos,
-                                firstShipId,
-                                secondShipId,
-                                player
-                        );
-                    } else {
-                        // If rope creation fails due to not being on a block (i.e., flying), do not play sound.
-                        playSound = false;
-                    }
-                }
-
-                if (playSound) {
-                    serverLevel.playSound(
-                            null,
-                            firstPos,
-                            net.minecraft.sounds.SoundEvents.LEASH_KNOT_PLACE,
-                            net.minecraft.sounds.SoundSource.PLAYERS,
-                            1.0F,
-                            1.0F
-                    );
-                }
-
-                this.discard();  // Discord??????????
-            }
-            super.onHitBlock(result);
+        if (!(level() instanceof ServerLevel serverLevel)) {
+            return;
         }
+
+        if (startPos == null || !serverLevel.dimension().equals(startDimension)) {
+            discard();
+            return;
+        }
+
+        BlockPos hitPos = result.getBlockPos().immutable();
+        Long secondShipId = getShipIdAtPos(serverLevel, hitPos);
+
+        RopeUtil.RopeReturn ropeReturn = Rope.createNew(
+                VStuffItems.LEAD_CONSTRAINT_ITEM.get(),
+                serverLevel,
+                startPos,
+                hitPos,
+                startShipId,
+                secondShipId,
+                getOwner() instanceof Player p ? p : null
+        );
+
+        if (ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS) {
+
+            if (connectionType == RopeConnectionType.PULLEY
+                    && waitingPulley != null
+                    && serverLevel.getBlockEntity(hitPos) instanceof PulleyAnchorBlockEntity anchor) {
+
+                waitingPulley.attachRopeAndAnchor(ropeReturn.rope(), anchor);
+            }
+
+
+            serverLevel.playSound(
+                    null,
+                    hitPos,
+                    net.minecraft.sounds.SoundEvents.LEASH_KNOT_PLACE,
+                    SoundSource.PLAYERS,
+                    1.0F,
+                    1.0F
+            );
+        }
+
+        discard();
     }
 
 
