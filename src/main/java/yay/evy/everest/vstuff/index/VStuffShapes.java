@@ -16,7 +16,7 @@ public class VStuffShapes {
 
     public static final VoxelShaper
 
-            ROTATIONAL_THRUSTER = shape(0, 4, 0, 16, 16, 16) // main
+        ROTATIONAL_THRUSTER = shape(0, 4, 0, 16, 16, 16) // main
             .add(0, 3, 0, 2, 4, 16) // front rim
             .add(14, 3, 0, 16, 4, 16) // front rim
             .add(4, 2, 4, 12, 4, 12) // nozzle (large layer)
@@ -28,15 +28,13 @@ public class VStuffShapes {
             .erase(2, 15, 0, 14, 16, 16) // back
             .forDirectional(), // i hate this so much.
 
-        PHYS_PULLEY = shape(0, 0, 0, 16, 16, 16) // main
-            .erase(15, 2, 2, 16, 14, 14) // side
-            .erase(0, 2, 2, 1, 14, 14) // side
-            .erase(3, 15, 0, 13, 16, 16)
-            .erase(3, 0, 0, 13, 1, 16)
-            .erase(3, 14, 0, 13, 15, 13)
-            .erase(3, 1, 0, 13, 2, 13)
-            .erase(3, 0, 0, 13, 16, 1) // top
-            .forDirectional();
+        PHYS_PULLEY = shape(3, 8, 1.25, 13, 14, 10.25) // main
+            .forDirectional(),
+
+        PULLEY_ANCHOR = shape(4,4,15,12,12,16)
+                .add(3,3,14,13,13,15)
+                .add(5,5,13,11,11,14)
+                .forDirectional();
 
 
     public static Builder shape(VoxelShape shape) {

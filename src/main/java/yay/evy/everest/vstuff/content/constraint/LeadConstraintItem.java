@@ -50,6 +50,7 @@ public class LeadConstraintItem extends Item {
                     return InteractionResult.FAIL;
                 } else if (!pulleyBE.canAttachManualConstraint) {
                     resetStateWithMessage(serverLevel, heldItem, player, "pulley_attach_fail");
+                    pulleyBE.resetSelf();
                     NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.RED);
                     return InteractionResult.FAIL;
 
@@ -103,6 +104,8 @@ public class LeadConstraintItem extends Item {
                 if (serverLevel.getBlockEntity(clickedPos) instanceof PulleyAnchorBlockEntity pulleyAnchorBE && connectionType == ConnectionType.PULLEY) {
                     if (Objects.equals(secondShipId, firstShipId)) { // pulley and anchor cannot be in same body
                         resetStateWithMessage(serverLevel, heldItem, player, "pulley_body_fail");
+                        PhysPulleyBlockEntity waitingPulley = (PhysPulleyBlockEntity) serverLevel.getBlockEntity(firstClickedPos);
+                        waitingPulley.resetSelf();
                         NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.RED);
                         return InteractionResult.FAIL;
                     }
@@ -163,11 +166,7 @@ public class LeadConstraintItem extends Item {
 
             if (ConnectionType.valueOf(tag.getString("type")) == ConnectionType.PULLEY) {
                 PhysPulleyBlockEntity pulleyBE = (PhysPulleyBlockEntity) level.getBlockEntity(NbtUtils.readBlockPos(tag.getCompound("pos")));
-
-                if (pulleyBE != null) {
-                    pulleyBE.clearWaitingLeadConstraintItem();
-                    pulleyBE.resetSelf();
-                }
+                if (pulleyBE != null) pulleyBE.clearWaitingLeadConstraintItem();
             }
 
             stack.setTag(null);

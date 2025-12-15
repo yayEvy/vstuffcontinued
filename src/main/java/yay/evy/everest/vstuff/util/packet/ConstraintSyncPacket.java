@@ -3,6 +3,7 @@ package yay.evy.everest.vstuff.util.packet;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 import org.joml.Vector3d;
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.ClientConstraintTracker;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
@@ -179,7 +180,7 @@ public class ConstraintSyncPacket {
                         break;
                 }
             } catch (Exception e) {
-                System.err.println("Error handling constraint sync packet: " + e.getMessage());
+                VStuff.LOGGER.error("Error handling constraint sync packet: " + e.getMessage());
                 e.printStackTrace();
             }
         });

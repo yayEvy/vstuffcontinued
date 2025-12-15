@@ -7,12 +7,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.valkyrienskies.core.impl.shadow.In;
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
 import yay.evy.everest.vstuff.content.constraint.Rope;
 import yay.evy.everest.vstuff.content.constraint.RopeUtil;
 import yay.evy.everest.vstuff.index.VStuffItems;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +28,7 @@ public class RopeBreakHandler {
 
         BlockPos brokenPos = event.getPos();
         List<Integer> constraintsToRemove = new ArrayList<>();
+        Map<Integer, Rope> toRemove = new HashMap<>();
 
         for (Map.Entry<Integer, Rope> entry : ConstraintTracker.getActiveRopes().entrySet()) {
             Integer id = entry.getKey();
@@ -75,8 +79,8 @@ public class RopeBreakHandler {
                     }
                 }
 
-                if (remove && dropPos != null) {
-                    constraintsToRemove.add(id);
+                if (remove) {
+                    toRemove.put(id, rope);
 
                     ItemStack ropeDrop = new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get());
                     ItemEntity itemEntity = new ItemEntity(
@@ -90,15 +94,18 @@ public class RopeBreakHandler {
                 }
 
             } catch (Exception e) {
-                System.err.println("[RopeBreakHandler] Failed checking constraint " + id + ": " + e.getMessage());
+                VStuff.LOGGER.error("[RopeBreakHandler] Failed checking constraint {}: {}", id, e.getMessage());
             }
         }
 
-        for (Integer constraintId : constraintsToRemove) {
+        for (Map.Entry<Integer, Rope> ropeEntry: toRemove.entrySet()) {
+            Integer id = ropeEntry.getKey();
+            Rope rope = ropeEntry.getValue();
             try {
-                ConstraintTracker.removeConstraintWithPersistence(level, constraintId);
+                rope.removeJoint(level);
+                ConstraintTracker.removeConstraintWithPersistence(level, id);
             } catch (Exception e) {
-                System.err.println("[RopeBreakHandler] Failed to remove constraint " + constraintId + ": " + e.getMessage());
+                VStuff.LOGGER.error("[RopeBreakHandler] Failed to remove constraint {}: {}", id, e.getMessage());
             }
         }
     }

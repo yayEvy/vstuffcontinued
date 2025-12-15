@@ -1,17 +1,14 @@
 package yay.evy.everest.vstuff.content.constraint;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Vector3d;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.VStuff;
 
@@ -25,11 +22,6 @@ public class ConstraintPersistence extends SavedData {
     private final Map<Integer, Rope> persistedConstraints = new HashMap<>();
     private final Set<Integer> restoredConstraints = new HashSet<>();
     private boolean hasAttemptedRestore = false;
-
-    private boolean cleanupScheduled = false;
-    private int ticksUntilCleanup = 0;
-    private ServerLevel cleanupLevel = null;
-
 
     public static ConstraintPersistence get(ServerLevel level) {
         DimensionDataStorage storage = level.getDataStorage();
@@ -112,98 +104,6 @@ public class ConstraintPersistence extends SavedData {
         }
     }
 
-    public Map<Integer, Rope> getAllConstraints() {
-        return new HashMap<>(persistedConstraints);
-    }
-
-    private void restoreLoadedChunkConstraints(ServerLevel level, Long currentGroundBodyId) {
-        int successCount = 0;
-        int failCount = 0;
-        int skipCount = 0;
-
-        Map<Integer, Rope> constraintsCopy = getAllConstraints();
-        for (Map.Entry<Integer, Rope> entry : constraintsCopy.entrySet()) {
-            Integer persistenceId = entry.getKey();
-            Rope rope = entry.getValue();
-
-            if (removedConstraints.contains(persistenceId)) {
-                skipCount++;
-                continue;
-            }
-
-            if (restoredConstraints.contains(persistenceId)) {
-                skipCount++;
-                continue;
-            }
-
-            if (!isConstraintInLoadedChunks(level, rope, currentGroundBodyId)) {
-                VStuff.LOGGER.info("Constraint {} is not in loaded chunks, will restore when chunks load", persistenceId);
-                skipCount++;
-                continue;
-            }
-
-
-        }
-
-        VStuff.LOGGER.info("Initial constraint restoration complete: {} success, {} failed, {} skipped (will restore when chunks load)", successCount, failCount, skipCount);
-    }
-
-    private boolean isConstraintInLoadedChunks(ServerLevel level, Rope rope, Long groundBodyId) {
-        try {
-            if (rope.constraintType == RopeUtil.ConstraintType.PULLEY && rope.sourceBlockPos != null) {
-                return level.isLoaded(rope.sourceBlockPos);
-            }
-
-            boolean pointALoaded = isPositionChunkLoaded(level, rope.localPosA, rope.shipA, rope.shipAIsGround, groundBodyId);
-            boolean pointBLoaded = isPositionChunkLoaded(level, rope.localPosB, rope.shipB, rope.shipBIsGround, groundBodyId);
-
-            return pointALoaded && pointBLoaded;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private boolean isPositionChunkLoaded(ServerLevel level, Vector3d localPos, Long shipId, boolean isGround, Long groundBodyId) {
-        try {
-            Vector3d worldPos;
-
-            if (isGround) {
-                worldPos = new Vector3d(localPos);
-            } else if (shipId != null) {
-                org.valkyrienskies.core.api.ships.Ship ship = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
-                if (ship == null) {
-                    return false;
-                }
-                worldPos = new Vector3d();
-                ship.getTransform().getShipToWorld().transformPosition(localPos, worldPos);
-            } else {
-                return false;
-            }
-
-            BlockPos blockPos = new BlockPos(
-                    (int) Math.floor(worldPos.x),
-                    (int) Math.floor(worldPos.y),
-                    (int) Math.floor(worldPos.z)
-            );
-
-            return level.isLoaded(blockPos);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-
-    public static Integer getConstraintIdForBlock(ServerLevel level, BlockPos blockPos) {
-        for (Map.Entry<Integer, Rope> entry : ConstraintTracker.getActiveRopes().entrySet()) {
-            Rope rope = entry.getValue();
-            if (rope.sourceBlockPos != null && rope.sourceBlockPos.equals(blockPos)) {
-                return entry.getKey();
-            }
-        }
-        return null;
-    }
-
-
     public static void restoreConstraints(ServerLevel level) {
         ConstraintPersistence persistence = ConstraintPersistence.get(level);
         persistence.restoreConstraintsInstance(level);
@@ -250,87 +150,12 @@ public class ConstraintPersistence extends SavedData {
                 }
             }
 
-            VStuff.LOGGER.info("ConstraintPersistence successfully restored {} constraints, failed to restore {} constraints", successCount, failCount);
+            VStuff.LOGGER.info("ConstraintPersistence successfully restored {} constraints, failed to restore {} constraints, and skipped restoring {} constraints", successCount, failCount, skipCount);
 
             for (ServerPlayer player : level.getServer().getPlayerList().getPlayers()) {
                 ConstraintTracker.syncAllConstraintsToPlayer(player);
             }
         });
-    }
-
-    private void cleanupDeadConstraints(ServerLevel level) {
-        try {
-            Long groundBodyId = VSGameUtilsKt.getShipObjectWorld(level).getDimensionToGroundBodyIdImmutable()
-                    .get(VSGameUtilsKt.getDimensionId(level));
-
-            if (groundBodyId == null) return;
-
-            List<Integer> toRemove = new ArrayList<>();
-
-            for (Map.Entry<Integer, Rope> entry : persistedConstraints.entrySet()) {
-                Integer persistenceId = entry.getKey();
-                Rope rope = entry.getValue();
-
-                if (restoredConstraints.contains(persistenceId)) continue;
-
-                if (rope.shipAIsGround || rope.shipBIsGround) continue;
-
-                Long actualShipA = rope.shipAIsGround ? groundBodyId : rope.shipA;
-                Long actualShipB = rope.shipBIsGround ? groundBodyId : rope.shipB;
-
-                boolean shipAValid = rope.shipAIsGround ||
-                        (actualShipA != null && VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(actualShipA) != null);
-                boolean shipBValid = rope.shipBIsGround ||
-                        (actualShipB != null && VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(actualShipB) != null);
-
-                if (!shipAValid || !shipBValid) toRemove.add(persistenceId);
-            }
-
-            for (Integer deadId : toRemove) removeConstraint(deadId);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    public void restoreConstraintsForChunk(ServerLevel level, ChunkPos chunkPos) {
-        if (persistedConstraints.isEmpty()) {
-            return;
-        }
-
-        Long currentGroundBodyId = null;
-        try {
-            currentGroundBodyId = VSGameUtilsKt.getShipObjectWorld(level).getDimensionToGroundBodyIdImmutable()
-                    .get(VSGameUtilsKt.getDimensionId(level));
-        } catch (Exception e) {
-            return;
-        }
-
-        if (currentGroundBodyId == null) {
-            return;
-        }
-
-        int restoredCount = 0;
-        Map<Integer, Rope> constraintsCopy = getAllConstraints();
-
-        for (Map.Entry<Integer, Rope> entry : constraintsCopy.entrySet()) {
-            Integer persistenceId = entry.getKey();
-            Rope rope = entry.getValue();
-
-            if (removedConstraints.contains(persistenceId) ||
-                    restoredConstraints.contains(persistenceId) ||
-                    !isConstraintInChunk(level, rope, chunkPos, currentGroundBodyId)) {
-                continue;
-            }
-
-            Long actualShipA = rope.shipAIsGround ? currentGroundBodyId : rope.shipA;
-            Long actualShipB = rope.shipBIsGround ? currentGroundBodyId : rope.shipB;
-
-            if (validateShipsAndCreateConstraint(level, persistenceId, rope, actualShipA, actualShipB)) {
-                restoredCount++;
-                restoredConstraints.add(persistenceId);
-            }
-        }
     }
 
     private boolean validateShipsAndCreateConstraint(ServerLevel level, Integer persistenceId, Rope rope,
@@ -344,54 +169,4 @@ public class ConstraintPersistence extends SavedData {
         }
         return false;
     }
-
-
-
-    private boolean isConstraintInChunk(ServerLevel level, Rope rope, ChunkPos chunkPos, Long groundBodyId) {
-        try {
-            if (rope.constraintType == RopeUtil.ConstraintType.PULLEY
-                    && rope.sourceBlockPos != null) {
-                ChunkPos sourceChunk = new ChunkPos(rope.sourceBlockPos);
-                return sourceChunk.equals(chunkPos);
-            }
-
-            boolean pointAInChunk = isPositionInChunk(level, rope.localPosA, rope.shipA, rope.shipAIsGround, chunkPos, groundBodyId);
-            boolean pointBInChunk = isPositionInChunk(level, rope.localPosB, rope.shipB, rope.shipBIsGround, chunkPos, groundBodyId);
-
-            return pointAInChunk || pointBInChunk;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private boolean isPositionInChunk(ServerLevel level, Vector3d localPos, Long shipId, boolean isGround,
-                                      ChunkPos chunkPos, Long groundBodyId) {
-        try {
-            Vector3d worldPos;
-
-            if (isGround) {
-                worldPos = new Vector3d(localPos);
-            } else if (shipId != null) {
-                org.valkyrienskies.core.api.ships.Ship ship = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
-                if (ship == null) {
-                    return false;
-                }
-                worldPos = new Vector3d();
-                ship.getTransform().getShipToWorld().transformPosition(localPos, worldPos);
-            } else {
-                return false;
-            }
-
-            ChunkPos posChunk = new ChunkPos(
-                    (int) Math.floor(worldPos.x) >> 4,
-                    (int) Math.floor(worldPos.z) >> 4
-            );
-
-            return posChunk.equals(chunkPos);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-
 }

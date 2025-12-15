@@ -526,7 +526,7 @@ public class Rope {
             try {
                 constraintType = ConstraintType.valueOf(tag.getString("constraintType"));
             } catch (IllegalArgumentException e) {
-                System.err.println("Invalid constraint type in save data, defaulting to GENERIC: " + e.getMessage());
+                VStuff.LOGGER.warn("Invalid constraint type in save data, defaulting to GENERIC: {}", e.getMessage());
             }
         }
 

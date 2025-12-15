@@ -130,7 +130,7 @@ public class RopeRendererClient {
                     renderedAny = true;
                 } catch (Exception e) {
                     if (level.getGameTime() % 100 == 0) {
-                        System.err.println("Error rendering client rope: " + e.getMessage());
+                        VStuff.LOGGER.error("Error rendering client rope: {}", e.getMessage());
                     }
                 }
             }

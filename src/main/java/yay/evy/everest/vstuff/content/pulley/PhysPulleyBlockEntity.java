@@ -281,29 +281,13 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
         tooltip.add(Component.literal(" "));
 
-        if (hasRope()) {
-            tooltip.add(Component.literal("Rope: Yes")
-                    .withStyle(ChatFormatting.GREEN));
-        } else {
-            tooltip.add(Component.literal("Rope: No")
-                    .withStyle(ChatFormatting.RED));
-        }
-
-        if (hasAnchor()) {
-            tooltip.add(Component.literal("Anchor: Yes")
-                    .withStyle(ChatFormatting.GREEN));
-        } else {
-            tooltip.add(Component.literal("Anchor: No")
-                    .withStyle(ChatFormatting.RED));
-        }
-
         if (constraintId != null) {
             tooltip.add(Component.literal("Length: " + String.format("%.1f", currentRopeLength) + " blocks")
                     .withStyle(ChatFormatting.BLUE));
             float speed = getSpeed();
             if (Math.abs(speed) > 4) {
                 String direction = speed > 0 ? "Extending" : "Retracting";
-                tooltip.add(Component.literal("Status: " + direction + " (" + String.format("%.1f", speed))
+                tooltip.add(Component.literal("Status: " + direction + " (" + String.format("%.1f", Math.abs(speed)) + " RPM )")
                         .withStyle(ChatFormatting.GREEN));
 
             } else {
@@ -311,13 +295,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
                         .withStyle(ChatFormatting.GRAY));
             }
         } else {
-            if (hasAnchor() && hasRope()) {
-                tooltip.add(Component.literal("Ready - Pulley is able to extend")
-                        .withStyle(ChatFormatting.YELLOW));
-            } else if (isExtended) {
-                tooltip.add(Component.literal("Extended - ")
-                        .withStyle(ChatFormatting.YELLOW));
-            }
+            tooltip.add(Component.literal("No rope attached").withStyle(ChatFormatting.AQUA));
         }
         return true;
     }

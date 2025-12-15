@@ -1,6 +1,6 @@
 {
 "parent": "item/generated",
-"textures": {
-"layer0": "vstuff:item/rope_thrower"
-}
+  "textures": {
+  "layer0": "vstuff:item/rope_thrower"
+  }
 }
