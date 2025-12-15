@@ -103,12 +103,10 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     public void setWaitingLeadConstraintItem(LeadConstraintItem item) {
         hasWaitingRope = true;
         waitingConstraintItem = item;
-        item.waitingPulley = this;
     }
 
     public void clearWaitingLeadConstraintItem() {
         hasWaitingRope = false;
-        waitingConstraintItem.waitingPulley = null;
         waitingConstraintItem = null;
     }
 

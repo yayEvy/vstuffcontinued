@@ -3,8 +3,8 @@ package yay.evy.everest.vstuff.content.constraint;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.client.ClientRopeUtil;
+import yay.evy.everest.vstuff.client.ClientOutlineHandler;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.pulley.*;
 import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
@@ -25,12 +25,6 @@ import yay.evy.everest.vstuff.util.RopeStyles;
 import java.util.Objects;
 
 public class LeadConstraintItem extends Item {
-    private BlockPos firstClickedPos;
-    private Long firstShipId;
-    private ConnectionType connectionType;
-    public PhysPulleyBlockEntity waitingPulley;
-    public boolean canAttachPhysPulley = true;
-    private ResourceKey<Level> firstClickDimension;
 
     public LeadConstraintItem(Properties pProperties) {
         super(pProperties);
@@ -50,24 +44,19 @@ public class LeadConstraintItem extends Item {
 
 
         if (!isFoil(heldItem)) {
-            firstClickedPos = clickedPos;
-            firstShipId = getShipIdAtPos(serverLevel, clickedPos);
-            firstClickDimension = serverLevel.dimension();
-
+            ConnectionType connectionType = ConnectionType.NORMAL;
             if (serverLevel.getBlockEntity(clickedPos) instanceof PhysPulleyBlockEntity pulleyBE) {
                 if (player.isShiftKeyDown()) { // nothing
                     return InteractionResult.FAIL;
                 } else if (!pulleyBE.canAttachManualConstraint) {
-                    resetStateWithMessage(heldItem, player, "pulley_attach_fail");
-                    NetworkHandler.sendOutline(clickedPos, ClientRopeUtil.RED);
+                    resetStateWithMessage(serverLevel, heldItem, player, "pulley_attach_fail");
+                    NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.RED);
                     return InteractionResult.FAIL;
 
                 } else {
                     pulleyBE.setWaitingLeadConstraintItem(this);
                     connectionType = ConnectionType.PULLEY;
                 }
-            } else {
-                connectionType = ConnectionType.NORMAL;
             }
 
             if (connectionType == ConnectionType.NORMAL) {
@@ -75,46 +64,61 @@ public class LeadConstraintItem extends Item {
             } else {
                 sendRopeMessage(player, "pulley_first");
             }
-            heldItem.getOrCreateTagElement("first");
-            NetworkHandler.sendOutline(clickedPos, ClientRopeUtil.GREEN);
+
+            Long tempId = getShipIdAtPos(serverLevel, clickedPos);
+            Long actualId = tempId != null ? tempId : RopeUtil.getGroundBodyId(serverLevel);
+
+            CompoundTag tag = heldItem.getOrCreateTagElement("first");
+            tag.putBoolean("hasFirst", true);
+            tag.put("pos", NbtUtils.writeBlockPos(clickedPos));
+            tag.putLong("shipId", actualId);
+            tag.putString("dim", serverLevel.dimension().location().toString());
+            tag.putString("type", connectionType.name());
+            NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.GREEN);
             return InteractionResult.SUCCESS;
 
         } else {
+            CompoundTag tag = heldItem.getTag().getCompound("first");
+            BlockPos firstClickedPos = NbtUtils.readBlockPos(tag.getCompound("pos"));
+            Long firstShipId = tag.getLong("shipId");
+            ConnectionType connectionType = ConnectionType.valueOf(tag.getString("type"));
+
+            Long secondShipId = getShipIdAtPos(serverLevel, clickedPos);
+
             if (player.isShiftKeyDown() || firstClickedPos.equals(clickedPos)) {
-                resetStateWithMessage(heldItem, player, "rope_reset");
-                NetworkHandler.sendOutline(clickedPos, ClientRopeUtil.GREEN);
+                resetStateWithMessage(serverLevel, heldItem, player, "rope_reset");
+                NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.GREEN);
                 return InteractionResult.SUCCESS;
             }
 
-            if (!serverLevel.dimension().equals(firstClickDimension)) {
-                resetStateWithMessage(heldItem, player, "interdimensional_fail");
-                NetworkHandler.sendOutline(clickedPos, ClientRopeUtil.RED);
+            if (!serverLevel.dimension().location().toString().equals(tag.getString("dim"))) {
+                resetStateWithMessage(serverLevel, heldItem, player, "interdimensional_fail");
+                NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.RED);
                 return InteractionResult.FAIL;
             }
 
             if (connectionType == ConnectionType.NORMAL) {
 
             } else {
-                if (serverLevel.getBlockEntity(clickedPos) instanceof PulleyAnchorBlockEntity pulleyAnchorBE) {
-                    Long secondShipId = getShipIdAtPos(serverLevel, clickedPos);
+                if (serverLevel.getBlockEntity(clickedPos) instanceof PulleyAnchorBlockEntity pulleyAnchorBE && connectionType == ConnectionType.PULLEY) {
                     if (Objects.equals(secondShipId, firstShipId)) { // pulley and anchor cannot be in same body
-                        resetStateWithMessage(heldItem, player, "pulley_body_fail");
-                        NetworkHandler.sendOutline(clickedPos, ClientRopeUtil.RED);
+                        resetStateWithMessage(serverLevel, heldItem, player, "pulley_body_fail");
+                        NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.RED);
                         return InteractionResult.FAIL;
                     }
 
                     RopeUtil.RopeReturn ropeReturn = Rope.createNew(this, serverLevel, firstClickedPos, clickedPos, firstShipId, secondShipId, player);
                     if (ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS) {
+                        PhysPulleyBlockEntity waitingPulley = (PhysPulleyBlockEntity) serverLevel.getBlockEntity(firstClickedPos);
                         waitingPulley.attachRopeAndAnchor(ropeReturn.rope(), pulleyAnchorBE);
                     }
                 } else {
-                    resetStateWithMessage(heldItem, player, "pulley_fail");
-                    NetworkHandler.sendOutline(clickedPos, ClientRopeUtil.RED);
+                    resetStateWithMessage(serverLevel, heldItem, player, "pulley_fail");
+                    NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.RED);
                     return InteractionResult.FAIL;
                 }
             }
 
-            Long secondShipId = getShipIdAtPos(serverLevel, clickedPos);
             RopeUtil.RopeReturn ropeReturn = Rope.createNew(this, serverLevel, firstClickedPos, clickedPos, firstShipId, secondShipId, player);
 
             if (ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS) {
@@ -134,8 +138,8 @@ public class LeadConstraintItem extends Item {
                         1.0F
                 );
 
-                NetworkHandler.sendOutline(clickedPos, ClientRopeUtil.GREEN);
-                resetStateWithMessage(heldItem, player, isChain ? "chain_created" : "rope_created");
+                NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.GREEN);
+                resetStateWithMessage(serverLevel, heldItem, player, isChain ? "chain_created" : "rope_created");
 
             }
 
@@ -153,24 +157,29 @@ public class LeadConstraintItem extends Item {
         return pStack.hasTag() && pStack.getTag().contains("first");
     }
 
-    private void resetState(ItemStack stack) {
-        firstClickedPos = null;
-        firstShipId = null;
-        firstClickDimension = null;
-        connectionType = null;
-        stack.setTag(null);
-        if (waitingPulley != null) {
-            waitingPulley.clearWaitingLeadConstraintItem();
-            waitingPulley.resetSelf();
+    private void resetState(ServerLevel level, ItemStack stack) {
+        if (isFoil(stack)) {
+            CompoundTag tag = stack.getTag().getCompound("first");
+
+            if (ConnectionType.valueOf(tag.getString("type")) == ConnectionType.PULLEY) {
+                PhysPulleyBlockEntity pulleyBE = (PhysPulleyBlockEntity) level.getBlockEntity(NbtUtils.readBlockPos(tag.getCompound("pos")));
+
+                if (pulleyBE != null) {
+                    pulleyBE.clearWaitingLeadConstraintItem();
+                    pulleyBE.resetSelf();
+                }
+            }
+
+            stack.setTag(null);
         }
 
         VStuff.LOGGER.info("Successfully reset LeadConstraintItem");
     }
 
-    private void resetStateWithMessage(ItemStack stack, Player player, String name) {
+    private void resetStateWithMessage(ServerLevel level, ItemStack stack, Player player, String name) {
         sendRopeMessage(player, name);
 
-        resetState(stack);
+        resetState(level, stack);
     }
 
     enum ConnectionType {

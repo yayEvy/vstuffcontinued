@@ -1,12 +1,10 @@
 package yay.evy.everest.vstuff.util.packet;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
-import yay.evy.everest.vstuff.client.ClientRopeUtil;
+import org.valkyrienskies.core.impl.shadow.Bl;
+import yay.evy.everest.vstuff.client.ClientOutlineHandler;
 import java.util.function.Supplier;
 
 public class OutlinePacket {
@@ -32,10 +30,10 @@ public class OutlinePacket {
     }
 
     public static void handle(OutlinePacket msg, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.level != null) ClientRopeUtil.drawAnyOutline(mc.level, msg.pos, msg.color);
-        }));
+        ctx.get().enqueueWork(() -> ClientOutlineHandler.handleOutlinePacket(msg));
         ctx.get().setPacketHandled(true);
     }
+
+    public BlockPos pos() { return pos; }
+    public int color() { return color; }
 }

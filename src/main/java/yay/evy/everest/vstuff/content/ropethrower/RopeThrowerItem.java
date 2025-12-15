@@ -4,9 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -17,13 +15,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import yay.evy.everest.vstuff.client.ClientRopeUtil;
+import yay.evy.everest.vstuff.client.ClientOutlineHandler;
+import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.constraint.RopeConnectionType;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.index.VStuffSounds;
-
-import static net.minecraft.world.level.block.entity.BeaconBlockEntity.playSound;
 
 public class RopeThrowerItem extends Item {
 
@@ -50,7 +47,7 @@ public class RopeThrowerItem extends Item {
             );
 
             if (hit.getType() == net.minecraft.world.phys.HitResult.Type.BLOCK) {
-                ClientRopeUtil.drawOutline(level, hit.getBlockPos());
+                NetworkHandler.sendOutline(hit.getBlockPos(), ClientOutlineHandler.GREEN);
             }
 
             return InteractionResultHolder.success(stack);

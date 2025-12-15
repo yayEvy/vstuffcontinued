@@ -471,6 +471,7 @@ public class Rope {
                     ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);
                 }
 
+                VStuff.LOGGER.info("return jointless rope");
                 return new RopeReturn(RopeInteractionReturn.SUCCESS, rope);
             } else {
                 RopeStyles.RopeStyle ropeStyle = null;
@@ -497,7 +498,7 @@ public class Rope {
                         ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);
                     }
                 });
-
+                VStuff.LOGGER.info("return impactful rope");
                 return new RopeReturn(RopeInteractionReturn.SUCCESS, rope);
             }
         } catch (Exception e) {
