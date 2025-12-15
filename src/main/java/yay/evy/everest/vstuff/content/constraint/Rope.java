@@ -321,8 +321,8 @@ public class Rope {
                 0f,
                 (float) maxLength,
                 0.1f,
-                1e8f,
-                1000f
+                1e9f,
+                100f
         );
     }
 

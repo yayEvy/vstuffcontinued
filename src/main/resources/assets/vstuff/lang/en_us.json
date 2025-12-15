@@ -14,6 +14,11 @@
   "vstuff.pulley_anchor.tooltip": "Use this as a second pos for pulley connections!",
   "vstuff.pulley_anchor.tooltip.summary": "Acts as an anchor point for pulley rope connections",
 
+  "vstuff.message.pulley_attach_fail": "§cThis pulley cannot accept a rope.",
+  "vstuff.message.pulley_first": "§aPulley selected as first position!",
+  "vstuff.message.pulley_body_fail": "§cPulley and anchor cannot be on the same ship/world pos is invalid!",
+  "vstuff.message.pulley_fail": "§cYou must attach the rope to a Pulley Anchor!",
+
 
   "block.vstuff.phys_pulley": "Phys Pulley",
   "block.vstuff.rotational_thruster": "Rotational Thruster",
