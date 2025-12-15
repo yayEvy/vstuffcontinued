@@ -15,33 +15,8 @@ public class ServerTickHandler {
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
         for (ServerLevel level : event.getServer().getAllLevels()) {
-            ConstraintPersistence.get(level).restoreConstraintsInstance(level);
-        }
-    }
-/*
-    @SubscribeEvent
-    public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
-
-        tickCounter++;
-        if (tickCounter < TICKS_PER_SECOND) return;
-        tickCounter = 0;
-
-        for (ServerLevel level : event.getServer().getAllLevels()) {
-            if (level.players().isEmpty()) continue;
-
-            ConstraintTracker.getActiveConstraints().forEach((id, rope) -> {
-                if (rope.constraintType == ConstraintTracker.RopeConstraintData.ConstraintType.ROPE_PULLEY) {
-                    if (rope.sourceBlockPos != null && level.getBlockState(rope.sourceBlockPos).isAir()) {
-                        System.out.println("Removing orphaned rope " + id + " at " + rope.sourceBlockPos);
-                        ConstraintTracker.removeConstraintWithPersistence(level, id);
-                    }
-                }
-            });
-
-            ConstraintTracker.validateAndCleanupConstraints(level);
+            ConstraintPersistence.restoreConstraints(level);
         }
     }
 
- */
 }

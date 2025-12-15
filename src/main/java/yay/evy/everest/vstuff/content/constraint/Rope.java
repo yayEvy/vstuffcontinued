@@ -256,7 +256,7 @@ public class Rope {
     public boolean restoreJoint(ServerLevel level) {
         if (!hasPhysicalImpact) {
             VStuff.LOGGER.info("nuh uh [not restoring joint for rope without joint]");
-            return false;
+            return true;
         }
         this.level = level;
         this.levelId = RopeUtil.registerLevel(level);
@@ -290,9 +290,9 @@ public class Rope {
             VSJoint ropeConstraint = makeDistanceJoint(actualShipA, actualShipB);
 
             gtpa.addJoint(ropeConstraint, 0, newConstraintId -> {
-                ConstraintTracker.addConstraintToTracker(this);
-
                 ID = newConstraintId;
+
+                ConstraintTracker.addConstraintToTracker(this);
             });
 
 
@@ -441,7 +441,7 @@ public class Rope {
                     0f,
                     (float) maxLength,
                     1f,
-                    1e9f,
+                    1e8f,
                     100f
             );
 
@@ -483,18 +483,21 @@ public class Rope {
                 }
 
                 Rope rope = new Rope(
-                        level, -1, finalShipA, finalShipB, // id is temporary
+                        level, UUID.randomUUID().hashCode(), finalShipA, finalShipB, // id is temporary
                         finalLocalPosA, finalLocalPosB, maxLength, compliance, maxForce,
                         ConstraintType.GENERIC, null, ropeStyle, ropeConstraint
                 );
 
-                gtpa.addJoint(ropeConstraint, 0, newConstraintId -> rope.ID = newConstraintId);
+                gtpa.addJoint(ropeConstraint, 0, newConstraintId -> {
+                    rope.ID = newConstraintId;
 
-                ConstraintTracker.addConstraintWithPersistence(rope);
+                    ConstraintTracker.addConstraintWithPersistence(rope);
 
-                if (finalPlayer instanceof ServerPlayer serverPlayer) {
-                    ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);
-                }
+                    if (finalPlayer instanceof ServerPlayer serverPlayer) {
+                        ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);
+                    }
+                });
+
                 return new RopeReturn(RopeInteractionReturn.SUCCESS, rope);
             }
         } catch (Exception e) {
