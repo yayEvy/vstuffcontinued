@@ -78,6 +78,10 @@ public class VStuffRopeStyles {
     private static final RopeStyle MANGROVE = new RopeStyle("mangrove", PrimitiveRopeStyle.LOG, "block.minecraft.mangrove_log");
     private static final RopeStyle MANGROVE_STRIPPED = new RopeStyle("stripped_mangrove", PrimitiveRopeStyle.LOG, "block.minecraft.stripped_mangrove_log");
 
+    private static final RopeStyle  CHRISTMAS_CANDYCANE = new RopeStyle("christmas_candycane", PrimitiveRopeStyle.OTHER, "vstuff.rope.christmas_candycane");
+    private static final RopeStyle  CHRISTMAS_CHRISTMAS_TREE = new RopeStyle("christmas_christmas_tree", PrimitiveRopeStyle.OTHER, "vstuff.rope.christmas_christmas_tree");
+
+
     private static final RopeStyleCategory BASIC_STYLES = new RopeStyleCategory(
             "vstuff.rope_category.normal",
             new RopeStyle[]{
@@ -124,6 +128,13 @@ public class VStuffRopeStyles {
             }
     );
 
+    private static final RopeStyleCategory VSTUFFMAS = new RopeStyleCategory(
+            "vstuff.rope_category.vstuffmas",
+            new RopeStyle[]{
+                    CHRISTMAS_CANDYCANE, CHRISTMAS_CHRISTMAS_TREE
+            }
+    );
+
     public static List<RopeStyleCategory> CATEGORIES = new ArrayList<>();
 
     public static void register() {
@@ -133,6 +144,7 @@ public class VStuffRopeStyles {
         CATEGORIES.add(CASING_STYLES);
         CATEGORIES.add(FLAGS);
         CATEGORIES.add(LOGS);
+        CATEGORIES.add(VSTUFFMAS);
     }
 }
 
