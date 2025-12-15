@@ -87,7 +87,7 @@ public class ConstraintPersistence extends SavedData {
         }
 
         tag.put("constraints", constraintsList);
-        System.out.println("Saved " + persistedConstraints.size() + " constraints to disk");
+        VStuff.LOGGER.info("Saved {} constraints to /data/" + DATA_NAME + ".dat", persistedConstraints.size());
         return tag;
     }
 
@@ -137,7 +137,7 @@ public class ConstraintPersistence extends SavedData {
             }
 
             if (!isConstraintInLoadedChunks(level, rope, currentGroundBodyId)) {
-                System.out.println("Constraint " + persistenceId + " is not in loaded chunks, will restore when chunks load");
+                VStuff.LOGGER.info("Constraint {} is not in loaded chunks, will restore when chunks load", persistenceId);
                 skipCount++;
                 continue;
             }
@@ -145,8 +145,7 @@ public class ConstraintPersistence extends SavedData {
 
         }
 
-        System.out.println("Initial constraint restoration complete: " + successCount + " success, " +
-                failCount + " failed, " + skipCount + " skipped (will restore when chunks load)");
+        VStuff.LOGGER.info("Initial constraint restoration complete: {} success, {} failed, {} skipped (will restore when chunks load)", successCount, failCount, skipCount);
     }
 
     private boolean isConstraintInLoadedChunks(ServerLevel level, Rope rope, Long groundBodyId) {
@@ -331,10 +330,6 @@ public class ConstraintPersistence extends SavedData {
                 restoredCount++;
                 restoredConstraints.add(persistenceId);
             }
-        }
-
-        if (restoredCount > 0) {
-            //  System.out.println("Restored " + restoredCount + " constraints for chunk " + chunkPos);
         }
     }
 

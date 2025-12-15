@@ -46,7 +46,6 @@ public class VStuffCreativeModeTabs {
                     items.add(item);
             }
             items = new ReferenceArrayList<>(new ReferenceLinkedOpenHashSet<>(items));
-            System.out.println("collected" + items);
             return items;
         }
 
@@ -62,7 +61,6 @@ public class VStuffCreativeModeTabs {
                 if (!exclusionPredicate.test(item))
                     items.add(item);
             }
-            System.out.println("collected" + items);
             return items;
         }
 

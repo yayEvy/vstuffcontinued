@@ -138,8 +138,6 @@ public class RotationalThrusterBlockEntity extends KineticBlockEntity {
 
         thrusterData.setThrust(thrust);
         isThrustDirty = false;
-
-      //  System.out.println("[Thruster] speed=" + speed + ", obstruction=" + obstructionEffect + ", thrust=" + thrust);
     }
 
     @Override

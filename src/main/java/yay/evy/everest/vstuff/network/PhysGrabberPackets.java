@@ -18,36 +18,30 @@ public class PhysGrabberPackets {
     public static void handleGrabOnServer(ServerLevel level, long shipId, Vector3d initialTarget) {
         LoadedServerShip ship = VSGameUtilsKt.getShipObjectWorld(level).getLoadedShips().getById(shipId);
         if (ship == null) {
-            //System.out.println("[PhysGrabber] handleGrab: ship " + shipId + " not found on server");
             return;
         }
 
         PhysGrabberServerAttachment grabber = PhysGrabberServerAttachment.getOrCreate(ship);
         grabber.setTarget(initialTarget);
-        //  System.out.println("[PhysGrabber] handleGrab: attached grabber to ship " + shipId + " and activated");
     }
 
 
     public static void handleReleaseOnServer(ServerLevel level, long shipId) {
         LoadedServerShip ship = VSGameUtilsKt.getShipObjectWorld(level).getLoadedShips().getById(shipId);
         if (ship == null) {
-            //   System.out.println("[PhysGrabber] handleRelease: ship " + shipId + " not found on server");
             return;
         }
         PhysGrabberServerAttachment grabber = PhysGrabberServerAttachment.getOrCreate(ship);
         grabber.release();
-        // System.out.println("[PhysGrabber] handleRelease: released attachment on ship " + shipId);
     }
 
     public static void handleUpdateOnServer(ServerLevel level, long shipId, Vector3d target) {
         LoadedServerShip ship = VSGameUtilsKt.getShipObjectWorld(level).getLoadedShips().getById(shipId);
         if (ship == null) {
-            //  System.out.println("[PhysGrabber] handleUpdate: ship " + shipId + " not found on server");
             return;
         }
         PhysGrabberServerAttachment grabber = PhysGrabberServerAttachment.getOrCreate(ship);
         grabber.setTarget(target);
-        //    System.out.println("[PhysGrabber] handleUpdate: set target " + target + " on ship " + shipId);
     }
 
 
@@ -120,7 +114,6 @@ public class PhysGrabberPackets {
             ctx.enqueueWork(() -> {
                 ServerPlayer sender = ctx.getSender();
                 if (sender == null) {
-                    //   System.out.println("[PhysGrabber] ReleasePacket handler: sender is null!");
                     return;
                 }
                 ServerLevel level = sender.serverLevel();

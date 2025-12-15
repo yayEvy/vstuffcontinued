@@ -241,7 +241,6 @@ public class Rope {
             gtpa.updateJoint(new VSJointAndId(ID, newConstraint));
             constraint = newConstraint;
             maxLength = newConstraint.getMaxDistance();
-            System.out.println(maxLength);
         } catch (Exception e) {
             VStuff.LOGGER.error("Error updating joint for constraint {}: {}", ID, e.getMessage());
         }

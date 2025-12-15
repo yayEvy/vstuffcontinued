@@ -86,9 +86,7 @@ public class RotationalThrusterBlock extends DirectionalAxisKineticBlock impleme
                 if (deferredAttachment != null) {
                     ThrusterForceApplier applier = new ThrusterForceApplier(data);
                     deferredAttachment.addApplier(pos, applier);
-                    //  System.out.println("[Thruster] onPlace: deferred registration succeeded at " + pos);
                 } else {
-                    //  System.out.println("[Thruster] onPlace: deferred registration still null at " + pos);
                 }
             });
         }
