@@ -23,13 +23,12 @@ import yay.evy.everest.vstuff.util.RopeStyles;
 public class ColorHaggler {
 
     @SubscribeEvent
-    public void onPlayerRightClickItem(PlayerInteractEvent.RightClickItem event) {
+    public void onPlayerColorItem(PlayerInteractEvent.RightClickItem event) {
         try {
             ItemStack itemStack = event.getItemStack();
             Item item = event.getItemStack().getItem();
             Level level = event.getLevel();
             Player player = event.getEntity();
-
 
             if (level instanceof ServerLevel serverLevel) {
                 Integer targetConstraintId = RopeUtil.findTargetedLead(serverLevel, player);
