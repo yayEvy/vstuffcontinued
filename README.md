@@ -15,7 +15,7 @@
 - Complete Config
 - Rope Thrower
   
-## PLANNED for 0.3.0:
+## PLANNED for v0.3.0:
 - Rope Anchor
 - Rope Grappler
 
