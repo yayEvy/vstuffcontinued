@@ -1,22 +1,23 @@
-VStuff!
+# VStuff!
 
-features as of v0.2.3
+## features as of v0.2.4
 
-- ropes (world to world, ship to ship, ship to world)
-- rope item, crafted with a lead surrounded by string, is consumed if in survival
-- rope cutter cutter item, breaks ropes
-- phys pulley, can be used to control rope lengths
-- rotational thruster, generates thrust via rotation
-- phys grabber
-- energy core
-- empty energy core
-- rope style changer
-- rope coloring using dyes
-- complete config
+- Ropes (world to world, ship to ship, ship to world)
+- Rope item, crafted with a lead surrounded by string, is consumed if in survival
+- Rope Cutter item, breaks ropes
+- Phys Pulley, can be used to control rope lengths
+- Rotational Thruster, generates thrust via rotation
+- Phys Grabber
+- Energy Core
+- Empty Energy Core
+- Rope Styles menu
+- Rope Coloring (using dyes)
+- Complete Config
+- Rope Thrower
   
-PLANNED 0.3.0:
+## PLANNED for v0.3.0:
 - Rope Anchor
 - Rope Grappler
-- Rope Thrower (name TBD)
+
 
   
