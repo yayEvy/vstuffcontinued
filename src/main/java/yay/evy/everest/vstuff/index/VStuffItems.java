@@ -36,6 +36,13 @@ public class VStuffItems {
                     .defaultModel()
                     .register();
 
+    public static final ItemEntry<RopeThrowerItem> ROPE_THROWER_ITEM =
+            REGISTRATE.item("rope_thrower", RopeThrowerItem::new)
+                    .properties(p -> p
+                            .stacksTo(64))
+                    .defaultModel()
+                    .register();
+
     public static final ItemEntry<LeadBreakItem> LEAD_BREAK_ITEM =
             REGISTRATE.item("lead_break_item", LeadBreakItem::new)
                     .properties(p -> p
@@ -70,12 +77,7 @@ public class VStuffItems {
                     .model(AssetLookup.itemModelWithPartials())
                     .register();
 
-    public static final ItemEntry<RopeThrowerItem> ROPE_THROWER_ITEM =
-            REGISTRATE.item("rope_thrower", RopeThrowerItem::new)
-                    .properties(p -> p
-                    .stacksTo(64))
-                    .defaultModel()
-                    .register();
+
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
