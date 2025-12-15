@@ -17,7 +17,7 @@ import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.client.ClientOutlineHandler;
 import yay.evy.everest.vstuff.client.NetworkHandler;
-import yay.evy.everest.vstuff.content.constraint.RopeConnectionType;
+import yay.evy.everest.vstuff.content.constraint.RopeUtil;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.index.VStuffSounds;
@@ -28,7 +28,7 @@ public class RopeThrowerItem extends Item {
     private Long firstShipId;
     private ResourceKey<Level> firstClickDimension;
     private boolean hasFirst = false;
-    private RopeConnectionType connectionType;
+    private RopeUtil.ConnectionType connectionType;
     private PhysPulleyBlockEntity waitingPulley;
 
     public RopeThrowerItem(Properties properties) {
@@ -81,7 +81,7 @@ public class RopeThrowerItem extends Item {
             firstClickDimension = serverLevel.dimension();
 
             if (serverLevel.getBlockEntity(clickedPos) instanceof PhysPulleyBlockEntity pulley) {
-                if (!pulley.canAttachManualConstraint) {
+                if (!pulley.canAttach()) {
                     player.displayClientMessage(
                             Component.translatable("vstuff.message.pulley_attach_fail"),
                             true
@@ -90,18 +90,16 @@ public class RopeThrowerItem extends Item {
                     return InteractionResultHolder.fail(stack);
                 }
 
-                pulley.setWaitingLeadConstraintItem(
-                        VStuffItems.LEAD_CONSTRAINT_ITEM.get()
-                );
+                pulley.setWaiting();
                 waitingPulley = pulley;
-                connectionType = RopeConnectionType.PULLEY;
+                connectionType = RopeUtil.ConnectionType.PULLEY;
 
                 player.displayClientMessage(
                         Component.translatable("vstuff.message.pulley_first"),
                         true
                 );
             } else {
-                connectionType = RopeConnectionType.NORMAL;
+                connectionType = RopeUtil.ConnectionType.NORMAL;
                 player.displayClientMessage(
                         Component.translatable("vstuff.message.rope_first"),
                         true

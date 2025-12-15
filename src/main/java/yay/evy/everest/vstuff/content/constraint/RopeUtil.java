@@ -196,6 +196,11 @@ public class RopeUtil {
         RESET
     }
 
+    public enum ConnectionType {
+        NORMAL,
+        PULLEY
+    }
+
     public enum ConstraintType {
         GENERIC,
         PULLEY

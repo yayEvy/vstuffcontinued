@@ -21,6 +21,7 @@ import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.pulley.*;
 import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
 import yay.evy.everest.vstuff.util.RopeStyles;
+import yay.evy.everest.vstuff.content.constraint.RopeUtil.ConnectionType;
 
 import java.util.Objects;
 
@@ -48,14 +49,14 @@ public class LeadConstraintItem extends Item {
             if (serverLevel.getBlockEntity(clickedPos) instanceof PhysPulleyBlockEntity pulleyBE) {
                 if (player.isShiftKeyDown()) { // nothing
                     return InteractionResult.FAIL;
-                } else if (!pulleyBE.canAttachManualConstraint) {
+                } else if (!pulleyBE.canAttach()) {
                     resetStateWithMessage(serverLevel, heldItem, player, "pulley_attach_fail");
                     pulleyBE.resetSelf();
                     NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.RED);
                     return InteractionResult.FAIL;
 
                 } else {
-                    pulleyBE.setWaitingLeadConstraintItem(this);
+                    pulleyBE.setWaiting();
                     connectionType = ConnectionType.PULLEY;
                 }
             }
@@ -98,10 +99,12 @@ public class LeadConstraintItem extends Item {
                 return InteractionResult.FAIL;
             }
 
-            if (connectionType == ConnectionType.NORMAL) {
+            RopeUtil.RopeReturn ropeReturn;
 
+            if (connectionType == ConnectionType.NORMAL) {
+                ropeReturn = Rope.createNew(this, serverLevel, firstClickedPos, clickedPos, firstShipId, secondShipId, player);
             } else {
-                if (serverLevel.getBlockEntity(clickedPos) instanceof PulleyAnchorBlockEntity pulleyAnchorBE && connectionType == ConnectionType.PULLEY) {
+                if (serverLevel.getBlockEntity(clickedPos) instanceof PulleyAnchorBlockEntity && connectionType == ConnectionType.PULLEY) {
                     if (Objects.equals(secondShipId, firstShipId)) { // pulley and anchor cannot be in same body
                         resetStateWithMessage(serverLevel, heldItem, player, "pulley_body_fail");
                         PhysPulleyBlockEntity waitingPulley = (PhysPulleyBlockEntity) serverLevel.getBlockEntity(firstClickedPos);
@@ -110,10 +113,10 @@ public class LeadConstraintItem extends Item {
                         return InteractionResult.FAIL;
                     }
 
-                    RopeUtil.RopeReturn ropeReturn = Rope.createNew(this, serverLevel, firstClickedPos, clickedPos, firstShipId, secondShipId, player);
+                    ropeReturn = Rope.createNew(this, serverLevel, firstClickedPos, clickedPos, firstShipId, secondShipId, player);
                     if (ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS) {
                         PhysPulleyBlockEntity waitingPulley = (PhysPulleyBlockEntity) serverLevel.getBlockEntity(firstClickedPos);
-                        waitingPulley.attachRopeAndAnchor(ropeReturn.rope(), pulleyAnchorBE);
+                        waitingPulley.attachRope(ropeReturn.rope());
                     }
                 } else {
                     resetStateWithMessage(serverLevel, heldItem, player, "pulley_fail");
@@ -121,8 +124,6 @@ public class LeadConstraintItem extends Item {
                     return InteractionResult.FAIL;
                 }
             }
-
-            RopeUtil.RopeReturn ropeReturn = Rope.createNew(this, serverLevel, firstClickedPos, clickedPos, firstShipId, secondShipId, player);
 
             if (ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS) {
 
@@ -140,12 +141,11 @@ public class LeadConstraintItem extends Item {
                         1.0F,
                         1.0F
                 );
-
-                NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.GREEN);
                 resetStateWithMessage(serverLevel, heldItem, player, isChain ? "chain_created" : "rope_created");
-
             }
 
+            int color = ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS ? ClientOutlineHandler.GREEN : ClientOutlineHandler.RED;
+            NetworkHandler.sendOutline(clickedPos, color);
             return ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS ? InteractionResult.SUCCESS : InteractionResult.FAIL;
         }
     }
@@ -166,7 +166,7 @@ public class LeadConstraintItem extends Item {
 
             if (ConnectionType.valueOf(tag.getString("type")) == ConnectionType.PULLEY) {
                 PhysPulleyBlockEntity pulleyBE = (PhysPulleyBlockEntity) level.getBlockEntity(NbtUtils.readBlockPos(tag.getCompound("pos")));
-                if (pulleyBE != null) pulleyBE.clearWaitingLeadConstraintItem();
+                if (pulleyBE != null) pulleyBE.clearWaiting();
             }
 
             stack.setTag(null);
@@ -179,11 +179,6 @@ public class LeadConstraintItem extends Item {
         sendRopeMessage(player, name);
 
         resetState(level, stack);
-    }
-
-    enum ConnectionType {
-        NORMAL,
-        PULLEY
     }
 
     private void sendRopeMessage(Player player, String name) {

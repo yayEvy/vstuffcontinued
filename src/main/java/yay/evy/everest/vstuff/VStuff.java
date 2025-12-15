@@ -36,7 +36,7 @@ import org.valkyrienskies.mod.api.VsApi;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.client.VStuffClient;
-import yay.evy.everest.vstuff.content.constraint.RopeConnectionType;
+import yay.evy.everest.vstuff.content.constraint.RopeUtil;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberServerAttachment;
 import yay.evy.everest.vstuff.content.ropethrower.RopeThrowerEntity;
 import yay.evy.everest.vstuff.content.thrust.ThrusterForceAttachment;
@@ -80,12 +80,11 @@ public class VStuff {
 
         modEventBus.addListener(this::commonSetup);
 
-
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> VStuffClient::initialize);
-
 
         LOGGER.info("VStuff mod initialized");
     }
+
     @VsBeta
     private void commonSetup(final FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
@@ -96,7 +95,7 @@ public class VStuff {
     public static void registerAttachments() {
         LOGGER.info("Registering vstuff attachments...");
 
-        // thruster attachment !
+        // thruster attachment ! yippee
         ValkyrienSkiesMod.getApi().registerAttachment(
                 ThrusterForceAttachment.class, builder -> {
                     builder.build();
@@ -144,7 +143,7 @@ public class VStuff {
                                 startPos,
                                 startShipId,
                                 serverLevel.dimension(),
-                                RopeConnectionType.NORMAL,
+                                RopeUtil.ConnectionType.NORMAL,
                                 null
                         );
 

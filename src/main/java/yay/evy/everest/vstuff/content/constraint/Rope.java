@@ -607,3 +607,10 @@ public class Rope {
     }
 
 }
+
+/*
+hidden devlog 1
+wren here
+i've been lost in the rope forest for so many days now... i don't know if i'll ever get out
+so many ropes...
+ */

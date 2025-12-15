@@ -12,30 +12,17 @@ import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.network.ConnectionType;
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.content.constraint.Rope;
-import yay.evy.everest.vstuff.content.constraint.RopeConnectionType;
 import yay.evy.everest.vstuff.content.constraint.RopeUtil;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.content.pulley.PulleyAnchorBlockEntity;
 import yay.evy.everest.vstuff.index.VStuffEntities;
 import yay.evy.everest.vstuff.index.VStuffItems;
-import yay.evy.everest.vstuff.index.VStuffSounds;
 
 public class RopeThrowerEntity extends ThrowableItemProjectile {
 
-    private BlockPos ownerBlockPos;
-
-    public void setOwnerBlockPos(BlockPos pos) {
-        this.ownerBlockPos = pos;
-    }
-    private boolean isDispenserShot = false;
-
-    public void setDispenserShot(boolean value) {
-        this.isDispenserShot = value;
-    }
 
     public RopeThrowerEntity(EntityType<? extends ThrowableItemProjectile> entityType, Level level) {
         super(entityType, level);
@@ -45,14 +32,14 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
     private BlockPos startPos;
     private Long startShipId;
     private ResourceKey<Level> startDimension;
-    private RopeConnectionType connectionType;
+    private RopeUtil.ConnectionType connectionType;
     private PhysPulleyBlockEntity waitingPulley;
 
     public void setStartData(
             BlockPos pos,
             Long shipId,
             ResourceKey<Level> dimension,
-            RopeConnectionType type,
+            RopeUtil.ConnectionType type,
             PhysPulleyBlockEntity pulley
     ) {
         this.startPos = pos;
@@ -102,11 +89,11 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
 
         if (ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS) {
 
-            if (connectionType == RopeConnectionType.PULLEY
+            if (connectionType == RopeUtil.ConnectionType.PULLEY
                     && waitingPulley != null
-                    && serverLevel.getBlockEntity(hitPos) instanceof PulleyAnchorBlockEntity anchor) {
+                    && serverLevel.getBlockEntity(hitPos) instanceof PulleyAnchorBlockEntity) {
 
-                waitingPulley.attachRopeAndAnchor(ropeReturn.rope(), anchor);
+                waitingPulley.attachRope(ropeReturn.rope());
             }
 
 
