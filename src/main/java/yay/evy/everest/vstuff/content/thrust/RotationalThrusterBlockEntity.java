@@ -32,7 +32,7 @@ import static com.simibubi.create.content.kinetics.motor.CreativeMotorBlockEntit
 @SuppressWarnings({"deprecation", "unchecked"})
 public class RotationalThrusterBlockEntity extends KineticBlockEntity {
 
-    public static final int BASE_MAX_THRUST = 400_000;
+    public static final int BASE_MAX_THRUST = 100_000;
     // Constants
     protected static final int OBSTRUCTION_LENGTH = 10;
     protected static final int TICKS_PER_ENTITY_CHECK = 5;
