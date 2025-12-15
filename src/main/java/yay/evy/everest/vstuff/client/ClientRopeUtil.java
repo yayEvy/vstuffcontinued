@@ -11,6 +11,9 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class ClientRopeUtil {
     private static final Object FAIL_OUTLINE_KEY = new Object();
 
+    public static final int RED = 0xFF6961;
+    public static final int GREEN = 0x77DD77;
+
     public static void drawOutline(Level level, BlockPos pos) {
         if (!level.isClientSide())
             return;
@@ -31,7 +34,7 @@ public class ClientRopeUtil {
     }
 
 
-    public static void drawFailOutline(Level level, BlockPos pos) {
+    public static void drawAnyOutline(Level level, BlockPos pos, int color) {
         if (!level.isClientSide()) return;
 
         var state = level.getBlockState(pos);

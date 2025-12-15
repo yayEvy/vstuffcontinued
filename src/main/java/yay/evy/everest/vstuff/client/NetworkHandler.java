@@ -1,5 +1,6 @@
 package yay.evy.everest.vstuff.client;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkRegistry;
@@ -8,6 +9,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 import org.joml.Vector3d;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.util.packet.ConstraintSyncPacket;
+import yay.evy.everest.vstuff.util.packet.OutlinePacket;
 import yay.evy.everest.vstuff.util.packet.RopeSoundPacket;
 import yay.evy.everest.vstuff.util.RopeStyles;
 import yay.evy.everest.vstuff.util.packet.RopeStyleSelectPacket;
@@ -42,6 +44,12 @@ public class NetworkHandler {
                 .encoder(RopeStyleSelectPacket::encode)
                 .consumerMainThread(RopeStyleSelectPacket::handle)
                 .add();
+
+        INSTANCE.messageBuilder(OutlinePacket.class, packetId++)
+                .decoder(OutlinePacket::decode)
+                .encoder(OutlinePacket::encode)
+                .consumerMainThread(OutlinePacket::handle)
+                .add();
     }
 
 
@@ -63,7 +71,6 @@ public class NetworkHandler {
     }
 
     public static void sendConstraintRemoveToPlayer(ServerPlayer player, Integer constraintId) {
-        VStuff.LOGGER.info("[NetworkHandler] Sending removeConstraint to player {}", player.getName());
         ConstraintSyncPacket packet = new ConstraintSyncPacket(constraintId);
         INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);
     }
@@ -72,7 +79,6 @@ public class NetworkHandler {
     public static void sendConstraintAddToPlayer(ServerPlayer player, Integer constraintId, Long shipA, Long shipB,
                                                  Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle style) {
         ConstraintSyncPacket packet = new ConstraintSyncPacket(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
-        VStuff.LOGGER.info("[NetworkHandler] Sending addConstraint to player {}", player.getName());
         INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);
     }
     public static void sendClearAllConstraints() {
@@ -81,8 +87,17 @@ public class NetworkHandler {
     }
 
     public static void sendClearAllConstraintsToPlayer(ServerPlayer player) {
-        VStuff.LOGGER.info("[NetworkHandler] Sending clearAllConstraints to player {}", player.getName());
         ConstraintSyncPacket packet = new ConstraintSyncPacket();
+        INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);
+    }
+
+    public static void sendOutline(BlockPos pos, int color) {
+        OutlinePacket packet = new OutlinePacket(pos, color);
+        INSTANCE.send(PacketDistributor.ALL.noArg(), packet);
+    }
+
+    public static void sendOutlineToPlayer(ServerPlayer player, BlockPos pos, int color) {
+        OutlinePacket packet = new OutlinePacket(pos, color);
         INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);
     }
 

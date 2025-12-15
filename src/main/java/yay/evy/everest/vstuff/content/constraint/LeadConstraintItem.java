@@ -17,6 +17,7 @@ import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.ClientRopeUtil;
+import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.pulley.*;
 import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
 import yay.evy.everest.vstuff.util.RopeStyles;
@@ -58,6 +59,7 @@ public class LeadConstraintItem extends Item {
                     return InteractionResult.FAIL;
                 } else if (!pulleyBE.canAttachManualConstraint) {
                     resetStateWithMessage(heldItem, player, "pulley_attach_fail");
+                    NetworkHandler.sendOutline(clickedPos, ClientRopeUtil.RED);
                     return InteractionResult.FAIL;
 
                 } else {
@@ -74,16 +76,19 @@ public class LeadConstraintItem extends Item {
                 sendRopeMessage(player, "pulley_first");
             }
             heldItem.getOrCreateTagElement("first");
+            NetworkHandler.sendOutline(clickedPos, ClientRopeUtil.GREEN);
             return InteractionResult.SUCCESS;
 
         } else {
             if (player.isShiftKeyDown() || firstClickedPos.equals(clickedPos)) {
                 resetStateWithMessage(heldItem, player, "rope_reset");
+                NetworkHandler.sendOutline(clickedPos, ClientRopeUtil.GREEN);
                 return InteractionResult.SUCCESS;
             }
 
             if (!serverLevel.dimension().equals(firstClickDimension)) {
                 resetStateWithMessage(heldItem, player, "interdimensional_fail");
+                NetworkHandler.sendOutline(clickedPos, ClientRopeUtil.RED);
                 return InteractionResult.FAIL;
             }
 
@@ -94,17 +99,17 @@ public class LeadConstraintItem extends Item {
                     Long secondShipId = getShipIdAtPos(serverLevel, clickedPos);
                     if (Objects.equals(secondShipId, firstShipId)) { // pulley and anchor cannot be in same body
                         resetStateWithMessage(heldItem, player, "pulley_body_fail");
+                        NetworkHandler.sendOutline(clickedPos, ClientRopeUtil.RED);
                         return InteractionResult.FAIL;
                     }
 
                     RopeUtil.RopeReturn ropeReturn = Rope.createNew(this, serverLevel, firstClickedPos, clickedPos, firstShipId, secondShipId, player);
-                    System.out.println(ropeReturn.result());
-                    System.out.println(ropeReturn.rope());
                     if (ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS) {
                         waitingPulley.attachRopeAndAnchor(ropeReturn.rope(), pulleyAnchorBE);
                     }
                 } else {
                     resetStateWithMessage(heldItem, player, "pulley_fail");
+                    NetworkHandler.sendOutline(clickedPos, ClientRopeUtil.RED);
                     return InteractionResult.FAIL;
                 }
             }
@@ -129,6 +134,7 @@ public class LeadConstraintItem extends Item {
                         1.0F
                 );
 
+                NetworkHandler.sendOutline(clickedPos, ClientRopeUtil.GREEN);
                 resetStateWithMessage(heldItem, player, isChain ? "chain_created" : "rope_created");
 
             }
@@ -155,6 +161,7 @@ public class LeadConstraintItem extends Item {
         stack.setTag(null);
         if (waitingPulley != null) {
             waitingPulley.clearWaitingLeadConstraintItem();
+            waitingPulley.resetSelf();
         }
 
         VStuff.LOGGER.info("Successfully reset LeadConstraintItem");

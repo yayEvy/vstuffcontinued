@@ -96,8 +96,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         attachedRope = rope;
         currentRopeLength = rope.maxLength;
         constraintId = rope.ID;
-        System.out.println(constraintId);
-        System.out.println(currentRopeLength);
 
         clearWaitingLeadConstraintItem();
     }
@@ -114,7 +112,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         waitingConstraintItem = null;
     }
 
-    private void resetSelf() {
+    public void resetSelf() {
         isExtended = false;
         hasWaitingRope = false;
         canAttachManualConstraint = true;
