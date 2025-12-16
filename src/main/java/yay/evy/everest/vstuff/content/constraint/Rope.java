@@ -225,6 +225,7 @@ public class Rope {
                     constraint.getShipId1(),
                     constraint.getPose1(),
                     constraint.getMaxForceTorque(),
+                    compliance,
                     constraint.getMinDistance(),
                     newLength,
                     constraint.getTolerance(),
@@ -310,6 +311,7 @@ public class Rope {
                         (float) maxForce,
                         (float) maxForce
                 ),
+                compliance,
                 0f,
                 (float) maxLength,
                 0.1f,
@@ -430,6 +432,7 @@ public class Rope {
                     finalShipB,
                     new VSJointPose(finalLocalPosB, new Quaterniond()),
                     new VSJointMaxForceTorque((float) maxForce, (float) maxForce),
+                    compliance,
                     0f,
                     (float) maxLength,
                     1f,
