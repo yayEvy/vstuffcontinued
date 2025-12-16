@@ -28,13 +28,18 @@ public class VStuffShapes {
             .erase(2, 15, 0, 14, 16, 16) // back
             .forDirectional(), // i hate this so much.
 
-        PHYS_PULLEY = shape(3, 8, 1.25, 13, 14, 10.25) // main
+        PHYS_PULLEY = shape(3, 2, 1.25, 13, 8, 10.25) // main piece
+                .add(0,0,0,3,16,16) // left side
+                .add(13,0,0,16,16,16) // right side
+                .add(3,9.75,5,7,13.75,11) // small bar
             .forDirectional(),
 
         PULLEY_ANCHOR = shape(4,4,15,12,12,16)
                 .add(3,3,14,13,13,15)
                 .add(5,5,13,11,11,14)
-                .forDirectional();
+                .forDirectional()
+
+                ;
 
 
     public static Builder shape(VoxelShape shape) {

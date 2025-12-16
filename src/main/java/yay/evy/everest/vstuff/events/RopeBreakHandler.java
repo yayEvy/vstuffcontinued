@@ -27,7 +27,6 @@ public class RopeBreakHandler {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
 
         BlockPos brokenPos = event.getPos();
-        List<Integer> constraintsToRemove = new ArrayList<>();
         Map<Integer, Rope> toRemove = new HashMap<>();
 
         for (Map.Entry<Integer, Rope> entry : ConstraintTracker.getActiveRopes().entrySet()) {
@@ -103,7 +102,7 @@ public class RopeBreakHandler {
             Rope rope = ropeEntry.getValue();
             try {
                 rope.removeJoint(level);
-                ConstraintTracker.removeConstraintWithPersistence(level, id);
+                ConstraintTracker.removeConstraintFromTracker(level, id);
             } catch (Exception e) {
                 VStuff.LOGGER.error("[RopeBreakHandler] Failed to remove constraint {}: {}", id, e.getMessage());
             }

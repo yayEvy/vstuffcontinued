@@ -136,13 +136,13 @@ public class VStuff {
 
                         Position dispensePos = DispenserBlock.getDispensePosition(source);
 
-                        RopeThrowerEntity rope = new RopeThrowerEntity(serverLevel);
+                        RopeThrowerEntity rope = new RopeThrowerEntity(VStuffEntities.ROPE_THROWER.get(), serverLevel);
                         rope.setPos(dispensePos.x(), dispensePos.y(), dispensePos.z());
 
                         rope.setStartData(
                                 startPos,
                                 startShipId,
-                                serverLevel.dimension(),
+                                serverLevel.dimension().location().toString(),
                                 RopeUtil.ConnectionType.NORMAL,
                                 null
                         );

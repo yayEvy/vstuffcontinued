@@ -5,7 +5,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
@@ -18,8 +17,6 @@ import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.client.NetworkHandler;
-import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
-import yay.evy.everest.vstuff.content.pulley.PulleyAnchorBlockEntity;
 import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
 import yay.evy.everest.vstuff.util.RopeStyles;
 import org.valkyrienskies.core.internal.joints.*;
@@ -27,9 +24,6 @@ import yay.evy.everest.vstuff.content.constraint.RopeUtil.*;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-
 public class Rope {
 
     private @Nullable ServerLevel level;
@@ -183,7 +177,7 @@ public class Rope {
     public boolean removeJoint(ServerLevel level) {
         if (!hasPhysicalImpact) {
             VStuff.LOGGER.info("nuh uh [not removing joint for rope without joint]");
-            return false;
+            return true;
         }
         this.level = level;
         this.levelId = RopeUtil.registerLevel(level);
@@ -200,7 +194,7 @@ public class Rope {
 
             gtpa.removeJoint(ID);
             this.constraint = null;
-            ConstraintTracker.removeConstraintWithPersistence(level, ID);
+            ConstraintTracker.removeConstraintFromTracker(level, ID);
             NetworkHandler.sendConstraintRemove(ID);
             VStuff.LOGGER.info("Successfully removed joint with id {}", ID);
             return true;
@@ -213,7 +207,7 @@ public class Rope {
     public boolean setJointLength(ServerLevel level, float newLength) {
         if (!hasPhysicalImpact) {
             VStuff.LOGGER.info("nuh uh [not settings joint length for rope without joint]");
-            return false;
+            return true;
         }
 
         if (constraint == null) {
@@ -241,6 +235,7 @@ public class Rope {
             gtpa.updateJoint(new VSJointAndId(ID, newConstraint));
             constraint = newConstraint;
             maxLength = newConstraint.getMaxDistance();
+            ConstraintTracker.replaceConstraint(ID, this);
         } catch (Exception e) {
             VStuff.LOGGER.error("Error updating joint for constraint {}: {}", ID, e.getMessage());
         }
@@ -293,8 +288,6 @@ public class Rope {
 
                 ConstraintTracker.addConstraintToTracker(this);
             });
-
-
 
             return true;
         } catch (Exception e) {
@@ -464,7 +457,7 @@ public class Rope {
                 );
                 rope.hasPhysicalImpact = false;
 
-                ConstraintTracker.addConstraintWithPersistence(rope);
+                ConstraintTracker.addConstraintToTracker(rope);
 
                 if (finalPlayer instanceof ServerPlayer serverPlayer) {
                     ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);
@@ -474,7 +467,7 @@ public class Rope {
                 return new RopeReturn(RopeInteractionReturn.SUCCESS, rope);
             } else {
                 RopeStyles.RopeStyle ropeStyle = null;
-                if (finalPlayer instanceof ServerPlayer serverPlayer) {
+                if (player instanceof ServerPlayer serverPlayer) {
                     ropeStyle = RopeStyleHandlerServer.getStyle(serverPlayer.getUUID());
                 }
 
@@ -491,7 +484,7 @@ public class Rope {
                 gtpa.addJoint(ropeConstraint, 0, newConstraintId -> {
                     rope.ID = newConstraintId;
 
-                    ConstraintTracker.addConstraintWithPersistence(rope);
+                    ConstraintTracker.addConstraintToTracker(rope);
 
                     if (finalPlayer instanceof ServerPlayer serverPlayer) {
                         ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);

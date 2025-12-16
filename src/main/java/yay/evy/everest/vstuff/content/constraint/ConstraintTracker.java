@@ -25,59 +25,44 @@ public class ConstraintTracker {
     public static final Map<Integer, Rope> activeRopes = new ConcurrentHashMap<>();
     private static long lastJoinTime = 0L;
 
-
-    public static void addConstraintWithPersistence(Rope rope) {
-
-        if (rope.constraintType == RopeUtil.ConstraintType.PULLEY && rope.sourceBlockPos != null) {
-            boolean existingConstraintFound = activeRopes.values().stream()
-                    .anyMatch(existing -> existing.constraintType == RopeUtil.ConstraintType.PULLEY
-                            && existing.sourceBlockPos != null
-                            && existing.sourceBlockPos.equals(rope.sourceBlockPos)
-                            && existing.style == rope.style);
-
-            if (existingConstraintFound) return;
-        }
-
-
-        activeRopes.put(rope.ID, rope);
-
-        ConstraintPersistence persistence = ConstraintPersistence.get(rope.getLevel());
-
-        persistence.addConstraint(rope);
-        NetworkHandler.sendConstraintAdd(rope.ID, rope.shipA, rope.shipB, rope.localPosA, rope.localPosB, rope.maxLength, rope.style);
-    }
-
     public static void replaceConstraint(Integer id, Rope rope) {
         activeRopes.put(id, rope);
     }
 
-    public static void removeConstraintWithPersistence(ServerLevel level, Integer constraintId) {
+    public static void addConstraintToTracker(Rope rope) {
+        if (activeRopes.containsKey(rope.ID)) return;
 
-        Rope data = activeRopes.remove(constraintId);
+        activeRopes.put(rope.ID, rope);
+        VStuff.LOGGER.info("Adding constraint {} to activeRopes", rope.ID);
+
+
+        NetworkHandler.sendConstraintAdd(rope.ID, rope.shipA, rope.shipB, rope.localPosA, rope.localPosB, rope.maxLength, rope.style);
+    }
+
+    public static void removeConstraintFromTracker(ServerLevel level, Integer id) {
+        Rope data = activeRopes.remove(id);
+
         if (data != null) {
-
-            ConstraintPersistence persistence = ConstraintPersistence.get(level);
-                persistence.markConstraintAsRemoved(constraintId);
-                persistence.setDirty();
 
             if (level.getServer() != null) {
                 for (ServerPlayer player : level.getServer().getPlayerList().getPlayers()) {
-                    NetworkHandler.sendConstraintRemoveToPlayer(player, constraintId);
+                    NetworkHandler.sendConstraintRemoveToPlayer(player, id);
                     level.getServer().tell(
                             new TickTask(
-                                0,
-                                () -> NetworkHandler.sendConstraintRemoveToPlayer(player, constraintId)
+                                    0,
+                                    () -> NetworkHandler.sendConstraintRemoveToPlayer(player, id)
                             )
                     );
                 }
             }
 
-            NetworkHandler.sendConstraintRemove(constraintId);
+            NetworkHandler.sendConstraintRemove(id);
 
             if (data.constraintType == RopeUtil.ConstraintType.GENERIC && data.sourceBlockPos != null) {
                 cleanupOrphanedConstraints(level, data.sourceBlockPos);
             }
         }
+
     }
 
 
@@ -107,18 +92,6 @@ public class ConstraintTracker {
     }
 
 
-    public static void addConstraintToTracker(Rope rope) {
-        if (activeRopes.containsKey(rope.ID)) return;
-
-        activeRopes.put(rope.ID, rope);
-        VStuff.LOGGER.info("Adding constraint {} to activeRopes", rope.ID);
-
-
-        NetworkHandler.sendConstraintAdd(rope.ID, rope.shipA, rope.shipB, rope.localPosA, rope.localPosB, rope.maxLength, rope.style);
-    }
-
-
-
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
@@ -146,7 +119,6 @@ public class ConstraintTracker {
         for (Integer constraintId : constraintsToRemove) {
             try {
                 gtpa.removeJoint(constraintId);
-                removeConstraintWithPersistence(level, constraintId);
             } catch (Exception ignored) {}
         }
     }

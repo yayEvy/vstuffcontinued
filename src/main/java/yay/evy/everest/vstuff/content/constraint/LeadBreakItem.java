@@ -86,10 +86,7 @@ public class LeadBreakItem extends Item {
             gtpa.removeJoint(id);
         } catch (Exception ignored) {}
 
-        ConstraintPersistence persistence = ConstraintPersistence.get(level);
-        persistence.saveNow(level);
-
-        ConstraintTracker.removeConstraintWithPersistence(level, id);
+        ConstraintTracker.removeConstraintFromTracker(level, id);
         NetworkHandler.sendConstraintRemove(id);
     }
 }

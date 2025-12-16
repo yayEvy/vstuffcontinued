@@ -25,6 +25,8 @@ import yay.evy.everest.vstuff.content.constraint.RopeUtil.ConnectionType;
 
 import java.util.Objects;
 
+import static yay.evy.everest.vstuff.content.constraint.RopeUtil.getShipIdAtPos;
+
 public class LeadConstraintItem extends Item {
 
     public LeadConstraintItem(Properties pProperties) {
@@ -150,10 +152,6 @@ public class LeadConstraintItem extends Item {
         }
     }
 
-    private Long getShipIdAtPos(ServerLevel level, BlockPos pos) {
-        LoadedShip loadedShip = VSGameUtilsKt.getLoadedShipManagingPos(level, pos);
-        return loadedShip != null ? loadedShip.getId() : null;
-    }
 
     @Override
     public boolean isFoil(ItemStack pStack) {

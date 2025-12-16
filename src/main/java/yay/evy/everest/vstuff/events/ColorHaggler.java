@@ -12,7 +12,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.NetworkHandler;
-import yay.evy.everest.vstuff.content.constraint.ConstraintPersistence;
 import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
 import yay.evy.everest.vstuff.content.constraint.Rope;
 import yay.evy.everest.vstuff.content.constraint.RopeUtil;
@@ -39,7 +38,6 @@ public class ColorHaggler {
                             if (ropeIsColorable(serverLevel, player)) {
 
                                 Rope rope = ConstraintTracker.getActiveRopes().get(targetConstraintId);
-                                ConstraintPersistence constraintPersistence = ConstraintPersistence.get(serverLevel);
 
                                 rope.style = getDyedStyle(item.toString(), getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(serverLevel, player));
 
@@ -47,10 +45,8 @@ public class ColorHaggler {
 
                                 NetworkHandler.sendConstraintRerender(targetConstraintId, rope.shipA, rope.shipB,
                                         rope.localPosA, rope.localPosB, rope.maxLength, rope.style);
-                                constraintPersistence.addConstraint(rope);
                                 ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);
 
-                                ConstraintPersistence.get(serverLevel).saveNow(serverLevel);
                             }
                         }
                     }

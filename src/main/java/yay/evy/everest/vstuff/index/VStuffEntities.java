@@ -1,5 +1,7 @@
 package yay.evy.everest.vstuff.index;
 
+import com.simibubi.create.foundation.data.CreateRegistrate;
+import com.tterrag.registrate.util.entry.EntityEntry;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -10,15 +12,14 @@ import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.ropethrower.RopeThrowerEntity;
 
 public class VStuffEntities {
-    public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
-            DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, VStuff.MOD_ID);
 
-    public static final RegistryObject<EntityType<RopeThrowerEntity>> ROPE_THROWER =
-            ENTITY_TYPES.register("rope_thrower", () -> EntityType.Builder.<RopeThrowerEntity>of(RopeThrowerEntity::new, MobCategory.MISC)
-                    .sized(0.5f, 0.5f).build("rope_thrower"));
+    static CreateRegistrate REGISTRATE = VStuff.registrate();
 
-public static void register(IEventBus eventBus) {
+    public static final EntityEntry<RopeThrowerEntity> ROPE_THROWER =
+            REGISTRATE.entity("rope_thrower", RopeThrowerEntity::new, MobCategory.MISC)
+                    .properties(p -> p.sized(0.5f, 0.5f).build("rope_thrower"))
+                    .register();
 
-    ENTITY_TYPES.register(eventBus);
-    }
+    public static void register(IEventBus eventBus) {}
+
 }

@@ -25,9 +25,6 @@ public class VStuffItems {
         REGISTRATE.setCreativeTab(VStuffCreativeModeTabs.VSTUFF_MAIN);
     }
 
-    public static final DeferredRegister<Item> ITEMS =
-            DeferredRegister.create(ForgeRegistries.ITEMS, VStuff.MOD_ID);
-
 
     public static final ItemEntry<LeadConstraintItem> LEAD_CONSTRAINT_ITEM =
             REGISTRATE.item("lead_constraint_item", LeadConstraintItem::new)
@@ -79,7 +76,5 @@ public class VStuffItems {
 
 
 
-    public static void register(IEventBus eventBus) {
-        ITEMS.register(eventBus);
-    }
+    public static void register(IEventBus eventBus) {}
 }

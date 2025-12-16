@@ -1,12 +1,15 @@
 package yay.evy.everest.vstuff.content.constraint;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
+import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
@@ -190,6 +193,11 @@ public class RopeUtil {
         return closestConstraintId;
     }
 
+    public static Long getShipIdAtPos(ServerLevel level, BlockPos pos) {
+        LoadedShip loadedShip = VSGameUtilsKt.getLoadedShipManagingPos(level, pos);
+        return loadedShip != null ? loadedShip.getId() : null;
+    }
+
     public enum RopeInteractionReturn {
         SUCCESS,
         FAIL,
@@ -209,5 +217,13 @@ public class RopeUtil {
     public record RopeReturn(RopeInteractionReturn result, Rope rope){
         static RopeReturn FAIL = new RopeReturn(RopeInteractionReturn.FAIL, null);
     }
+
+    public static void sendRopeMessage(Player player, String name) {
+        player.displayClientMessage(
+                Component.translatable("vstuff.message." + name),
+                true
+        );
+    }
+
 
 }
