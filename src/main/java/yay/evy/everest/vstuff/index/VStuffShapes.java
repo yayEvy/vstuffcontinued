@@ -31,7 +31,7 @@ public class VStuffShapes {
         PHYS_PULLEY = shape(3, 2, 1.25, 13, 8, 10.25) // main piece
                 .add(0,0,0,3,16,16) // left side
                 .add(13,0,0,16,16,16) // right side
-                .add(3,9.75,5,7,13.75,11) // small bar
+                .add(3,9.75,7,13,13.75,11) // small bar
             .forDirectional(),
 
         PULLEY_ANCHOR = shape(4,4,15,12,12,16)

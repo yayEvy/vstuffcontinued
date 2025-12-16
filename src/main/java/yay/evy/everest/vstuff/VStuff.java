@@ -63,15 +63,19 @@ public class VStuff {
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, VstuffConfig.CLIENT_CONFIG);
 
         VStuffCreativeModeTabs.register(modEventBus);
+
+        REGISTRATE.registerEventListeners(modEventBus);
+        REGISTRATE.setCreativeTab(VStuffCreativeModeTabs.VSTUFF_MAIN);
+
         VStuffSounds.register(modEventBus);
         ParticleTypes.register(modEventBus);
-        REGISTRATE.registerEventListeners(modEventBus);
 
-        VStuffRopeStyles.register();
         VStuffBlocks.register();
-        VStuffBlockEntities.register();
+        VStuffItems.register();
         VStuffEntities.register(modEventBus);
-        VStuffItems.register(modEventBus);
+        VStuffBlockEntities.register();
+        VStuffRopeStyles.register();
+
 
         MinecraftForge.EVENT_BUS.register(this);
         NetworkHandler.registerPackets();

@@ -1,9 +1,7 @@
 package yay.evy.everest.vstuff.index;
 
-import net.minecraft.network.chat.Component;
 
 import yay.evy.everest.vstuff.content.ropestyler.components.RopeStyleCategory;
-import yay.evy.everest.vstuff.util.RopeStyles;
 import yay.evy.everest.vstuff.util.RopeStyles.RopeStyle;
 import yay.evy.everest.vstuff.util.RopeStyles.PrimitiveRopeStyle;
 

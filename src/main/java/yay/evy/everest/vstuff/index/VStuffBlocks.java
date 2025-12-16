@@ -22,10 +22,6 @@ public class VStuffBlocks  {
 
     static CreateRegistrate REGISTRATE = VStuff.registrate();
 
-    static {
-        REGISTRATE.setCreativeTab(VStuffCreativeModeTabs.VSTUFF_MAIN);
-    }
-
     public static final BlockEntry<RotationalThrusterBlock> ROTATIONAL_THRUSTER =
             REGISTRATE.block("rotational_thruster", RotationalThrusterBlock::new)
                     .initialProperties(() -> Blocks.IRON_BLOCK)

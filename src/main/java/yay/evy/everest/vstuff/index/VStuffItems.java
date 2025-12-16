@@ -21,10 +21,6 @@ public class VStuffItems {
 
     static CreateRegistrate REGISTRATE = VStuff.registrate();
 
-    static {
-        REGISTRATE.setCreativeTab(VStuffCreativeModeTabs.VSTUFF_MAIN);
-    }
-
 
     public static final ItemEntry<LeadConstraintItem> LEAD_CONSTRAINT_ITEM =
             REGISTRATE.item("lead_constraint_item", LeadConstraintItem::new)
@@ -76,5 +72,5 @@ public class VStuffItems {
 
 
 
-    public static void register(IEventBus eventBus) {}
+    public static void register() {}
 }
