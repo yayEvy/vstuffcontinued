@@ -1,13 +1,15 @@
 {
 	"format_version": "1.9.0",
-	"credit": "Made with Blockbench",
+	"credit": "Model generated using MrCrayfish's Model Creator (http://mrcrayfish.com/modelcreator/)",
 	"parent": "block/block",
 	"texture_size": [64, 64],
 	"textures": {
 		"0": "vstuff:block/phys_pulley/phys_pulley_rims",
 		"1": "vstuff:block/phys_pulley/phys_pulley_sides",
 		"2": "vstuff:block/phys_pulley/phys_pulley_int",
-		"particle": "vstuff:block/phys_pulley/phys_pulley_sides"
+		"particle": "create:block/axis",
+		"1_0": "create:block/axis",
+		"1_1": "create:block/axis_top"
 	},
 	"elements": [
 		{
@@ -191,6 +193,42 @@
 				"up": {"uv": [0, 1.5, 2, 2.75], "texture": "#2"},
 				"down": {"uv": [2, 1.5, 0, 2.75], "texture": "#2"}
 			}
+		},
+		{
+			"name": "Axis",
+			"from": [0, 6, 6],
+			"to": [16, 10, 10],
+			"rotation": {"angle": 0, "axis": "z", "origin": [8, 8, 8]},
+			"faces": {
+				"north": {"uv": [6, 0, 10, 16], "rotation": 90, "texture": "#1_0"},
+				"east": {"uv": [6, 6, 10, 10], "rotation": 270, "texture": "#1_1"},
+				"south": {"uv": [6, 0, 10, 16], "rotation": 270, "texture": "#1_0"},
+				"west": {"uv": [6, 6, 10, 10], "rotation": 270, "texture": "#1_1"},
+				"up": {"uv": [6, 0, 10, 16], "rotation": 270, "texture": "#1_0"},
+				"down": {"uv": [6, 0, 10, 16], "rotation": 270, "texture": "#1_0"}
+			}
+		}
+	],
+	"groups": [
+		0,
+		1,
+		2,
+		3,
+		4,
+		5,
+		6,
+		7,
+		8,
+		9,
+		10,
+		11,
+		12,
+		13,
+		{
+			"name": "shaft (2)",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [14]
 		}
 	]
 }
