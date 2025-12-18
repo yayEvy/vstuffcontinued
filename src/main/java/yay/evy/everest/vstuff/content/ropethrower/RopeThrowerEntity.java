@@ -31,14 +31,14 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
 
     private BlockPos startPos;
     private Long startShipId;
-    private ResourceKey<Level> startDimension;
+    private String startDimension;
     private RopeUtil.ConnectionType connectionType;
     private PhysPulleyBlockEntity waitingPulley;
 
     public void setStartData(
             BlockPos pos,
             Long shipId,
-            ResourceKey<Level> dimension,
+            String dimension,
             RopeUtil.ConnectionType type,
             PhysPulleyBlockEntity pulley
     ) {
@@ -49,14 +49,6 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
         this.waitingPulley = pulley;
     }
 
-    public RopeThrowerEntity(Level level) {
-        super(VStuffEntities.ROPE_THROWER.get(), level);
-    }
-
-    public RopeThrowerEntity(Level level, LivingEntity livingEntity) {
-        super(VStuffEntities.ROPE_THROWER.get(), livingEntity, level);
-    }
-
     @Override
     protected Item getDefaultItem() {
         return VStuffItems.ROPE_THROWER_ITEM.get();
@@ -65,11 +57,12 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
 
     @Override
     protected void onHitBlock(BlockHitResult result) {
+        System.out.println("on hit");
         if (!(level() instanceof ServerLevel serverLevel)) {
             return;
         }
 
-        if (startPos == null || !serverLevel.dimension().equals(startDimension)) {
+        if (startPos == null || !serverLevel.dimension().location().toString().equals(startDimension)) {
             discard();
             return;
         }

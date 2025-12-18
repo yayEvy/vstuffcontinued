@@ -231,11 +231,12 @@ public class Rope {
                     constraint.getShipId1(),
                     constraint.getPose1(),
                     constraint.getMaxForceTorque(),
+                    constraint.getCompliance(),
                     constraint.getMinDistance(),
                     newLength,
                     constraint.getTolerance(),
-                    1e10f,
-                    1000f
+                    constraint.getStiffness(),
+                    constraint.getDamping()
             );
 
             gtpa.updateJoint(new VSJointAndId(ID, newConstraint));
@@ -317,10 +318,11 @@ public class Rope {
                         (float) maxForce,
                         (float) maxForce
                 ),
+                compliance,
                 0f,
                 (float) maxLength,
                 0.1f,
-                1e9f,
+                1e8f,
                 100f
         );
     }
@@ -437,6 +439,7 @@ public class Rope {
                     finalShipB,
                     new VSJointPose(finalLocalPosB, new Quaterniond()),
                     new VSJointMaxForceTorque((float) maxForce, (float) maxForce),
+                    compliance,
                     0f,
                     (float) maxLength,
                     1f,

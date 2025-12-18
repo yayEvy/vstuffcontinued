@@ -14,12 +14,6 @@
   "vstuff.pulley_anchor.tooltip": "Use this as a second pos for pulley connections!",
   "vstuff.pulley_anchor.tooltip.summary": "Acts as an anchor point for pulley rope connections",
 
-  "vstuff.message.pulley_attach_fail": "§cThis pulley cannot accept a rope.",
-  "vstuff.message.pulley_first": "§aPulley selected as first position!",
-  "vstuff.message.pulley_body_fail": "§cPulley and anchor cannot be on the same ship/world pos is invalid!",
-  "vstuff.message.pulley_fail": "§cYou must attach the rope to a Pulley Anchor!",
-
-
   "block.vstuff.phys_pulley": "Phys Pulley",
   "block.vstuff.rotational_thruster": "Rotational Thruster",
 
@@ -41,7 +35,12 @@
   "vstuff.message.rope_first": "§aFirst position selected.",
   "vstuff.message.rope_break": "§aRope broken!",
   "vstuff.message.chain_break": "§aChain broken!",
-
+  "vstuff.message.rope_thrower_not_set": "No block selected!",
+  "vstuff.message.pulley_attach_fail": "§cThis pulley cannot accept a rope.",
+  "vstuff.message.pulley_first": "§aPulley selected as first position!",
+  "vstuff.message.pulley_body_fail": "§cPulley and anchor cannot be on the same ship/world pos is invalid!",
+  "vstuff.message.pulley_fail": "§cYou must attach the rope to a Pulley Anchor!",
+  "vstuff.message.rope_thrown": "§aRope thrown!",
 
   "vstuff.ponder.phys_pulley.text_3": "First, shift-right-click the pulley to start defining the rope's path.",
   "vstuff.ponder.phys_pulley.text_4": "Then, right-click another block to set the rope's anchor point and length.",
@@ -65,7 +64,6 @@
   "vstuff.rope_thrower.tooltip.summary": "A _Throwable_ rope! Press the _Open Rope Styler_ key (default _ALT_) to change the rope texture.",
   "vstuff.rope_thrower.tooltip.condition1": "Select the first pos as normal",
   "vstuff.rope_thrower.tooltip.behavior1": "Creates a rope between the first pos and the block you hit on throw.",
-  "vstuff.message.rope_thrower_no_block": "No block selected!",
 
   "vstuff.lead_break_item.tooltip.summary": "Cuts the rope you are looking at.",
   "vstuff.phys_grabber.tooltip.summary": "A method of dragging ships around!",
@@ -102,7 +100,6 @@
 
   "vstuff.rope.christmas_candycane": "Candy Cane",
   "vstuff.rope.christmas_christmas_tree": "Christmas Tree",
-
 
   "vstuff.rope_category.normal": "Basic Styles",
   "vstuff.rope_category.casing": "Casing Styles",

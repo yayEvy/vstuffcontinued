@@ -63,15 +63,19 @@ public class VStuff {
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, VstuffConfig.CLIENT_CONFIG);
 
         VStuffCreativeModeTabs.register(modEventBus);
+
+        REGISTRATE.registerEventListeners(modEventBus);
+        REGISTRATE.setCreativeTab(VStuffCreativeModeTabs.VSTUFF_MAIN);
+
         VStuffSounds.register(modEventBus);
         ParticleTypes.register(modEventBus);
-        REGISTRATE.registerEventListeners(modEventBus);
 
-        VStuffRopeStyles.register();
         VStuffBlocks.register();
-        VStuffBlockEntities.register();
+        VStuffItems.register();
         VStuffEntities.register(modEventBus);
-        VStuffItems.register(modEventBus);
+        VStuffBlockEntities.register();
+        VStuffRopeStyles.register();
+
 
         MinecraftForge.EVENT_BUS.register(this);
         NetworkHandler.registerPackets();
@@ -136,13 +140,13 @@ public class VStuff {
 
                         Position dispensePos = DispenserBlock.getDispensePosition(source);
 
-                        RopeThrowerEntity rope = new RopeThrowerEntity(serverLevel);
+                        RopeThrowerEntity rope = new RopeThrowerEntity(VStuffEntities.ROPE_THROWER.get(), serverLevel);
                         rope.setPos(dispensePos.x(), dispensePos.y(), dispensePos.z());
 
                         rope.setStartData(
                                 startPos,
                                 startShipId,
-                                serverLevel.dimension(),
+                                serverLevel.dimension().location().toString(),
                                 RopeUtil.ConnectionType.NORMAL,
                                 null
                         );
@@ -208,5 +212,3 @@ public class VStuff {
 
 
 }
-
-
