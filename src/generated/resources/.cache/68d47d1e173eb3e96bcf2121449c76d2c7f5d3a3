@@ -1,14 +1,15 @@
-// 1.20.1	2025-12-03T15:36:08.1128599	Registrate Provider for vstuff [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2025-12-18T10:44:07.7847655	Registrate Provider for vstuff [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 06226623a5731cbedbc7295cf3b3abbd826fb979 assets/vstuff/blockstates/phys_pulley.json
 459168383c490e619eab4630510f578ba6efc702 assets/vstuff/blockstates/pulley_anchor.json
 ff749d4bf96f31fb90a1f0207e803f749a60509e assets/vstuff/blockstates/rotational_thruster.json
-fd8a6e606c097b19085e1d4f94c876eaa7902d45 assets/vstuff/lang/en_ud.json
-ebd57b0898d1550e1c7aad315319efc4c6f3e66e assets/vstuff/lang/en_us.json
+e835c0126e714ba5ee5bab5e121a08d11008d6d4 assets/vstuff/lang/en_ud.json
+6ee64f96d4b673a4ab560979ae0dfe0b8fedcccb assets/vstuff/lang/en_us.json
 be5937ff5de8a51366cf82b9c7f5b34c4496d60c assets/vstuff/models/item/empty_energy_core.json
 934450fe012958ef13d982dba54b71966e41d124 assets/vstuff/models/item/energy_core.json
 3725e1308e5160b48ea68779143614a187f560ac assets/vstuff/models/item/lead_break_item.json
 1be9c03b646ca04abc0068c63836926b2622dd50 assets/vstuff/models/item/lead_constraint_item.json
 630aa4d6a4edf2be76099637986311bc9b303464 assets/vstuff/models/item/phys_grabber.json
+11143b0d7c4a07597d66b5b5dfd30481e172c8af assets/vstuff/models/item/rope_thrower.json
 bc287033aa50b1580d0cfc6aaf8a359f13e2d44a data/minecraft/tags/blocks/mineable/axe.json
 6f917b05de76dc0cb15e3a65fa3b970b0c07d9d0 data/minecraft/tags/blocks/mineable/pickaxe.json
 9b732f327d789e082266581fb72ca704fb538ee5 data/vstuff/loot_tables/blocks/phys_pulley.json
