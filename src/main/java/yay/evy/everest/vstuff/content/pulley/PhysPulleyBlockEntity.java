@@ -13,12 +13,12 @@ import org.jetbrains.annotations.Nullable;
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.mod.api.BlockEntityPhysicsListener;
-
 import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
 import yay.evy.everest.vstuff.content.constraint.Rope;
 import yay.evy.everest.vstuff.index.VStuffBlockEntities;
 
 import java.util.List;
+import java.util.Map;
 
 public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEntityPhysicsListener {
 
@@ -42,27 +42,33 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     }
 
     public void attachRope(Rope rope) {
+        if (rope == null) return;
         state = PulleyState.EXTENDED;
         attachedRope = rope;
         currentRopeLength = rope.maxLength;
         constraintId = rope.ID;
-
         clearWaiting();
+        setChanged();
     }
 
     public void setWaiting() {
         state = PulleyState.WAITING;
+        setChanged();
     }
 
     public void clearWaiting() {
         state = PulleyState.OPEN;
+        setChanged();
     }
 
     public void resetSelf() {
         state = PulleyState.OPEN;
         attachedRope = null;
         constraintId = null;
+        currentRopeLength = 0.0;
+        setChanged();
     }
+
     public static PhysPulleyBlockEntity create(BlockPos pos, BlockState state) {
         return new PhysPulleyBlockEntity(VStuffBlockEntities.PHYS_PULLEY_BE.get(), pos, state);
     }
@@ -75,28 +81,30 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     @Override
     public void physTick(@Nullable PhysShip physShip, @NotNull PhysLevel physLevel) {
         if (!(level instanceof ServerLevel serverLevel)) return;
-        if (state == PulleyState.EXTENDED && attachedRope == null) {
-            attachedRope = ConstraintTracker.activeRopes.get(constraintId); // if it failed to get before
+
+        if (state == PulleyState.EXTENDED && attachedRope == null && constraintId != null) {
+            Map<Integer, Rope> active = ConstraintTracker.getActiveRopes();
+            if (active != null) attachedRope = active.get(constraintId);
+            if (attachedRope != null) currentRopeLength = attachedRope.maxLength;
         }
-        if (!(state == PulleyState.EXTENDED) || attachedRope == null) return;
+
+        if (state != PulleyState.EXTENDED || attachedRope == null) return;
 
         float speed = getSpeed();
         if (speed == 0) return;
 
         float ropeDelta = speed * 0.0005f;
-
         float newLength = (float) attachedRope.maxLength + ropeDelta;
         float minRopeLength = 0.25f;
         newLength = Math.max(newLength, minRopeLength);
 
         attachedRope.setJointLength(serverLevel, newLength);
         currentRopeLength = newLength;
+        setChanged();
     }
-
 
     @Override
     public void setDimension(@NotNull String s) {
-
     }
 
     @Override
@@ -113,7 +121,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
                 String direction = speed > 0 ? "Extending" : "Retracting";
                 tooltip.add(Component.literal("Status: " + direction + " (" + String.format("%.1f", Math.abs(speed)) + " RPM )")
                         .withStyle(ChatFormatting.GREEN));
-
             } else {
                 tooltip.add(Component.literal("Status: Idle")
                         .withStyle(ChatFormatting.GRAY));
@@ -130,7 +137,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         if (constraintId != null) {
             tag.putInt("id", constraintId);
         }
-
+        tag.putDouble("length", currentRopeLength);
         tag.putString("state", state.name());
     }
 
@@ -139,26 +146,52 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         super.read(tag, clientPacket);
 
         if (tag.contains("id")) {
-            constraintId = tag.contains("id") ? tag.getInt("id") : null;
-
-            attachedRope = ConstraintTracker.getActiveRopes().get(constraintId);
-            currentRopeLength = attachedRope.maxLength;
+            constraintId = tag.getInt("id");
+            Map<Integer, Rope> active = ConstraintTracker.getActiveRopes();
+            attachedRope = (active != null && constraintId != null) ? active.get(constraintId) : null;
+            if (attachedRope != null) {
+                currentRopeLength = attachedRope.maxLength;
+            } else {
+                currentRopeLength = tag.contains("length") ? tag.getDouble("length") : currentRopeLength;
+            }
+        } else {
+            constraintId = null;
+            attachedRope = null;
+            currentRopeLength = tag.contains("length") ? tag.getDouble("length") : currentRopeLength;
         }
 
-        state = PulleyState.valueOf(tag.getString("state"));
+        if (tag.contains("state")) {
+            try {
+                state = PulleyState.valueOf(tag.getString("state"));
+            } catch (IllegalArgumentException ex) {
+                state = PulleyState.OPEN;
+            }
+        } else {
+            state = PulleyState.OPEN;
+        }
     }
 
     @Override
     public @NotNull CompoundTag getUpdateTag() {
         CompoundTag tag = super.getUpdateTag();
         tag.putString("state", state.name());
+        if (constraintId != null) tag.putInt("id", constraintId);
+        tag.putDouble("length", currentRopeLength);
         return tag;
     }
 
     @Override
     public void handleUpdateTag(CompoundTag tag) {
         super.handleUpdateTag(tag);
-        state = PulleyState.valueOf(tag.getString("state"));
+        if (tag.contains("state")) {
+            try {
+                state = PulleyState.valueOf(tag.getString("state"));
+            } catch (IllegalArgumentException ignored) {
+                state = PulleyState.OPEN;
+            }
+        }
+        if (tag.contains("id")) constraintId = tag.getInt("id");
+        if (tag.contains("length")) currentRopeLength = tag.getDouble("length");
     }
 
     @Override
