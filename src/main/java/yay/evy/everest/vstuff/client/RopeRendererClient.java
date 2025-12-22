@@ -18,6 +18,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.rendering.RopeRendererType;
@@ -156,13 +157,16 @@ public class RopeRendererClient {
         Vector3d startPos = ropeData.getWorldPosA(level, partialTick);
         Vector3d endPos = ropeData.getWorldPosB(level, partialTick);
 
-        if (startPos != null && endPos != null) {
-            double actualRopeLength = startPos.distance(endPos);
-            double maxRopeLength = ropeData.maxLength();
+        double actualRopeLength = startPos.distance(endPos);
+        double maxRopeLength = ropeData.maxLength();
 
-            renderRope(poseStack, bufferSource, startPos, endPos,
+        // Shipyard check, don't want to render from world to shipyard
+        if (VSGameUtilsKt.isBlockInShipyard(level, startPos.x, startPos.y, startPos.z)) return;
+        if (VSGameUtilsKt.isBlockInShipyard(level, endPos.x, endPos.y, endPos.z)) return;
+
+        renderRope(poseStack, bufferSource, startPos, endPos,
                     actualRopeLength, maxRopeLength, cameraPos, partialTick, level, style);
-        }
+
     }
 
     private static void renderRope(PoseStack poseStack, MultiBufferSource bufferSource,
