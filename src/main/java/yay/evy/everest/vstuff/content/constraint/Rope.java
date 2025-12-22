@@ -5,7 +5,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
@@ -18,8 +17,6 @@ import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.client.NetworkHandler;
-import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
-import yay.evy.everest.vstuff.content.pulley.PulleyAnchorBlockEntity;
 import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
 import yay.evy.everest.vstuff.util.RopeStyles;
 import org.valkyrienskies.core.internal.joints.*;
@@ -27,8 +24,6 @@ import yay.evy.everest.vstuff.content.constraint.RopeUtil.*;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class Rope {
 
@@ -247,63 +242,55 @@ public class Rope {
         }
         return false;
     }
+
     /**
      * Restores a Rope's joint and sets its id and constraint.
      * This method calls ConstraintTracker.addConstraintWithPersistence.
+     * <br></br>
+     * This method will silently fail if one (or more) of the ropes attached ships can't be found.
+     * However, the ropes ID will become -1 in that situation.
+     *
      * @param level the ServerLevel to restore the joint to
-     * @return if the method succeeded
      */
-    public boolean restoreJoint(ServerLevel level) {
+    // Note: we no longer return a bool for success because its possible we failed,
+    // but asynchronously (joint id was -1), which would be confusing if we returned true
+    public void restoreJoint(ServerLevel level) {
         if (!hasPhysicalImpact) {
             VStuff.LOGGER.info("nuh uh [not restoring joint for rope without joint]");
-            return true;
+            return;
         }
         this.level = level;
         this.levelId = RopeUtil.registerLevel(level);
 
         Long currentGroundBodyId;
 
-        try {
-            currentGroundBodyId = VSGameUtilsKt.getShipObjectWorld(level).getDimensionToGroundBodyIdImmutable()
-                    .get(VSGameUtilsKt.getDimensionId(level));
-        } catch (Exception e) {
-            VStuff.LOGGER.warn("Exception occurred while trying to get ground body id: {}", e.getMessage());
-            return false;
-        }
+        currentGroundBodyId = VSGameUtilsKt.getShipObjectWorld(level).getDimensionToGroundBodyIdImmutable()
+                .get(VSGameUtilsKt.getDimensionId(level));
 
         Long actualShipA = shipAIsGround ? currentGroundBodyId : shipA;
         Long actualShipB = shipBIsGround ? currentGroundBodyId : shipB;
 
-        try {
-            String dimensionId = ValkyrienSkies.getDimensionId(level);
-            var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(dimensionId);
+        String dimensionId = ValkyrienSkies.getDimensionId(level);
+        var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(dimensionId);
 
-            VsiServerShipWorld shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
+        VsiServerShipWorld shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
 
-            boolean shipAValid = shipAIsGround ||
-                    (actualShipA != null && shipWorld.getAllShips().getById(actualShipA) != null);
-            boolean shipBValid = shipBIsGround ||
-                    (actualShipB != null && shipWorld.getAllShips().getById(actualShipB) != null);
+        boolean shipAValid = shipAIsGround ||
+                (actualShipA != null && shipWorld.getAllShips().getById(actualShipA) != null);
+        boolean shipBValid = shipBIsGround ||
+                (actualShipB != null && shipWorld.getAllShips().getById(actualShipB) != null);
 
-            if (!shipAValid || !shipBValid) return false;
+        if (!shipAValid || !shipBValid) return;
 
-            VSJoint ropeConstraint = makeDistanceJoint(actualShipA, actualShipB);
+        VSJoint ropeConstraint = makeDistanceJoint(actualShipA, actualShipB);
 
-            gtpa.addJoint(ropeConstraint, 0, newConstraintId -> {
-                ID = newConstraintId;
+        gtpa.addJoint(ropeConstraint, 0, newConstraintId -> {
+            // This stuff is called async later by VS once it has time to make our joint
+            ID = newConstraintId;
+            ConstraintTracker.addConstraintToTracker(this);
+        });
 
-                ConstraintTracker.addConstraintToTracker(this);
-            });
-
-
-
-            return true;
-        } catch (Exception e) {
-            VStuff.LOGGER.error("Error restoring joint for constraint {}: {}", ID, e.getMessage());
-        }
-        return false;
     }
-
 
     private @NotNull VSJoint makeDistanceJoint(Long actualShipA, Long actualShipB, double maxLength) {
         VSJointPose poseA = new VSJointPose(localPosA, new Quaterniond());
