@@ -36,6 +36,7 @@ import org.valkyrienskies.mod.api.VsApi;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.client.VStuffClient;
+import yay.evy.everest.vstuff.content.constraint.ConstraintPersistence;
 import yay.evy.everest.vstuff.content.constraint.RopeUtil;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberServerAttachment;
 import yay.evy.everest.vstuff.content.ropethrower.RopeThrowerEntity;
@@ -85,6 +86,8 @@ public class VStuff {
         modEventBus.addListener(this::commonSetup);
 
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> VStuffClient::initialize);
+
+        ValkyrienSkiesMod.getApi().getShipLoadEvent().on(ConstraintPersistence::onShipLoad);
 
         LOGGER.info("VStuff mod initialized");
     }

@@ -4,33 +4,35 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 import org.jetbrains.annotations.NotNull;
+import org.valkyrienskies.core.api.event.RegisteredListener;
+import org.valkyrienskies.core.api.events.ShipLoadEvent;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.VStuff;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class ConstraintPersistence extends SavedData {
     private static final String DATA_NAME = "vstuff_constraints";
     private final Set<Integer> removedConstraints = new HashSet<>();
 
-
     private final Map<Integer, Rope> persistedConstraints = new HashMap<>();
-    private final Set<Integer> restoredConstraints = new HashSet<>();
-    private boolean hasAttemptedRestore = false;
 
     public static ConstraintPersistence get(ServerLevel level) {
         DimensionDataStorage storage = level.getDataStorage();
         return storage.computeIfAbsent(ConstraintPersistence::load, ConstraintPersistence::new, DATA_NAME);
     }
+
     public void markConstraintAsRemoved(Integer id) {
         removedConstraints.add(id);
         persistedConstraints.remove(id);
-        restoredConstraints.remove(id);
         setDirty();
     }
 
@@ -55,8 +57,6 @@ public class ConstraintPersistence extends SavedData {
         }
         return data;
     }
-
-
 
     @Override
     public @NotNull CompoundTag save(@NotNull CompoundTag tag) {
@@ -98,75 +98,33 @@ public class ConstraintPersistence extends SavedData {
         if (data != null && (data.shipAIsGround || data.shipBIsGround)) return;
 
         if (persistedConstraints.remove(id) != null) {
-            restoredConstraints.remove(id);
             markConstraintAsRemoved(id);
             setDirty();
         }
     }
 
-    public static void restoreConstraints(ServerLevel level) {
-        ConstraintPersistence persistence = ConstraintPersistence.get(level);
-        persistence.restoreConstraintsInstance(level);
-    }
+    public static void onShipLoad(ShipLoadEvent shipLoadEvent, RegisteredListener registeredListener) {
+        long loadedId = shipLoadEvent.getShip().getId();
 
-    public void restoreConstraintsInstance(ServerLevel level) {
+        // Tomato said this was the best way to do it.
+        // Hopefully this stuff shouldn't ever be null but we gotta make sure
+        MinecraftServer server = ValkyrienSkiesMod.getCurrentServer();
+        if (server == null) return;
 
-        if (hasAttemptedRestore) return;
-        hasAttemptedRestore = true;
+        ServerLevel level = VSGameUtilsKt.getLevelFromDimensionId(server, shipLoadEvent.getShip().getChunkClaimDimension());
+        if (level == null) return;
 
-        level.getServer().execute(() -> {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ignored) {}
+        ConstraintPersistence constraintPersistence = ConstraintPersistence.get(level);
 
-            Long currentGroundBodyId;
-            try {
-                currentGroundBodyId = VSGameUtilsKt.getShipObjectWorld(level).getDimensionToGroundBodyIdImmutable()
-                        .get(VSGameUtilsKt.getDimensionId(level));
-            } catch (Exception e) {
-                VStuff.LOGGER.error("Failed to get ground body id: {}", e.getMessage());
-                return;
-            }
+        // Get all the ropes that are on the ship that just loaded
+        Stream<Rope> matchingRopes = constraintPersistence.persistedConstraints.values().stream().filter((rope) -> (rope.shipA == loadedId) || (rope.shipB == loadedId));
 
-            int successCount = 0;
-            int failCount = 0;
-            int skipCount = 0;
-
-            for (Map.Entry<Integer, Rope> entry : persistedConstraints.entrySet()) {
-                Integer persistenceId = entry.getKey();
-                Rope rope = entry.getValue();
-
-                if (removedConstraints.contains(persistenceId)) { skipCount++; continue; }
-                if (restoredConstraints.contains(persistenceId)) { skipCount++; continue; }
-
-                Long actualShipA = rope.shipAIsGround ? currentGroundBodyId : rope.shipA;
-                Long actualShipB = rope.shipBIsGround ? currentGroundBodyId : rope.shipB;
-
-                if (validateShipsAndCreateConstraint(level, persistenceId, rope, actualShipA, actualShipB)) {
-                    restoredConstraints.add(persistenceId);
-                    successCount++;
-                } else {
-                    failCount++;
-                }
-            }
-
-            VStuff.LOGGER.info("ConstraintPersistence successfully restored {} constraints, failed to restore {} constraints, and skipped restoring {} constraints", successCount, failCount, skipCount);
-
-            for (ServerPlayer player : level.getServer().getPlayerList().getPlayers()) {
-                ConstraintTracker.syncAllConstraintsToPlayer(player);
-            }
-        });
-    }
-
-    private boolean validateShipsAndCreateConstraint(ServerLevel level, Integer persistenceId, Rope rope,
-                                                     Long actualShipA, Long actualShipB) {
-        try {
+        matchingRopes.forEach((rope) -> {
+            // We actually don't care about if the joint succeeds or not because
+            // if it fails because other ship was unloaded, it will get created
+            // once _that_ ship is loaded. Additionally, we don't need to store if it's been created or not
+            // Because a ship can only throw the "loaded" event once (until unloaded again).
             rope.restoreJoint(level);
-
-            return true;
-        } catch (Exception e) {
-            VStuff.LOGGER.error("Error restoring constraint {}: {}", persistenceId, e.getMessage());
-        }
-        return false;
+        });
     }
 }
