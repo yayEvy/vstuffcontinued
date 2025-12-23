@@ -106,8 +106,6 @@ public class ConstraintPersistence extends SavedData {
     public static void onShipLoad(ShipLoadEvent shipLoadEvent, RegisteredListener registeredListener) {
         long loadedId = shipLoadEvent.getShip().getId();
 
-        // Tomato said this was the best way to do it.
-        // Hopefully this stuff shouldn't ever be null but we gotta make sure
         MinecraftServer server = ValkyrienSkiesMod.getCurrentServer();
         if (server == null) return;
 
@@ -116,15 +114,12 @@ public class ConstraintPersistence extends SavedData {
 
         ConstraintPersistence constraintPersistence = ConstraintPersistence.get(level);
 
-        // Get all the ropes that are on the ship that just loaded
-        Stream<Rope> matchingRopes = constraintPersistence.persistedConstraints.values().stream().filter((rope) -> (rope.shipA == loadedId) || (rope.shipB == loadedId));
-
-        matchingRopes.forEach((rope) -> {
-            // We actually don't care about if the joint succeeds or not because
-            // if it fails because other ship was unloaded, it will get created
-            // once _that_ ship is loaded. Additionally, we don't need to store if it's been created or not
-            // Because a ship can only throw the "loaded" event once (until unloaded again).
-            rope.restoreJoint(level);
-        });
+        Long loadedLong = Long.valueOf(loadedId);
+        constraintPersistence.persistedConstraints.values().stream()
+                .filter(rope -> Objects.equals(rope.shipA, loadedLong) || Objects.equals(rope.shipB, loadedLong))
+                .forEach(rope -> {
+                    rope.restoreJoint(level);
+                });
     }
+
 }
