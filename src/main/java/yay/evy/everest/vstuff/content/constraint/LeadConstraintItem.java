@@ -50,7 +50,7 @@ public class LeadConstraintItem extends Item {
                 if (player.isShiftKeyDown()) { // nothing
                     return InteractionResult.FAIL;
                 } else if (!pulleyBE.canAttach()) {
-                    resetStateWithMessage(serverLevel, heldItem, player, "pulley_attach_fail");
+                    resetStateWithMessage(serverLevel, heldItem, false, player, "pulley_attach_fail");
                     pulleyBE.resetSelf();
                     NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.RED);
                     return InteractionResult.FAIL;
@@ -71,7 +71,7 @@ public class LeadConstraintItem extends Item {
             Long actualId = tempId != null ? tempId : RopeUtil.getGroundBodyId(serverLevel);
 
             CompoundTag tag = heldItem.getOrCreateTagElement("first");
-            tag.putBoolean("hasFirst", true);
+            tag.putBoolean("waiting", true);
             tag.put("pos", NbtUtils.writeBlockPos(clickedPos));
             tag.putLong("shipId", actualId);
             tag.putString("dim", serverLevel.dimension().location().toString());
@@ -88,13 +88,13 @@ public class LeadConstraintItem extends Item {
             Long secondShipId = getShipIdAtPos(serverLevel, clickedPos);
 
             if (player.isShiftKeyDown() || firstClickedPos.equals(clickedPos)) {
-                resetStateWithMessage(serverLevel, heldItem, player, "rope_reset");
+                resetStateWithMessage(serverLevel, heldItem, false, player, "rope_reset");
                 NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.GREEN);
                 return InteractionResult.SUCCESS;
             }
 
             if (!serverLevel.dimension().location().toString().equals(tag.getString("dim"))) {
-                resetStateWithMessage(serverLevel, heldItem, player, "interdimensional_fail");
+                resetStateWithMessage(serverLevel, heldItem, false, player, "interdimensional_fail");
                 NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.RED);
                 return InteractionResult.FAIL;
             }
@@ -106,7 +106,7 @@ public class LeadConstraintItem extends Item {
             } else {
                 if (serverLevel.getBlockEntity(clickedPos) instanceof PulleyAnchorBlockEntity && connectionType == ConnectionType.PULLEY) {
                     if (Objects.equals(secondShipId, firstShipId)) { // pulley and anchor cannot be in same body
-                        resetStateWithMessage(serverLevel, heldItem, player, "pulley_body_fail");
+                        resetStateWithMessage(serverLevel, heldItem, false, player, "pulley_body_fail");
                         PhysPulleyBlockEntity waitingPulley = (PhysPulleyBlockEntity) serverLevel.getBlockEntity(firstClickedPos);
                         waitingPulley.resetSelf();
                         NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.RED);
@@ -117,9 +117,10 @@ public class LeadConstraintItem extends Item {
                     if (ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS) {
                         PhysPulleyBlockEntity waitingPulley = (PhysPulleyBlockEntity) serverLevel.getBlockEntity(firstClickedPos);
                         waitingPulley.attachRope(ropeReturn.rope());
+                        ropeReturn.rope().setSourceBlockPos(firstClickedPos);
                     }
                 } else {
-                    resetStateWithMessage(serverLevel, heldItem, player, "pulley_fail");
+                    resetStateWithMessage(serverLevel, heldItem, false, player, "pulley_fail");
                     NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.RED);
                     return InteractionResult.FAIL;
                 }
@@ -141,7 +142,7 @@ public class LeadConstraintItem extends Item {
                         1.0F,
                         1.0F
                 );
-                resetStateWithMessage(serverLevel, heldItem, player, isChain ? "chain_created" : "rope_created");
+                resetStateWithMessage(serverLevel, heldItem, true, player, isChain ? "chain_created" : "rope_created");
             }
 
             int color = ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS ? ClientOutlineHandler.GREEN : ClientOutlineHandler.RED;
@@ -160,13 +161,13 @@ public class LeadConstraintItem extends Item {
         return pStack.hasTag() && pStack.getTag().contains("first");
     }
 
-    private void resetState(ServerLevel level, ItemStack stack) {
+    private void resetState(ServerLevel level, ItemStack stack, boolean didSucceed) {
         if (isFoil(stack)) {
             CompoundTag tag = stack.getTag().getCompound("first");
 
-            if (ConnectionType.valueOf(tag.getString("type")) == ConnectionType.PULLEY) {
+            if (ConnectionType.valueOf(tag.getString("type")) == ConnectionType.PULLEY && !didSucceed) {
                 PhysPulleyBlockEntity pulleyBE = (PhysPulleyBlockEntity) level.getBlockEntity(NbtUtils.readBlockPos(tag.getCompound("pos")));
-                if (pulleyBE != null) pulleyBE.clearWaiting();
+                if (pulleyBE != null) pulleyBE.open();
             }
 
             stack.setTag(null);
@@ -175,10 +176,10 @@ public class LeadConstraintItem extends Item {
         VStuff.LOGGER.info("Successfully reset LeadConstraintItem");
     }
 
-    private void resetStateWithMessage(ServerLevel level, ItemStack stack, Player player, String name) {
+    private void resetStateWithMessage(ServerLevel level, ItemStack stack, boolean didSucceed, Player player, String name) {
         sendRopeMessage(player, name);
 
-        resetState(level, stack);
+        resetState(level, stack, didSucceed);
     }
 
     private void sendRopeMessage(Player player, String name) {

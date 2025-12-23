@@ -42,13 +42,15 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     }
 
     public void attachRope(Rope rope) {
+        System.out.println("attaching");
         if (rope == null) return;
         state = PulleyState.EXTENDED;
         attachedRope = rope;
         currentRopeLength = rope.maxLength;
         constraintId = rope.ID;
-        clearWaiting();
         setChanged();
+        System.out.println("attached");
+        System.out.println(state);
     }
 
     public void setWaiting() {
@@ -56,12 +58,14 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         setChanged();
     }
 
-    public void clearWaiting() {
+    public void open() {
         state = PulleyState.OPEN;
+        System.out.println("opening");
         setChanged();
     }
 
     public void resetSelf() {
+        System.out.println("self reset");
         state = PulleyState.OPEN;
         attachedRope = null;
         constraintId = null;
@@ -81,21 +85,27 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     @Override
     public void physTick(@Nullable PhysShip physShip, @NotNull PhysLevel physLevel) {
         if (!(level instanceof ServerLevel serverLevel)) return;
+        System.out.println("pt");
 
         if (state == PulleyState.EXTENDED && attachedRope == null && constraintId != null) {
             Map<Integer, Rope> active = ConstraintTracker.getActiveRopes();
-            if (active != null) attachedRope = active.get(constraintId);
+            attachedRope = active.get(constraintId);
             if (attachedRope != null) currentRopeLength = attachedRope.maxLength;
+            System.out.println("22");
         }
 
+        System.out.println("w");
+        System.out.println(state);
+        System.out.println(attachedRope);
         if (state != PulleyState.EXTENDED || attachedRope == null) return;
-
+        System.out.println("r");
         float speed = getSpeed();
         if (speed == 0) return;
+        System.out.println("g");
 
         float ropeDelta = speed * 0.0005f;
         float newLength = (float) attachedRope.maxLength + ropeDelta;
-        float minRopeLength = 0.25f;
+        float minRopeLength = 0.5f;
         newLength = Math.max(newLength, minRopeLength);
 
         attachedRope.setJointLength(serverLevel, newLength);

@@ -17,6 +17,7 @@ import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.client.NetworkHandler;
+import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
 import yay.evy.everest.vstuff.util.RopeStyles;
 import org.valkyrienskies.core.internal.joints.*;
@@ -194,6 +195,10 @@ public class Rope {
 
 
             gtpa.removeJoint(ID);
+
+            if (this.sourceBlockPos != null && level.getBlockEntity(sourceBlockPos) instanceof PhysPulleyBlockEntity pulleyBE) {
+                pulleyBE.resetSelf();
+            }
             this.constraint = null;
             ConstraintTracker.removeConstraintWithPersistence(level, ID);
             NetworkHandler.sendConstraintRemove(ID);
@@ -594,6 +599,10 @@ public class Rope {
         constraintTag.putString("styleLKey", style.getLangKey());
 
         return constraintTag;
+    }
+
+    public void setSourceBlockPos(BlockPos sourceBlockPos) {
+        this.sourceBlockPos = sourceBlockPos;
     }
 
 }

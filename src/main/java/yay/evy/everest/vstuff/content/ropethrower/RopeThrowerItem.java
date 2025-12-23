@@ -179,7 +179,7 @@ public class RopeThrowerItem extends Item {
 
             if (RopeUtil.ConnectionType.valueOf(tag.getString("type")) == RopeUtil.ConnectionType.PULLEY) {
                 PhysPulleyBlockEntity pulleyBE = (PhysPulleyBlockEntity) level.getBlockEntity(NbtUtils.readBlockPos(tag.getCompound("pos")));
-                if (pulleyBE != null) pulleyBE.clearWaiting();
+                if (pulleyBE != null) pulleyBE. open();
             }
 
             stack.setTag(null);
