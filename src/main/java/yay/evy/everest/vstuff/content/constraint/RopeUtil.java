@@ -122,7 +122,7 @@ public class RopeUtil {
 
     public static Double getMassForShip(ServerLevel level, Long shipId) {
         Long groundBodyId = getGroundBodyId(level);
-        if (shipId.equals(groundBodyId)) {
+        if (shipId == null || shipId.equals(groundBodyId)) {
             return 1e12;
         }
 

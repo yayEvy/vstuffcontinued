@@ -45,6 +45,7 @@ public class ConstraintTracker {
 
         persistence.addConstraint(rope);
         NetworkHandler.sendConstraintAdd(rope.ID, rope.shipA, rope.shipB, rope.localPosA, rope.localPosB, rope.maxLength, rope.style);
+        VStuff.LOGGER.info("Adding constraint with id {} to persistence", rope.ID);
     }
 
     public static void replaceConstraint(Integer id, Rope rope) {

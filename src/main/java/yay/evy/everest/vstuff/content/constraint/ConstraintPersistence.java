@@ -41,6 +41,9 @@ public class ConstraintPersistence extends SavedData {
         ListTag constraintsList = tag.getList("constraints", Tag.TAG_COMPOUND);
         ListTag removedList = tag.getList("removedConstraints", Tag.TAG_INT);
 
+        VStuff.LOGGER.info("ConstraintPersistence found {} removed constraints", removedList.size());
+        VStuff.LOGGER.info("ConstraintPersistence found {} constraints", constraintsList.size());
+
         for (int i = 0; i < removedList.size(); i++) {
             data.removedConstraints.add(removedList.getInt(i));
         }
@@ -55,6 +58,8 @@ public class ConstraintPersistence extends SavedData {
 
             data.persistedConstraints.put(id, Rope.fromTag(constraintTag));
         }
+
+        VStuff.LOGGER.info("ConstraintPersistence loaded with {} constraints", data.persistedConstraints.size() );
         return data;
     }
 
@@ -62,6 +67,9 @@ public class ConstraintPersistence extends SavedData {
     public @NotNull CompoundTag save(@NotNull CompoundTag tag) {
         ListTag constraintsList = new ListTag();
         ListTag removedList = new ListTag();
+
+        VStuff.LOGGER.info("Found {} removed constraints to save to persistence", removedConstraints.size());
+        VStuff.LOGGER.info("Found {} constraints to save to persistence", persistedConstraints.size());
 
         for (Integer removedId : removedConstraints) {
             removedList.add(IntTag.valueOf(removedId));

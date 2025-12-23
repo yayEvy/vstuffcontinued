@@ -292,7 +292,7 @@ public class Rope {
         gtpa.addJoint(ropeConstraint, 0, newConstraintId -> {
             // This stuff is called async later by VS once it has time to make our joint
             ID = newConstraintId;
-            ConstraintTracker.addConstraintToTracker(this);
+            ConstraintTracker.addConstraintWithPersistence(this);
         });
 
     }
@@ -382,6 +382,9 @@ public class Rope {
 
         boolean shipAIsWorld = shipA.equals(groundBodyId);
         boolean shipBIsWorld = shipB.equals(groundBodyId);
+
+        shipA = shipAIsWorld ? null : shipA;
+        shipB = shipBIsWorld ? null : shipB;
 
         if (shipAIsWorld && !shipBIsWorld) {
             finalShipA = shipB;
@@ -480,7 +483,7 @@ public class Rope {
                 Rope rope = new Rope(
                         level, UUID.randomUUID().hashCode(), finalShipA, finalShipB, // id is temporary
                         finalLocalPosA, finalLocalPosB, maxLength, compliance, maxForce,
-                        ConstraintType.GENERIC, null, ropeStyle, ropeConstraint
+                          ConstraintType.GENERIC, null, ropeStyle, ropeConstraint
                 );
 
                 gtpa.addJoint(ropeConstraint, 0, newConstraintId -> {
@@ -535,10 +538,8 @@ public class Rope {
         }
 
         String style = tag.contains("style") ? tag.getString("style") : "normal";
-        String primitiveType = tag.contains("primitiveStyle") ? tag.getString("primitiveStyle") : "normal";
-        String styleLKey = tag.contains("styleLKey") ? tag.getString("styleLKey") : "vstuff.rope.normal";
 
-        RopeStyles.RopeStyle ropeStyle = new RopeStyles.RopeStyle(style, primitiveType, styleLKey);
+        RopeStyles.RopeStyle ropeStyle = RopeStyles.fromString(style);
 
         String levelId = tag.getString("levelId");
 
@@ -595,8 +596,6 @@ public class Rope {
         }
 
         constraintTag.putString("style", style.getStyle());
-        constraintTag.putString("primitiveStyle", style.getBasicStyle().name().toLowerCase());
-        constraintTag.putString("styleLKey", style.getLangKey());
 
         return constraintTag;
     }
