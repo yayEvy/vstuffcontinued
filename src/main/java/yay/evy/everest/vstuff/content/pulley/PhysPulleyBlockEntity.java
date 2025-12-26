@@ -111,6 +111,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         attachedRope.setJointLength(serverLevel, newLength);
         currentRopeLength = newLength;
         setChanged();
+        serverLevel.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
     }
 
     @Override
@@ -208,4 +209,15 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     public float calculateStressApplied() {
         return 32f;
     }
+
+    public void onRedstoneUpdate(boolean powered) {
+        if (!(level instanceof ServerLevel serverLevel)) return;
+
+        if (!powered) return;
+
+        if (constraintId == null || attachedRope == null) return;
+
+        attachedRope.removeJoint(serverLevel);
+    }
+
 }
