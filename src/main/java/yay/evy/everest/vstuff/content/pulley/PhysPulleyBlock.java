@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -37,6 +38,7 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
     public PhysPulleyBlock(Properties properties) {
         super(properties.strength(3.0f).requiresCorrectToolForDrops());
     }
+    public static final BooleanProperty POWERED = BooleanProperty.create("powered");
 
 
     @Override
@@ -53,13 +55,16 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
+        builder.add(POWERED);
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction facing = context.getHorizontalDirection().getOpposite();
         return this.defaultBlockState()
-                .setValue(HORIZONTAL_FACING, facing);
+                .setValue(HORIZONTAL_FACING, facing)
+                .setValue(POWERED, false);
+
     }
 
     @Override
@@ -124,4 +129,24 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
     public BlockEntityType<? extends PhysPulleyBlockEntity> getBlockEntityType() {
         return VStuffBlockEntities.PHYS_PULLEY_BE.get(); // change later
     }
+
+    @Override
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block,
+                                BlockPos fromPos, boolean isMoving) {
+        if (level.isClientSide) return;
+
+        boolean powered = level.hasNeighborSignal(pos);
+        boolean wasPowered = state.getValue(POWERED);
+
+        if (powered != wasPowered) {
+            level.setBlock(pos, state.setValue(POWERED, powered), 3);
+
+            if (level.getBlockEntity(pos) instanceof PhysPulleyBlockEntity be) {
+                be.onRedstoneUpdate(powered);
+            }
+        }
+    }
+
+
+
 }
