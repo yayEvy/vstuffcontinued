@@ -7,9 +7,11 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import org.valkyrienskies.core.api.ships.LoadedShip;
@@ -69,6 +71,21 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
 
         BlockPos hitPos = result.getBlockPos().immutable();
         Long secondShipId = getShipIdAtPos(serverLevel, hitPos);
+
+        if (connectionType == RopeUtil.ConnectionType.PULLEY && !(serverLevel.getBlockEntity(hitPos) instanceof PulleyAnchorBlockEntity)) {
+            ItemStack ropeDrop = new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get());
+            ItemEntity itemEntity = new ItemEntity(
+                    serverLevel,
+                    hitPos.getX() + 0.5,
+                    hitPos.getY() + 1.5,
+                    hitPos.getZ() + 0.5,
+                    ropeDrop
+            );
+            serverLevel.addFreshEntity(itemEntity);
+
+            discard();
+            return;
+        }
 
         RopeUtil.RopeReturn ropeReturn = Rope.createNew(
                 VStuffItems.LEAD_CONSTRAINT_ITEM.get(),

@@ -53,12 +53,18 @@ public class LeadConstraintItem extends Item {
                     resetStateWithMessage(serverLevel, heldItem, false, player, "pulley_attach_fail");
                     pulleyBE.resetSelf();
                     NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.RED);
-                    return InteractionResult.FAIL;
+                    return InteractionResult.SUCCESS;
 
                 } else {
                     pulleyBE.setWaiting();
                     connectionType = ConnectionType.PULLEY;
                 }
+            }
+
+            if (serverLevel.getBlockEntity(clickedPos) instanceof PulleyAnchorBlockEntity) {
+                resetStateWithMessage(serverLevel, heldItem, false, player, "anchor_first_fail");
+                NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.RED);
+                return InteractionResult.SUCCESS;
             }
 
             if (connectionType == ConnectionType.NORMAL) {

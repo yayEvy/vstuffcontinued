@@ -41,6 +41,7 @@
   "vstuff.message.pulley_body_fail": "§cPulley and anchor cannot be on the same ship/world pos is invalid!",
   "vstuff.message.pulley_fail": "§cYou must attach the rope to a Pulley Anchor!",
   "vstuff.message.rope_thrown": "§aRope thrown!",
+  "vstuff.message.anchor_first_fail": "§cYou must select a Phys Pulley first!",
 
   "vstuff.ponder.phys_pulley.text_3": "First, shift-right-click the pulley to start defining the rope's path.",
   "vstuff.ponder.phys_pulley.text_4": "Then, right-click another block to set the rope's anchor point and length.",
