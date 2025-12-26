@@ -27,23 +27,23 @@ public class RotationalThrusterPonder {
         BlockPos thrusterPos = util.grid().at(2, 1, 2);
         BlockPos motorPos = util.grid().at(1, 1, 2);
 
-        scene.overlay().showText(60)
+        scene.overlay().showText(20)
                 .text("vstuff.ponder.rotational_thruster.title")
                 .pointAt(util.vector().topOf(thrusterPos))
                 .placeNearTarget();
-        scene.idle(70);
+        scene.idle(30);
 
-        scene.overlay().showText(70)
+        scene.overlay().showText(20)
                 .text("vstuff.ponder.rotational_thruster.how")
                 .pointAt(util.vector().topOf(motorPos))
                 .placeNearTarget();
-        scene.idle(80);
+        scene.idle(30);
 
-        scene.overlay().showText(80)
+        scene.overlay().showText(20)
                 .text("vstuff.ponder.rotational_thruster.effect")
                 .pointAt(util.vector().blockSurface(thrusterPos, Direction.NORTH))
                 .placeNearTarget();
-        scene.idle(90);
+        scene.idle(30);
 
         scene.markAsFinished();
     }
