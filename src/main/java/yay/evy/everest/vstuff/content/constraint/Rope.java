@@ -42,6 +42,7 @@ public class Rope {
     public double maxForce;
     public ConstraintType constraintType;
     public net.minecraft.core.BlockPos sourceBlockPos;
+    public RopeType type;
     public RopeStyles.RopeStyle style;
     boolean hasPhysicalImpact = true;
 
@@ -75,16 +76,17 @@ public class Rope {
         this.style = style;
         this.constraint = constraint;
 
-        try {
-            Long currentGroundBodyId = VSGameUtilsKt.getShipObjectWorld(level)
-                    .getDimensionToGroundBodyIdImmutable()
-                    .get(VSGameUtilsKt.getDimensionId(level));
-
-            this.shipAIsGround = shipA != null && shipA.equals(currentGroundBodyId);
-            this.shipBIsGround = shipB != null && shipB.equals(currentGroundBodyId);
-        } catch (Exception e) {
-            VStuff.LOGGER.error("Rope creation failed to check ground body ID: {}", e.getMessage());
+        this.type = RopeType.SS;
+        if (shipA == null) {
+            this.type = RopeType.WS;
+            this.shipAIsGround = true;
         }
+
+        if (shipB == null) {
+            this.type =  RopeType.WW;
+            this.shipBIsGround = true;
+        }
+
 
         if (shipAIsGround && shipBIsGround) {
             this.hasPhysicalImpact = false;
@@ -292,7 +294,7 @@ public class Rope {
         gtpa.addJoint(ropeConstraint, 0, newConstraintId -> {
             // This stuff is called async later by VS once it has time to make our joint
             ID = newConstraintId;
-            ConstraintTracker.addConstraintWithPersistence(this);
+            ConstraintTracker.addConstraintToTracker(this);
         });
 
     }
@@ -347,16 +349,14 @@ public class Rope {
             Player player
     ) {
         Vector3d firstWorldPos = RopeUtil.getWorldPosition(level, firstClickedPos, firstShipId);
-        Long shipA = firstShipId != null ? firstShipId : RopeUtil.getGroundBodyId(level);
-        Vector3d firstLocalPos = RopeUtil.getLocalPositionFixed(level, firstClickedPos, firstShipId, shipA);
+        Vector3d firstLocalPos = RopeUtil.getLocalPos(level, firstClickedPos);
 
         Vector3d secondWorldPos = RopeUtil.getWorldPosition(level, secondClickedPos, secondShipId);
-        Long shipB = secondShipId != null ? secondShipId : RopeUtil.getGroundBodyId(level);
-        Vector3d secondLocalPos = RopeUtil.getLocalPositionFixed(level, secondClickedPos, secondShipId, shipB);
+        Vector3d secondLocalPos = RopeUtil.getLocalPos(level, secondClickedPos);
 
         return createNew(
                 ropeItem, level,
-                shipA, shipB,
+                firstShipId, secondShipId,
                 firstLocalPos, secondLocalPos,
                 firstWorldPos, secondWorldPos,
                 player
@@ -371,8 +371,6 @@ public class Rope {
             Vector3d worldPosA, Vector3d worldPosB,
             Player player
     ) {
-        final Long groundBodyId = RopeUtil.getGroundBodyId(level);
-
         final Long finalShipA;
         final Long finalShipB;
         final Vector3d finalLocalPosA;
@@ -380,14 +378,11 @@ public class Rope {
         final Vector3d finalWorldPosA;
         final Vector3d finalWorldPosB;
 
-        boolean shipAIsWorld = shipA.equals(groundBodyId);
-        boolean shipBIsWorld = shipB.equals(groundBodyId);
+        boolean shipAIsWorld = shipA == null;
+        boolean shipBIsWorld = shipB == null;
 
-        shipA = shipAIsWorld ? null : shipA;
-        shipB = shipBIsWorld ? null : shipB;
-
-        if (shipAIsWorld && !shipBIsWorld) {
-            finalShipA = shipB;
+        if (!shipAIsWorld && shipBIsWorld) { // switch if second pos is world
+            finalShipA = null;
             finalShipB = shipA;
             finalLocalPosA = localPosB;
             finalLocalPosB = localPosA;
@@ -456,11 +451,10 @@ public class Rope {
                 }
 
                 rope = new Rope(
-                        level, UUID.randomUUID().hashCode(), finalShipA, finalShipB,
+                        level, UUID.randomUUID().hashCode(), null, null,
                         finalLocalPosA, finalLocalPosB, maxLength, compliance, maxForce,
                         ConstraintType.GENERIC, null, ropeStyle, null
                 );
-                rope.hasPhysicalImpact = false;
 
                 ConstraintTracker.addConstraintWithPersistence(rope);
 
@@ -527,6 +521,7 @@ public class Rope {
                 VStuff.LOGGER.warn("Invalid constraint type in save data, defaulting to GENERIC: {}", e.getMessage());
             }
         }
+
 
         BlockPos sourceBlockPos = null;
         if (tag.contains("sourceBlockPos_x")) {

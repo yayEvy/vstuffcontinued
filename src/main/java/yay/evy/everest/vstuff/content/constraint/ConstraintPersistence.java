@@ -112,7 +112,7 @@ public class ConstraintPersistence extends SavedData {
     }
 
     public static void onShipLoad(ShipLoadEvent shipLoadEvent, RegisteredListener registeredListener) {
-        long loadedId = shipLoadEvent.getShip().getId();
+        Long loadedId = shipLoadEvent.getShip().getId();
 
         MinecraftServer server = ValkyrienSkiesMod.getCurrentServer();
         if (server == null) return;
@@ -122,9 +122,8 @@ public class ConstraintPersistence extends SavedData {
 
         ConstraintPersistence constraintPersistence = ConstraintPersistence.get(level);
 
-        Long loadedLong = Long.valueOf(loadedId);
         constraintPersistence.persistedConstraints.values().stream()
-                .filter(rope -> Objects.equals(rope.shipA, loadedLong) || Objects.equals(rope.shipB, loadedLong))
+                .filter(rope -> Objects.equals(rope.shipA, loadedId) || Objects.equals(rope.shipB, loadedId))
                 .forEach(rope -> {
                     rope.restoreJoint(level);
                 });

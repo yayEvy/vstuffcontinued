@@ -76,6 +76,12 @@ public class RopeUtil {
         return localPos;
     }
 
+    public static Long whythefuckisitsupposedtobenullwhyyyyy(Long shipId, ServerLevel level) {
+        if (shipId == null) return null;
+        if (shipId.equals(getGroundBodyId(level))) return null;
+        return shipId;
+    }
+
     public static Vector3d getLocalPositionFixed(ServerLevel level, BlockPos pos, Long clickedShipId, Long targetShipId) {
         Vector3d blockPos;
         try {
@@ -117,6 +123,19 @@ public class RopeUtil {
             targetShip.getTransform().getWorldToShip().transformPosition(worldPos, localPos);
             return localPos;
         }
+        return blockPos;
+    }
+
+    public static Vector3d getLocalPos(ServerLevel level, BlockPos pos) {
+        Vector3d blockPos;
+        try {
+            VoxelShape shape = level.getBlockState(pos).getShape(level, pos);
+            Vec3 vec = shape.bounds().getCenter().add(pos.getCenter());
+            blockPos = new Vector3d(vec.x - 0.5, vec.y - 0.5, vec.z - 0.5);
+        } catch (UnsupportedOperationException ex) {
+            blockPos = new Vector3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+        }
+
         return blockPos;
     }
 
@@ -212,6 +231,12 @@ public class RopeUtil {
     public enum ConstraintType {
         GENERIC,
         PULLEY
+    }
+
+    public enum RopeType {
+        WW,
+        WS,
+        SS
     }
 
     public record RopeReturn(RopeInteractionReturn result, Rope rope){

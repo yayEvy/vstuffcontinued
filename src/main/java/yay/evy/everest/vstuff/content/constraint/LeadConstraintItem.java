@@ -99,6 +99,9 @@ public class LeadConstraintItem extends Item {
                 return InteractionResult.FAIL;
             }
 
+            firstShipId = RopeUtil.whythefuckisitsupposedtobenullwhyyyyy(firstShipId, serverLevel);
+            secondShipId = RopeUtil.whythefuckisitsupposedtobenullwhyyyyy(secondShipId, serverLevel);
+
             RopeUtil.RopeReturn ropeReturn;
 
             if (connectionType == ConnectionType.NORMAL) {
