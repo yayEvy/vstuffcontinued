@@ -45,6 +45,7 @@ public class Rope {
     public RopeType type;
     public RopeStyles.RopeStyle style;
     boolean hasPhysicalImpact = true;
+    boolean hasRestoredJoint = false;
 
     @Nullable VSDistanceJoint constraint;
 
@@ -183,6 +184,12 @@ public class Rope {
             VStuff.LOGGER.info("nuh uh [not removing joint for rope without joint]");
             return false;
         }
+
+        if (!hasRestoredJoint) {
+            VStuff.LOGGER.info("nuh uh [cannot remove a joint which has not been restored yet]");
+            return false;
+        }
+
         this.level = level;
         this.levelId = RopeUtil.registerLevel(level);
 
@@ -196,12 +203,13 @@ public class Rope {
             var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(dimensionId);
 
 
-            gtpa.removeJoint(ID);
+            gtpa.removeJoint(this.ID);
 
             if (this.sourceBlockPos != null && level.getBlockEntity(sourceBlockPos) instanceof PhysPulleyBlockEntity pulleyBE) {
                 pulleyBE.resetSelf();
             }
-            this.constraint = null;
+            //this.constraint = null;
+            this.hasRestoredJoint = false;
             ConstraintTracker.removeConstraintWithPersistence(level, ID);
             NetworkHandler.sendConstraintRemove(ID);
             VStuff.LOGGER.info("Successfully removed joint with id {}", ID);
@@ -266,6 +274,11 @@ public class Rope {
             VStuff.LOGGER.info("nuh uh [not restoring joint for rope without joint]");
             return;
         }
+        if (hasRestoredJoint) {
+            VStuff.LOGGER.info("nuh uh [this joint has already been restored!]");
+            return;
+        }
+        this.hasRestoredJoint = true;
         this.level = level;
         this.levelId = RopeUtil.registerLevel(level);
 
@@ -455,6 +468,7 @@ public class Rope {
                         finalLocalPosA, finalLocalPosB, maxLength, compliance, maxForce,
                         ConstraintType.GENERIC, null, ropeStyle, null
                 );
+                rope.hasRestoredJoint = true;
 
                 ConstraintTracker.addConstraintWithPersistence(rope);
 
@@ -488,6 +502,7 @@ public class Rope {
                     if (finalPlayer instanceof ServerPlayer serverPlayer) {
                         ConstraintTracker.syncAllConstraintsToPlayer(serverPlayer);
                     }
+                    rope.hasRestoredJoint = true;
                 });
                 VStuff.LOGGER.info("return impactful rope");
                 return new RopeReturn(RopeInteractionReturn.SUCCESS, rope);

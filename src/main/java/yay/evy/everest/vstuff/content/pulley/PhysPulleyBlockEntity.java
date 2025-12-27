@@ -85,23 +85,15 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     @Override
     public void physTick(@Nullable PhysShip physShip, @NotNull PhysLevel physLevel) {
         if (!(level instanceof ServerLevel serverLevel)) return;
-        System.out.println("pt");
 
         if (state == PulleyState.EXTENDED && attachedRope == null && constraintId != null) {
             Map<Integer, Rope> active = ConstraintTracker.getActiveRopes();
             attachedRope = active.get(constraintId);
             if (attachedRope != null) currentRopeLength = attachedRope.maxLength;
-            System.out.println("22");
         }
-
-        System.out.println("w");
-        System.out.println(state);
-        System.out.println(attachedRope);
         if (state != PulleyState.EXTENDED || attachedRope == null) return;
-        System.out.println("r");
         float speed = getSpeed();
         if (speed == 0) return;
-        System.out.println("g");
 
         float ropeDelta = speed * 0.0005f;
         float newLength = (float) attachedRope.maxLength + ropeDelta;

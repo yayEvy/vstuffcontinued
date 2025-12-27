@@ -61,7 +61,7 @@ public class LeadBreakItem extends Item {
                     }
 
                     data.removeJoint(serverLevel);
-                    forceRemoveConstraint(serverLevel, targetConstraintId);
+                    System.out.println("a");
 
                     if (soundPos != null) {
                         ConstraintTracker.cleanupOrphanedConstraints(serverLevel, soundPos);
@@ -79,17 +79,5 @@ public class LeadBreakItem extends Item {
             }
         }
         return InteractionResultHolder.pass(itemStack);
-    }
-    private void forceRemoveConstraint(ServerLevel level, int id) {
-        try {
-            var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(ValkyrienSkies.getDimensionId(level));
-            gtpa.removeJoint(id);
-        } catch (Exception ignored) {}
-
-        ConstraintPersistence persistence = ConstraintPersistence.get(level);
-        persistence.saveNow(level);
-
-        ConstraintTracker.removeConstraintWithPersistence(level, id);
-        NetworkHandler.sendConstraintRemove(id);
     }
 }

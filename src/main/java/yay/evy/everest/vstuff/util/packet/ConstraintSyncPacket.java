@@ -23,8 +23,6 @@ public class ConstraintSyncPacket {
     private final double maxLength;
     private final RopeStyles.RopeStyle ropeStyle;
     private final String style;
-    private final RopeStyles.PrimitiveRopeStyle basicStyle;
-    private final String styleLKey;
 
     public ConstraintSyncPacket(Integer constraintId, Long shipA, Long shipB,
                                 Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle ropeStyle) {
@@ -37,12 +35,10 @@ public class ConstraintSyncPacket {
         this.maxLength = maxLength;
 
         if (ropeStyle == null) {
-            ropeStyle = new RopeStyles.RopeStyle("none", RopeStyles.PrimitiveRopeStyle.NORMAL, "none");
+            ropeStyle = RopeStyles.fromString("normal");
         }
         this.ropeStyle = ropeStyle;
         this.style = ropeStyle.getStyle();
-        this.basicStyle = ropeStyle.getBasicStyle();
-        this.styleLKey = ropeStyle.getLangKey();
     }
 
     public ConstraintSyncPacket() {
@@ -53,10 +49,8 @@ public class ConstraintSyncPacket {
         this.localPosA = null;
         this.localPosB = null;
         this.maxLength = 0;
-        this.ropeStyle = new RopeStyles.RopeStyle("none", RopeStyles.PrimitiveRopeStyle.NORMAL, "none");
+        this.ropeStyle = RopeStyles.fromString("normal");
         this.style = ropeStyle.getStyle();
-        this.basicStyle = ropeStyle.getBasicStyle();
-        this.styleLKey = ropeStyle.getLangKey();
     }
 
     public ConstraintSyncPacket(Integer constraintId) {
@@ -67,10 +61,8 @@ public class ConstraintSyncPacket {
         this.localPosA = null;
         this.localPosB = null;
         this.maxLength = 0;
-        this.ropeStyle = new RopeStyles.RopeStyle("none", RopeStyles.PrimitiveRopeStyle.NORMAL, "none");
+        this.ropeStyle = RopeStyles.fromString("normal");
         this.style = ropeStyle.getStyle();
-        this.basicStyle = ropeStyle.getBasicStyle();
-        this.styleLKey = ropeStyle.getLangKey();
     }
 
     public ConstraintSyncPacket(FriendlyByteBuf buf) {
@@ -87,10 +79,8 @@ public class ConstraintSyncPacket {
                 this.maxLength = buf.readDouble();
 
                 this.style = buf.readUtf();
-                this.basicStyle = buf.readEnum(RopeStyles.PrimitiveRopeStyle.class);
-                this.styleLKey = buf.readUtf();
 
-                this.ropeStyle = new RopeStyles.RopeStyle(this.style, this.basicStyle, this.styleLKey);
+                this.ropeStyle = RopeStyles.fromString(this.style);
                 break;
             case REMOVE:
                 this.constraintId = buf.readInt();
@@ -99,10 +89,8 @@ public class ConstraintSyncPacket {
                 this.localPosA = null;
                 this.localPosB = null;
                 this.maxLength = 0;
-                this.style = "none";
-                this.basicStyle = RopeStyles.PrimitiveRopeStyle.NORMAL;
-                this.styleLKey = "none";
-                this.ropeStyle = new RopeStyles.RopeStyle(style, basicStyle, styleLKey);
+                this.style = "normal";
+                this.ropeStyle = RopeStyles.fromString(this.style);
                 break;
             case CLEAR_ALL:
             default:
@@ -112,10 +100,8 @@ public class ConstraintSyncPacket {
                 this.localPosA = null;
                 this.localPosB = null;
                 this.maxLength = 0;
-                this.style = "none";
-                this.basicStyle = RopeStyles.PrimitiveRopeStyle.NORMAL;
-                this.styleLKey = "none";
-                this.ropeStyle = new RopeStyles.RopeStyle(style, basicStyle, styleLKey);
+                this.style = "normal";
+                this.ropeStyle = RopeStyles.fromString(this.style);
                 break;
         }
     }
@@ -150,8 +136,6 @@ public class ConstraintSyncPacket {
                 buf.writeDouble(maxLength);
 
                 buf.writeUtf(style);
-                buf.writeEnum(basicStyle);
-                buf.writeUtf(styleLKey);
                 break;
             case REMOVE:
                 if (constraintId == null) {
@@ -180,7 +164,7 @@ public class ConstraintSyncPacket {
                         break;
                 }
             } catch (Exception e) {
-                VStuff.LOGGER.error("Error handling constraint sync packet: " + e.getMessage());
+                VStuff.LOGGER.error("Error handling constraint sync packet: {}", e.getMessage());
                 e.printStackTrace();
             }
         });
