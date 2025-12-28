@@ -127,6 +127,8 @@ public class LeadConstraintItem extends Item {
                         PhysPulleyBlockEntity waitingPulley = (PhysPulleyBlockEntity) serverLevel.getBlockEntity(firstClickedPos);
                         waitingPulley.attachRope(ropeReturn.rope());
                         ropeReturn.rope().setSourceBlockPos(firstClickedPos);
+
+                        serverLevel.sendBlockUpdated(firstClickedPos, waitingPulley.getBlockState(), waitingPulley.getBlockState(), 3);
                     }
                 } else {
                     resetStateWithMessage(serverLevel, heldItem, false, player, "pulley_fail");

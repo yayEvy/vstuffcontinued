@@ -38,19 +38,24 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     }
 
     public boolean canAttach() {
+        if (state == PulleyState.EXTENDED || state == PulleyState.WAITING) {
+            if (constraintId == null || !ConstraintTracker.getActiveRopes().containsKey(constraintId)) {
+                resetSelf();
+                return true;
+            }
+        }
         return state == PulleyState.OPEN;
     }
-
     public void attachRope(Rope rope) {
-        System.out.println("attaching");
+      //  System.out.println("attaching");
         if (rope == null) return;
         state = PulleyState.EXTENDED;
         attachedRope = rope;
         currentRopeLength = rope.maxLength;
         constraintId = rope.ID;
         setChanged();
-        System.out.println("attached");
-        System.out.println(state);
+     //   System.out.println("attached");
+       // System.out.println(state);
     }
 
     public void setWaiting() {
@@ -60,12 +65,12 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
     public void open() {
         state = PulleyState.OPEN;
-        System.out.println("opening");
+       // System.out.println("opening");
         setChanged();
     }
 
     public void resetSelf() {
-        System.out.println("self reset");
+       // System.out.println("self reset");
         state = PulleyState.OPEN;
         attachedRope = null;
         constraintId = null;
@@ -114,9 +119,16 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);
 
+        if (constraintId != null) {
+            Map<Integer, Rope> active = ConstraintTracker.getActiveRopes();
+            if (active == null || !active.containsKey(constraintId)) {
+                this.resetSelf();
+            }
+        }
+
         tooltip.add(Component.literal(" "));
 
-        if (constraintId != null) {
+        if (attachedRope != null) {
             tooltip.add(Component.literal("Length: " + String.format("%.1f", currentRopeLength) + " blocks")
                     .withStyle(ChatFormatting.BLUE));
             float speed = getSpeed();
@@ -133,6 +145,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         }
         return true;
     }
+
 
     @Override
     protected void write(CompoundTag tag, boolean clientPacket) {
@@ -210,6 +223,13 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         if (constraintId == null || attachedRope == null) return;
 
         attachedRope.removeJoint(serverLevel);
+
+        attachedRope = null;
+        constraintId = null;
+        currentRopeLength = 0.0;
+        state = PulleyState.OPEN;
+        setChanged();
+        serverLevel.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
     }
 
 }
