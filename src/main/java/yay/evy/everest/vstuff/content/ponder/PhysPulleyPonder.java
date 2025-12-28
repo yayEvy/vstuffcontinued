@@ -28,7 +28,7 @@ public class PhysPulleyPonder {
         BlockPos anchorPos = util.grid().at(2, 2, 2);
 
 
-        scene.overlay().showText(30)
+        scene.overlay().showText(40)
                 .text("vstuff.ponder.phys_pulley.text_rope")
                 .pointAt(util.vector().centerOf(pulleyPos))
                 .placeNearTarget();
@@ -41,7 +41,7 @@ public class PhysPulleyPonder {
                 .withItem(new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get()))
                 .rightClick();
 
-        scene.idle(30);
+        scene.idle(40);
 
 
         scene.overlay().showOutline(
@@ -51,12 +51,12 @@ public class PhysPulleyPonder {
                 50
         );
 
-        scene.overlay().showText(30)
+        scene.overlay().showText(40)
                 .text("vstuff.ponder.phys_pulley.text_anchor")
                 .pointAt(util.vector().topOf(anchorPos))
                 .placeNearTarget();
 
-        scene.idle(10);
+        scene.idle(30);
 
         scene.overlay().showControls(
                         util.vector().topOf(anchorPos),
@@ -66,7 +66,7 @@ public class PhysPulleyPonder {
                 .withItem(new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get()))
                 .rightClick();
 
-        scene.idle(30);
+        scene.idle(40);
         scene.markAsFinished();
     }
 
