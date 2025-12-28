@@ -40,7 +40,7 @@ public class RopeRendererClient {
     private static final float CHAIN_ROPE_V_SCALE = 0.5f;
     private static final float WIND_STRENGTH = 0.02f;
 
-    private static final Map<Integer, RopePositionCache> positionCache = new ConcurrentHashMap<>();
+    static final Map<Integer, RopePositionCache> positionCache = new ConcurrentHashMap<>();
 
     private static final BlockPos.MutableBlockPos sharedMutablePos = new BlockPos.MutableBlockPos();
 
@@ -153,6 +153,11 @@ public class RopeRendererClient {
                                          Integer constraintId, ClientConstraintTracker.ClientRopeData ropeData,
                                          Level level, Vec3 cameraPos, float partialTick, RopeStyles.RopeStyle style) {
         if (!level.isClientSide) return;
+
+        if (!ropeData.isRenderable(level)) {
+            positionCache.remove(constraintId);
+            return;
+        }
 
         Vector3d startPos = ropeData.getWorldPosA(level, partialTick);
         Vector3d endPos = ropeData.getWorldPosB(level, partialTick);
@@ -489,5 +494,12 @@ public class RopeRendererClient {
         double windSwayZ = Math.cos((gameTime * 0.5 + t * 1.5)) * windOffset * Math.max(sagAmount, 0.1) * 0.15;
 
         return new Vector3d(x + windSway, y - sagCurve, z + windSwayZ);
+    }
+
+    public static void removePositionCache(Integer constraintId) {
+        positionCache.remove(constraintId);
+    }
+    public static void clearCache() {
+        positionCache.clear();
     }
 }

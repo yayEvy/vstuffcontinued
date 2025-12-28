@@ -24,8 +24,19 @@ public class ConstraintTracker {
 
     public static final Map<Integer, Rope> activeRopes = new ConcurrentHashMap<>();
     private static long lastJoinTime = 0L;
+    private static int lastUsedId = 0;
 
 
+    public static int getNextId() {
+        return ++lastUsedId;
+    }
+
+    public static void setLastUsedId(int id) {
+        if (id > lastUsedId) {
+            lastUsedId = id;
+            VStuff.LOGGER.info("ConstraintTracker ID counter updated to {}", lastUsedId);
+        }
+    }
     public static void addConstraintWithPersistence(Rope rope) {
 
         if (rope.constraintType == RopeUtil.ConstraintType.PULLEY && rope.sourceBlockPos != null) {
@@ -64,13 +75,8 @@ public class ConstraintTracker {
             if (level.getServer() != null) {
                 for (ServerPlayer player : level.getServer().getPlayerList().getPlayers()) {
                     NetworkHandler.sendConstraintRemoveToPlayer(player, constraintId);
-                    level.getServer().tell(
-                            new TickTask(
-                                0,
-                                () -> NetworkHandler.sendConstraintRemoveToPlayer(player, constraintId)
-                            )
-                    );
                 }
+
             }
 
             NetworkHandler.sendConstraintRemove(constraintId);
@@ -122,20 +128,13 @@ public class ConstraintTracker {
 
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            for (Map.Entry<Integer, Rope> entry : activeRopes.entrySet()) {
-                Integer constraintId = entry.getKey();
-                Rope rope = entry.getValue();
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
 
-                NetworkHandler.sendConstraintAddToPlayer(player, constraintId, rope.shipA, rope.shipB,
-                        rope.localPosA, rope.localPosB, rope.maxLength, rope.style);
-            }
-            NetworkHandler.sendClearAllConstraintsToPlayer(player);
-            syncAllConstraintsToPlayer(player);
+        NetworkHandler.sendClearAllConstraintsToPlayer(player);
 
-            lastJoinTime = System.currentTimeMillis();
-        }
+        syncAllConstraintsToPlayer(player);
     }
+
 
 
 

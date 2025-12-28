@@ -34,41 +34,33 @@ public class ConstraintPersistence extends SavedData {
         setDirty();
     }
 
+
     public static ConstraintPersistence load(CompoundTag tag) {
         ConstraintPersistence data = new ConstraintPersistence();
+
+        if (tag.contains("lastUsedId")) {
+            ConstraintTracker.setLastUsedId(tag.getInt("lastUsedId"));
+        }
+
         ListTag constraintsList = tag.getList("constraints", Tag.TAG_COMPOUND);
-
-        VStuff.LOGGER.info("ConstraintPersistence found {} constraints", constraintsList.size());
-
         for (int i = 0; i < constraintsList.size(); i++) {
             CompoundTag constraintTag = constraintsList.getCompound(i);
             Integer id = constraintTag.getInt("id");
-
             data.persistedConstraints.put(id, Rope.fromTag(constraintTag));
         }
-
-        VStuff.LOGGER.info("ConstraintPersistence loaded with {} constraints", data.persistedConstraints.size() );
         return data;
     }
 
     @Override
     public @NotNull CompoundTag save(@NotNull CompoundTag tag) {
+
+        tag.putInt("lastUsedId", ConstraintTracker.getNextId() - 1);
+
         ListTag constraintsList = new ListTag();
-        ListTag removedList = new ListTag();
-
-        VStuff.LOGGER.info("Found {} constraints to save to persistence", persistedConstraints.size());
-
-
         for (Map.Entry<Integer, Rope> entry : persistedConstraints.entrySet()) {
-            Integer constraintId = entry.getKey();
-
-            CompoundTag constraintTag = entry.getValue().toTag();
-
-            constraintsList.add(constraintTag);
+            constraintsList.add(entry.getValue().toTag());
         }
-
         tag.put("constraints", constraintsList);
-        VStuff.LOGGER.info("Saved {} constraints to /data/" + DATA_NAME + ".dat", persistedConstraints.size());
         return tag;
     }
 
@@ -84,13 +76,14 @@ public class ConstraintPersistence extends SavedData {
 
     public void removeConstraint(Integer id) {
         Rope data = persistedConstraints.get(id);
-        if (data != null && (data.shipAIsGround || data.shipBIsGround)) return;
+        if (data == null) return;
 
-        if (persistedConstraints.remove(id) != null) {
-            markConstraintAsRemoved(id);
-            setDirty();
-        }
+        persistedConstraints.remove(id);
+        setDirty();
+
+        VStuff.LOGGER.info("Removed constraint {} from persistence", id);
     }
+
 
     public static void onShipLoad(ShipLoadEvent shipLoadEvent, RegisteredListener registeredListener) {
         Long loadedId = shipLoadEvent.getShip().getId();
@@ -105,11 +98,13 @@ public class ConstraintPersistence extends SavedData {
         ConstraintPersistence constraintPersistence = ConstraintPersistence.get(level);
 
         constraintPersistence.persistedConstraints.values().stream()
-                .filter(rope -> Objects.equals(rope.shipA, loadedId) || Objects.equals(rope.shipB, loadedId))
+                .filter(rope -> (Objects.equals(rope.shipA, loadedId) || Objects.equals(rope.shipB, loadedId))
+                        && !rope.hasRestoredJoint)
                 .forEach(rope -> {
                     VStuff.LOGGER.info("Restoring rope with ID {}", rope.ID);
                     rope.restoreJoint(level);
                 });
+
     }
 
 }

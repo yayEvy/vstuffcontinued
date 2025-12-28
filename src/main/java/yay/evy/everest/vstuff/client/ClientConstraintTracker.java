@@ -124,7 +124,28 @@ public class ClientConstraintTracker {
                     return new Vector3d(localPosB);
                 }
             }
+        public boolean isRenderable(Level level) {
+            if (level == null) return false;
+
+            var shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
+            if (shipWorld == null) return false;
+
+            if (shipA != null && shipA != 0L) {
+                Ship a = shipWorld.getAllShips().getById(shipA);
+                if (!(a instanceof ClientShip csA)) return false;
+                if (csA.getRenderTransform() == null) return false;
+            }
+
+            if (shipB != null && shipB != 0L) {
+                Ship b = shipWorld.getAllShips().getById(shipB);
+                if (!(b instanceof ClientShip csB)) return false;
+                if (csB.getRenderTransform() == null) return false;
+            }
+
+            return true;
         }
+
+    }
 
     public static void addClientConstraint(Integer constraintId, Long shipA, Long shipB,
                                            Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle style) {
@@ -132,14 +153,21 @@ public class ClientConstraintTracker {
     }
 
     public static void removeClientConstraint(Integer constraintId) {
+        if (constraintId == null) return;
+
         clientConstraints.remove(constraintId);
+
+
+        RopeRendererClient.positionCache.remove(constraintId);
     }
 
     public static Map<Integer, ClientRopeData> getClientConstraints() {
-        return new HashMap<>(clientConstraints);
+        return clientConstraints;
     }
 
     public static void clearAllClientConstraints() {
         clientConstraints.clear();
+        RopeRendererClient.clearCache();
     }
+
 }
