@@ -182,7 +182,7 @@ public class LeadConstraintItem extends Item {
             stack.setTag(null);
         }
 
-        VStuff.LOGGER.info("Successfully reset LeadConstraintItem");
+       // VStuff.LOGGER.info("Successfully reset LeadConstraintItem");
     }
 
     private void resetStateWithMessage(ServerLevel level, ItemStack stack, boolean didSucceed, Player player, String name) {

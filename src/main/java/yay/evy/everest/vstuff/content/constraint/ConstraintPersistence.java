@@ -81,13 +81,13 @@ public class ConstraintPersistence extends SavedData {
         persistedConstraints.remove(id);
         setDirty();
 
-        VStuff.LOGGER.info("Removed constraint {} from persistence", id);
+       // VStuff.LOGGER.info("Removed constraint {} from persistence", id);
     }
 
 
     public static void onShipLoad(ShipLoadEvent shipLoadEvent, RegisteredListener registeredListener) {
         Long loadedId = shipLoadEvent.getShip().getId();
-        System.out.println("loaded ship " + loadedId);
+        //System.out.println("loaded ship " + loadedId);
 
         MinecraftServer server = ValkyrienSkiesMod.getCurrentServer();
         if (server == null) return;
@@ -101,7 +101,7 @@ public class ConstraintPersistence extends SavedData {
                 .filter(rope -> (Objects.equals(rope.shipA, loadedId) || Objects.equals(rope.shipB, loadedId))
                         && !rope.hasRestoredJoint)
                 .forEach(rope -> {
-                    VStuff.LOGGER.info("Restoring rope with ID {}", rope.ID);
+                  //  VStuff.LOGGER.info("Restoring rope with ID {}", rope.ID);
                     rope.restoreJoint(level);
                 });
 

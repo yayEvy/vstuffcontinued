@@ -17,15 +17,15 @@ public class RopeStyleHandlerServer {
     public static void addStyle(UUID uuid, RopeStyles.RopeStyle style) {
         selectedStyles.put(uuid, style);
 
-        VStuff.LOGGER.info("Set UUID {} style to {}", uuid, style.asString());
+        //VStuff.LOGGER.info("Set UUID {} style to {}", uuid, style.asString());
     }
 
     public static RopeStyles.RopeStyle getStyle(UUID uuid) {
         if (selectedStyles.containsKey(uuid)) {
-            VStuff.LOGGER.info("Successfully got style for UUID {}", uuid);
+          //  VStuff.LOGGER.info("Successfully got style for UUID {}", uuid);
             return selectedStyles.get(uuid);
         }
-        VStuff.LOGGER.info("Could not get style for UUID {}, defaulting to normal rope style", uuid);
+       // VStuff.LOGGER.info("Could not get style for UUID {}, defaulting to normal rope style", uuid);
         return new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal");
     }
 

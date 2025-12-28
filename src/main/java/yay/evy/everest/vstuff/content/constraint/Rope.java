@@ -192,9 +192,9 @@ public class Rope {
             try {
                 var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(ValkyrienSkies.getDimensionId(level));
                 gtpa.removeJoint(this.physicsId);
-                VStuff.LOGGER.info("Successfully removed physics joint {}", physicsId);
+              //  VStuff.LOGGER.info("Successfully removed physics joint {}", physicsId);
             } catch (Exception e) {
-                VStuff.LOGGER.error("Failed to remove physics joint for rope {}: {}", ID, e.getMessage());
+              //  VStuff.LOGGER.error("Failed to remove physics joint for rope {}: {}", ID, e.getMessage());
             }
         }
 
@@ -210,12 +210,12 @@ public class Rope {
 
     public boolean setJointLength(ServerLevel level, float newLength) {
         if (!hasPhysicalImpact) {
-            VStuff.LOGGER.info("nuh uh [not settings joint length for rope without joint]");
+          //  VStuff.LOGGER.info("nuh uh [not settings joint length for rope without joint]");
             return false;
         }
 
         if (constraint == null) {
-            VStuff.LOGGER.warn("Cannot change the length of a null joint!");
+           // VStuff.LOGGER.warn("Cannot change the length of a null joint!");
             return false;
         }
 
@@ -241,7 +241,7 @@ public class Rope {
             constraint = newConstraint;
             maxLength = newConstraint.getMaxDistance();
         } catch (Exception e) {
-            VStuff.LOGGER.error("Error updating joint for constraint {}: {}", ID, e.getMessage());
+           // VStuff.LOGGER.error("Error updating joint for constraint {}: {}", ID, e.getMessage());
         }
         return false;
     }
@@ -459,7 +459,7 @@ public class Rope {
             try {
                 constraintType = ConstraintType.valueOf(tag.getString("constraintType"));
             } catch (IllegalArgumentException e) {
-                VStuff.LOGGER.warn("Invalid constraint type in save data, defaulting to GENERIC: {}", e.getMessage());
+               // VStuff.LOGGER.warn("Invalid constraint type in save data, defaulting to GENERIC: {}", e.getMessage());
             }
         }
 

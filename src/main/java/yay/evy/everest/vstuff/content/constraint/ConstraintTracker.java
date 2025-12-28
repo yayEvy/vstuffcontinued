@@ -34,7 +34,7 @@ public class ConstraintTracker {
     public static void setLastUsedId(int id) {
         if (id > lastUsedId) {
             lastUsedId = id;
-            VStuff.LOGGER.info("ConstraintTracker ID counter updated to {}", lastUsedId);
+           // VStuff.LOGGER.info("ConstraintTracker ID counter updated to {}", lastUsedId);
         }
     }
     public static void addConstraintWithPersistence(Rope rope) {
@@ -56,7 +56,7 @@ public class ConstraintTracker {
 
         persistence.addConstraint(rope);
         NetworkHandler.sendConstraintAdd(rope.ID, rope.shipA, rope.shipB, rope.localPosA, rope.localPosB, rope.maxLength, rope.style);
-        VStuff.LOGGER.info("Adding constraint with id {} to persistence", rope.ID);
+        //VStuff.LOGGER.info("Adding constraint with id {} to persistence", rope.ID);
     }
 
     public static void replaceConstraint(Integer id, Rope rope) {
@@ -91,7 +91,7 @@ public class ConstraintTracker {
 
     public static void syncAllConstraintsToPlayer(ServerPlayer player) {
         NetworkHandler.sendClearAllConstraintsToPlayer(player);
-        VStuff.LOGGER.info("Attempting to sync all constraints to player {}", player.getName());
+      //  VStuff.LOGGER.info("Attempting to sync all constraints to player {}", player.getName());
 
         for (Map.Entry<Integer, Rope> entry : activeRopes.entrySet()) {
             Rope data = entry.getValue();
@@ -118,7 +118,7 @@ public class ConstraintTracker {
         if (activeRopes.containsKey(rope.ID)) return;
 
         activeRopes.put(rope.ID, rope);
-        VStuff.LOGGER.info("Adding constraint {} to activeRopes", rope.ID);
+     //   VStuff.LOGGER.info("Adding constraint {} to activeRopes", rope.ID);
 
 
         NetworkHandler.sendConstraintAdd(rope.ID, rope.shipA, rope.shipB, rope.localPosA, rope.localPosB, rope.maxLength, rope.style);

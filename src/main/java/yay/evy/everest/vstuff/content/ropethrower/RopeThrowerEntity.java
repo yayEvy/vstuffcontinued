@@ -59,7 +59,7 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
 
     @Override
     protected void onHitBlock(BlockHitResult result) {
-        System.out.println("on hit");
+       // System.out.println("on hit");
         if (!(level() instanceof ServerLevel serverLevel)) {
             return;
         }
