@@ -94,7 +94,7 @@ public class RopeRendererClient {
 
     @SubscribeEvent
     public static void onRenderLevel(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_ENTITIES) {
             return;
         }
 
@@ -253,11 +253,8 @@ public class RopeRendererClient {
             renderType = RopeRendererType.ropeRendererChainStyle(style.getTexture());
             renderChainRope(poseStack, bufferSource.getBuffer(renderType), curvePoints, lightValues, currentDistance, style);
         } else {
-            renderType = underwater
-                    ? RopeRendererType.ropeRendererUnderwater(style.getTexture())
-                    : RopeRendererType.ropeRenderer(style.getTexture());
-            renderNormalRope(poseStack, bufferSource.getBuffer(renderType), curvePoints, lightValues, currentDistance, startRelative, endRelative);
-        }
+            renderType = RopeRendererType.ropeRenderer(style.getTexture());
+            renderNormalRope(poseStack, bufferSource.getBuffer(renderType), curvePoints, lightValues, currentDistance, startRelative, endRelative);        }
 
         poseStack.popPose();
     }
