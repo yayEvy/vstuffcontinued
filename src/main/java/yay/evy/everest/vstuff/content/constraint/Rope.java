@@ -49,6 +49,9 @@ public class Rope {
     public boolean hasRestoredJoint = false;
     private Integer physicsId = null;
 
+    public double renderLength;
+
+
     @Nullable VSDistanceJoint constraint;
 
     /**
@@ -72,6 +75,8 @@ public class Rope {
         this.maxLength = maxLength;
         this.maxForce = maxForce;
         this.compliance = compliance;
+        this.renderLength = maxLength;
+
 
         this.constraintType = constraintType;
 
@@ -123,6 +128,9 @@ public class Rope {
         this.sourceBlockPos = sourceBlockPos;
         this.style = style;
         this.constraint = constraint;
+
+        this.renderLength = maxLength;
+
     }
 
     public @NotNull ServerLevel getLevel() {
@@ -239,6 +247,16 @@ public class Rope {
 
             this.constraint = newConstraint;
             this.maxLength = newLength;
+            this.renderLength = newLength;
+
+            MinecraftServer server = level.getServer();
+            if (server != null) {
+                for (ServerPlayer sp : server.getPlayerList().getPlayers()) {
+                    ConstraintTracker.syncAllConstraintsToPlayer(sp);
+                }
+            }
+
+
             return true;
 
         } catch (Exception e) {
@@ -484,7 +502,7 @@ public class Rope {
 
         String levelId = tag.getString("levelId");
 
-        return new Rope(
+        Rope rope = new Rope(
                 RopeUtil.getRegisteredLevel(levelId),
                 tag.getInt("id"),
                 shipA,
@@ -501,6 +519,13 @@ public class Rope {
                 ropeStyle,
                 null
         );
+
+        rope.renderLength = tag.contains("renderLength")
+                ? tag.getDouble("renderLength")
+                : rope.maxLength;
+
+        return rope;
+
     }
 
     /**
@@ -527,6 +552,9 @@ public class Rope {
         constraintTag.putDouble("maxLength", maxLength);
         constraintTag.putDouble("compliance", compliance);
         constraintTag.putDouble("maxForce", maxForce);
+
+        constraintTag.putDouble("renderLength", renderLength);
+
 
         constraintTag.putString("constraintType", constraintType.name());
 
