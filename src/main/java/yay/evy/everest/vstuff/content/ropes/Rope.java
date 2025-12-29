@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.constraint;
+package yay.evy.everest.vstuff.content.ropes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -21,7 +21,7 @@ import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
 import yay.evy.everest.vstuff.util.RopeStyles;
 import org.valkyrienskies.core.internal.joints.*;
-import yay.evy.everest.vstuff.content.constraint.RopeUtil.*;
+import yay.evy.everest.vstuff.content.ropes.RopeUtil.*;
 
 import javax.annotation.Nullable;
 

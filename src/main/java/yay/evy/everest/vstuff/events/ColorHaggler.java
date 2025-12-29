@@ -12,10 +12,10 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.NetworkHandler;
-import yay.evy.everest.vstuff.content.constraint.RopePersistence;
-import yay.evy.everest.vstuff.content.constraint.RopeTracker;
-import yay.evy.everest.vstuff.content.constraint.Rope;
-import yay.evy.everest.vstuff.content.constraint.RopeUtil;
+import yay.evy.everest.vstuff.content.ropes.RopePersistence;
+import yay.evy.everest.vstuff.content.ropes.RopeTracker;
+import yay.evy.everest.vstuff.content.ropes.Rope;
+import yay.evy.everest.vstuff.content.ropes.RopeUtil;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
 

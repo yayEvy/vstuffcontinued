@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "vstuff:item/lead_constraint_item"
+    "layer0": "vstuff:item/rope_cutter_item"
   }
 }

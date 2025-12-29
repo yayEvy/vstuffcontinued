@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.constraint;
+package yay.evy.everest.vstuff.content.ropes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;

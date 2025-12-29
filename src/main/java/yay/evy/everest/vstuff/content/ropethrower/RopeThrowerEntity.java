@@ -1,12 +1,9 @@
 package yay.evy.everest.vstuff.content.ropethrower;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
@@ -16,11 +13,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import yay.evy.everest.vstuff.content.constraint.Rope;
-import yay.evy.everest.vstuff.content.constraint.RopeUtil;
+import yay.evy.everest.vstuff.content.ropes.Rope;
+import yay.evy.everest.vstuff.content.ropes.RopeUtil;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.content.pulley.PulleyAnchorBlockEntity;
-import yay.evy.everest.vstuff.index.VStuffEntities;
 import yay.evy.everest.vstuff.index.VStuffItems;
 
 public class RopeThrowerEntity extends ThrowableItemProjectile {
@@ -73,7 +69,7 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
         Long secondShipId = getShipIdAtPos(serverLevel, hitPos);
 
         if (connectionType == RopeUtil.ConnectionType.PULLEY && !(serverLevel.getBlockEntity(hitPos) instanceof PulleyAnchorBlockEntity)) {
-            ItemStack ropeDrop = new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get());
+            ItemStack ropeDrop = new ItemStack(VStuffItems.ROPE_ITEM.get());
             ItemEntity itemEntity = new ItemEntity(
                     serverLevel,
                     hitPos.getX() + 0.5,
@@ -88,7 +84,7 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
         }
 
         RopeUtil.RopeReturn ropeReturn = Rope.createNew(
-                VStuffItems.LEAD_CONSTRAINT_ITEM.get(),
+                VStuffItems.ROPE_ITEM.get(),
                 serverLevel,
                 startPos,
                 hitPos,

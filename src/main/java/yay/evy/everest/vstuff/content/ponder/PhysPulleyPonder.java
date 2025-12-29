@@ -38,7 +38,7 @@ public class PhysPulleyPonder {
                         Pointing.DOWN,
                         40
                 )
-                .withItem(new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get()))
+                .withItem(new ItemStack(VStuffItems.ROPE_ITEM.get()))
                 .rightClick();
 
         scene.idle(40);
@@ -63,7 +63,7 @@ public class PhysPulleyPonder {
                         Pointing.DOWN,
                         40
                 )
-                .withItem(new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get()))
+                .withItem(new ItemStack(VStuffItems.ROPE_ITEM.get()))
                 .rightClick();
 
         scene.idle(40);

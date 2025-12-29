@@ -8,9 +8,9 @@ import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.constraint.RopeTracker;
-import yay.evy.everest.vstuff.content.constraint.Rope;
-import yay.evy.everest.vstuff.content.constraint.RopeUtil;
+import yay.evy.everest.vstuff.content.ropes.RopeTracker;
+import yay.evy.everest.vstuff.content.ropes.Rope;
+import yay.evy.everest.vstuff.content.ropes.RopeUtil;
 import yay.evy.everest.vstuff.index.VStuffItems;
 
 import java.util.ArrayList;
@@ -81,7 +81,7 @@ public class RopeBreakHandler {
                 if (remove) {
                     toRemove.put(id, rope);
 
-                    ItemStack ropeDrop = new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get());
+                    ItemStack ropeDrop = new ItemStack(VStuffItems.ROPE_ITEM.get());
                     ItemEntity itemEntity = new ItemEntity(
                             level,
                             dropPos.getX() + 0.5,

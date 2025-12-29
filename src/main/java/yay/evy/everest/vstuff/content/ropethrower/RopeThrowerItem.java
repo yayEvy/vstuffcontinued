@@ -4,7 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -15,21 +14,15 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.BlockHitResult;
-import org.valkyrienskies.core.api.ships.LoadedShip;
-import org.valkyrienskies.core.impl.shadow.In;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.client.ClientOutlineHandler;
 import yay.evy.everest.vstuff.client.NetworkHandler;
-import yay.evy.everest.vstuff.content.constraint.RopeUtil;
+import yay.evy.everest.vstuff.content.ropes.RopeUtil;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.index.VStuffEntities;
-import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.index.VStuffSounds;
 
-import static yay.evy.everest.vstuff.content.constraint.RopeUtil.getShipIdAtPos;
+import static yay.evy.everest.vstuff.content.ropes.RopeUtil.getShipIdAtPos;
 
 public class RopeThrowerItem extends Item {
 

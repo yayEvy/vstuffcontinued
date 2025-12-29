@@ -13,8 +13,8 @@ import org.jetbrains.annotations.Nullable;
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.mod.api.BlockEntityPhysicsListener;
-import yay.evy.everest.vstuff.content.constraint.RopeTracker;
-import yay.evy.everest.vstuff.content.constraint.Rope;
+import yay.evy.everest.vstuff.content.ropes.RopeTracker;
+import yay.evy.everest.vstuff.content.ropes.Rope;
 import yay.evy.everest.vstuff.index.VStuffBlockEntities;
 
 import java.util.List;

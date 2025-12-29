@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.constraint;
+package yay.evy.everest.vstuff.content.ropes;
 
 
 import net.minecraft.core.BlockPos;
@@ -20,7 +20,7 @@ import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.pulley.*;
 import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
 import yay.evy.everest.vstuff.util.RopeStyles;
-import yay.evy.everest.vstuff.content.constraint.RopeUtil.ConnectionType;
+import yay.evy.everest.vstuff.content.ropes.RopeUtil.ConnectionType;
 
 import java.util.Objects;
 

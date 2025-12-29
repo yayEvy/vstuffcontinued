@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.constraint;
+package yay.evy.everest.vstuff.content.ropes;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
