@@ -93,7 +93,13 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     @Override
     public void physTick(@Nullable PhysShip physShip, @NotNull PhysLevel physLevel) {
         if (!(level instanceof ServerLevel serverLevel)) return;
-        if (state != PulleyState.EXTENDED || attachedRope == null) return;
+        if (state != PulleyState.EXTENDED) return;
+
+        if (attachedRope == null && constraintId != null) {
+            attachedRope = ConstraintTracker.getActiveRopes().get(constraintId);
+        }
+
+        if (attachedRope == null) return;
 
         attachedRope.ensureJointExists(serverLevel);
 
@@ -235,12 +241,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     }
 
 
-    @Override
-    public void onLoad() {
-        super.onLoad();
-        if (level instanceof ServerLevel sl && attachedRope != null) {
-            attachedRope.restoreJoint(sl);
-        }
-    }
+
 
 }
