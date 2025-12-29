@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
-public class ClientConstraintTracker {
+public class ClientRopeTracker {
     private static final Map<Integer, ClientRopeData> clientConstraints = new HashMap<>();
 
     public record ClientRopeData(Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB, double maxLength,

@@ -15,7 +15,6 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.ClientOutlineHandler;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.pulley.*;
@@ -25,9 +24,9 @@ import yay.evy.everest.vstuff.content.constraint.RopeUtil.ConnectionType;
 
 import java.util.Objects;
 
-public class LeadConstraintItem extends Item {
+public class RopeItem extends Item {
 
-    public LeadConstraintItem(Properties pProperties) {
+    public RopeItem(Properties pProperties) {
         super(pProperties);
     }
 

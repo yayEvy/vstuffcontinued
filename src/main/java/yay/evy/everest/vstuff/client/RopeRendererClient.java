@@ -7,7 +7,6 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -112,11 +111,11 @@ public class RopeRendererClient {
             Vec3 cameraPos = event.getCamera().getPosition();
             float partialTick = event.getPartialTick();
 
-            Map<Integer, ClientConstraintTracker.ClientRopeData> constraints = ClientConstraintTracker.getClientConstraints();
+            Map<Integer, ClientRopeTracker.ClientRopeData> constraints = ClientRopeTracker.getClientConstraints();
 
             boolean renderedAny = false;
 
-            for (Map.Entry<Integer, ClientConstraintTracker.ClientRopeData> entry : constraints.entrySet()) {
+            for (Map.Entry<Integer, ClientRopeTracker.ClientRopeData> entry : constraints.entrySet()) {
                 try {
                     renderClientRope(
                             poseStack,
@@ -145,12 +144,12 @@ public class RopeRendererClient {
     }
 
     private static void cleanupPositionCache() {
-        Map<Integer, ClientConstraintTracker.ClientRopeData> constraints = ClientConstraintTracker.getClientConstraints();
+        Map<Integer, ClientRopeTracker.ClientRopeData> constraints = ClientRopeTracker.getClientConstraints();
         positionCache.entrySet().removeIf(entry -> !constraints.containsKey(entry.getKey()));
     }
 
     private static void renderClientRope(PoseStack poseStack, MultiBufferSource bufferSource,
-                                         Integer constraintId, ClientConstraintTracker.ClientRopeData ropeData,
+                                         Integer constraintId, ClientRopeTracker.ClientRopeData ropeData,
                                          Level level, Vec3 cameraPos, float partialTick, RopeStyles.RopeStyle style) {
         if (!level.isClientSide) return;
 

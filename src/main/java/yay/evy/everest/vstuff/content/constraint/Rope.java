@@ -18,14 +18,12 @@ import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.client.NetworkHandler;
-import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
 import yay.evy.everest.vstuff.util.RopeStyles;
 import org.valkyrienskies.core.internal.joints.*;
 import yay.evy.everest.vstuff.content.constraint.RopeUtil.*;
 
 import javax.annotation.Nullable;
-import java.util.UUID;
 
 public class Rope {
 
@@ -210,7 +208,7 @@ public class Rope {
         this.constraint = null;
         this.hasRestoredJoint = false;
 
-        ConstraintTracker.removeConstraintWithPersistence(level, this.ID);
+        RopeTracker.removeConstraintWithPersistence(level, this.ID);
 
         return true;
     }
@@ -252,7 +250,7 @@ public class Rope {
             MinecraftServer server = level.getServer();
             if (server != null) {
                 for (ServerPlayer sp : server.getPlayerList().getPlayers()) {
-                    ConstraintTracker.syncAllConstraintsToPlayer(sp);
+                    RopeTracker.syncAllConstraintsToPlayer(sp);
                 }
             }
 
@@ -307,16 +305,16 @@ public class Rope {
             this.physicsId = newConstraintId;
             this.constraint = ropeConstraint;
 
-            if (!ConstraintTracker.getActiveRopes().containsKey(this.ID)) {
-                ConstraintTracker.addConstraintWithPersistence(this);
+            if (!RopeTracker.getActiveRopes().containsKey(this.ID)) {
+                RopeTracker.addConstraintWithPersistence(this);
             } else {
-                ConstraintTracker.getActiveRopes().put(this.ID, this);
+                RopeTracker.getActiveRopes().put(this.ID, this);
             }
 
             MinecraftServer server = level.getServer();
             if (server != null) {
                 for (ServerPlayer sp : server.getPlayerList().getPlayers()) {
-                    ConstraintTracker.syncAllConstraintsToPlayer(sp);
+                    RopeTracker.syncAllConstraintsToPlayer(sp);
                 }
             }
          //   VStuff.LOGGER.info("Successfully restored Physics Joint for Rope ID: {} (Physics ID: {})", this.ID, newConstraintId);
@@ -364,7 +362,7 @@ public class Rope {
      * @return yes
      */
     public static RopeReturn createNew(
-            LeadConstraintItem ropeItem,
+            RopeItem ropeItem,
             ServerLevel level,
             BlockPos firstClickedPos,
             BlockPos secondClickedPos,
@@ -388,7 +386,7 @@ public class Rope {
     }
 
     public static RopeReturn createNew(
-            LeadConstraintItem ropeItem,
+            RopeItem ropeItem,
             ServerLevel level,
             Long shipA, Long shipB,
             Vector3d localPosA, Vector3d localPosB,
@@ -427,14 +425,14 @@ public class Rope {
             ropeStyle = new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal");
         }
 
-        int persistentId = ConstraintTracker.getNextId();
+        int persistentId = RopeTracker.getNextId();
 
         if (shipAIsWorld && shipBIsWorld) {
             Rope rope = new Rope(level, persistentId, null, null, localPosA, localPosB,
                     maxLength, compliance, maxForce, ConstraintType.GENERIC, null, ropeStyle, null);
             rope.hasRestoredJoint = true;
-            ConstraintTracker.addConstraintWithPersistence(rope);
-            if (player instanceof ServerPlayer sp) ConstraintTracker.syncAllConstraintsToPlayer(sp);
+            RopeTracker.addConstraintWithPersistence(rope);
+            if (player instanceof ServerPlayer sp) RopeTracker.syncAllConstraintsToPlayer(sp);
             return new RopeReturn(RopeInteractionReturn.SUCCESS, rope);
         }
 
@@ -458,8 +456,8 @@ public class Rope {
         gtpa.addJoint(ropeConstraint, 0, newConstraintId -> {
             rope.physicsId = newConstraintId;
             rope.hasRestoredJoint = true;
-            ConstraintTracker.addConstraintWithPersistence(rope);
-            if (player instanceof ServerPlayer sp) ConstraintTracker.syncAllConstraintsToPlayer(sp);
+            RopeTracker.addConstraintWithPersistence(rope);
+            if (player instanceof ServerPlayer sp) RopeTracker.syncAllConstraintsToPlayer(sp);
         });
 
         return new RopeReturn(RopeInteractionReturn.SUCCESS, rope);

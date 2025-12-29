@@ -4,12 +4,12 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 import org.joml.Vector3d;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.client.ClientConstraintTracker;
+import yay.evy.everest.vstuff.client.ClientRopeTracker;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
 import java.util.function.Supplier;
 
-public class ConstraintSyncPacket {
+public class RopeSyncPacket {
     public enum Action {
         ADD, REMOVE, CLEAR_ALL
     }
@@ -24,8 +24,8 @@ public class ConstraintSyncPacket {
     private final RopeStyles.RopeStyle ropeStyle;
     private final String style;
 
-    public ConstraintSyncPacket(Integer constraintId, Long shipA, Long shipB,
-                                Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle ropeStyle) {
+    public RopeSyncPacket(Integer constraintId, Long shipA, Long shipB,
+                          Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle ropeStyle) {
         this.action = Action.ADD;
         this.constraintId = constraintId;
         this.shipA = shipA;
@@ -41,7 +41,7 @@ public class ConstraintSyncPacket {
         this.style = ropeStyle.getStyle();
     }
 
-    public ConstraintSyncPacket() {
+    public RopeSyncPacket() {
         this.action = Action.CLEAR_ALL;
         this.constraintId = null;
         this.shipA = null;
@@ -53,7 +53,7 @@ public class ConstraintSyncPacket {
         this.style = ropeStyle.getStyle();
     }
 
-    public ConstraintSyncPacket(Integer constraintId) {
+    public RopeSyncPacket(Integer constraintId) {
         this.action = Action.REMOVE;
         this.constraintId = constraintId;
         this.shipA = null;
@@ -65,7 +65,7 @@ public class ConstraintSyncPacket {
         this.style = ropeStyle.getStyle();
     }
 
-    public ConstraintSyncPacket(FriendlyByteBuf buf) {
+    public RopeSyncPacket(FriendlyByteBuf buf) {
         this.action = buf.readEnum(Action.class);
         switch (action) {
             case ADD:
@@ -154,13 +154,13 @@ public class ConstraintSyncPacket {
             try {
                 switch (action) {
                     case ADD:
-                        ClientConstraintTracker.addClientConstraint(constraintId, shipA, shipB, localPosA, localPosB, maxLength, ropeStyle);
+                        ClientRopeTracker.addClientConstraint(constraintId, shipA, shipB, localPosA, localPosB, maxLength, ropeStyle);
                         break;
                     case REMOVE:
-                        ClientConstraintTracker.removeClientConstraint(constraintId);
+                        ClientRopeTracker.removeClientConstraint(constraintId);
                         break;
                     case CLEAR_ALL:
-                        ClientConstraintTracker.clearAllClientConstraints();
+                        ClientRopeTracker.clearAllClientConstraints();
                         break;
                 }
             } catch (Exception e) {

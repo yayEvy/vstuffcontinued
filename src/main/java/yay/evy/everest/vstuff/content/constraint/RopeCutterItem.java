@@ -11,15 +11,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.valkyrienskies.mod.api.ValkyrienSkies;
-import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
-public class LeadBreakItem extends Item {
-    public LeadBreakItem(Properties pProperties) {
+public class RopeCutterItem extends Item {
+    public RopeCutterItem(Properties pProperties) {
         super(pProperties);
     }
 
@@ -34,7 +32,7 @@ public class LeadBreakItem extends Item {
         if (targetConstraintId == null) return InteractionResultHolder.pass(itemStack);
 
         try {
-            Rope data = ConstraintTracker.getActiveRopes().get(targetConstraintId);
+            Rope data = RopeTracker.getActiveRopes().get(targetConstraintId);
             if (data == null) return InteractionResultHolder.pass(itemStack);
 
             RopeStyles.PrimitiveRopeStyle style = data.style.getBasicStyle();
@@ -61,7 +59,7 @@ public class LeadBreakItem extends Item {
 
             data.removeJoint(serverLevel);
 
-            ConstraintTracker.getActiveRopes().remove(targetConstraintId);
+            RopeTracker.getActiveRopes().remove(targetConstraintId);
 
 
 
@@ -69,7 +67,7 @@ public class LeadBreakItem extends Item {
 
 
             if (soundPos != null) {
-                ConstraintTracker.cleanupOrphanedConstraints(serverLevel, soundPos);
+                RopeTracker.cleanupOrphanedConstraints(serverLevel, soundPos);
             }
 
             if (!player.isCreative()) {

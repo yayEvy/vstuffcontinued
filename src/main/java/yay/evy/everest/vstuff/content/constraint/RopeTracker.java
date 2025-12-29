@@ -1,7 +1,6 @@
 package yay.evy.everest.vstuff.content.constraint;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -10,7 +9,6 @@ import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
-import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 
 import java.util.HashMap;
@@ -20,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class ConstraintTracker {
+public class RopeTracker {
 
     public static final Map<Integer, Rope> activeRopes = new ConcurrentHashMap<>();
     private static long lastJoinTime = 0L;
@@ -52,7 +50,7 @@ public class ConstraintTracker {
 
         activeRopes.put(rope.ID, rope);
 
-        ConstraintPersistence persistence = ConstraintPersistence.get(rope.getLevel());
+        RopePersistence persistence = RopePersistence.get(rope.getLevel());
 
         persistence.addConstraint(rope);
         NetworkHandler.sendConstraintAdd(rope.ID, rope.shipA, rope.shipB, rope.localPosA, rope.localPosB, rope.maxLength, rope.style);
@@ -68,7 +66,7 @@ public class ConstraintTracker {
         Rope data = activeRopes.remove(constraintId);
         if (data != null) {
 
-            ConstraintPersistence persistence = ConstraintPersistence.get(level);
+            RopePersistence persistence = RopePersistence.get(level);
                 persistence.markConstraintAsRemoved(constraintId);
                 persistence.setDirty();
 

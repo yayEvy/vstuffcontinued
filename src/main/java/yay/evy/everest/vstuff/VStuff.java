@@ -19,7 +19,6 @@ import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -30,13 +29,11 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
-import org.valkyrienskies.core.api.attachment.AttachmentRegistration;
 import org.valkyrienskies.core.api.ships.LoadedShip;
-import org.valkyrienskies.mod.api.VsApi;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.client.VStuffClient;
-import yay.evy.everest.vstuff.content.constraint.ConstraintPersistence;
+import yay.evy.everest.vstuff.content.constraint.RopePersistence;
 import yay.evy.everest.vstuff.content.constraint.RopeUtil;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberServerAttachment;
 import yay.evy.everest.vstuff.content.ropethrower.RopeThrowerEntity;
@@ -47,7 +44,6 @@ import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.network.PhysGrabberNetwork;
 import yay.evy.everest.vstuff.particles.ParticleTypes;
 import org.valkyrienskies.core.api.VsBeta;
-import kotlin.Unit;
 
 @Mod(VStuff.MOD_ID)
 public class VStuff {
@@ -87,7 +83,7 @@ public class VStuff {
 
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> VStuffClient::initialize);
 
-        ValkyrienSkiesMod.getApi().getShipLoadEvent().on(ConstraintPersistence::onShipLoad);
+        ValkyrienSkiesMod.getApi().getShipLoadEvent().on(RopePersistence::onShipLoad);
 
         LOGGER.info("VStuff mod initialized");
     }

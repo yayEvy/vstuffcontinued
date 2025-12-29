@@ -7,9 +7,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.valkyrienskies.core.impl.shadow.In;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
+import yay.evy.everest.vstuff.content.constraint.RopeTracker;
 import yay.evy.everest.vstuff.content.constraint.Rope;
 import yay.evy.everest.vstuff.content.constraint.RopeUtil;
 import yay.evy.everest.vstuff.index.VStuffItems;
@@ -30,7 +29,7 @@ public class RopeBreakHandler {
         List<Integer> constraintsToRemove = new ArrayList<>();
         Map<Integer, Rope> toRemove = new HashMap<>();
 
-        for (Map.Entry<Integer, Rope> entry : ConstraintTracker.getActiveRopes().entrySet()) {
+        for (Map.Entry<Integer, Rope> entry : RopeTracker.getActiveRopes().entrySet()) {
             Integer id = entry.getKey();
             Rope rope = entry.getValue();
 
@@ -103,7 +102,7 @@ public class RopeBreakHandler {
             Rope rope = ropeEntry.getValue();
             try {
                 rope.removeJoint(level);
-                ConstraintTracker.removeConstraintWithPersistence(level, id);
+                RopeTracker.removeConstraintWithPersistence(level, id);
             } catch (Exception e) {
                 VStuff.LOGGER.error("[RopeBreakHandler] Failed to remove constraint {}: {}", id, e.getMessage());
             }

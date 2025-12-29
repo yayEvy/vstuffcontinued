@@ -7,8 +7,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import org.joml.Vector3d;
-import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.util.packet.ConstraintSyncPacket;
+import yay.evy.everest.vstuff.util.packet.RopeSyncPacket;
 import yay.evy.everest.vstuff.util.packet.OutlinePacket;
 import yay.evy.everest.vstuff.util.packet.RopeSoundPacket;
 import yay.evy.everest.vstuff.util.RopeStyles;
@@ -27,10 +26,10 @@ public class NetworkHandler {
     private static int packetId = 0;
 
     public static void registerPackets() {
-        INSTANCE.messageBuilder(ConstraintSyncPacket.class, packetId++)
-                .decoder(ConstraintSyncPacket::new)
-                .encoder(ConstraintSyncPacket::encode)
-                .consumerMainThread(ConstraintSyncPacket::handle)
+        INSTANCE.messageBuilder(RopeSyncPacket.class, packetId++)
+                .decoder(RopeSyncPacket::new)
+                .encoder(RopeSyncPacket::encode)
+                .consumerMainThread(RopeSyncPacket::handle)
                 .add();
 
         INSTANCE.messageBuilder(RopeSoundPacket.class, packetId++)
@@ -56,38 +55,38 @@ public class NetworkHandler {
 
     public static void sendConstraintRerender(Integer constraintId, Long shipA, Long shipB,
                                               Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle style){
-        ConstraintSyncPacket packet = new ConstraintSyncPacket(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
+        RopeSyncPacket packet = new RopeSyncPacket(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
         INSTANCE.send(PacketDistributor.ALL.noArg(),packet );
     }
     public static void sendConstraintAdd(Integer constraintId, Long shipA, Long shipB,
                                          Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle style) {
-        ConstraintSyncPacket packet = new ConstraintSyncPacket(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
+        RopeSyncPacket packet = new RopeSyncPacket(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
         INSTANCE.send(PacketDistributor.ALL.noArg(), packet);
     }
 
     public static void sendConstraintRemove(Integer constraintId) {
-        ConstraintSyncPacket packet = new ConstraintSyncPacket(constraintId);
+        RopeSyncPacket packet = new RopeSyncPacket(constraintId);
         INSTANCE.send(PacketDistributor.ALL.noArg(), packet);
     }
 
     public static void sendConstraintRemoveToPlayer(ServerPlayer player, Integer constraintId) {
-        ConstraintSyncPacket packet = new ConstraintSyncPacket(constraintId);
+        RopeSyncPacket packet = new RopeSyncPacket(constraintId);
         INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);
     }
 
 
     public static void sendConstraintAddToPlayer(ServerPlayer player, Integer constraintId, Long shipA, Long shipB,
                                                  Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle style) {
-        ConstraintSyncPacket packet = new ConstraintSyncPacket(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
+        RopeSyncPacket packet = new RopeSyncPacket(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
         INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);
     }
     public static void sendClearAllConstraints() {
-        ConstraintSyncPacket packet = new ConstraintSyncPacket();
+        RopeSyncPacket packet = new RopeSyncPacket();
         INSTANCE.send(PacketDistributor.ALL.noArg(), packet);
     }
 
     public static void sendClearAllConstraintsToPlayer(ServerPlayer player) {
-        ConstraintSyncPacket packet = new ConstraintSyncPacket();
+        RopeSyncPacket packet = new RopeSyncPacket();
         INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);
     }
 
