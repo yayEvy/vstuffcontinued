@@ -93,30 +93,11 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     @Override
     public void physTick(@Nullable PhysShip physShip, @NotNull PhysLevel physLevel) {
         if (!(level instanceof ServerLevel serverLevel)) return;
-
-
-        if (state == PulleyState.EXTENDED) {
-            if (constraintId == null
-                    || attachedRope == null
-                    || !ConstraintTracker.getActiveRopes().containsKey(constraintId)) {
-                resetSelf();
-                return;
-            }
-        }
-
-        if (state == PulleyState.EXTENDED && attachedRope != null) {
-            if (!attachedRope.hasRestoredJoint) {
-                attachedRope.restoreJoint(serverLevel);
-                return;
-            }
-            if (attachedRope.getPhysicsId() == null) return;
-        }
-
         if (state != PulleyState.EXTENDED || attachedRope == null) return;
 
-        float speed = getSpeed();
-        if (Math.abs(speed) < 0.1f) return;
+        attachedRope.ensureJointExists(serverLevel);
 
+        float speed = getSpeed();
         float ropeDelta = speed * 0.001f;
 
         float oldLength = (float) attachedRope.maxLength;
@@ -127,7 +108,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         }
 
         float newLength = oldLength + ropeDelta;
-
         newLength = Math.max(1.0f, Math.min(newLength, 256f));
 
         if (Math.abs(newLength - oldLength) < 0.0001f) return;
@@ -139,7 +119,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 2);
         }
     }
-
 
     @Override
     public void setDimension(@NotNull String s) {
@@ -253,6 +232,15 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         state = PulleyState.OPEN;
         setChanged();
         serverLevel.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+    }
+
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level instanceof ServerLevel sl && attachedRope != null) {
+            attachedRope.restoreJoint(sl);
+        }
     }
 
 }

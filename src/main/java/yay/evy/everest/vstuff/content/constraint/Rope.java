@@ -547,6 +547,11 @@ public class Rope {
     public Integer getPhysicsId() {
         return this.physicsId;
     }
+
+    public void ensureJointExists(ServerLevel level) {
+        if (!hasRestoredJoint) restoreJoint(level);
+    }
+
 }
 
 /*
