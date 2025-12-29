@@ -45,12 +45,15 @@ public class ConstraintPersistence extends SavedData {
         ListTag constraintsList = tag.getList("constraints", Tag.TAG_COMPOUND);
         for (int i = 0; i < constraintsList.size(); i++) {
             CompoundTag constraintTag = constraintsList.getCompound(i);
-            Integer id = constraintTag.getInt("id");
-            data.persistedConstraints.put(id, Rope.fromTag(constraintTag));
+            Rope rope = Rope.fromTag(constraintTag);
+
+            data.persistedConstraints.put(rope.ID, rope);
+
+            ConstraintTracker.addConstraintToTracker(rope);
         }
+        VStuff.LOGGER.info("VStuff Persistence: Loaded {} ropes from disk.", data.persistedConstraints.size());
         return data;
     }
-
     @Override
     public @NotNull CompoundTag save(@NotNull CompoundTag tag) {
 

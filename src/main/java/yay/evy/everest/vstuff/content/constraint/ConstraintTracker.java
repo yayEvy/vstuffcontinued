@@ -115,16 +115,13 @@ public class ConstraintTracker {
 
 
     public static void addConstraintToTracker(Rope rope) {
-        if (activeRopes.containsKey(rope.ID)) return;
+        if (rope == null || rope.ID == null) return;
+
 
         activeRopes.put(rope.ID, rope);
-     //   VStuff.LOGGER.info("Adding constraint {} to activeRopes", rope.ID);
 
-
-        NetworkHandler.sendConstraintAdd(rope.ID, rope.shipA, rope.shipB, rope.localPosA, rope.localPosB, rope.maxLength, rope.style);
+        setLastUsedId(rope.ID);
     }
-
-
 
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {

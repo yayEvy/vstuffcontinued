@@ -46,7 +46,7 @@ public class Rope {
     public RopeType type;
     public RopeStyles.RopeStyle style;
     boolean hasPhysicalImpact = true;
-    boolean hasRestoredJoint = false;
+    public boolean hasRestoredJoint = false;
     private Integer physicsId = null;
 
     @Nullable VSDistanceJoint constraint;
@@ -192,9 +192,9 @@ public class Rope {
             try {
                 var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(ValkyrienSkies.getDimensionId(level));
                 gtpa.removeJoint(this.physicsId);
-              //  VStuff.LOGGER.info("Successfully removed physics joint {}", physicsId);
+                //  VStuff.LOGGER.info("Successfully removed physics joint {}", physicsId);
             } catch (Exception e) {
-              //  VStuff.LOGGER.error("Failed to remove physics joint for rope {}: {}", ID, e.getMessage());
+                //  VStuff.LOGGER.error("Failed to remove physics joint for rope {}: {}", ID, e.getMessage());
             }
         }
 
@@ -207,44 +207,43 @@ public class Rope {
         return true;
     }
 
-
     public boolean setJointLength(ServerLevel level, float newLength) {
-        if (!hasPhysicalImpact) {
-          //  VStuff.LOGGER.info("nuh uh [not settings joint length for rope without joint]");
-            return false;
-        }
-
-        if (constraint == null) {
-           // VStuff.LOGGER.warn("Cannot change the length of a null joint!");
-            return false;
-        }
+        if (!hasPhysicalImpact || physicsId == null || constraint == null) return false;
 
         try {
-            String dimensionId = ValkyrienSkies.getDimensionId(level);
-            var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(dimensionId);
+            Long actualShipA = shipAIsGround ? null : shipA;
+            Long actualShipB = shipBIsGround ? null : shipB;
 
-            VSDistanceJoint newConstraint = constraint.copy(
-                    constraint.getShipId0(),
+            VSDistanceJoint newConstraint = new VSDistanceJoint(
+                    actualShipA,
                     constraint.getPose0(),
-                    constraint.getShipId1(),
+                    actualShipB,
                     constraint.getPose1(),
                     constraint.getMaxForceTorque(),
                     constraint.getCompliance(),
-                    constraint.getMinDistance(),
+                    1F,
                     newLength,
                     constraint.getTolerance(),
                     constraint.getStiffness(),
                     constraint.getDamping()
             );
 
-            gtpa.updateJoint(new VSJointAndId(ID - 1, newConstraint));
-            constraint = newConstraint;
-            maxLength = newConstraint.getMaxDistance();
+            String dimensionId = ValkyrienSkies.getDimensionId(level);
+            var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(dimensionId);
+
+            gtpa.updateJoint(new VSJointAndId(this.physicsId, newConstraint));
+
+            this.constraint = newConstraint;
+            this.maxLength = (double) newLength;
+            return true;
+
         } catch (Exception e) {
-           // VStuff.LOGGER.error("Error updating joint for constraint {}: {}", ID, e.getMessage());
+            VStuff.LOGGER.error("Failed to update VS Joint {}: {}", physicsId, e.getMessage());
+            return false;
         }
-        return false;
     }
+
+
 
     /**
      * Restores a Rope's joint and sets its id and constraint.
@@ -255,23 +254,19 @@ public class Rope {
      *
      * @param level the ServerLevel to restore the joint to
      */
-    // Note: we no longer return a bool for success because its possible we failed,
-    // but asynchronously (joint id was -1), which would be confusing if we returned true
+
 
     public void restoreJoint(ServerLevel level) {
         if (!hasPhysicalImpact) return;
-        if (hasRestoredJoint) return;
+        if (hasRestoredJoint && this.physicsId != null) return;
 
         this.level = level;
         this.levelId = RopeUtil.registerLevel(level);
         this.hasRestoredJoint = true;
+        this.physicsId = null;
 
-        Long groundBodyId = VSGameUtilsKt.getShipObjectWorld(level)
-                .getDimensionToGroundBodyIdImmutable()
-                .get(ValkyrienSkies.getDimensionId(level));
-
-        Long actualShipA = shipAIsGround ? groundBodyId : shipA;
-        Long actualShipB = shipBIsGround ? groundBodyId : shipB;
+        Long actualShipA = shipAIsGround ? null : shipA;
+        Long actualShipB = shipBIsGround ? null : shipB;
 
         VsiServerShipWorld shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
 
@@ -279,7 +274,7 @@ public class Rope {
         boolean shipBValid = shipBIsGround || (actualShipB != null && shipWorld.getAllShips().getById(actualShipB) != null);
 
         if (!shipAValid || !shipBValid) {
-            this.hasRestoredJoint = false; // Allow retry later
+            this.hasRestoredJoint = false;
             return;
         }
 
@@ -288,7 +283,13 @@ public class Rope {
 
         gtpa.addJoint(ropeConstraint, 0, newConstraintId -> {
             this.physicsId = newConstraintId;
-            ConstraintTracker.addConstraintWithPersistence(this);
+            this.constraint = ropeConstraint;
+
+            if (!ConstraintTracker.getActiveRopes().containsKey(this.ID)) {
+                ConstraintTracker.addConstraintWithPersistence(this);
+            } else {
+                ConstraintTracker.getActiveRopes().put(this.ID, this);
+            }
 
             MinecraftServer server = level.getServer();
             if (server != null) {
@@ -296,6 +297,7 @@ public class Rope {
                     ConstraintTracker.syncAllConstraintsToPlayer(sp);
                 }
             }
+         //   VStuff.LOGGER.info("Successfully restored Physics Joint for Rope ID: {} (Physics ID: {})", this.ID, newConstraintId);
         });
     }
 
@@ -374,7 +376,6 @@ public class Rope {
         boolean shipAIsWorld = shipA == null;
         boolean shipBIsWorld = shipB == null;
 
-        // Flip if needed so ship is first
         if (!shipAIsWorld && shipBIsWorld) {
             Long tmpShip = shipA; shipA = shipB; shipB = tmpShip;
             Vector3d tmpLocal = localPosA; localPosA = localPosB; localPosB = tmpLocal;
@@ -459,7 +460,7 @@ public class Rope {
             try {
                 constraintType = ConstraintType.valueOf(tag.getString("constraintType"));
             } catch (IllegalArgumentException e) {
-               // VStuff.LOGGER.warn("Invalid constraint type in save data, defaulting to GENERIC: {}", e.getMessage());
+                // VStuff.LOGGER.warn("Invalid constraint type in save data, defaulting to GENERIC: {}", e.getMessage());
             }
         }
 
@@ -539,7 +540,9 @@ public class Rope {
     public void setSourceBlockPos(BlockPos sourceBlockPos) {
         this.sourceBlockPos = sourceBlockPos;
     }
-
+    public Integer getPhysicsId() {
+        return this.physicsId;
+    }
 }
 
 /*

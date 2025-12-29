@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.mod.api.BlockEntityPhysicsListener;
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
 import yay.evy.everest.vstuff.content.constraint.Rope;
 import yay.evy.everest.vstuff.index.VStuffBlockEntities;
@@ -47,17 +48,19 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         return state == PulleyState.OPEN;
     }
     public void attachRope(Rope rope) {
-      //  System.out.println("attaching");
         if (rope == null) return;
-        state = PulleyState.EXTENDED;
-        attachedRope = rope;
-        currentRopeLength = rope.maxLength;
-        constraintId = rope.ID;
-        setChanged();
-     //   System.out.println("attached");
-       // System.out.println(state);
-    }
 
+        this.state = PulleyState.EXTENDED;
+        this.attachedRope = rope;
+        this.currentRopeLength = rope.maxLength;
+        this.constraintId = rope.ID;
+
+
+        this.setChanged();
+        if (level instanceof ServerLevel sl) {
+            sl.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
+    }
     public void setWaiting() {
         state = PulleyState.WAITING;
         setChanged();
@@ -65,12 +68,12 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
     public void open() {
         state = PulleyState.OPEN;
-       // System.out.println("opening");
+        // System.out.println("opening");
         setChanged();
     }
 
     public void resetSelf() {
-       // System.out.println("self reset");
+        // System.out.println("self reset");
         state = PulleyState.OPEN;
         attachedRope = null;
         constraintId = null;
@@ -91,24 +94,41 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     public void physTick(@Nullable PhysShip physShip, @NotNull PhysLevel physLevel) {
         if (!(level instanceof ServerLevel serverLevel)) return;
 
-        if (state == PulleyState.EXTENDED && attachedRope == null && constraintId != null) {
-            Map<Integer, Rope> active = ConstraintTracker.getActiveRopes();
-            attachedRope = active.get(constraintId);
-            if (attachedRope != null) currentRopeLength = attachedRope.maxLength;
+        if (state == PulleyState.EXTENDED && attachedRope != null) {
+            if (!attachedRope.hasRestoredJoint) {
+                attachedRope.restoreJoint(serverLevel);
+                return;
+            }
+
+
+            if (attachedRope.getPhysicsId() == null) {
+                return;
+            }
         }
+
         if (state != PulleyState.EXTENDED || attachedRope == null) return;
+
         float speed = getSpeed();
-        if (speed == 0) return;
+        if (Math.abs(speed) < 0.1f) return;
 
-        float ropeDelta = speed * 0.0005f;
-        float newLength = (float) attachedRope.maxLength + ropeDelta;
-        float minRopeLength = 0.5f;
-        newLength = Math.max(newLength, minRopeLength);
+        float ropeDelta = speed * 0.001f;
+        float oldLength = (float) attachedRope.maxLength;
+        float newLength = oldLength + ropeDelta;
 
-        attachedRope.setJointLength(serverLevel, newLength);
-        currentRopeLength = newLength;
-        setChanged();
-        serverLevel.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        newLength = Math.max(0.5f, Math.min(newLength, 256f));
+
+        if (Math.abs(newLength - oldLength) > 0.0001f) {
+            if (!attachedRope.hasRestoredJoint) attachedRope.restoreJoint(serverLevel);
+
+            boolean success = attachedRope.setJointLength(serverLevel, newLength);
+            if (success) {
+                this.currentRopeLength = newLength;
+                if (serverLevel.getGameTime() % 20 == 0)
+
+                this.setChanged();
+                level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 2);
+            }
+        }
     }
 
     @Override
@@ -119,13 +139,12 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);
 
-        if (constraintId != null) {
+        if (constraintId != null && attachedRope == null) {
             Map<Integer, Rope> active = ConstraintTracker.getActiveRopes();
-            if (active == null || !active.containsKey(constraintId)) {
-                this.resetSelf();
+            if (active != null && active.containsKey(constraintId)) {
+                attachedRope = active.get(constraintId);
             }
         }
-
         tooltip.add(Component.literal(" "));
 
         if (attachedRope != null) {
@@ -150,61 +169,52 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     @Override
     protected void write(CompoundTag tag, boolean clientPacket) {
         super.write(tag, clientPacket);
-        if (constraintId != null) {
-            tag.putInt("id", constraintId);
+
+        if (this.constraintId != null) {
+            tag.putInt("rope_constraint_id", this.constraintId);
+        } else {
+            tag.putInt("rope_constraint_id", -1);
         }
+
         tag.putDouble("length", currentRopeLength);
         tag.putString("state", state.name());
     }
-
     @Override
     protected void read(CompoundTag tag, boolean clientPacket) {
         super.read(tag, clientPacket);
 
-        if (tag.contains("id")) {
-            constraintId = tag.getInt("id");
-            Map<Integer, Rope> active = ConstraintTracker.getActiveRopes();
-            attachedRope = (active != null && constraintId != null) ? active.get(constraintId) : null;
-            if (attachedRope != null) {
-                currentRopeLength = attachedRope.maxLength;
-            } else {
-                currentRopeLength = tag.contains("length") ? tag.getDouble("length") : currentRopeLength;
-            }
-        } else {
-            constraintId = null;
-            attachedRope = null;
-            currentRopeLength = tag.contains("length") ? tag.getDouble("length") : currentRopeLength;
+        if (tag.contains("rope_constraint_id")) {
+            this.constraintId = tag.getInt("rope_constraint_id");
+            if (this.constraintId == -1) this.constraintId = null;
+        }
+        if (tag.contains("state")) {
+            this.state = PulleyState.valueOf(tag.getString("state"));
         }
 
-        if (tag.contains("state")) {
-            try {
-                state = PulleyState.valueOf(tag.getString("state"));
-            } catch (IllegalArgumentException ex) {
-                state = PulleyState.OPEN;
-            }
-        } else {
-            state = PulleyState.OPEN;
+        this.currentRopeLength = tag.getDouble("length");
+
+        Map<Integer, Rope> active = ConstraintTracker.getActiveRopes();
+        if (active != null && constraintId != null) {
+            this.attachedRope = active.get(constraintId);
         }
     }
-
     @Override
     public @NotNull CompoundTag getUpdateTag() {
         CompoundTag tag = super.getUpdateTag();
-        tag.putString("state", state.name());
-        if (constraintId != null) tag.putInt("id", constraintId);
         tag.putDouble("length", currentRopeLength);
+        tag.putString("state", state.name());
+        if (constraintId != null) tag.putInt("rope_constraint_id", constraintId);
         return tag;
     }
-
     @Override
     public void handleUpdateTag(CompoundTag tag) {
         super.handleUpdateTag(tag);
+        if (tag.contains("length")) {
+            this.currentRopeLength = tag.getDouble("length");
+        }
         if (tag.contains("state")) {
-            try {
-                state = PulleyState.valueOf(tag.getString("state"));
-            } catch (IllegalArgumentException ignored) {
-                state = PulleyState.OPEN;
-            }
+            this.state = PulleyState.valueOf(tag.getString("state"));
+
         }
         if (tag.contains("id")) constraintId = tag.getInt("id");
         if (tag.contains("length")) currentRopeLength = tag.getDouble("length");
