@@ -94,6 +94,16 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     public void physTick(@Nullable PhysShip physShip, @NotNull PhysLevel physLevel) {
         if (!(level instanceof ServerLevel serverLevel)) return;
 
+
+        if (state == PulleyState.EXTENDED) {
+            if (constraintId == null
+                    || attachedRope == null
+                    || !ConstraintTracker.getActiveRopes().containsKey(constraintId)) {
+                resetSelf();
+                return;
+            }
+        }
+
         if (state == PulleyState.EXTENDED && attachedRope != null) {
             if (!attachedRope.hasRestoredJoint) {
                 attachedRope.restoreJoint(serverLevel);
@@ -139,12 +149,15 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);
 
-        if (constraintId != null && attachedRope == null) {
-            Map<Integer, Rope> active = ConstraintTracker.getActiveRopes();
-            if (active != null && active.containsKey(constraintId)) {
-                attachedRope = active.get(constraintId);
+        if (attachedRope != null) {
+            if (!ConstraintTracker.getActiveRopes().containsKey(attachedRope.ID)) {
+                attachedRope = null;
+                constraintId = null;
+                state = PulleyState.OPEN;
+                currentRopeLength = 0.0;
             }
         }
+
         tooltip.add(Component.literal(" "));
 
         if (attachedRope != null) {
