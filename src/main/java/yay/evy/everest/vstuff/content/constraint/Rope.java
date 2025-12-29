@@ -228,7 +228,7 @@ public class Rope {
                     1.0f,
                     newLength,
                     constraint.getTolerance(),
-                    constraint.getStiffness(),
+                    1e8f,
                     null
             );
 
