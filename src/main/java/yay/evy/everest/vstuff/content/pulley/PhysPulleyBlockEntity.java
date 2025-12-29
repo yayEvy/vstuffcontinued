@@ -93,19 +93,29 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     @Override
     public void physTick(@Nullable PhysShip physShip, @NotNull PhysLevel physLevel) {
         if (!(level instanceof ServerLevel serverLevel)) return;
+
         if (state != PulleyState.EXTENDED) return;
+
+
+        if (constraintId != null && !ConstraintTracker.getActiveRopes().containsKey(constraintId)) {
+            resetSelf();
+            serverLevel.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+            return;
+        }
 
         if (attachedRope == null && constraintId != null) {
             attachedRope = ConstraintTracker.getActiveRopes().get(constraintId);
         }
 
-        if (attachedRope == null) return;
+        if (attachedRope == null) {
+            resetSelf();
+            return;
+        }
 
         attachedRope.ensureJointExists(serverLevel);
 
         float speed = getSpeed();
         float ropeDelta = speed * 0.001f;
-
         float oldLength = (float) attachedRope.maxLength;
 
         if (oldLength <= 1.0f && ropeDelta < 0f) {
@@ -134,20 +144,15 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);
 
-        if (attachedRope != null) {
-            if (!ConstraintTracker.getActiveRopes().containsKey(attachedRope.ID)) {
-                attachedRope = null;
-                constraintId = null;
-                state = PulleyState.OPEN;
-                currentRopeLength = 0.0;
-            }
-        }
+
+        boolean hasRope = (state == PulleyState.EXTENDED || state == PulleyState.WAITING) && constraintId != null;
 
         tooltip.add(Component.literal(" "));
 
-        if (attachedRope != null) {
+        if (hasRope) {
             tooltip.add(Component.literal("Length: " + String.format("%.1f", currentRopeLength) + " blocks")
                     .withStyle(ChatFormatting.BLUE));
+
             float speed = getSpeed();
             if (Math.abs(speed) > 4) {
                 String direction = speed > 0 ? "Extending" : "Retracting";

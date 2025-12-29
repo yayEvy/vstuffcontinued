@@ -63,6 +63,8 @@ public class LeadBreakItem extends Item {
 
             ConstraintTracker.getActiveRopes().remove(targetConstraintId);
 
+
+
             NetworkHandler.sendConstraintRemove(targetConstraintId);
 
 
