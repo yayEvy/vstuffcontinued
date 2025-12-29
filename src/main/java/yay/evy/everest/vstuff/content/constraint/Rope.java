@@ -210,6 +210,10 @@ public class Rope {
     public boolean setJointLength(ServerLevel level, float newLength) {
         if (!hasPhysicalImpact || physicsId == null || constraint == null) return false;
 
+        if (newLength < 1.0f) {
+            newLength = 1.0f;
+        }
+
         try {
             Long actualShipA = shipAIsGround ? null : shipA;
             Long actualShipB = shipBIsGround ? null : shipB;
@@ -221,11 +225,11 @@ public class Rope {
                     constraint.getPose1(),
                     constraint.getMaxForceTorque(),
                     constraint.getCompliance(),
-                    1F,
+                    1.0f,
                     newLength,
                     constraint.getTolerance(),
                     constraint.getStiffness(),
-                    constraint.getDamping()
+                    null
             );
 
             String dimensionId = ValkyrienSkies.getDimensionId(level);
@@ -234,7 +238,7 @@ public class Rope {
             gtpa.updateJoint(new VSJointAndId(this.physicsId, newConstraint));
 
             this.constraint = newConstraint;
-            this.maxLength = (double) newLength;
+            this.maxLength = newLength;
             return true;
 
         } catch (Exception e) {

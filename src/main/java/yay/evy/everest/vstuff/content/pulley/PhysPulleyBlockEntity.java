@@ -99,11 +99,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
                 attachedRope.restoreJoint(serverLevel);
                 return;
             }
-
-
-            if (attachedRope.getPhysicsId() == null) {
-                return;
-            }
+            if (attachedRope.getPhysicsId() == null) return;
         }
 
         if (state != PulleyState.EXTENDED || attachedRope == null) return;
@@ -112,24 +108,28 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         if (Math.abs(speed) < 0.1f) return;
 
         float ropeDelta = speed * 0.001f;
+
         float oldLength = (float) attachedRope.maxLength;
+
+        if (oldLength <= 1.0f && ropeDelta < 0f) {
+            currentRopeLength = 1.0f;
+            return;
+        }
+
         float newLength = oldLength + ropeDelta;
 
-        newLength = Math.max(0.5f, Math.min(newLength, 256f));
+        newLength = Math.max(1.0f, Math.min(newLength, 256f));
 
-        if (Math.abs(newLength - oldLength) > 0.0001f) {
-            if (!attachedRope.hasRestoredJoint) attachedRope.restoreJoint(serverLevel);
+        if (Math.abs(newLength - oldLength) < 0.0001f) return;
 
-            boolean success = attachedRope.setJointLength(serverLevel, newLength);
-            if (success) {
-                this.currentRopeLength = newLength;
-                if (serverLevel.getGameTime() % 20 == 0)
-
-                this.setChanged();
-                level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 2);
-            }
+        boolean success = attachedRope.setJointLength(serverLevel, newLength);
+        if (success) {
+            this.currentRopeLength = newLength;
+            setChanged();
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 2);
         }
     }
+
 
     @Override
     public void setDimension(@NotNull String s) {

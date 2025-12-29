@@ -28,18 +28,26 @@ public class PulleyAnchorBlock extends HorizontalDirectionalBlock implements IBE
     }
 
     @Override
-    @ParametersAreNonnullByDefault
-    public @NotNull VoxelShape getShape(BlockState state, BlockGetter p_220053_2_, BlockPos p_220053_3_,
-                                        CollisionContext p_220053_4_) {
+    public @NotNull VoxelShape getShape(
+            BlockState state,
+            BlockGetter level,
+            BlockPos pos,
+            CollisionContext context
+    ) {
         return VStuffShapes.PULLEY_ANCHOR.get(state.getValue(FACING));
     }
 
+
     @Override
-    @ParametersAreNonnullByDefault
-    public @NotNull VoxelShape getCollisionShape(BlockState state, BlockGetter p_220071_2_, BlockPos p_220071_3_,
-                                                 CollisionContext p_220071_4_) {
-        return getShape(state, p_220071_2_, p_220071_3_, p_220071_4_);
+    public @NotNull VoxelShape getCollisionShape(
+            BlockState state,
+            BlockGetter level,
+            BlockPos pos,
+            CollisionContext context
+    ) {
+        return net.minecraft.world.phys.shapes.Shapes.empty();
     }
+
     @Override
     public Class<PulleyAnchorBlockEntity> getBlockEntityClass() {
         return PulleyAnchorBlockEntity.class;
