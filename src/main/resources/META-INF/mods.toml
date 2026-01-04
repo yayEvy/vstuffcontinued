@@ -34,11 +34,3 @@ mandatory = true
 versionRange = "[${vs2_version},)"
 ordering = "AFTER"
 side = "BOTH"
-
-
-[[dependencies.${mod_id}]]
-modId="create_sa"
-mandatory=false
-versionRange="[2.0.8,)"
-ordering="AFTER"
-side="CLIENT"
