@@ -1,6 +1,7 @@
 package yay.evy.everest.vstuff.content.roperework;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -88,6 +89,29 @@ public class NewRope {
 
     public VSDistanceJoint makeJoint() {
         return this.jointValues.makeJoint(posData0.shipId(), posData0.localPos(), posData1.shipId(), posData1.localPos());
+    }
+
+    public CompoundTag toTag() {
+        CompoundTag ropeTag = new CompoundTag();
+
+        ropeTag.put("posData0", posData0.toTag());
+        ropeTag.put("posData1", posData1.toTag());
+        ropeTag.put("jointValues", JointValues.writeJointValues(jointValues));
+        ropeTag.putString("style", style.getStyle());
+        ropeTag.putString("type", type.name());
+
+        return ropeTag;
+    }
+
+    public static NewRope fromTag(ServerLevel level, Integer id, CompoundTag ropeTag) {
+        return new NewRope(
+                id,
+                NewRopeUtils.RopePosData.fromTag(level, ropeTag.getCompound("posData0")),
+                NewRopeUtils.RopePosData.fromTag(level, ropeTag.getCompound("posData0")),
+                JointValues.readJointValues(ropeTag.getCompound("jointValues")),
+                RopeStyles.fromString(ropeTag.getString("style")),
+                NewRopeUtils.RopeType.valueOf(ropeTag.getString("type"))
+        );
     }
 
 }

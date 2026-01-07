@@ -1,5 +1,6 @@
 package yay.evy.everest.vstuff.util;
 
+import net.minecraft.nbt.CompoundTag;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
@@ -7,7 +8,9 @@ import org.valkyrienskies.core.internal.joints.VSDistanceJoint;
 import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
 import org.valkyrienskies.core.internal.joints.VSJointPose;
 
-public record JointValues(VSJointMaxForceTorque maxForceTorque, Float minLength, Float maxLength, Double compliance, Float tolerance, Float stiffness, Float damping) {
+import javax.annotation.Nullable;
+
+public record JointValues(VSJointMaxForceTorque maxForceTorque, Float minLength, Float maxLength, Double compliance, @Nullable Float tolerance, @Nullable Float stiffness, @Nullable Float damping) {
     public static final Float DEFAULT_MINLENGTH = 0f;
     public static final Float DEFAULT_TOLERANCE = 0.1f;
     public static final Float DEFAULT_STIFFNESS = 1e8f;
@@ -30,5 +33,34 @@ public record JointValues(VSJointMaxForceTorque maxForceTorque, Float minLength,
                 this.stiffness,
                 this.damping
         );
+    }
+
+    public static CompoundTag writeJointValues(JointValues jointValues) {
+        CompoundTag tag = new CompoundTag();
+
+        tag.putFloat("maxForce", jointValues.maxForceTorque.getMaxForce());
+        tag.putFloat("maxTorque", jointValues.maxForceTorque.getMaxTorque());
+        tag.putFloat("minLength", jointValues.minLength);
+        tag.putFloat("maxLength", jointValues.maxLength);
+        tag.putDouble("compliance", jointValues.compliance);
+        tag.putFloat("tolerance", jointValues.tolerance == null ? -1 : jointValues.tolerance);
+        tag.putFloat("stiffness", jointValues.stiffness == null ? -1 : jointValues.stiffness);
+        tag.putFloat("damping", jointValues.damping == null ? -1 : jointValues.damping);
+
+        return tag;
+    }
+
+    public static JointValues readJointValues(CompoundTag tag) {
+
+        VSJointMaxForceTorque maxForceTorque = new VSJointMaxForceTorque(tag.getFloat("maxForce"), tag.getFloat("maxTorque"));
+        Float tolerance = tag.getFloat("tolerance");
+        Float stiffness = tag.getFloat("stiffness");
+        Float damping = tag.getFloat("damping");
+
+        if (tolerance == -1) tolerance = null;
+        if (stiffness == -1) stiffness = null;
+        if (damping == -1) damping = null;
+
+        return new JointValues(maxForceTorque, tag.getFloat("minLength"), tag.getFloat("maxLength"), tag.getDouble("compliance"), tolerance, stiffness, damping);
     }
 }

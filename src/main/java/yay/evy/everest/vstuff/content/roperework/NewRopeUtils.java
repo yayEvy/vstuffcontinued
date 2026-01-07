@@ -1,6 +1,8 @@
 package yay.evy.everest.vstuff.content.roperework;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
@@ -14,6 +16,7 @@ import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.ropes.Rope;
 import yay.evy.everest.vstuff.content.ropes.RopeTracker;
 import yay.evy.everest.vstuff.util.BodyUtils;
+import yay.evy.everest.vstuff.util.JointValues;
 
 import javax.annotation.Nullable;
 
@@ -125,6 +128,15 @@ public class NewRopeUtils {
     }
 
     public record RopePosData(ServerLevel level, @Nullable Long shipId, BlockPos blockPos, Vector3f localPos, PosType posType, BlockType blockType) {
+        public RopePosData(ServerLevel level, @Nullable Long shipId, BlockPos blockPos, Vector3f localPos, PosType posType, BlockType blockType) {
+            this.level = level;
+            this.shipId = BodyUtils.getGroundBodyId(level).equals(shipId) ? null : shipId; // if made from tag, we convert the ground body id back into null
+            this.blockPos = blockPos;
+            this.localPos = localPos;
+            this.posType = posType;
+            this.blockType = blockType;
+        }
+
         public static RopePosData create(ServerLevel level, Long id, BlockPos pos) {
             if (BodyUtils.getGroundBodyId(level).equals(id)) {
                 VStuff.LOGGER.warn("RopePosData received actual id for ground body identifier instead of null (expected value), correcting");
@@ -143,6 +155,40 @@ public class NewRopeUtils {
         public Vector3f getWorldPos() {
             return convertLocalToWorld(this.level, this.localPos, this.shipId);
         }
+
+        public CompoundTag toTag() {
+            CompoundTag tag = new CompoundTag();
+
+            tag.putLong("shipId", shipId == null ? BodyUtils.getGroundBodyId(this.level) : shipId); // use ground body id for tag
+            tag.put("blockPos", NbtUtils.writeBlockPos(blockPos));
+            tag.put("localPos", writeVector3f(localPos));
+            tag.putString("posType", posType.name());
+            tag.putString("blockType", blockType.name());
+
+            return tag;
+        }
+
+        public static RopePosData fromTag(ServerLevel level, CompoundTag tag) {
+            Long shipId = tag.getLong("shipId");
+            BlockPos blockPos = NbtUtils.readBlockPos(tag.getCompound("blockPos"));
+            Vector3f localPos = readVector3f(tag.getCompound("localPos"));
+            PosType posType = PosType.valueOf(tag.getString("posType"));
+            BlockType blockType = BlockType.valueOf(tag.getString("blockType"));
+
+            return new RopePosData(level, shipId, blockPos, localPos, posType, blockType);
+        }
+    }
+
+    public static CompoundTag writeVector3f(Vector3f vector3f) {
+        CompoundTag tag = new CompoundTag();
+        tag.putFloat("X", vector3f.x);
+        tag.putFloat("Y", vector3f.y);
+        tag.putFloat("Z", vector3f.z);
+        return tag;
+    }
+
+    public static Vector3f readVector3f(CompoundTag tag) {
+        return new Vector3f(tag.getFloat("X"), tag.getFloat("Y"), tag.getFloat("Z"));
     }
 
     public static void sendRopeMessage(Player player, String name) {

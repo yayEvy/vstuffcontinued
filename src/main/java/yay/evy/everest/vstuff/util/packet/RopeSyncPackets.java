@@ -27,6 +27,7 @@ public class RopeSyncPackets {
             this.localPos1 = localPos1;
             this.ship0 = ship0;
             this.ship1 = ship1;
+            this.length = length;
             this.styleId = styleId;
             this.style = RopeStyles.fromString(styleId);
         }
