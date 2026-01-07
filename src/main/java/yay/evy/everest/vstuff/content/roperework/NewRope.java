@@ -7,6 +7,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import org.valkyrienskies.core.internal.joints.VSDistanceJoint;
 import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
+import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.VStuffConfig;
 import yay.evy.everest.vstuff.content.ropes.RopeUtil;
 import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
@@ -31,7 +33,20 @@ public class NewRope {
     public double renderLength;
 
     public NewRope(Integer ropeId, NewRopeUtils.RopePosData posData0, NewRopeUtils.RopePosData posData1, JointValues jointValues, RopeStyles.RopeStyle style, NewRopeUtils.RopeType type) {
+        this.ropeId = ropeId;
+        this.posData0 = posData0;
+        this.posData1 = posData1;
+        this.jointValues = jointValues;
+        this.style = style;
+        this.type = type;
+    }
 
+    public NewRope(NewRopeUtils.RopePosData posData0, NewRopeUtils.RopePosData posData1, JointValues jointValues, RopeStyles.RopeStyle style, NewRopeUtils.RopeType type) {
+        this.posData0 = posData0;
+        this.posData1 = posData1;
+        this.jointValues = jointValues;
+        this.style = style;
+        this.type = type;
     }
 
     public static NewRope create(ServerLevel level, @Nullable Long ship0, @Nullable Long ship1, BlockPos blockPos0, BlockPos blockPos1, Player player) {
@@ -56,11 +71,11 @@ public class NewRope {
         }
 
         length += 0.5f;
-        float massA = RopeUtil.getFMassForShip(level, ship0);
-        float massB = RopeUtil.getFMassForShip(level, ship1);
-        double effectiveMass = Math.max(Math.min(massA, massB), 100.0);
+        float mass0 = RopeUtil.getFMassForShip(level, ship0);
+        float mass1 = RopeUtil.getFMassForShip(level, ship1);
+        double effectiveMass = Math.max(Math.min(mass0, mass1), 100.0);
         double compliance = 1e-12 / effectiveMass * (posData0.isWorld() || posData1.isWorld() ? 0.05 : 1);
-        float massRatio = Math.max(massA, massB) / Math.min(massA, massB);
+        float massRatio = Math.max(mass0, mass1) / Math.min(mass0, mass1);
         float maxForce = 5e13f * Math.min(massRatio, 20.0f) * (posData0.isWorld() || posData1.isWorld() ? 10f : 1f);
 
         RopeStyles.RopeStyle style = null;
@@ -79,16 +94,46 @@ public class NewRope {
         return rope;
     }
 
-    public void createOrRestoreJoint(ServerLevel level) {
+    public void restoreJoint(ServerLevel level) {
+        if (this.hasRestored()) {
+            VStuff.LOGGER.info("Not creating joint for rope that has already restored joint!");
+            return;
+        }
 
+        GTPAUtils.restoreJoint(level, this);
     }
 
-    public void removeJoint(ServerLevel level) {
+    public boolean removeJoint(ServerLevel level) {
+        if (this.jointId == null || this.joint == null || !this.hasRestored) {
+            VStuff.LOGGER.warn("Cannot remove joint for rope id {} because the joint or joint id is null, or the rope has not restored its joint.", this.ropeId);
+            return false;
+        }
 
+        GameToPhysicsAdapter gtpa = GTPAUtils.getGTPA(level);
+        gtpa.removeJoint(this.jointId);
+
+        this.jointId = null;
+        this.joint = null;
+        this.hasRestored = false;
+
+        RopeManager.removeRope(level, this.ropeId);
+
+        return true;
     }
 
     public VSDistanceJoint makeJoint() {
         return this.jointValues.makeJoint(posData0.shipId(), posData0.localPos(), posData1.shipId(), posData1.localPos());
+    }
+
+    public boolean isRopeOnShip(Long shipId) {
+        if (shipId == null) {
+            return this.posData0.isWorld() || this.posData1.isWorld();
+        }
+        return this.posData0.getShipIdSafe().equals(shipId) || this.posData1.getShipIdSafe().equals(shipId);
+    }
+
+    public boolean hasRestored() {
+        return this.hasRestored || this.joint != null || (this.jointId != null && this.jointId != -1);
     }
 
     public CompoundTag toTag() {
@@ -103,9 +148,8 @@ public class NewRope {
         return ropeTag;
     }
 
-    public static NewRope fromTag(ServerLevel level, Integer id, CompoundTag ropeTag) {
+    public static NewRope fromTag(ServerLevel level, CompoundTag ropeTag) {
         return new NewRope(
-                id,
                 NewRopeUtils.RopePosData.fromTag(level, ropeTag.getCompound("posData0")),
                 NewRopeUtils.RopePosData.fromTag(level, ropeTag.getCompound("posData0")),
                 JointValues.readJointValues(ropeTag.getCompound("jointValues")),

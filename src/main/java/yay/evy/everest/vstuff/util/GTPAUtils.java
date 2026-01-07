@@ -1,5 +1,6 @@
 package yay.evy.everest.vstuff.util;
 
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -12,6 +13,7 @@ import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
 import yay.evy.everest.vstuff.content.roperework.NewRope;
 import yay.evy.everest.vstuff.content.roperework.RopeManager;
+import yay.evy.everest.vstuff.content.ropes.RopeTracker;
 import yay.evy.everest.vstuff.network.NetworkManager;
 
 import java.util.Collections;
@@ -36,6 +38,25 @@ public class GTPAUtils {
                 RopeManager.syncAllConstraintsToPlayer(serverPlayer);
             }
         });
+    }
+
+    public static void restoreJoint(ServerLevel level, NewRope rope) {
+        VSDistanceJoint distanceJoint = rope.makeJoint();
+        GameToPhysicsAdapter gtpa = getGTPA(level);
+        if (!rope.hasRestored()) {
+            gtpa.addJoint(distanceJoint, 0, (jointId) -> {
+                if (jointId != -1) {
+                    rope.jointId = jointId;
+                    rope.joint = distanceJoint;
+                    rope.hasRestored = true;
+
+                    MinecraftServer server = level.getServer();
+                    for (ServerPlayer sp : server.getPlayerList().getPlayers()) {
+                        RopeTracker.syncAllConstraintsToPlayer(sp);
+                    }
+                }
+            });
+        }
     }
 
 }

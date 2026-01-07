@@ -1,12 +1,11 @@
 package yay.evy.everest.vstuff.content.roperework;
 
-
-import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.network.NetworkManager;
 
 import java.util.HashMap;
@@ -55,8 +54,7 @@ public class RopeManager {
         if (data != null) {
 
             RopePersistence persistence = RopePersistence.getOrCreate(level);
-            persistence.removeRope(data);
-            persistence.setDirty();
+            persistence.removeRope(data.ropeId);
 
             for (ServerPlayer player : level.getServer().getPlayerList().getPlayers()) {
                 NetworkManager.sendRopeRemoveToPlayer(player, constraintId);
@@ -90,12 +88,18 @@ public class RopeManager {
     }
 
 
-    public static void addRopeToTracker(NewRope rope) {
-        if (rope == null || rope.ropeId == null) return;
+    public static void addRopeToManager(NewRope rope) {
+        if (rope == null) return;
 
-        activeRopes.put(rope.ropeId, rope);
+        Integer id = getNextId();
+        activeRopes.put(id, rope);
 
-        replaceId(rope.ropeId, getNextId());
+        rope.ropeId = id;
+    }
+
+    public static void clearAllRopes() {
+        activeRopes.clear();
+        VStuff.LOGGER.info("Clearing all ropes from manager...");
     }
 
     @SubscribeEvent

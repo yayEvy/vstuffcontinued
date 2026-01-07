@@ -8,15 +8,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.ropes.Rope;
-import yay.evy.everest.vstuff.content.ropes.RopeTracker;
 import yay.evy.everest.vstuff.util.BodyUtils;
-import yay.evy.everest.vstuff.util.JointValues;
 
 import javax.annotation.Nullable;
 
@@ -150,6 +148,10 @@ public class NewRopeUtils {
 
         public boolean isWorld() {
             return this.posType == PosType.WORLD;
+        }
+
+        public @NotNull Long getShipIdSafe() {
+            return shipId == null ? BodyUtils.getGroundBodyId(level) : shipId;
         }
 
         public Vector3f getWorldPos() {
