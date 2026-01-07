@@ -4,7 +4,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 import org.joml.Vector3d;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.client.ClientRopeTracker;
+import yay.evy.everest.vstuff.client.ClientRopeManager;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
 import java.util.function.Supplier;
@@ -154,13 +154,13 @@ public class RopeSyncPacket {
             try {
                 switch (action) {
                     case ADD:
-                        ClientRopeTracker.addClientConstraint(constraintId, shipA, shipB, localPosA, localPosB, maxLength, ropeStyle);
+                        ClientRopeManager.addClientConstraint(constraintId, shipA, shipB, localPosA, localPosB, maxLength, ropeStyle);
                         break;
                     case REMOVE:
-                        ClientRopeTracker.removeClientConstraint(constraintId);
+                        ClientRopeManager.removeClientConstraint(constraintId);
                         break;
                     case CLEAR_ALL:
-                        ClientRopeTracker.clearAllClientConstraints();
+                        ClientRopeManager.clearAllClientConstraints();
                         break;
                 }
             } catch (Exception e) {

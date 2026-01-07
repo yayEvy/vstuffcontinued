@@ -18,6 +18,9 @@ public class RopeStyles {
         return STYLE_REGISTRY.get(styleId);
     }
 
+    public static RopeStyle normal() {
+        return fromString("normal");
+    }
 
     public static ResourceLocation getRopeStyle(String style) {
         return new ResourceLocation(VStuff.MOD_ID, "textures/entity/rope/rope_" + style + ".png");

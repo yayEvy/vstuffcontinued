@@ -11,7 +11,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import yay.evy.everest.vstuff.VstuffConfig;
+import yay.evy.everest.vstuff.VStuffConfig;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.util.RopeStyles;
@@ -43,7 +43,7 @@ public class RopeCutterItem extends Item {
                     : Component.translatable("vstuff.message.rope_break");
             player.displayClientMessage(notif, true);
 
-            if (VstuffConfig.ROPE_SOUNDS.get()) {
+            if (VStuffConfig.ROPE_SOUNDS.get()) {
                 var sound = (style == RopeStyles.PrimitiveRopeStyle.CHAIN)
                         ? SoundEvents.CHAIN_BREAK
                         : SoundEvents.LEASH_KNOT_BREAK;

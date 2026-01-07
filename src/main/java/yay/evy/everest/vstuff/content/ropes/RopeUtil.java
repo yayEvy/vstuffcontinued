@@ -161,6 +161,31 @@ public class RopeUtil {
         return 1000.0;
     }
 
+    public static Float getFMassForShip(ServerLevel level, Long shipId) {
+        Long groundBodyId = getGroundBodyId(level);
+        if (shipId == null || shipId.equals(groundBodyId)) {
+            return 1e12f;
+        }
+
+        Ship shipObject = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
+        if (shipObject != null) {
+            try {
+                float mass = 1000.0f;
+                var bounds = shipObject.getShipAABB();
+                if (bounds != null) {
+                    float volume = (bounds.maxX() - bounds.minX()) *
+                            (bounds.maxY() - bounds.minY()) *
+                            (bounds.maxZ() - bounds.minZ());
+                    mass = Math.max(volume * 10.0f, 1000.0f);
+                }
+                return Math.min(mass, 1e9f);
+            } catch (Exception e) {
+                return 1000.0f;
+            }
+        }
+        return 1000.0f;
+    }
+
     public static double getDistanceToRope(Vec3 eyePos, Vec3 lookVec, Vector3d ropeStart, Vector3d ropeEnd, double maxDistance) {
         Vec3 start = new Vec3(ropeStart.x, ropeStart.y, ropeStart.z);
         Vec3 end = new Vec3(ropeEnd.x, ropeEnd.y, ropeEnd.z);

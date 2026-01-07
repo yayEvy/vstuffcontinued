@@ -19,7 +19,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3d;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.VstuffConfig;
+import yay.evy.everest.vstuff.VStuffConfig;
 import yay.evy.everest.vstuff.rendering.RopeRendererType;
 import yay.evy.everest.vstuff.util.RopeStyles;
 
@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RopeRendererClient {
 
     private static float getRopeWidth() {
-        return VstuffConfig.ROPE_THICKNESS.get().floatValue();
+        return VStuffConfig.ROPE_THICKNESS.get().floatValue();
     }
 
     private static final int ROPE_CURVE_SEGMENTS = 32;
@@ -111,11 +111,11 @@ public class RopeRendererClient {
             Vec3 cameraPos = event.getCamera().getPosition();
             float partialTick = event.getPartialTick();
 
-            Map<Integer, ClientRopeTracker.ClientRopeData> constraints = ClientRopeTracker.getClientConstraints();
+            Map<Integer, ClientRopeManager.ClientRopeData> constraints = ClientRopeManager.getClientConstraints();
 
             boolean renderedAny = false;
 
-            for (Map.Entry<Integer, ClientRopeTracker.ClientRopeData> entry : constraints.entrySet()) {
+            for (Map.Entry<Integer, ClientRopeManager.ClientRopeData> entry : constraints.entrySet()) {
                 try {
                     renderClientRope(
                             poseStack,
@@ -144,12 +144,12 @@ public class RopeRendererClient {
     }
 
     private static void cleanupPositionCache() {
-        Map<Integer, ClientRopeTracker.ClientRopeData> constraints = ClientRopeTracker.getClientConstraints();
+        Map<Integer, ClientRopeManager.ClientRopeData> constraints = ClientRopeManager.getClientConstraints();
         positionCache.entrySet().removeIf(entry -> !constraints.containsKey(entry.getKey()));
     }
 
     private static void renderClientRope(PoseStack poseStack, MultiBufferSource bufferSource,
-                                         Integer constraintId, ClientRopeTracker.ClientRopeData ropeData,
+                                         Integer constraintId, ClientRopeManager.ClientRopeData ropeData,
                                          Level level, Vec3 cameraPos, float partialTick, RopeStyles.RopeStyle style) {
         if (!level.isClientSide) return;
 

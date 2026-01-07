@@ -2,7 +2,7 @@ package yay.evy.everest.vstuff;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 
-public class VstuffConfig {
+public class VStuffConfig {
 
     public static final ForgeConfigSpec SERVER_CONFIG;
     public static final ForgeConfigSpec CLIENT_CONFIG;
@@ -14,7 +14,7 @@ public class VstuffConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER;
     public static final ForgeConfigSpec.ConfigValue<Double> THRUSTER_PARTICLE_COUNT_MULTIPLIER;
 
-    public static final ForgeConfigSpec.ConfigValue<Double> MAX_ROPE_LENGTH;
+    public static final ForgeConfigSpec.ConfigValue<Float> MAX_ROPE_LENGTH;
     public static final ForgeConfigSpec.ConfigValue<Double> ROPE_THICKNESS;
     public static final ForgeConfigSpec.BooleanValue ROPE_SOUNDS;
     public static final ForgeConfigSpec.BooleanValue ROPE_ONLY_FULL_BLOCKS;
@@ -39,7 +39,7 @@ public class VstuffConfig {
         serverBuilder.pop();
 
         serverBuilder.push("rope");
-        MAX_ROPE_LENGTH = serverBuilder.define("max_rope_length", 200.0);
+        MAX_ROPE_LENGTH = serverBuilder.define("max_rope_length", 200f);
         ROPE_ONLY_FULL_BLOCKS = serverBuilder.define("ropeOnlyFullBlocks", true);
         ROPE_SOUNDS = serverBuilder.define("ropeSounds", true);
         serverBuilder.pop();

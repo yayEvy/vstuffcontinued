@@ -8,7 +8,7 @@ import net.minecraftforge.network.NetworkEvent;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import yay.evy.everest.vstuff.VstuffConfig;
+import yay.evy.everest.vstuff.VStuffConfig;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberServerAttachment;
 
 import java.util.function.Supplier;
@@ -168,7 +168,7 @@ public class PhysGrabberPackets {
                 if (ship == null) return;
 
                 double mass = ship.getInertiaData().getMass();
-                double maxMass = VstuffConfig.PHYS_GRABBER_MAX_MASS.get();
+                double maxMass = VStuffConfig.PHYS_GRABBER_MAX_MASS.get();
 
 
                 if (mass > maxMass && !msg.creative) {

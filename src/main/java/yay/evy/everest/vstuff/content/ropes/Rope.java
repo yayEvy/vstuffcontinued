@@ -16,7 +16,7 @@ import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.VstuffConfig;
+import yay.evy.everest.vstuff.VStuffConfig;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
 import yay.evy.everest.vstuff.util.RopeStyles;
@@ -403,7 +403,7 @@ public class Rope {
         }
 
         double distance = worldPosA.distance(worldPosB);
-        double maxAllowedLength = VstuffConfig.MAX_ROPE_LENGTH.get();
+        double maxAllowedLength = VStuffConfig.MAX_ROPE_LENGTH.get();
         if (distance > maxAllowedLength && player != null) {
             player.displayClientMessage(Component.literal("§cRope too long! Max length is " + maxAllowedLength + " blocks."), true);
             return RopeUtil.RopeReturn.FAIL;
