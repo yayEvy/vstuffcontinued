@@ -7,11 +7,11 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import org.joml.Vector3d;
-import yay.evy.everest.vstuff.util.packet.RopeSyncPacket;
-import yay.evy.everest.vstuff.util.packet.OutlinePacket;
-import yay.evy.everest.vstuff.util.packet.RopeSoundPacket;
+import yay.evy.everest.vstuff.foundation.network.packets.RopeSyncPacket;
+import yay.evy.everest.vstuff.foundation.network.packets.OutlinePacket;
+import yay.evy.everest.vstuff.foundation.network.packets.RopeSoundPacket;
 import yay.evy.everest.vstuff.util.RopeStyles;
-import yay.evy.everest.vstuff.util.packet.RopeStyleSelectPacket;
+import yay.evy.everest.vstuff.foundation.network.packets.RopeStyleSelectPacket;
 
 public class NetworkHandler {
 

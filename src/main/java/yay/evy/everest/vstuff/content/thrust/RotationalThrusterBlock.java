@@ -1,8 +1,6 @@
 package yay.evy.everest.vstuff.content.thrust;
 
 
-import com.simibubi.create.AllItems;
-import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.content.kinetics.base.DirectionalAxisKineticBlock;
 import com.simibubi.create.content.processing.AssemblyOperatorUseContext;
 import com.simibubi.create.foundation.block.IBE;
@@ -10,7 +8,6 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntityTicker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -25,12 +22,10 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
-import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.index.VStuffBlockEntities;
 import yay.evy.everest.vstuff.index.VStuffShapes;
 

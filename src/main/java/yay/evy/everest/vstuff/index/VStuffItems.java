@@ -5,12 +5,12 @@ import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import net.minecraft.world.item.Rarity;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.ropes.RopeCutterItem;
-import yay.evy.everest.vstuff.content.ropes.RopeItem;
+import yay.evy.everest.vstuff.content.rope.ropes.RopeCutterItem;
+import yay.evy.everest.vstuff.content.rope.ropes.RopeItem;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberItem;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.EmptyEnergyCoreItem;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.EnergyCoreItem;
-import yay.evy.everest.vstuff.content.ropethrower.RopeThrowerItem;
+import yay.evy.everest.vstuff.content.rope.ropethrower.RopeThrowerItem;
 
 
 public class VStuffItems {

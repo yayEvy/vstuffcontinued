@@ -8,9 +8,9 @@ import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.ropes.RopeTracker;
-import yay.evy.everest.vstuff.content.ropes.Rope;
-import yay.evy.everest.vstuff.content.ropes.RopeUtil;
+import yay.evy.everest.vstuff.content.rope.ropes.RopeTracker;
+import yay.evy.everest.vstuff.content.rope.ropes.Rope;
+import yay.evy.everest.vstuff.content.rope.ropes.RopeUtil;
 import yay.evy.everest.vstuff.index.VStuffItems;
 
 import java.util.ArrayList;

@@ -15,7 +15,7 @@ import org.joml.Math;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
-import yay.evy.everest.vstuff.MathUtility;
+import yay.evy.everest.vstuff.foundation.utility.MathUtility;
 import yay.evy.everest.vstuff.VStuffConfig;
 
 import java.util.List;

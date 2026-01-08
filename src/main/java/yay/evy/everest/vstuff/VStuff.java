@@ -2,6 +2,7 @@ package yay.evy.everest.vstuff;
 
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
+import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.core.BlockPos;
@@ -33,15 +34,15 @@ import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.client.VStuffClient;
-import yay.evy.everest.vstuff.content.ropes.RopePersistence;
-import yay.evy.everest.vstuff.content.ropes.RopeUtil;
+import yay.evy.everest.vstuff.content.rope.ropes.RopePersistence;
+import yay.evy.everest.vstuff.content.rope.ropes.RopeUtil;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberServerAttachment;
-import yay.evy.everest.vstuff.content.ropethrower.RopeThrowerEntity;
+import yay.evy.everest.vstuff.content.rope.ropethrower.RopeThrowerEntity;
 import yay.evy.everest.vstuff.content.thrust.ThrusterForceAttachment;
 import yay.evy.everest.vstuff.events.ColorHaggler;
 import yay.evy.everest.vstuff.index.*;
 import yay.evy.everest.vstuff.client.NetworkHandler;
-import yay.evy.everest.vstuff.network.PhysGrabberNetwork;
+import yay.evy.everest.vstuff.foundation.network.PhysGrabberNetwork;
 import yay.evy.everest.vstuff.particles.ParticleTypes;
 import org.valkyrienskies.core.api.VsBeta;
 
@@ -176,6 +177,9 @@ public class VStuff {
         );
     }
 
+    public static LangBuilder lang() {
+        return new LangBuilder(MOD_ID);
+    }
 
     public static CreateRegistrate registrate() {
         return REGISTRATE;

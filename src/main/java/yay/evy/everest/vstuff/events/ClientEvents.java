@@ -7,7 +7,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleMenuHandler;
+import yay.evy.everest.vstuff.content.rope.styler.handler.RopeStyleMenuHandler;
 
 @EventBusSubscriber(value = Dist.CLIENT, modid = "vstuff")
 public class ClientEvents {

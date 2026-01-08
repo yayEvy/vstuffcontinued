@@ -6,8 +6,8 @@ import com.simibubi.create.content.kinetics.base.SingleAxisRotatingVisual;
 import com.simibubi.create.content.kinetics.base.ShaftRenderer;
 
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
-import yay.evy.everest.vstuff.content.pulley.PulleyAnchorBlockEntity;
+import yay.evy.everest.vstuff.content.rope.pulley.PhysPulleyBlockEntity;
+import yay.evy.everest.vstuff.content.rope.pulley.PulleyAnchorBlockEntity;
 import yay.evy.everest.vstuff.content.thrust.RotationalThrusterBlockEntity;
 
 public class VStuffBlockEntities {
