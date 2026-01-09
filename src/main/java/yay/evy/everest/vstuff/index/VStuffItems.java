@@ -5,8 +5,8 @@ import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import net.minecraft.world.item.Rarity;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.rope.ropes.RopeCutterItem;
-import yay.evy.everest.vstuff.content.rope.ropes.RopeItem;
+import yay.evy.everest.vstuff.content.rope.roperework.items.NewRopeCutterItem;
+import yay.evy.everest.vstuff.content.rope.roperework.items.NewRopeItem;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberItem;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.EmptyEnergyCoreItem;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.EnergyCoreItem;
@@ -22,8 +22,8 @@ public class VStuffItems {
     }
 
 
-    public static final ItemEntry<RopeItem> ROPE_ITEM =
-            REGISTRATE.item("rope_item", RopeItem::new)
+    public static final ItemEntry<NewRopeItem> ROPE_ITEM =
+            REGISTRATE.item("rope_item", NewRopeItem::new)
                     .properties(p -> p
                             .stacksTo(64))
                     .defaultModel()
@@ -36,8 +36,8 @@ public class VStuffItems {
                     .defaultModel()
                     .register();
 
-    public static final ItemEntry<RopeCutterItem> ROPE_CUTTER_ITEM =
-            REGISTRATE.item("rope_cutter_item", RopeCutterItem::new)
+    public static final ItemEntry<NewRopeCutterItem> ROPE_CUTTER_ITEM =
+            REGISTRATE.item("rope_cutter_item", NewRopeCutterItem::new)
                     .properties(p -> p
                             .stacksTo(1)
                             .durability(238))

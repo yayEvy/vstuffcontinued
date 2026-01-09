@@ -10,11 +10,11 @@ import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
 import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.VStuffConfig;
-import yay.evy.everest.vstuff.content.rope.ropes.RopeUtil;
 import yay.evy.everest.vstuff.content.rope.styler.handler.RopeStyleHandlerServer;
+import yay.evy.everest.vstuff.foundation.utility.BodyUtils;
 import yay.evy.everest.vstuff.foundation.utility.GTPAUtils;
 import yay.evy.everest.vstuff.foundation.utility.JointValues;
-import yay.evy.everest.vstuff.util.RopeStyles;
+import yay.evy.everest.vstuff.foundation.RopeStyles;
 
 import javax.annotation.Nullable;
 
@@ -71,8 +71,8 @@ public class NewRope {
         }
 
         length += 0.5f;
-        float mass0 = RopeUtil.getFMassForShip(level, ship0);
-        float mass1 = RopeUtil.getFMassForShip(level, ship1);
+        float mass0 = BodyUtils.getMassForShip(level, ship0);
+        float mass1 = BodyUtils.getMassForShip(level, ship1);
         double effectiveMass = Math.max(Math.min(mass0, mass1), 100.0);
         double compliance = 1e-12 / effectiveMass * (posData0.isWorld() || posData1.isWorld() ? 0.05 : 1);
         float massRatio = Math.max(mass0, mass1) / Math.min(mass0, mass1);

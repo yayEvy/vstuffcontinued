@@ -66,7 +66,7 @@ public class RopeManager {
 
 
 
-    public static void syncAllConstraintsToPlayer(ServerPlayer player) {
+    public static void syncAllRopesToPlayer(ServerPlayer player) {
         NetworkManager.sendClearAllRopesToPlayer(player);
 
         for (Map.Entry<Integer, NewRope> entry : activeRopes.entrySet()) {
@@ -108,6 +108,6 @@ public class RopeManager {
 
         NetworkManager.sendClearAllRopesToPlayer(player);
 
-        syncAllConstraintsToPlayer(player);
+        syncAllRopesToPlayer(player);
     }
 }

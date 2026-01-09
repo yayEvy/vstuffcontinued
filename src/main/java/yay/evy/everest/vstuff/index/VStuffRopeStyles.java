@@ -1,8 +1,8 @@
 package yay.evy.everest.vstuff.index;
 
 import yay.evy.everest.vstuff.content.rope.styler.components.RopeStyleCategory;
-import yay.evy.everest.vstuff.util.RopeStyles.RopeStyle;
-import yay.evy.everest.vstuff.util.RopeStyles.PrimitiveRopeStyle;
+import yay.evy.everest.vstuff.foundation.RopeStyles.RopeStyle;
+import yay.evy.everest.vstuff.foundation.RopeStyles.PrimitiveRopeStyle;
 
 import java.util.*;
 public class VStuffRopeStyles {

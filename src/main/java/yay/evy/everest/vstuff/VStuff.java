@@ -10,6 +10,8 @@ import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
 import net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,15 +35,14 @@ import org.slf4j.Logger;
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
-import yay.evy.everest.vstuff.client.VStuffClient;
-import yay.evy.everest.vstuff.content.rope.ropes.RopePersistence;
-import yay.evy.everest.vstuff.content.rope.ropes.RopeUtil;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberServerAttachment;
+import yay.evy.everest.vstuff.content.rope.roperework.NewRopeUtils;
+import yay.evy.everest.vstuff.content.rope.roperework.RopePersistence;
 import yay.evy.everest.vstuff.content.rope.ropethrower.RopeThrowerEntity;
 import yay.evy.everest.vstuff.content.thrust.ThrusterForceAttachment;
 import yay.evy.everest.vstuff.events.ColorHaggler;
+import yay.evy.everest.vstuff.foundation.network.NetworkManager;
 import yay.evy.everest.vstuff.index.*;
-import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.foundation.network.PhysGrabberNetwork;
 import yay.evy.everest.vstuff.particles.ParticleTypes;
 import org.valkyrienskies.core.api.VsBeta;
@@ -76,7 +77,7 @@ public class VStuff {
 
 
         MinecraftForge.EVENT_BUS.register(this);
-        NetworkHandler.registerPackets();
+        NetworkManager.registerPackets();
         PhysGrabberNetwork.register();
         MinecraftForge.EVENT_BUS.register(new ColorHaggler());
 
@@ -95,6 +96,12 @@ public class VStuff {
             registerAttachments();
             registerDispenserBehaviors();
         });
+    }
+
+    public static void registerEventListeners() {
+        ValkyrienSkiesMod.getApi().getShipLoadEvent().on(RopePersistence::onShipLoad);
+        MinecraftForge.EVENT_BUS.addListener(ColorHaggler::onPlayerColorItem);
+
     }
     public static void registerAttachments() {
         LOGGER.info("Registering vstuff attachments...");
@@ -147,7 +154,7 @@ public class VStuff {
                                 startPos,
                                 startShipId,
                                 serverLevel.dimension().location().toString(),
-                                RopeUtil.ConnectionType.NORMAL,
+                                NewRopeUtils.SelectType.NORMAL,
                                 null
                         );
 
@@ -177,10 +184,6 @@ public class VStuff {
         );
     }
 
-    public static LangBuilder lang() {
-        return new LangBuilder(MOD_ID);
-    }
-
     public static CreateRegistrate registrate() {
         return REGISTRATE;
     }
@@ -197,6 +200,11 @@ public class VStuff {
         return new ResourceLocation(MOD_ID, "models/" + path);
     }
 
+    public static MutableComponent translate(String key, Object... args) {
+        Object[] args1 = LangBuilder.resolveBuilders(args);
+        return Component.translatable(VStuff.MOD_ID + "." + key, args1);
+    }
+
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value =  Dist.CLIENT)
     public static class ClientModEvents {
         @SubscribeEvent
@@ -208,7 +216,7 @@ public class VStuff {
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
-            NetworkHandler.sendClearAllConstraintsToPlayer(player);
+            NetworkManager.sendClearAllRopesToPlayer(player);
         }
     }
 

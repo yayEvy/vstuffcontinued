@@ -8,25 +8,23 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.MapItem;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import org.valkyrienskies.core.impl.shadow.Bl;
-import org.valkyrienskies.core.impl.shadow.In;
+import net.minecraft.world.phys.HitResult;
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.ClientOutlineHandler;
-import yay.evy.everest.vstuff.content.rope.pulley.PhysPulleyBlock;
+import yay.evy.everest.vstuff.client.ClientRopeManager;
 import yay.evy.everest.vstuff.content.rope.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.content.rope.roperework.NewRopeUtils;
-import yay.evy.everest.vstuff.foundation.lang.VStuffLang;
 import yay.evy.everest.vstuff.foundation.network.NetworkManager;
 import yay.evy.everest.vstuff.foundation.utility.PosUtils;
 
 import static yay.evy.everest.vstuff.content.rope.roperework.NewRopeUtils.sendRopeMessage;
-import static yay.evy.everest.vstuff.foundation.utility.PosUtils.*;
 
 public class NewRopeItem extends Item {
     public NewRopeItem(Properties pProperties) {
@@ -47,6 +45,7 @@ public class NewRopeItem extends Item {
         }
 
         if (!isFoil(heldItem)) {
+            if (player.isShiftKeyDown()) return InteractionResult.FAIL;
             if (PosUtils.isPulleyAnchor(state)) {
                 if (!level.isClientSide) firstFailWithMessage(player, clickedPos, "anchor_first");
                 return InteractionResult.SUCCESS;
@@ -57,13 +56,21 @@ public class NewRopeItem extends Item {
             }
             firstSelect(serverLevel, clickedPos, player, heldItem);
             return InteractionResult.SUCCESS;
+        } else if (player.isShiftKeyDown()) {
+            player.displayClientMessage(VStuff.translate("rope.reset").withStyle(ChatFormatting.GREEN), true);
+            CompoundTag tag = heldItem.getTag().getCompound("first");
+            if (serverLevel.getBlockEntity(NbtUtils.readBlockPos(tag.getCompound("pos"))) instanceof PhysPulleyBlockEntity pulleyBE) {
+                pulleyBE.resetSelf();
+            }
+            heldItem.setTag(null);
+            return InteractionResult.SUCCESS;
         }
 
         boolean taut = Minecraft.getInstance().options.keySprint.isDown();
-        NewRopeUtils.RopeInfo info = NewRopeUtils.RopeInfo.tryConnect(level, player, clickedPos, PosUtils.getSafeLoadedShipIdAtPos(serverLevel, clickedPos), state, heldItem, taut);
+        NewRopeUtils.RopeInfo info = NewRopeUtils.RopeInfo.tryConnect(serverLevel, player, clickedPos, PosUtils.getSafeLoadedShipIdAtPos(serverLevel, clickedPos), serverLevel.dimension().location().toString(), state, heldItem, taut);
 
         if (info.message != null && !level.isClientSide) {
-            player.displayClientMessage(VStuffLang.translateDirect(info.message), true);
+            player.displayClientMessage(VStuff.translate(info.message), true);
         }
 
         if (level.isClientSide) {
@@ -76,16 +83,16 @@ public class NewRopeItem extends Item {
 
 
     private void firstSelect(ServerLevel level, BlockPos clickedPos, Player player, ItemStack heldItem) {
-        SelectType selection = SelectType.NORMAL;
+        NewRopeUtils.SelectType selection = NewRopeUtils.SelectType.NORMAL;
         if (level.getBlockEntity(clickedPos) instanceof PhysPulleyBlockEntity pulleyBE && pulleyBE.canAttach()) {
             pulleyBE.setWaiting();
-            selection = SelectType.PULLEY;
+            selection = NewRopeUtils.SelectType.PULLEY;
         }
 
-        if (selection == SelectType.NORMAL) {
-            player.displayClientMessage(VStuffLang.translateDirect("rope.first").withStyle(ChatFormatting.GREEN), true);
+        if (selection == NewRopeUtils.SelectType.NORMAL) {
+            player.displayClientMessage(VStuff.translate("rope.first").withStyle(ChatFormatting.GREEN), true);
         } else {
-            player.displayClientMessage(VStuffLang.translateDirect("rope.pulley_first").withStyle(ChatFormatting.GREEN), true);
+            player.displayClientMessage(VStuff.translate("rope.pulley_first").withStyle(ChatFormatting.GREEN), true);
         }
 
         CompoundTag tag = heldItem.getOrCreateTagElement("first");
@@ -102,28 +109,14 @@ public class NewRopeItem extends Item {
 
 
     private void firstFailWithMessage(Player player, BlockPos clickedPos, String message) {
-        player.displayClientMessage(VStuffLang.translateDirect("rope." + message).withStyle(ChatFormatting.RED), true);
+        player.displayClientMessage(VStuff.translate("rope." + message).withStyle(ChatFormatting.RED), true);
         if (player instanceof ServerPlayer serverPlayer) {
             NetworkManager.sendOutlineToPlayer(serverPlayer, clickedPos, ClientOutlineHandler.RED);
         }
     }
 
-    private void resetWithMessage(Player player, String message) {
-        sendRopeMessage(player, message);
-        reset();
-    }
-
-    private void reset() {
-
-    }
-
     @Override
     public boolean isFoil(ItemStack stack) {
         return stack.hasTag() && stack.getTag().contains("first");
-    }
-
-    enum SelectType {
-        NORMAL,
-        PULLEY
     }
 }

@@ -4,7 +4,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 import yay.evy.everest.vstuff.content.rope.styler.handler.RopeStyleHandlerServer;
-import yay.evy.everest.vstuff.util.RopeStyles;
+import yay.evy.everest.vstuff.foundation.RopeStyles;
 
 import java.util.function.Supplier;
 

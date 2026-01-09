@@ -7,10 +7,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.joml.Vector3f;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.rope.ropes.RopeTracker;
-import yay.evy.everest.vstuff.content.rope.ropes.Rope;
-import yay.evy.everest.vstuff.content.rope.ropes.RopeUtil;
+import yay.evy.everest.vstuff.content.rope.roperework.NewRope;
+import yay.evy.everest.vstuff.content.rope.roperework.NewRopeUtils;
+import yay.evy.everest.vstuff.content.rope.roperework.RopeManager;
 import yay.evy.everest.vstuff.index.VStuffItems;
 
 import java.util.ArrayList;
@@ -27,54 +28,50 @@ public class RopeBreakHandler {
 
         BlockPos brokenPos = event.getPos();
         List<Integer> constraintsToRemove = new ArrayList<>();
-        Map<Integer, Rope> toRemove = new HashMap<>();
+        Map<Integer, NewRope> toRemove = new HashMap<>();
 
-        for (Map.Entry<Integer, Rope> entry : RopeTracker.getActiveRopes().entrySet()) {
+        for (Map.Entry<Integer, NewRope> entry : RopeManager.getActiveRopes().entrySet()) {
             Integer id = entry.getKey();
-            Rope rope = entry.getValue();
+            NewRope rope = entry.getValue();
 
-            if (rope.constraintType == RopeUtil.ConstraintType.PULLEY) continue;
+            if (rope.posData0.blockType() == NewRopeUtils.BlockType.PULLEY) continue;
 
             try {
                 BlockPos dropPos = null;
                 boolean remove = false;
 
-                if (!rope.shipAIsGround) {
-                    BlockPos posA = BlockPos.containing(rope.localPosA.x, rope.localPosA.y, rope.localPosA.z);
+                if (!rope.posData0.isWorld()) {
+                    Vector3f localPos0 = rope.posData0.localPos();
+                    BlockPos posA = BlockPos.containing(localPos0.x, localPos0.y, localPos0.z);
                     if (brokenPos.equals(posA)) {
                         remove = true;
                         dropPos = posA;
                     }
                 }
-                if (!remove && !rope.shipBIsGround) {
-                    BlockPos posB = BlockPos.containing(rope.localPosB.x, rope.localPosB.y, rope.localPosB.z);
+                if (!remove && !rope.posData1.isWorld()) {
+                    Vector3f localPos1 = rope.posData1.localPos();
+                    BlockPos posB = BlockPos.containing(localPos1.x, localPos1.y, localPos1.z);
                     if (brokenPos.equals(posB)) {
                         remove = true;
                         dropPos = posB;
                     }
                 }
 
-                if (!remove && rope.shipAIsGround) {
-                    BlockPos worldPosA = BlockPos.containing(
-                            rope.getWorldPosA(level).x,
-                            rope.getWorldPosA(level).y,
-                            rope.getWorldPosA(level).z
-                    );
+                if (!remove && rope.posData0.isWorld()) {
+                    Vector3f worldPos0 = rope.posData0.getWorldPos();
+                    BlockPos worldPosA = BlockPos.containing(worldPos0.x, worldPos0.y, worldPos0.z);
                     if (brokenPos.equals(worldPosA)) {
                         remove = true;
                         dropPos = worldPosA;
                     }
                 }
 
-                if (!remove && rope.shipBIsGround) {
-                    BlockPos worldPosB = BlockPos.containing(
-                            rope.getWorldPosB(level).x,
-                            rope.getWorldPosB(level).y,
-                            rope.getWorldPosB(level).z
-                    );
-                    if (brokenPos.equals(worldPosB)) {
+                if (!remove && rope.posData1.isWorld()) {
+                    Vector3f worldPos1 = rope.posData1.getWorldPos();
+                    BlockPos blockPos1 = BlockPos.containing(worldPos1.x, worldPos1.y, worldPos1.z);
+                    if (brokenPos.equals(blockPos1)) {
                         remove = true;
-                        dropPos = worldPosB;
+                        dropPos = blockPos1;
                     }
                 }
 
@@ -97,12 +94,11 @@ public class RopeBreakHandler {
             }
         }
 
-        for (Map.Entry<Integer, Rope> ropeEntry: toRemove.entrySet()) {
+        for (Map.Entry<Integer, NewRope> ropeEntry: toRemove.entrySet()) {
             Integer id = ropeEntry.getKey();
-            Rope rope = ropeEntry.getValue();
+            NewRope rope = ropeEntry.getValue();
             try {
                 rope.removeJoint(level);
-                RopeTracker.removeConstraintWithPersistence(level, id);
             } catch (Exception e) {
                 VStuff.LOGGER.error("[RopeBreakHandler] Failed to remove constraint {}: {}", id, e.getMessage());
             }

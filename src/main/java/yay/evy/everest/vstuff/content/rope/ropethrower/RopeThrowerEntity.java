@@ -13,10 +13,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import yay.evy.everest.vstuff.content.rope.ropes.Rope;
-import yay.evy.everest.vstuff.content.rope.ropes.RopeUtil;
 import yay.evy.everest.vstuff.content.rope.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.content.rope.pulley.PulleyAnchorBlockEntity;
+import yay.evy.everest.vstuff.content.rope.roperework.NewRopeUtils;
 import yay.evy.everest.vstuff.index.VStuffItems;
 
 public class RopeThrowerEntity extends ThrowableItemProjectile {
@@ -30,20 +29,20 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
     private BlockPos startPos;
     private Long startShipId;
     private String startDimension;
-    private RopeUtil.ConnectionType connectionType;
+    private NewRopeUtils.SelectType selectType;
     private PhysPulleyBlockEntity waitingPulley;
 
     public void setStartData(
             BlockPos pos,
             Long shipId,
             String dimension,
-            RopeUtil.ConnectionType type,
+            NewRopeUtils.SelectType type,
             PhysPulleyBlockEntity pulley
     ) {
         this.startPos = pos;
         this.startShipId = shipId;
         this.startDimension = dimension;
-        this.connectionType = type;
+        this.selectType = type;
         this.waitingPulley = pulley;
     }
 
@@ -68,12 +67,12 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
         BlockPos hitPos = result.getBlockPos().immutable();
         Long secondShipId = getShipIdAtPos(serverLevel, hitPos);
 
-        if (connectionType == RopeUtil.ConnectionType.PULLEY && !(serverLevel.getBlockEntity(hitPos) instanceof PulleyAnchorBlockEntity)) {
+        if (selectType == NewRopeUtils.SelectType.PULLEY && !(serverLevel.getBlockEntity(hitPos) instanceof PulleyAnchorBlockEntity)) {
             ItemStack ropeDrop = new ItemStack(VStuffItems.ROPE_ITEM.get());
             ItemEntity itemEntity = new ItemEntity(
                     serverLevel,
                     hitPos.getX() + 0.5,
-                    hitPos.getY() + 1.5,
+                    hitPos.getY() + 0.5,
                     hitPos.getZ() + 0.5,
                     ropeDrop
             );
@@ -83,7 +82,7 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
             return;
         }
 
-        RopeUtil.RopeReturn ropeReturn = Rope.createNew(
+            RopeUtil.RopeReturn ropeReturn = Rope.createNew(
                 VStuffItems.ROPE_ITEM.get(),
                 serverLevel,
                 startPos,

@@ -8,7 +8,7 @@ import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.rope.styler.components.RopeStyleCategory;
 import yay.evy.everest.vstuff.index.VStuffRopeStyles;
-import yay.evy.everest.vstuff.util.RopeStyles.RopeStyle;
+import yay.evy.everest.vstuff.foundation.RopeStyles.RopeStyle;
 import yay.evy.everest.vstuff.client.ClientTextUtils;
 import yay.evy.everest.vstuff.index.VStuffGuiTextures;
 import yay.evy.everest.vstuff.content.rope.styler.components.RopeStyleButton;

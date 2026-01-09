@@ -29,7 +29,7 @@ public class GTPAUtils {
             RopeManager.addRope(level, rope);
 
             if (player instanceof ServerPlayer serverPlayer) {
-                RopeManager.syncAllConstraintsToPlayer(serverPlayer);
+                RopeManager.syncAllRopesToPlayer(serverPlayer);
             }
         });
     }
@@ -46,7 +46,7 @@ public class GTPAUtils {
 
                     MinecraftServer server = level.getServer();
                     for (ServerPlayer sp : server.getPlayerList().getPlayers()) {
-                        RopeTracker.syncAllConstraintsToPlayer(sp);
+                        RopeManager.syncAllRopesToPlayer(sp);
                     }
                 }
             });

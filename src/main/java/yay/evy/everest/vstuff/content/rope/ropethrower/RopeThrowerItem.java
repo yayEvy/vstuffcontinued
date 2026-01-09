@@ -1,10 +1,13 @@
 package yay.evy.everest.vstuff.content.rope.ropethrower;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -15,14 +18,15 @@ import net.minecraft.world.item.ItemStack;
 
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.ClientOutlineHandler;
-import yay.evy.everest.vstuff.client.NetworkHandler;
-import yay.evy.everest.vstuff.content.rope.ropes.RopeUtil;
+import yay.evy.everest.vstuff.content.rope.roperework.NewRopeUtils;
 import yay.evy.everest.vstuff.content.rope.pulley.PhysPulleyBlockEntity;
+import yay.evy.everest.vstuff.foundation.network.NetworkManager;
+import yay.evy.everest.vstuff.foundation.utility.PosUtils;
 import yay.evy.everest.vstuff.index.VStuffEntities;
 import yay.evy.everest.vstuff.index.VStuffSounds;
-
-import static yay.evy.everest.vstuff.content.rope.ropes.RopeUtil.getShipIdAtPos;
 
 public class RopeThrowerItem extends Item {
 
@@ -31,53 +35,60 @@ public class RopeThrowerItem extends Item {
     }
 
     @Override
-    public InteractionResult useOn(UseOnContext ctx) {
-        Level level = ctx.getLevel();
-        Player player = ctx.getPlayer();
-        ItemStack stack = ctx.getItemInHand();
-        BlockPos pos = ctx.getClickedPos();
+    public InteractionResult useOn(UseOnContext context) {
+        Level level = context.getLevel();
+        BlockPos clickedPos = context.getClickedPos().immutable();
+        BlockState state = level.getBlockState(clickedPos);
+        Player player = context.getPlayer();
+        ItemStack heldItem = context.getItemInHand();
+
 
         if (!(level instanceof ServerLevel serverLevel) || player == null) {
-            return InteractionResult.FAIL;
+            return InteractionResult.PASS;
         }
 
-        if (player.isShiftKeyDown()) {
-            if (isFoil(stack)) {
-                resetStateWithMessage(serverLevel, stack, player, "rope_reset");
-                NetworkHandler.sendOutline(pos, ClientOutlineHandler.GREEN);
-                return InteractionResult.SUCCESS;
-            }
-            return InteractionResult.FAIL;
+        if (PosUtils.isPulleyAnchor(state)) {
+            if (!level.isClientSide) firstFailWithMessage(player, clickedPos, "anchor_first");
+            return InteractionResult.SUCCESS;
         }
-
-        RopeUtil.ConnectionType type = RopeUtil.ConnectionType.NORMAL;
-
-        if (serverLevel.getBlockEntity(pos) instanceof PhysPulleyBlockEntity pulley) {
-            if (!pulley.canAttach()) {
-                sendRopeMessage(player, "pulley_attach_fail");
-                return InteractionResult.FAIL;
-            }
-
-            pulley.setWaiting();
-            type = RopeUtil.ConnectionType.PULLEY;
-            sendRopeMessage(player, "pulley_first");
-        } else {
-            sendRopeMessage(player, "rope_first");
+        if (level.getBlockEntity(clickedPos) instanceof PhysPulleyBlockEntity pulley && !pulley.canAttach()) {
+            if (!level.isClientSide) firstFailWithMessage(player, clickedPos, "pulley_waiting");
+            return InteractionResult.SUCCESS;
         }
-
-        Long shipId = getShipIdAtPos(serverLevel, pos);
-        if (shipId == null) {
-            shipId = RopeUtil.getGroundBodyId(serverLevel);
-        }
-
-        CompoundTag first = stack.getOrCreateTagElement("first");
-        first.put("pos", NbtUtils.writeBlockPos(pos));
-        first.putLong("shipId", shipId);
-        first.putString("dim", serverLevel.dimension().location().toString());
-        first.putString("type", type.name());
-
-        NetworkHandler.sendOutline(pos, ClientOutlineHandler.GREEN);
+        firstSelect(serverLevel, clickedPos, player, heldItem);
         return InteractionResult.SUCCESS;
+    }
+
+    private void firstSelect(ServerLevel level, BlockPos clickedPos, Player player, ItemStack heldItem) {
+        NewRopeUtils.SelectType selection = NewRopeUtils.SelectType.NORMAL;
+        if (level.getBlockEntity(clickedPos) instanceof PhysPulleyBlockEntity pulleyBE && pulleyBE.canAttach()) {
+            pulleyBE.setWaiting();
+            selection = NewRopeUtils.SelectType.PULLEY;
+        }
+
+        if (selection == NewRopeUtils.SelectType.NORMAL) {
+            player.displayClientMessage(VStuff.translate("rope.first").withStyle(ChatFormatting.GREEN), true);
+        } else {
+            player.displayClientMessage(VStuff.translate("rope.pulley_first").withStyle(ChatFormatting.GREEN), true);
+        }
+
+        CompoundTag tag = heldItem.getOrCreateTagElement("first");
+
+        tag.putLong("shipId", PosUtils.getSafeLoadedShipIdAtPos(level, clickedPos));
+        tag.put("pos", NbtUtils.writeBlockPos(clickedPos));
+        tag.putString("dim", level.dimension().location().toString());
+        tag.putString("type", selection.name());
+
+        if (player instanceof ServerPlayer serverPlayer) {
+            NetworkManager.sendOutlineToPlayer(serverPlayer, clickedPos, ClientOutlineHandler.GREEN);
+        }
+    }
+
+    private void firstFailWithMessage(Player player, BlockPos clickedPos, String message) {
+        player.displayClientMessage(VStuff.translate("rope." + message).withStyle(ChatFormatting.RED), true);
+        if (player instanceof ServerPlayer serverPlayer) {
+            NetworkManager.sendOutlineToPlayer(serverPlayer, clickedPos, ClientOutlineHandler.RED);
+        }
     }
 
     @Override
@@ -96,9 +107,9 @@ public class RopeThrowerItem extends Item {
         if (isFoil(stack)) {
             CompoundTag tag = stack.getTag().getCompound("first");
 
-            RopeUtil.ConnectionType type;
+            NewRopeUtils.SelectType type;
             try {
-                type = RopeUtil.ConnectionType.valueOf(tag.getString("type"));
+                type = NewRopeUtils.SelectType.valueOf(tag.getString("type"));
             } catch (Exception e) {
                 resetState(serverLevel, stack);
                 return InteractionResultHolder.fail(stack);
@@ -111,7 +122,7 @@ public class RopeThrowerItem extends Item {
 
 
             PhysPulleyBlockEntity pulley = null;
-            if (type == RopeUtil.ConnectionType.PULLEY &&
+            if (type == NewRopeUtils.SelectType.PULLEY &&
                     serverLevel.dimension().location().toString().equals(dim)) {
 
                 if (serverLevel.getBlockEntity(firstPos) instanceof PhysPulleyBlockEntity be) {
@@ -170,7 +181,7 @@ public class RopeThrowerItem extends Item {
         if (isFoil(stack)) {
             CompoundTag tag = stack.getTag().getCompound("first");
 
-            if (RopeUtil.ConnectionType.valueOf(tag.getString("type")) == RopeUtil.ConnectionType.PULLEY) {
+            if (NewRopeUtils.SelectType.valueOf(tag.getString("type")) == NewRopeUtils.SelectType.PULLEY) {
                 PhysPulleyBlockEntity pulleyBE = (PhysPulleyBlockEntity) level.getBlockEntity(NbtUtils.readBlockPos(tag.getCompound("pos")));
                 if (pulleyBE != null) pulleyBE. open();
             }

@@ -11,7 +11,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.GameType;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
-import yay.evy.everest.vstuff.foundation.lang.VStuffLang;
+import yay.evy.everest.vstuff.VStuff;
 
 public class RopeTextOverlay implements IGuiOverlay {
 
@@ -28,7 +28,7 @@ public class RopeTextOverlay implements IGuiOverlay {
             return;
 
         boolean active = mc.options.keySprint.isDown();
-        MutableComponent text = VStuffLang.translateDirect("rope.hold_to_pull_taut", Component.keybind("key.sprint")
+        MutableComponent text = VStuff.translate("rope.hold_to_pull_taut", Component.keybind("key.sprint")
                 .withStyle(active ? ChatFormatting.WHITE : ChatFormatting.GRAY));
 
         Window window = mc.getWindow();

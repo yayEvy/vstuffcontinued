@@ -11,11 +11,7 @@ import org.joml.Matrix4f;
 
 // From Steam 'n Rails
 public class ClientTextUtils {
-    /**
-     * Pass in a component, and a width in pixels,
-     * and it'll return a component that if it overflows after the cutoff,
-     * it will remove the extra text and add `...` at the end
-     */
+
     @OnlyIn(Dist.CLIENT)
     public static Component getComponentWithWidthCutoff(Component component, int maxWidth) {
         Font font = Minecraft.getInstance().font;

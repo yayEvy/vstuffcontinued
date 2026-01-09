@@ -12,30 +12,32 @@ public class BodyUtils {
                 .get(VSGameUtilsKt.getDimensionId(level));
     }
 
-    public static Double getMassForShip(ServerLevel level, Long shipId) {
+    public static Float getMassForShip(ServerLevel level, Long shipId) {
         Long groundBodyId = getGroundBodyId(level);
         if (shipId == null || shipId.equals(groundBodyId)) {
-            return 1e12;
+            return 1e12f;
         }
 
         Ship shipObject = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
         if (shipObject != null) {
             try {
-                double mass = 1000.0;
+                float mass = 1000.0f;
                 var bounds = shipObject.getShipAABB();
                 if (bounds != null) {
-                    double volume = (bounds.maxX() - bounds.minX()) *
+                    float volume = (bounds.maxX() - bounds.minX()) *
                             (bounds.maxY() - bounds.minY()) *
                             (bounds.maxZ() - bounds.minZ());
-                    mass = Math.max(volume * 10.0, 1000.0);
+                    mass = Math.max(volume * 10.0f, 1000.0f);
                 }
-                return Math.min(mass, 1e9);
+                return Math.min(mass, 1e9f);
             } catch (Exception e) {
-                return 1000.0;
+                return 1000.0f;
             }
         }
-        return 1000.0;
+        return 1000.0f;
     }
+
+
 
     public static Long whythefuckisitsupposedtobenullwhyyyyy(Long shipId, ServerLevel level) {
         if (shipId == null) return null;

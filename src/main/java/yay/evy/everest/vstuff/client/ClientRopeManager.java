@@ -1,26 +1,25 @@
 package yay.evy.everest.vstuff.client;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.common.Mod;
-import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import yay.evy.everest.vstuff.util.RopeStyles;
+import yay.evy.everest.vstuff.foundation.RopeStyles;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientRopeManager {
-    private static final Map<Integer, ClientRopeData> clientConstraints = new HashMap<>();
+    private static final Map<Integer, ClientRopeData> clientRopes = new HashMap<>();
+    private static ClientRopeData translucentRope = null;
 
-    public record ClientRopeData(Long shipA, Long shipB, Vector3f localPosA, Vector3f localPosB, double maxLength,
+    public record ClientRopeData(Long shipA, Long shipB, Vector3f localPosA, Vector3f localPosB, float maxLength,
                                  RopeStyles.RopeStyle style) {
-            public ClientRopeData(Long shipA, Long shipB, Vector3f localPosA, Vector3f localPosB, double maxLength, RopeStyles.RopeStyle style) {
+            public ClientRopeData(Long shipA, Long shipB, Vector3f localPosA, Vector3f localPosB, float maxLength, RopeStyles.RopeStyle style) {
                 this.shipA = shipA;
                 this.shipB = shipB;
                 this.localPosA = new Vector3f(localPosA);
@@ -51,26 +50,41 @@ public class ClientRopeManager {
 
     }
 
-    public static void addClientConstraint(Integer constraintId, Long shipA, Long shipB,
-                                           Vector3f localPosA, Vector3f localPosB, double maxLength, RopeStyles.RopeStyle style) {
-        clientConstraints.put(constraintId, new ClientRopeData(shipA, shipB, localPosA, localPosB, maxLength, style));
+    public static boolean hasPreviewRope() {
+        return !(translucentRope == null);
     }
 
-    public static void removeClientConstraint(Integer constraintId) {
+    public static void setPreviewRope(Long ship0, Long ship1, Vector3f localPos0, Vector3f localPos1, float maxLength, RopeStyles.RopeStyle style) {
+        translucentRope = new ClientRopeData(ship0, ship1, localPos0, localPos1, maxLength, style);
+    }
+
+    public static void clearPreviewRope() {
+        translucentRope = null;
+    }
+
+    public static void addClientRope(Integer constraintId, Long shipA, Long shipB,
+                                     Vector3f localPosA, Vector3f localPosB, float maxLength, RopeStyles.RopeStyle style) {
+        clientRopes.put(constraintId, new ClientRopeData(shipA, shipB, localPosA, localPosB, maxLength, style));
+    }
+
+    public static void removeClientRope(Integer constraintId) {
         if (constraintId == null) return;
 
-        clientConstraints.remove(constraintId);
-
+        clientRopes.remove(constraintId);
 
         RopeRendererClient.positionCache.remove(constraintId);
     }
 
-    public static Map<Integer, ClientRopeData> getClientConstraints() {
-        return clientConstraints;
+    public static Map<Integer, ClientRopeData> getClientRopes() {
+        return clientRopes;
+    }
+    public static ClientRopeData getPreviewRope() {
+        return translucentRope;
     }
 
     public static void clearAllClientConstraints() {
-        clientConstraints.clear();
+        clientRopes.clear();
+        translucentRope = null;
         RopeRendererClient.clearCache();
     }
 

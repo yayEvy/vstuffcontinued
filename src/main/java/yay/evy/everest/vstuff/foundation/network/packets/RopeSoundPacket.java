@@ -7,7 +7,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.network.NetworkEvent;
 import yay.evy.everest.vstuff.sound.RopeSoundHandler;
-import yay.evy.everest.vstuff.util.RopeStyles;
+import yay.evy.everest.vstuff.foundation.RopeStyles;
 
 import java.util.function.Supplier;
 

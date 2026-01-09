@@ -9,7 +9,7 @@ import yay.evy.everest.vstuff.content.ponder.PhysPulleyPonder;
 import yay.evy.everest.vstuff.content.ponder.RotationalThrusterPonder;
 import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper;
 
-public class VStuffPonders implements PonderPlugin {
+public class    VStuffPonders implements PonderPlugin {
 
 
     @Override

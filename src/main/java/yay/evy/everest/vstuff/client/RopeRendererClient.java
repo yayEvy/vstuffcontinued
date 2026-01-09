@@ -10,21 +10,23 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
+import org.joml.Vector3f;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.VStuffConfig;
 import yay.evy.everest.vstuff.rendering.RopeRendererType;
-import yay.evy.everest.vstuff.util.RopeStyles;
+import yay.evy.everest.vstuff.foundation.RopeStyles;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static yay.evy.everest.vstuff.content.rope.roperework.NewRopeUtils.convertLocalToWorld;
 
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class RopeRendererClient {
@@ -108,10 +110,10 @@ public class RopeRendererClient {
 
             PoseStack poseStack = event.getPoseStack();
             MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
-            Vec3 cameraPos = event.getCamera().getPosition();
+            Vector3f cameraPos = event.getCamera().getPosition().toVector3f();
             float partialTick = event.getPartialTick();
 
-            Map<Integer, ClientRopeManager.ClientRopeData> constraints = ClientRopeManager.getClientConstraints();
+            Map<Integer, ClientRopeManager.ClientRopeData> constraints = ClientRopeManager.getClientRopes();
 
             boolean renderedAny = false;
 
@@ -125,7 +127,8 @@ public class RopeRendererClient {
                             level,
                             cameraPos,
                             partialTick,
-                            entry.getValue().style()
+                            entry.getValue().style(),
+                            false
                     );
                     renderedAny = true;
                 } catch (Exception e) {
@@ -133,6 +136,24 @@ public class RopeRendererClient {
                         VStuff.LOGGER.error("Error rendering client rope: {}", e.getMessage());
                     }
                 }
+            }
+            try {
+                ClientRopeManager.ClientRopeData translucentRope = ClientRopeManager.getPreviewRope();
+                if (translucentRope != null) {
+                    renderClientRope(
+                            poseStack,
+                            bufferSource,
+                            -1,
+                            translucentRope,
+                            level,
+                            cameraPos,
+                            partialTick,
+                            translucentRope.style(),
+                            true
+                    );
+                }
+            } catch (Exception e) {
+                VStuff.LOGGER.error("Error rendering translucent rope on client: {}", e.getMessage());
             }
 
             if (renderedAny) {
@@ -144,13 +165,13 @@ public class RopeRendererClient {
     }
 
     private static void cleanupPositionCache() {
-        Map<Integer, ClientRopeManager.ClientRopeData> constraints = ClientRopeManager.getClientConstraints();
+        Map<Integer, ClientRopeManager.ClientRopeData> constraints = ClientRopeManager.getClientRopes();
         positionCache.entrySet().removeIf(entry -> !constraints.containsKey(entry.getKey()));
     }
 
     private static void renderClientRope(PoseStack poseStack, MultiBufferSource bufferSource,
                                          Integer constraintId, ClientRopeManager.ClientRopeData ropeData,
-                                         Level level, Vec3 cameraPos, float partialTick, RopeStyles.RopeStyle style) {
+                                         Level level, Vector3f cameraPos, float partialTick, RopeStyles.RopeStyle style, boolean translucent) {
         if (!level.isClientSide) return;
 
         if (!ropeData.isRenderable(level)) {
@@ -158,8 +179,8 @@ public class RopeRendererClient {
             return;
         }
 
-        Vector3d startPos = ropeData.getWorldPosA(level, partialTick);
-        Vector3d endPos = ropeData.getWorldPosB(level, partialTick);
+        Vector3f startPos = ClientRopeUtil.renderLocalToWorld(level, ropeData.localPosA(), ropeData.shipA());
+        Vector3f endPos = ClientRopeUtil.renderLocalToWorld(level, ropeData.localPosB(), ropeData.shipB());
 
         double actualRopeLength = startPos.distance(endPos);
         double maxRopeLength = ropeData.maxLength();
@@ -169,16 +190,16 @@ public class RopeRendererClient {
         if (VSGameUtilsKt.isBlockInShipyard(level, endPos.x, endPos.y, endPos.z)) return;
 
         renderRope(poseStack, bufferSource, startPos, endPos,
-                    actualRopeLength, maxRopeLength, cameraPos, partialTick, level, style);
+                    actualRopeLength, maxRopeLength, cameraPos, partialTick, level, style, translucent);
 
     }
 
     private static void renderRope(PoseStack poseStack, MultiBufferSource bufferSource,
-                                   Vector3d startPos, Vector3d endPos, double actualRopeLength,
-                                   double maxRopeLength, Vec3 cameraPos, float partialTick, Level level, RopeStyles.RopeStyle style) {
+                                   Vector3f startPos, Vector3f endPos, double actualRopeLength,
+                                   double maxRopeLength, Vector3f cameraPos, float partialTick, Level level, RopeStyles.RopeStyle style, boolean translucent) {
 
-        Vector3d startRelative = new Vector3d(startPos.x - cameraPos.x, startPos.y - cameraPos.y, startPos.z - cameraPos.z);
-        Vector3d endRelative = new Vector3d(endPos.x - cameraPos.x, endPos.y - cameraPos.y, endPos.z - cameraPos.z);
+        Vector3f startRelative = new Vector3f(startPos.x - cameraPos.x, startPos.y - cameraPos.y, startPos.z - cameraPos.z);
+        Vector3f endRelative = new Vector3f(endPos.x - cameraPos.x, endPos.y - cameraPos.y, endPos.z - cameraPos.z);
 
         Minecraft mc = Minecraft.getInstance();
         int renderChunks = mc.options.renderDistance().get();
@@ -252,8 +273,9 @@ public class RopeRendererClient {
             renderType = RopeRendererType.ropeRendererChainStyle(style.getTexture());
             renderChainRope(poseStack, bufferSource.getBuffer(renderType), curvePoints, lightValues, currentDistance, style);
         } else {
-            renderType = RopeRendererType.ropeRenderer(style.getTexture());
-            renderNormalRope(poseStack, bufferSource.getBuffer(renderType), curvePoints, lightValues, currentDistance, startRelative, endRelative);        }
+            renderType = translucent ? RopeRendererType.ropeRendererWithTransparency(style.getTexture()) : RopeRendererType.ropeRenderer(style.getTexture());
+            renderNormalRope(poseStack, bufferSource.getBuffer(renderType), curvePoints, lightValues, currentDistance, startRelative, endRelative);
+        }
 
         poseStack.popPose();
     }
@@ -269,7 +291,7 @@ public class RopeRendererClient {
 
     private static void renderNormalRope(PoseStack poseStack, VertexConsumer vertexConsumer,
                                          Vector3d[] curvePoints, int[] lightValues,
-                                         double linearDistance, Vector3d start, Vector3d end) {
+                                         double linearDistance, Vector3f start, Vector3f end) {
         Matrix4f matrix = poseStack.last().pose();
 
         Vector3d direction = new Vector3d(end).sub(start);
@@ -479,7 +501,7 @@ public class RopeRendererClient {
                 .endVertex();
     }
 
-    private static Vector3d calculateCatenaryPosition(Vector3d start, Vector3d end, float t,
+    private static Vector3d calculateCatenaryPosition(Vector3f start, Vector3f end, float t,
                                                       double sagAmount, float windOffset, float gameTime) {
         double x = start.x + (end.x - start.x) * t;
         double y = start.y + (end.y - start.y) * t;

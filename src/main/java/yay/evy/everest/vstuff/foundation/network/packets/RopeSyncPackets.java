@@ -4,7 +4,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 import org.joml.Vector3f;
 import yay.evy.everest.vstuff.client.ClientRopeManager;
-import yay.evy.everest.vstuff.util.RopeStyles;
+import yay.evy.everest.vstuff.foundation.RopeStyles;
 
 import java.util.function.Supplier;
 
@@ -55,7 +55,7 @@ public class RopeSyncPackets {
 
         public static void handle(Add msg, Supplier<NetworkEvent.Context> contextSupplier) {
             NetworkEvent.Context ctx = contextSupplier.get();
-            ctx.enqueueWork(() -> ClientRopeManager.addClientConstraint(msg.ropeId, msg.ship0, msg.ship1, msg.localPos0, msg.localPos1, msg.length, msg.style));
+            ctx.enqueueWork(() -> ClientRopeManager.addClientRope(msg.ropeId, msg.ship0, msg.ship1, msg.localPos0, msg.localPos1, msg.length, msg.style));
             ctx.setPacketHandled(true);
         }
     }
@@ -77,7 +77,7 @@ public class RopeSyncPackets {
 
         public static void handle(Remove msg, Supplier<NetworkEvent.Context> contextSupplier) {
             NetworkEvent.Context ctx = contextSupplier.get();
-            ctx.enqueueWork(() -> ClientRopeManager.removeClientConstraint(msg.ropeId));
+            ctx.enqueueWork(() -> ClientRopeManager.removeClientRope(msg.ropeId));
             ctx.setPacketHandled(true);
         }
 

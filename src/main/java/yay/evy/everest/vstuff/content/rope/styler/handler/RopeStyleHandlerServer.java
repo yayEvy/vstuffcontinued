@@ -1,6 +1,6 @@
 package yay.evy.everest.vstuff.content.rope.styler.handler;
 
-import yay.evy.everest.vstuff.util.RopeStyles;
+import yay.evy.everest.vstuff.foundation.RopeStyles;
 
 import java.util.HashMap;
 import java.util.UUID;

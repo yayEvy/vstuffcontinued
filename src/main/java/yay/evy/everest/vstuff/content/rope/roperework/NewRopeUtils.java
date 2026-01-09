@@ -8,7 +8,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -22,13 +21,13 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
-import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.VStuffConfig;
-import yay.evy.everest.vstuff.content.rope.roperework.items.NewRopeItem;
-import yay.evy.everest.vstuff.foundation.lang.VStuffLang;
+import yay.evy.everest.vstuff.client.ClientRopeManager;
+import yay.evy.everest.vstuff.client.ClientRopeUtil;
+import yay.evy.everest.vstuff.foundation.RopeStyles;
 import yay.evy.everest.vstuff.foundation.utility.BodyUtils;
 import yay.evy.everest.vstuff.foundation.utility.PosUtils;
 import yay.evy.everest.vstuff.index.VStuffItems;
@@ -40,19 +39,6 @@ import java.util.Map;
 import static yay.evy.everest.vstuff.foundation.utility.PosUtils.getBlockType;
 
 public class NewRopeUtils {
-
-    public static Vector3f getRopeConnectionPos(ServerLevel level, BlockPos pos) {
-        Vector3f blockPos;
-        try {
-            VoxelShape shape = level.getBlockState(pos).getShape(level, pos);
-            Vector3f vec = shape.bounds().getCenter().add(pos.getCenter()).toVector3f();
-            blockPos = new Vector3f(vec.x - 0.5f, vec.y - 0.5f, vec.z - 0.5f);
-        } catch (UnsupportedOperationException ex) {
-            blockPos = new Vector3f(pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f);
-        }
-
-        return blockPos;
-    }
 
     public static Vector3f getRopeConnectionPos(Level level, BlockPos pos) {
         Vector3f blockPos;
@@ -67,23 +53,11 @@ public class NewRopeUtils {
         return blockPos;
     }
 
-    public static Vector3f convertLocalToWorld(ServerLevel level, Vector3f localPos, Long shipId) {
+    public static Vector3f convertLocalToWorld(Level level, Vector3f localPos, Long shipId) {
         if (shipId != null) {
             Ship shipObject = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
             if (shipObject != null) {
                 Vector3d transformedPos = shipObject.getTransform().getShipToWorld().transformPosition(new Vector3d(localPos), new Vector3d());
-                return new Vector3f((float) transformedPos.x, (float) transformedPos.y, (float) transformedPos.z);
-            }
-        }
-        return localPos;
-    }
-
-    public static Vector3f getRopeConnectionPosWorld(ServerLevel level, BlockPos pos, Long shipId) {
-        Vector3f localPos = getRopeConnectionPos(level, pos);
-        if (shipId != null) {
-            LoadedShip loadedShip = PosUtils.getLoadedShipAtPos(level, pos);
-            if (loadedShip != null) {
-                Vector3d transformedPos = loadedShip.getTransform().getShipToWorld().transformPosition(new Vector3d(localPos), new Vector3d());
                 return new Vector3f((float) transformedPos.x, (float) transformedPos.y, (float) transformedPos.z);
             }
         }
@@ -167,6 +141,11 @@ public class NewRopeUtils {
         WW,
         WS,
         SS
+    }
+
+    public enum SelectType {
+        NORMAL,
+        PULLEY
     }
 
     public static RopeType getRopeType(RopePosData posData0, RopePosData posData1) {
@@ -262,6 +241,7 @@ public class NewRopeUtils {
     static ItemStack lastItem;
 
     static int extraTipWarmup;
+    static boolean wasRendering = false;
 
 
     public static class RopeInfo {
@@ -269,16 +249,20 @@ public class NewRopeUtils {
         boolean valid = false;
         boolean pulley = false;
         public String message = null;
+        Vector3f localPos0;
+        Vector3f localPos1;
         Vector3f worldPos0;
         Vector3f worldPos1;
         Long ship0;
         Long ship1;
+        float length;
+        RopeStyles.RopeStyle style;
 
-        public static RopeInfo tryConnect(Level level, Player player, BlockPos pos, Long ship, BlockState hitState, ItemStack stack, boolean taut) {
+        public static RopeInfo tryConnect(Level level, Player player, BlockPos pos, Long ship, String dimId, BlockState hitState, ItemStack stack, boolean taut) {
             float maxLength = VStuffConfig.MAX_ROPE_LENGTH.get();
 
             if (level.isClientSide() && cached != null && pos.equals(hoveringPos) && stack.equals(lastItem) && hoveringTaut == taut) {
-                return cached;
+                return cached; // has not changed
             }
 
             RopeInfo info = new RopeInfo();
@@ -292,16 +276,22 @@ public class NewRopeUtils {
 
             BlockPos blockPos0 = NbtUtils.readBlockPos(tag.getCompound("pos"));
             Long ship0 = tag.getLong("shipId");
+            String dimId0 = tag.getString("dim");
 
             if (level.isClientSide) {
-                info.worldPos0 = NewRopeUtils.getRopeConnectionPosWorld(level, blockPos0, ship0);
+                info.localPos0 = NewRopeUtils.getRopeConnectionPos(level, blockPos0);
+                info.worldPos0 = ClientRopeUtil.renderLocalToWorld(level, info.localPos0, ship0);
                 info.ship0 = ship0;
-                info.worldPos1 = NewRopeUtils.getRopeConnectionPosWorld(level, pos, ship);
+                info.localPos1 = NewRopeUtils.getRopeConnectionPos(level, blockPos0);
+                info.worldPos1 = ClientRopeUtil.renderLocalToWorld(level, info.localPos1, ship);
                 info.ship1 = ship;
             }
 
+            float length = info.worldPos0.distance(info.worldPos1);
+
+            if (!dimId0.equals(dimId)) return info.withMessage("interdimensional");
             if (info.worldPos0.equals(info.worldPos1)) return info.withMessage("second_point");
-            if (info.worldPos0.distance(info.worldPos1) > maxLength) return info.withMessage("too_long");
+            if (length > maxLength) return info.withMessage("too_long");
             if (PosUtils.isPhysPulley(hitState)) return info.withMessage("second_pulley");
             if (PosUtils.isPulleyAnchor(hitState) && PosUtils.isPhysPulley(level, pos)) {
                 info.pulley = true;
@@ -310,6 +300,7 @@ public class NewRopeUtils {
             }
 
             info.valid = true;
+            ClientRopeManager.setPreviewRope(info.ship0, info.ship1, info.localPos0, info.localPos1, info.length, info.style);
             return info;
         }
 
@@ -317,6 +308,7 @@ public class NewRopeUtils {
             this.message = "rope." + message;
             return this;
         }
+
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -327,34 +319,44 @@ public class NewRopeUtils {
         int restoreWarmup = extraTipWarmup;
         extraTipWarmup = 0;
 
-        if (hitResult == null)
+        if (hitResult == null && ClientRopeManager.hasPreviewRope()) {
+            ClientRopeManager.clearPreviewRope();
             return;
-        if (hitResult.getType() != HitResult.Type.BLOCK)
+        }
+        if (hitResult.getType() != HitResult.Type.BLOCK && ClientRopeManager.hasPreviewRope()) {
+            ClientRopeManager.clearPreviewRope();
             return;
+        }
+        if (!stack.getItem().equals(VStuffItems.ROPE_ITEM.get()) && ClientRopeManager.hasPreviewRope()) {
+            ClientRopeManager.clearPreviewRope();
+            return;
+        }
 
-        if (!stack.getItem().equals(VStuffItems.ROPE_ITEM.get())) return;
-
-        if (!stack.hasFoil()) return;
+        if (!stack.hasFoil() && ClientRopeManager.hasPreviewRope()) {
+            ClientRopeManager.clearPreviewRope();
+            return;
+        }
 
         Level level = player.level();
         BlockHitResult bhr = (BlockHitResult) hitResult;
         BlockPos pos = bhr.getBlockPos();
         BlockState hitState = level.getBlockState(pos);
         Long ship = PosUtils.getShipIdAtPos(level, pos);
+        String dimId = level.dimension().location().toString();
 
         extraTipWarmup = restoreWarmup;
         boolean taut = Minecraft.getInstance().options.keySprint.isDown();
-        RopeInfo info = RopeInfo.tryConnect(level, player, pos, ship, hitState, stack, taut);
+        RopeInfo info = RopeInfo.tryConnect(level, player, pos, ship, dimId, hitState, stack, taut);
         if (extraTipWarmup < 20)
             extraTipWarmup++;
         if (!info.valid || !hoveringTaut)
             extraTipWarmup = 0;
 
         if (info.valid)
-            player.displayClientMessage(VStuffLang.translateDirect("rope.can_connect")
+            player.displayClientMessage(VStuff.translate("rope.can_connect")
                     .withStyle(ChatFormatting.GREEN), true);
         else if (info.message != null)
-            player.displayClientMessage(VStuffLang.translateDirect(info.message)
+            player.displayClientMessage(VStuff.translate(info.message)
                             .withStyle(info.message.equals("rope.second_point") ? ChatFormatting.WHITE : ChatFormatting.RED),
                     true);
     }

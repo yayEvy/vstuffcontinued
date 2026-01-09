@@ -2,7 +2,7 @@ package yay.evy.everest.vstuff.content.rope.styler.components;
 
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
-import yay.evy.everest.vstuff.util.RopeStyles;
+import yay.evy.everest.vstuff.foundation.RopeStyles;
 
 import java.util.ArrayList;
 import java.util.Arrays;

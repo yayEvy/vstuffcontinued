@@ -9,21 +9,20 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.client.NetworkHandler;
-import yay.evy.everest.vstuff.content.rope.ropes.RopePersistence;
-import yay.evy.everest.vstuff.content.rope.ropes.RopeTracker;
-import yay.evy.everest.vstuff.content.rope.ropes.Rope;
-import yay.evy.everest.vstuff.content.rope.ropes.RopeUtil;
-import yay.evy.everest.vstuff.util.RopeStyles;
+import yay.evy.everest.vstuff.content.rope.roperework.NewRope;
+import yay.evy.everest.vstuff.content.rope.roperework.NewRopeUtils;
+import yay.evy.everest.vstuff.content.rope.roperework.RopeManager;
+import yay.evy.everest.vstuff.content.rope.roperework.RopePersistence;
+import yay.evy.everest.vstuff.foundation.RopeStyles;
+import yay.evy.everest.vstuff.foundation.network.NetworkManager;
 
 
-@Mod.EventBusSubscriber(modid = VStuff.MOD_ID)
 public class ColorHaggler {
 
     @SubscribeEvent
-    public void onPlayerColorItem(PlayerInteractEvent.RightClickItem event) {
+    public static void onPlayerColorItem(PlayerInteractEvent.RightClickItem event) {
         try {
             ItemStack itemStack = event.getItemStack();
             Item item = event.getItemStack().getItem();
@@ -31,26 +30,25 @@ public class ColorHaggler {
             Player player = event.getEntity();
 
             if (level instanceof ServerLevel serverLevel) {
-                Integer targetConstraintId = RopeUtil.findTargetedLead(serverLevel, player);
+                Integer targetConstraintId = NewRopeUtils.getTargetedRope(serverLevel, player);
                 if (player instanceof ServerPlayer serverPlayer) {
                     if (itemStack.is(Tags.Items.DYES)) {
                         if (!event.getLevel().isClientSide) {
 
                             if (ropeIsColorable(serverLevel, player)) {
 
-                                Rope rope = RopeTracker.getActiveRopes().get(targetConstraintId);
-                                RopePersistence ropePersistence = RopePersistence.get(serverLevel);
+                                NewRope rope = RopeManager.getActiveRopes().get(targetConstraintId);
+                                RopePersistence ropePersistence = RopePersistence.getOrCreate(serverLevel);
 
                                 rope.style = getDyedStyle(item.toString(), getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(serverLevel, player));
 
-                                RopeTracker.replaceConstraint(rope.ID, rope);
+                                RopeManager.replaceRope(rope.ropeId, rope);
 
-                                NetworkHandler.sendConstraintRerender(targetConstraintId, rope.shipA, rope.shipB,
-                                        rope.localPosA, rope.localPosB, rope.maxLength, rope.style);
-                                ropePersistence.addConstraint(rope);
-                                RopeTracker.syncAllConstraintsToPlayer(serverPlayer);
+                                NetworkManager.sendRopeRerender(targetConstraintId, rope.posData0, rope.posData1, rope.jointValues.maxLength(), rope.style.getStyle());
+                                ropePersistence.addRope(rope);
+                                RopeManager.syncAllRopesToPlayer(serverPlayer);
 
-                                RopePersistence.get(serverLevel).saveNow(serverLevel);
+                                RopePersistence.getOrCreate(serverLevel).saveNow(serverLevel);
                             }
                         }
                     }
@@ -63,20 +61,20 @@ public class ColorHaggler {
         }
     }
 
-    private boolean ropeIsColorable(ServerLevel serverLevel, Player player){
+    private static boolean ropeIsColorable(ServerLevel serverLevel, Player player){
         return getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(serverLevel, player).toString().equals("DYE")
                 || getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(serverLevel, player).toString().equals("WOOL");
     }
 
-    private RopeStyles.PrimitiveRopeStyle getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(ServerLevel level, Player player) {
-        Integer targetConstraintId = RopeUtil.findTargetedLead(level, player);
+    private static RopeStyles.PrimitiveRopeStyle getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(ServerLevel level, Player player) {
+        Integer targetConstraintId = NewRopeUtils.getTargetedRope(level, player);
 
-        Rope wizardsWorstKeptSecret = RopeTracker.getActiveRopes().get(targetConstraintId);
+        NewRope wizardsWorstKeptSecret = RopeManager.getActiveRopes().get(targetConstraintId);
 
         return wizardsWorstKeptSecret.style.getBasicStyle();
     }
 
-    private RopeStyles.RopeStyle getDyedStyle(String dyeItem, RopeStyles.PrimitiveRopeStyle type) {
+    private static RopeStyles.RopeStyle getDyedStyle(String dyeItem, RopeStyles.PrimitiveRopeStyle type) {
         String color = dyeItem.split("_")[0]; // splits purple_dye into { purple, dye }, then we just get the first element, therefore only getting the desired color of the rope
         return RopeStyles.fromString(color + "_" + type.toString().toLowerCase());
     }
