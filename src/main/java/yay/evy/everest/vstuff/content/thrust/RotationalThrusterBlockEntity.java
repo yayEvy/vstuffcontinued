@@ -2,7 +2,10 @@ package yay.evy.everest.vstuff.content.thrust;
 
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.compat.computercraft.AbstractComputerBehaviour;
+import com.simibubi.create.content.kinetics.fan.AirCurrent;
+import com.simibubi.create.content.kinetics.fan.IAirCurrentSource;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import net.createmod.catnip.math.VecHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -12,11 +15,15 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 import org.joml.Math;
 import org.valkyrienskies.core.api.ships.ClientShip;
@@ -25,12 +32,18 @@ import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.particles.ParticleTypes;
 import yay.evy.everest.vstuff.particles.PlumeParticleData;
+import com.simibubi.create.content.kinetics.fan.AirFlowParticleData;
+import com.simibubi.create.content.kinetics.fan.AirFlowParticle;
 
 import java.util.List;
 
 import static com.simibubi.create.content.kinetics.motor.CreativeMotorBlockEntity.MAX_SPEED;
 @SuppressWarnings({"deprecation", "unchecked"})
-public class RotationalThrusterBlockEntity extends KineticBlockEntity {
+public class RotationalThrusterBlockEntity extends KineticBlockEntity
+implements IAirCurrentSource {
+
+    private AirCurrent airCurrent;
+
 
     public static final int BASE_MAX_THRUST = 100_000;
     // Constants
@@ -95,10 +108,10 @@ public class RotationalThrusterBlockEntity extends KineticBlockEntity {
         super.tick();
         BlockState currentBlockState = getBlockState();
         if (level.isClientSide) {
-            if (shouldEmitParticles()) {
-                emitParticles(level, worldPosition, currentBlockState);
-            }
+            spawnAirFlowParticles();
             return;
+
+
         }
         currentTick++;
         damager.tick(currentTick);
@@ -200,72 +213,32 @@ public class RotationalThrusterBlockEntity extends KineticBlockEntity {
         return Math.abs(getSpeed() / 256);
     }
 
-    public void emitParticles(Level level, BlockPos pos, BlockState state) {
-        if (emptyBlocks == 0) return;
 
-        if (!(level instanceof ClientLevel clientLevel)) {
+    protected void spawnAirFlowParticles() {
+        if (!(level instanceof ClientLevel clientLevel))
             return;
-        }
 
-        double particleCountMultiplier = org.joml.Math.clamp(
-                0.0, 2.0,
-                VstuffConfig.THRUSTER_PARTICLE_COUNT_MULTIPLIER.get() * getSpeedScalar()
+        if (!isWorking() || emptyBlocks == 0)
+            return;
+
+        Direction exhaust =
+                getBlockState().getValue(RotationalThrusterBlock.FACING).getOpposite();
+
+        Vec3 spawnPos = VecHelper.getCenterOf(worldPosition)
+                .add(Vec3.atLowerCornerOf(exhaust.getNormal()).scale(0.6));
+
+        clientLevel.addParticle(
+                new AirFlowParticleData(
+                        worldPosition.getX(),
+                        worldPosition.getY(),
+                        worldPosition.getZ()
+                ),
+                spawnPos.x, spawnPos.y, spawnPos.z,
+                0, 0, 0
         );
-        if (particleCountMultiplier <= 0) return;
-
-        clientTick++;
-        if (clientTick % 2 == 0) {
-            clientTick = 0;
-            return;
-        }
-
-        this.particleSpawnAccumulator += particleCountMultiplier;
-        int particlesToSpawn = (int) this.particleSpawnAccumulator;
-        if (particlesToSpawn == 0) return;
-        this.particleSpawnAccumulator -= particlesToSpawn;
-
-        Direction direction = state.getValue(RotationalThrusterBlock.FACING);
-        Direction oppositeDirection = direction.getOpposite();
-
-        double currentNozzleOffset = NOZZLE_OFFSET_FROM_CENTER;
-        Vector3d additionalVel = new Vector3d();
-
-        ClientShip ship = VSGameUtilsKt.getShipObjectManagingPos(clientLevel, pos);
-        if (ship != null) {
-            Vector3dc shipWorldVelocityJOML = ship.getVelocity();
-            Matrix4dc transform = ship.getRenderTransform().getShipToWorld();
-            Matrix4dc invTransform = ship.getRenderTransform().getWorldToShip();
-
-            Vector3d shipVelocity = invTransform.transformDirection(new Vector3d(shipWorldVelocityJOML));
-            Vector3d particleEjectionUnitVecJOML = transform.transformDirection(VectorConversionsMCKt.toJOMLD(oppositeDirection.getNormal()));
-
-            double shipVelComponentAlongRotatedEjection = shipWorldVelocityJOML.dot(particleEjectionUnitVecJOML);
-            if (shipVelComponentAlongRotatedEjection > 0.0) {
-                Vector3d normalizedVelocity = new Vector3d();
-                shipWorldVelocityJOML.normalize(normalizedVelocity);
-                double shipVelComponentAlongRotatedEjectionNormalized = normalizedVelocity.dot(particleEjectionUnitVecJOML);
-
-                double effect = org.joml.Math.clamp(0.0, 1.0, shipVelComponentAlongRotatedEjectionNormalized);
-                double additionalOffset = shipVelComponentAlongRotatedEjection * VstuffConfig.THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER.get();
-                currentNozzleOffset += additionalOffset * effect;
-                additionalVel = new Vector3d(shipVelocity).mul(SHIP_VELOCITY_INHERITANCE * effect);
-            }
-        }
-
-        double particleX = pos.getX() + 0.5 + oppositeDirection.getStepX() * currentNozzleOffset;
-        double particleY = pos.getY() + 0.5 + oppositeDirection.getStepY() * currentNozzleOffset;
-        double particleZ = pos.getZ() + 0.5 + oppositeDirection.getStepZ() * currentNozzleOffset;
-
-        Vector3d particleVelocity = new Vector3d(oppositeDirection.getStepX(), oppositeDirection.getStepY(), oppositeDirection.getStepZ())
-                .mul(PARTICLE_VELOCITY * getSpeedScalar())
-                .add(additionalVel);
-
-        for (int i = 0; i < particlesToSpawn; i++) {
-            clientLevel.addParticle(new PlumeParticleData(particleType), true,
-                    particleX, particleY, particleZ,
-                    particleVelocity.x, particleVelocity.y, particleVelocity.z);
-        }
     }
+
+
 
     public void calculateObstruction(Level level, BlockPos pos, Direction forwardDirection){
         //Starting from the block behind and iterate OBSTRUCTION_LENGTH blocks in that direction
@@ -369,5 +342,63 @@ public class RotationalThrusterBlockEntity extends KineticBlockEntity {
         setChanged();
     }
 
+    @Override
+    public boolean isSourceRemoved() {
+        return isRemoved() || !isWorking();
+    }
+
+    @Override
+    public BlockPos getAirCurrentPos() {
+        return worldPosition;
+    }
+
+    @Override
+    public Direction getAirflowOriginSide() {
+        return null;
+    }
+
+    @Override
+    public AirCurrent getAirCurrent() {
+        if (airCurrent == null)
+            airCurrent = new AirCurrent(this);
+
+        Direction exhaust = getAirFlowDirection();
+
+        airCurrent.direction = exhaust;
+        airCurrent.pushing = true;
+
+        float rpm = Math.abs(getSpeed());
+        float strength = Mth.clamp(rpm / 24f, 0f, 6f);
+
+        airCurrent.maxDistance =
+                (float) (1.5 + strength * 0.9) * calculateObstructionEffect();
+
+        Vec3 start = VecHelper.getCenterOf(worldPosition);
+        Vec3 dir = Vec3.atLowerCornerOf(exhaust.getNormal());
+
+        airCurrent.bounds = new AABB(
+                start,
+                start.add(dir.scale(airCurrent.maxDistance + 1))
+        ).inflate(0.5);
+
+        return airCurrent;
+    }
+
+    @Override
+    public @Nullable Level getAirCurrentWorld() {
+        return null;
+    }
+
+
+    private void invalidateAirCurrent() {
+        if (airCurrent != null)
+            airCurrent.rebuild();
+    }
+    @Override
+    public Direction getAirFlowDirection() {
+        return getBlockState()
+                .getValue(RotationalThrusterBlock.FACING)
+                .getOpposite();
+    }
 
 }

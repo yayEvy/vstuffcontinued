@@ -43,11 +43,13 @@ public class Rope {
     public net.minecraft.core.BlockPos sourceBlockPos;
     public RopeType type;
     public RopeStyles.RopeStyle style;
-    boolean hasPhysicalImpact = true;
+    public boolean hasPhysicalImpact = true;
     public boolean hasRestoredJoint = false;
     private Integer physicsId = null;
 
     public double renderLength;
+    private Double targetLength = null;
+    private static final float LENGTH_SMOOTHING = 0.1f; // fraction of difference applied per tick
 
 
     @Nullable VSDistanceJoint constraint;
@@ -577,6 +579,86 @@ public class Rope {
     public void ensureJointExists(ServerLevel level) {
         if (!hasRestoredJoint) restoreJoint(level);
     }
+
+    public void setStyle(String styleId) {
+        RopeStyles.RopeStyle newStyle = RopeStyles.fromString(styleId);
+        if (newStyle != null) {
+            this.style = newStyle;
+        }
+    }
+
+    public void updateFromEditor(ServerLevel level, float newLength, String styleId) {
+        if (hasPhysicalImpact) {
+            setJointLengthFromMenu(level, newLength);
+        } else {
+            this.renderLength = newLength;
+        }
+
+        this.setStyle(styleId);
+
+        sync(level);
+    }
+
+    private void sync(ServerLevel level) {
+        MinecraftServer server = level.getServer();
+        if (server != null) {
+            for (ServerPlayer sp : server.getPlayerList().getPlayers()) {
+                RopeTracker.syncAllConstraintsToPlayer(sp);
+            }
+        }
+    }
+
+
+    public boolean setJointLengthFromMenu(ServerLevel level, float newLength) {
+        if (!hasPhysicalImpact || physicsId == null || constraint == null) return false;
+
+        if (newLength < 1.0f) {
+            newLength = 1.0f;
+        }
+
+        try {
+            Long actualShipA = shipAIsGround ? null : shipA;
+            Long actualShipB = shipBIsGround ? null : shipB;
+
+            VSDistanceJoint newConstraint = new VSDistanceJoint(
+                    actualShipA,
+                    constraint.getPose0(),
+                    actualShipB,
+                    constraint.getPose1(),
+                    constraint.getMaxForceTorque(),
+                    constraint.getCompliance(),
+                    1.0f,
+                    newLength,
+                    constraint.getTolerance(),
+                    1e8f,
+                    null
+            );
+
+            String dimensionId = ValkyrienSkies.getDimensionId(level);
+            var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(dimensionId);
+
+            gtpa.updateJoint(new VSJointAndId(this.physicsId, newConstraint));
+
+            this.constraint = newConstraint;
+            this.maxLength = newLength;
+            this.renderLength = newLength;
+
+            MinecraftServer server = level.getServer();
+            if (server != null) {
+                for (ServerPlayer sp : server.getPlayerList().getPlayers()) {
+                    RopeTracker.syncAllConstraintsToPlayer(sp);
+                }
+            }
+
+
+            return true;
+
+        } catch (Exception e) {
+            VStuff.LOGGER.error("Failed to update VS Joint {}: {}", physicsId, e.getMessage());
+            return false;
+        }
+    }
+
 
 
 }

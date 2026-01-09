@@ -5,6 +5,7 @@ import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import net.minecraft.world.item.Rarity;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.content.ropes.CreativeRopeEditorItem;
 import yay.evy.everest.vstuff.content.ropes.RopeCutterItem;
 import yay.evy.everest.vstuff.content.ropes.RopeItem;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberItem;
@@ -43,6 +44,15 @@ public class VStuffItems {
                             .durability(238))
                     .defaultModel()
                     .register();
+
+    public static final ItemEntry<CreativeRopeEditorItem> CREATVE_ROPE_EDITOR_ITEM =
+            REGISTRATE.item("creative_rope_editor_item", CreativeRopeEditorItem::new)
+                    .properties(p -> p
+                            .stacksTo(1)
+                            .durability(238))
+                    .defaultModel()
+                    .register();
+
 
 
 

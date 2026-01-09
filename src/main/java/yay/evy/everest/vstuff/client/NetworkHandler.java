@@ -7,11 +7,8 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import org.joml.Vector3d;
-import yay.evy.everest.vstuff.util.packet.RopeSyncPacket;
-import yay.evy.everest.vstuff.util.packet.OutlinePacket;
-import yay.evy.everest.vstuff.util.packet.RopeSoundPacket;
+import yay.evy.everest.vstuff.util.packet.*;
 import yay.evy.everest.vstuff.util.RopeStyles;
-import yay.evy.everest.vstuff.util.packet.RopeStyleSelectPacket;
 
 public class NetworkHandler {
 
@@ -49,7 +46,14 @@ public class NetworkHandler {
                 .encoder(OutlinePacket::encode)
                 .consumerMainThread(OutlinePacket::handle)
                 .add();
+
+        INSTANCE.messageBuilder(RopeUpdatePacket.class, packetId++)
+                .decoder(RopeUpdatePacket::decode)
+                .encoder(RopeUpdatePacket::encode)
+                .consumerMainThread(RopeUpdatePacket::handle)
+                .add();
     }
+
 
 
 

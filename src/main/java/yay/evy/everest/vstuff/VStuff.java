@@ -18,6 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -33,8 +34,7 @@ import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.client.VStuffClient;
-import yay.evy.everest.vstuff.content.ropes.RopePersistence;
-import yay.evy.everest.vstuff.content.ropes.RopeUtil;
+import yay.evy.everest.vstuff.content.ropes.*;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberServerAttachment;
 import yay.evy.everest.vstuff.content.ropethrower.RopeThrowerEntity;
 import yay.evy.everest.vstuff.content.thrust.ThrusterForceAttachment;
@@ -44,12 +44,14 @@ import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.network.PhysGrabberNetwork;
 import yay.evy.everest.vstuff.particles.ParticleTypes;
 import org.valkyrienskies.core.api.VsBeta;
+import org.valkyrienskies.mod.api.BlockEntityPhysicsListener;
 
 @Mod(VStuff.MOD_ID)
 public class VStuff {
     public static final String MOD_ID = "vstuff";
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String NAME = "VStuff";
+
 
     public static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MOD_ID);
 
@@ -72,6 +74,10 @@ public class VStuff {
         VStuffEntities.register(modEventBus);
         VStuffBlockEntities.register();
         VStuffRopeStyles.register();
+        VStuffPackets.register();
+        VStuffMenus.register();
+        modEventBus.addListener(VStuffClient::clientSetup);
+
 
 
         MinecraftForge.EVENT_BUS.register(this);
@@ -81,7 +87,6 @@ public class VStuff {
 
         modEventBus.addListener(this::commonSetup);
 
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> VStuffClient::initialize);
 
         ValkyrienSkiesMod.getApi().getShipLoadEvent().on(RopePersistence::onShipLoad);
 
