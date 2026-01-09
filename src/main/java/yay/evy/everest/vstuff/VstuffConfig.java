@@ -30,10 +30,10 @@ public class VstuffConfig {
         ForgeConfigSpec.Builder serverBuilder = new ForgeConfigSpec.Builder();
 
         serverBuilder.push("thruster");
-        THRUSTER_THRUST_MULTIPLIER = serverBuilder.define("thrustMultiplier", 0.5);
-        THRUSTER_MAX_SPEED = serverBuilder.define("maxSpeed", 20);
+        THRUSTER_THRUST_MULTIPLIER = serverBuilder.define("thrustMultiplier", 0.1);
+        THRUSTER_MAX_SPEED = serverBuilder.define("maxSpeed", 5);
         THRUSTER_TICKS_PER_UPDATE = serverBuilder.define("ticksPerUpdate", 1);
-        THRUSTER_DAMAGE_ENTITIES = serverBuilder.define("damageEntities", true);
+        THRUSTER_DAMAGE_ENTITIES = serverBuilder.define("damageEntities", false);
         THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER = serverBuilder.define("particleOffsetIncomingVelModifier", 1.0);
         THRUSTER_PARTICLE_COUNT_MULTIPLIER = serverBuilder.define("particleCountMultiplier", 1.0);
         serverBuilder.pop();
