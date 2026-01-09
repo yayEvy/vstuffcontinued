@@ -31,7 +31,7 @@ public class VstuffConfig {
 
         serverBuilder.push("thruster");
         THRUSTER_THRUST_MULTIPLIER = serverBuilder.define("thrustMultiplier", 0.1);
-        THRUSTER_MAX_SPEED = serverBuilder.define("maxSpeed", 5);
+        THRUSTER_MAX_SPEED = serverBuilder.define("maxSpeed", 3);
         THRUSTER_TICKS_PER_UPDATE = serverBuilder.define("ticksPerUpdate", 1);
         THRUSTER_DAMAGE_ENTITIES = serverBuilder.define("damageEntities", false);
         THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER = serverBuilder.define("particleOffsetIncomingVelModifier", 1.0);

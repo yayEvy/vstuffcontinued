@@ -215,17 +215,23 @@ implements IAirCurrentSource {
 
 
     protected void spawnAirFlowParticles() {
-        if (!(level instanceof ClientLevel clientLevel))
-            return;
+        if (!(level instanceof ClientLevel clientLevel)) return;
+        if (!isWorking() || emptyBlocks == 0) return;
 
-        if (!isWorking() || emptyBlocks == 0)
-            return;
+        Direction exhaust = getBlockState().getValue(RotationalThrusterBlock.FACING).getOpposite();
 
-        Direction exhaust =
-                getBlockState().getValue(RotationalThrusterBlock.FACING).getOpposite();
-
-        Vec3 spawnPos = VecHelper.getCenterOf(worldPosition)
+        Vec3 localPos = VecHelper.getCenterOf(worldPosition)
                 .add(Vec3.atLowerCornerOf(exhaust.getNormal()).scale(0.6));
+
+        Vec3 finalPos;
+        var ship = VSGameUtilsKt.getShipObjectManagingPos(level, worldPosition);
+        if (ship != null) {
+            finalPos = VectorConversionsMCKt.toMinecraft(
+                    ship.getShipToWorld().transformPosition(VectorConversionsMCKt.toJOML(localPos))
+            );
+        } else {
+            finalPos = localPos;
+        }
 
         clientLevel.addParticle(
                 new AirFlowParticleData(
@@ -233,7 +239,7 @@ implements IAirCurrentSource {
                         worldPosition.getY(),
                         worldPosition.getZ()
                 ),
-                spawnPos.x, spawnPos.y, spawnPos.z,
+                finalPos.x, finalPos.y, finalPos.z,
                 0, 0, 0
         );
     }
@@ -386,7 +392,7 @@ implements IAirCurrentSource {
 
     @Override
     public @Nullable Level getAirCurrentWorld() {
-        return null;
+        return level;
     }
 
 
