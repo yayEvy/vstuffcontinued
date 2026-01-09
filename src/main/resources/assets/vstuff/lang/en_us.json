@@ -16,7 +16,7 @@
   "vstuff.pulley_anchor.tooltip.summary": "Acts as an anchor point for pulley rope connections",
 
   "block.vstuff.phys_pulley": "Phys Pulley",
-  "block.vstuff.rotational_thruster": "Rotational Thruster",
+  "block.vstuff.mechanical_thruster": "Mechanical Thruster",
 
   "creativetabs.main": "VStuff",
 

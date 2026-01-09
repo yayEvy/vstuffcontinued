@@ -14,20 +14,20 @@ import org.joml.Vector3f;
 
 import java.util.function.Consumer;
 
-public class RotationalThrusterVisual
-        extends KineticBlockEntityVisual<RotationalThrusterBlockEntity> {
+public class MechanicalThrusterVisual
+        extends KineticBlockEntityVisual<MechanicalThrusterBlockEntity> {
 
     private final RotatingInstance fan;
     private final Direction facing;
 
-    public RotationalThrusterVisual(
+    public MechanicalThrusterVisual(
             VisualizationContext context,
-            RotationalThrusterBlockEntity be,
+            MechanicalThrusterBlockEntity be,
             float partialTick
     ) {
         super(context, be, partialTick);
 
-        facing = blockState.getValue(RotationalThrusterBlock.FACING);
+        facing = blockState.getValue(MechanicalThrusterBlock.FACING);
 
         fan = instancerProvider()
                 .instancer(AllInstanceTypes.ROTATING,

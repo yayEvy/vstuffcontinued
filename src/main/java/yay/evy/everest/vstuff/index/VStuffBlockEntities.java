@@ -8,16 +8,16 @@ import com.simibubi.create.content.kinetics.base.ShaftRenderer;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.content.pulley.PulleyAnchorBlockEntity;
-import yay.evy.everest.vstuff.content.thrust.RotationalThrusterBlockEntity;
+import yay.evy.everest.vstuff.content.thrust.MechanicalThrusterBlockEntity;
 
 public class VStuffBlockEntities {
 
     static CreateRegistrate REGISTRATE = VStuff.registrate();
 
-    public static final BlockEntityEntry<RotationalThrusterBlockEntity> ROTATIONAL_THRUSTER_BE =
-            REGISTRATE.blockEntity("rotational_thruster", RotationalThrusterBlockEntity::new)
+    public static final BlockEntityEntry<MechanicalThrusterBlockEntity> MECHANICAL_THRUSTER_BE =
+            REGISTRATE.blockEntity("mechanical_thruster", MechanicalThrusterBlockEntity::new)
                     .visual(() -> SingleAxisRotatingVisual::shaft, false)
-                    .validBlocks(VStuffBlocks.ROTATIONAL_THRUSTER)
+                    .validBlocks(VStuffBlocks.MECHANICAL_THRUSTER)
                     .renderer(() -> ShaftRenderer::new)
                     .register();
 

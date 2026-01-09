@@ -3,8 +3,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [64, 64],
 	"textures": {
-		"0": "vstuff:block/rotational_thruster/rotational_thruster",
-		"particle": "vstuff:block/rotational_thruster/rotational_thruster"
+		"0": "vstuff:block/mechanical_thruster/mechanical_thruster",
+		"particle": "vstuff:block/mechanical_thruster/mechanical_thruster"
 	},
 	"elements": [
 		{

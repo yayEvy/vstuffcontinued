@@ -24,22 +24,19 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import org.joml.*;
 import org.joml.Math;
-import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.particles.ParticleTypes;
 import yay.evy.everest.vstuff.particles.PlumeParticleData;
 import com.simibubi.create.content.kinetics.fan.AirFlowParticleData;
-import com.simibubi.create.content.kinetics.fan.AirFlowParticle;
 
 import java.util.List;
 
 import static com.simibubi.create.content.kinetics.motor.CreativeMotorBlockEntity.MAX_SPEED;
 @SuppressWarnings({"deprecation", "unchecked"})
-public class RotationalThrusterBlockEntity extends KineticBlockEntity
+public class MechanicalThrusterBlockEntity extends KineticBlockEntity
 implements IAirCurrentSource {
 
     private AirCurrent airCurrent;
@@ -71,7 +68,7 @@ implements IAirCurrentSource {
     public boolean overridePower = false;
     public int overridenPower;
 
-    public RotationalThrusterBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
+    public MechanicalThrusterBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
         thrusterData = new ThrusterData();
         particleType = (ParticleType<PlumeParticleData>) ParticleTypes.getPlumeType();
@@ -89,7 +86,7 @@ implements IAirCurrentSource {
     public void initialize() {
         super.initialize();
         if (!level.isClientSide) {
-            calculateObstruction(level, worldPosition, getBlockState().getValue(RotationalThrusterBlock.FACING));
+            calculateObstruction(level, worldPosition, getBlockState().getValue(MechanicalThrusterBlock.FACING));
         }
     }
 
@@ -119,7 +116,7 @@ implements IAirCurrentSource {
 
         if (currentTick % (tick_rate * 2) == 0) {
             int previousEmptyBlocks = emptyBlocks;
-            calculateObstruction(level, worldPosition, currentBlockState.getValue(RotationalThrusterBlock.FACING));
+            calculateObstruction(level, worldPosition, currentBlockState.getValue(MechanicalThrusterBlock.FACING));
             if (previousEmptyBlocks != emptyBlocks) {
                 isThrustDirty = true;
                 setChanged();
@@ -218,7 +215,7 @@ implements IAirCurrentSource {
         if (!(level instanceof ClientLevel clientLevel)) return;
         if (!isWorking() || emptyBlocks == 0) return;
 
-        Direction exhaust = getBlockState().getValue(RotationalThrusterBlock.FACING).getOpposite();
+        Direction exhaust = getBlockState().getValue(MechanicalThrusterBlock.FACING).getOpposite();
 
         Vec3 localPos = VecHelper.getCenterOf(worldPosition)
                 .add(Vec3.atLowerCornerOf(exhaust.getNormal()).scale(0.6));
@@ -265,7 +262,7 @@ implements IAirCurrentSource {
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);
 
         boolean wasThrustDirty = isThrustDirty;
-        calculateObstruction(getLevel(), worldPosition, getBlockState().getValue(RotationalThrusterBlock.FACING));
+        calculateObstruction(getLevel(), worldPosition, getBlockState().getValue(MechanicalThrusterBlock.FACING));
         isThrustDirty = wasThrustDirty;
 
         tooltip.add(Component.translatable("create.gui.goggles.thruster.status")
@@ -331,7 +328,7 @@ implements IAirCurrentSource {
                 if (attachment != null) {
                     ThrusterData data = getThrusterData();
                     data.setDirection(VectorConversionsMCKt.toJOMLD(
-                            getBlockState().getValue(RotationalThrusterBlock.FACING).getNormal()
+                            getBlockState().getValue(MechanicalThrusterBlock.FACING).getNormal()
                     ));
 
                     ThrusterForceApplier applier = new ThrusterForceApplier(data);
@@ -342,7 +339,7 @@ implements IAirCurrentSource {
     }
 
     private void recalcThruster() {
-        calculateObstruction(level, worldPosition, getBlockState().getValue(RotationalThrusterBlock.FACING));
+        calculateObstruction(level, worldPosition, getBlockState().getValue(MechanicalThrusterBlock.FACING));
         isThrustDirty = true;
         updateThrust(getBlockState());
         setChanged();
@@ -403,7 +400,7 @@ implements IAirCurrentSource {
     @Override
     public Direction getAirFlowDirection() {
         return getBlockState()
-                .getValue(RotationalThrusterBlock.FACING)
+                .getValue(MechanicalThrusterBlock.FACING)
                 .getOpposite();
     }
 

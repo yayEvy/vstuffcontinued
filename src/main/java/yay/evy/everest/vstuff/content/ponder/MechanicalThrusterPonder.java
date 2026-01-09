@@ -6,13 +6,10 @@ import net.createmod.ponder.api.scene.SceneBuildingUtil;
 import net.createmod.ponder.api.scene.Selection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.network.chat.Component;
 
-public class RotationalThrusterPonder {
+public class MechanicalThrusterPonder {
 
-    public static void rotationalThruster(SceneBuilder scene, SceneBuildingUtil util) {
+    public static void mechanicalThruster(SceneBuilder scene, SceneBuildingUtil util) {
         scene.title("rotational_thruster", "Using the Rotational Thruster");
         scene.configureBasePlate(0, 0, 5);
         scene.scaleSceneView(0.7f);

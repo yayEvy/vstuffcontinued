@@ -12,7 +12,7 @@ import net.minecraft.world.level.material.MapColor;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlock;
 import yay.evy.everest.vstuff.content.pulley.PulleyAnchorBlock;
-import yay.evy.everest.vstuff.content.thrust.RotationalThrusterBlock;
+import yay.evy.everest.vstuff.content.thrust.MechanicalThrusterBlock;
 
 import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
 import static com.simibubi.create.foundation.data.TagGen.axeOrPickaxe;
@@ -26,8 +26,8 @@ public class VStuffBlocks  {
         REGISTRATE.setCreativeTab(VStuffCreativeModeTabs.VSTUFF_MAIN);
     }
 
-    public static final BlockEntry<RotationalThrusterBlock> ROTATIONAL_THRUSTER =
-            REGISTRATE.block("rotational_thruster", RotationalThrusterBlock::new)
+    public static final BlockEntry<MechanicalThrusterBlock> MECHANICAL_THRUSTER =
+            REGISTRATE.block("mechanical_thruster", MechanicalThrusterBlock::new)
                     .initialProperties(() -> Blocks.IRON_BLOCK)
                     .properties(p -> p.mapColor(MapColor.COLOR_YELLOW))
                     .transform(axeOrPickaxe())
@@ -35,7 +35,7 @@ public class VStuffBlocks  {
                     .transform(b -> b
                             .onRegister(block -> BlockStressValues.setGeneratorSpeed(32).accept(block)))
                     .item()
-                    .model(AssetLookup.itemModel("rotational_thruster.json"))
+                    .model(AssetLookup.itemModel("mechanical_thruster.json"))
                     .build()
                     .register();
 

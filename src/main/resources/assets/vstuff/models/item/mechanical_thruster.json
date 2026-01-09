@@ -4,12 +4,12 @@
 	"parent": "block/block",
 	"texture_size": [32, 32],
 	"textures": {
-		"0": "vstuff:block/rotational_thruster/rotational_thruster",
-		"1": "vstuff:block/rotational_thruster/rotational_thruster",
-		"2": "vstuff:block/rotational_thruster/rotational_thruster",
+		"0": "vstuff:block/mechanical_thruster/mechanical_thruster",
+		"1": "vstuff:block/mechanical_thruster/mechanical_thruster",
+		"2": "vstuff:block/mechanical_thruster/mechanical_thruster",
 		"3": "create:block/axis",
 		"4": "create:block/axis_top",
-		"particle": "vstuff:block/rotational_thruster/rotational_thruster"
+		"particle": "vstuff:block/mechanical_thruster/mechanical_thruster"
 	},
 	"elements": [
 		{
