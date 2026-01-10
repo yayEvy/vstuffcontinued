@@ -6,9 +6,12 @@ import com.simibubi.create.content.kinetics.base.SingleAxisRotatingVisual;
 import com.simibubi.create.content.kinetics.base.ShaftRenderer;
 
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.content.propeller.WoodenPropellerBlockEntity;
+import yay.evy.everest.vstuff.content.propeller.base.PropellerInstance;
+import yay.evy.everest.vstuff.content.propeller.base.PropellerRenderer;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.content.pulley.PulleyAnchorBlockEntity;
-import yay.evy.everest.vstuff.content.thrust.MechanicalThrusterBlockEntity;
+import yay.evy.everest.vstuff.content.mechanical_thruster.MechanicalThrusterBlockEntity;
 
 public class VStuffBlockEntities {
 
@@ -31,6 +34,13 @@ public class VStuffBlockEntities {
     public static final BlockEntityEntry<PulleyAnchorBlockEntity> PULLEY_ANCHOR_BE =
             REGISTRATE.blockEntity("pulley_anchor", PulleyAnchorBlockEntity::new)
                     .validBlocks(VStuffBlocks.PULLEY_ANCHOR)
+                    .register();
+
+    public static final BlockEntityEntry<WoodenPropellerBlockEntity> WOODEN_PROPELLER_BE =
+            REGISTRATE.blockEntity("wooden_propeller", WoodenPropellerBlockEntity::new)
+                    .visual(() -> PropellerInstance::new, true)
+                    .validBlocks(VStuffBlocks.WOODEN_PROPELLER)
+                    .renderer(() -> PropellerRenderer::new)
                     .register();
 
     public static void register() {}

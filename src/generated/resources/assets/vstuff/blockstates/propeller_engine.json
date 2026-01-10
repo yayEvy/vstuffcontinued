@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "vstuff:block/propeller/block", "y": 90
+    },
+    "axis=y": {
+      "model": "vstuff:block/propeller/block", "z": 90
+    },
+    "axis=z": {
+      "model": "vstuff:block/propeller/block"
+    }
+  }
+}

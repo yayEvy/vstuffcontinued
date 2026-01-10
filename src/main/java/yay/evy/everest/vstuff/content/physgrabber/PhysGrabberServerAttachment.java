@@ -8,7 +8,7 @@ import org.valkyrienskies.core.api.ships.*;
 import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 
-import yay.evy.everest.vstuff.content.thrust.AttachmentUtils;
+import yay.evy.everest.vstuff.content.mechanical_thruster.AttachmentUtils;
 
 public final class PhysGrabberServerAttachment implements ShipPhysicsListener {
 

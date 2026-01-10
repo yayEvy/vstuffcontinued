@@ -37,7 +37,11 @@ public class VStuffShapes {
         PULLEY_ANCHOR = shape(4,4,15,12,12,16)
                 .add(3,3,14,13,13,15)
                 .add(5,5,13,11,11,14)
-                .forDirectional();
+                .forDirectional(),
+
+    WOODEN_ENGINE = shape(6, 1, 6, 12, 15, 12)
+            .forDirectional();
+
 
 
     public static Builder shape(VoxelShape shape) {

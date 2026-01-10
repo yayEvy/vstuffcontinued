@@ -3,7 +3,7 @@ package yay.evy.everest.vstuff.client;
 import dev.engine_room.flywheel.api.visualization.VisualizerRegistry;
 import net.createmod.ponder.foundation.PonderIndex;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import yay.evy.everest.vstuff.content.thrust.MechanicalThrusterVisualizer;
+import yay.evy.everest.vstuff.content.mechanical_thruster.MechanicalThrusterVisualizer;
 import yay.evy.everest.vstuff.index.VStuffBlockEntities;
 import yay.evy.everest.vstuff.index.VStuffMenus;
 import yay.evy.everest.vstuff.index.VStuffPonders;

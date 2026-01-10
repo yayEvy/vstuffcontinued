@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.thrust;
+package yay.evy.everest.vstuff.content.mechanical_thruster;
 
 import dev.engine_room.flywheel.api.visualization.BlockEntityVisualizer;
 import dev.engine_room.flywheel.api.visualization.VisualizationContext;

@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.thrust;
+package yay.evy.everest.vstuff.content.mechanical_thruster;
 
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
@@ -97,4 +97,9 @@ public class ThrusterForceApplier {
         scaledForce_temp1.mul(mass / deltaTime, scaledForce_temp2);
         ship.applyInvariantForce(scaledForce_temp2);
     }
+
+    public void updateData(ThrusterData newData) {
+        this.data = newData;
+    }
+
 }

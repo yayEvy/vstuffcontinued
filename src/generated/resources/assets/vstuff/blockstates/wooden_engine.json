@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "vstuff:block/propeller/wooden_engine",
+      "y": 90
+    },
+    "axis=y": {
+      "model": "vstuff:block/propeller/wooden_engine",
+      "x": 90
+    },
+    "axis=z": {
+      "model": "vstuff:block/propeller/wooden_engine",
+      "y": 0
+    }
+  }
+}

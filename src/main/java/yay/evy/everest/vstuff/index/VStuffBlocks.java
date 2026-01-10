@@ -4,15 +4,17 @@ import com.simibubi.create.api.stress.BlockStressValues;
 import com.simibubi.create.foundation.data.AssetLookup;
 import com.simibubi.create.foundation.data.BlockStateGen;
 import com.simibubi.create.foundation.data.CreateRegistrate;
+import com.simibubi.create.foundation.data.SharedProperties;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import net.minecraft.world.level.material.MapColor;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.content.propeller.WoodenPropellerBlock;
 import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlock;
 import yay.evy.everest.vstuff.content.pulley.PulleyAnchorBlock;
-import yay.evy.everest.vstuff.content.thrust.MechanicalThrusterBlock;
+import yay.evy.everest.vstuff.content.mechanical_thruster.MechanicalThrusterBlock;
 
 import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
 import static com.simibubi.create.foundation.data.TagGen.axeOrPickaxe;
@@ -60,6 +62,16 @@ public class VStuffBlocks  {
                     .item()
                     .model(AssetLookup.itemModel("pulley_anchor.json"))
                     .build()
+                    .register();
+
+
+    public static final BlockEntry<WoodenPropellerBlock> WOODEN_PROPELLER =
+            REGISTRATE.block("wooden_propeller", WoodenPropellerBlock::new)
+                    .initialProperties(SharedProperties::wooden)
+                    .properties(p -> p.mapColor(MapColor.WOOD))
+                    .transform(axeOrPickaxe())
+                    .onRegister(BlockStressValues.setGeneratorSpeed(4))
+                    .simpleItem()
                     .register();
 
     public static void register() {}

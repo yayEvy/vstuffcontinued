@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.thrust;
+package yay.evy.everest.vstuff.content.mechanical_thruster;
 
 
 import com.simibubi.create.content.kinetics.base.DirectionalAxisKineticBlock;

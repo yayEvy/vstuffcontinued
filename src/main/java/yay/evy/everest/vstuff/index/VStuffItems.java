@@ -5,6 +5,7 @@ import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import net.minecraft.world.item.Rarity;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.content.propeller.WoodenDoubleBladeItem;
 import yay.evy.everest.vstuff.content.ropes.CreativeRopeEditorItem;
 import yay.evy.everest.vstuff.content.ropes.RopeCutterItem;
 import yay.evy.everest.vstuff.content.ropes.RopeItem;
@@ -80,6 +81,9 @@ public class VStuffItems {
                     .model(AssetLookup.itemModelWithPartials())
                     .register();
 
+
+    public static final ItemEntry<WoodenDoubleBladeItem> WOODEN_DOUBLE_BLADE_ITEM =
+            REGISTRATE.item("wooden_double_blade", WoodenDoubleBladeItem::new).register();
 
 
     public static void register() {}
