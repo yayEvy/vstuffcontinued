@@ -1,5 +1,6 @@
 package yay.evy.everest.vstuff.content.rope.roperework;
 
+import kotlin.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -49,7 +50,9 @@ public class NewRope {
         this.type = type;
     }
 
-    public static NewRope create(ServerLevel level, @Nullable Long ship0, @Nullable Long ship1, BlockPos blockPos0, BlockPos blockPos1, Player player) {
+    public static Pair<NewRope, String> create(ServerLevel level, @Nullable Long ship0, @Nullable Long ship1, BlockPos blockPos0, BlockPos blockPos1, Player player, boolean taut) {
+        ship0 = (BodyUtils.getGroundBodyId(level).equals(ship0)) ? null : ship0;
+        ship1 = (BodyUtils.getGroundBodyId(level).equals(ship1)) ? null : ship1;
         NewRopeUtils.RopePosData posData0tmp = NewRopeUtils.RopePosData.create(level, ship0, blockPos0);
         NewRopeUtils.RopePosData posData1tmp = NewRopeUtils.RopePosData.create(level, ship1, blockPos1);
         NewRopeUtils.RopePosData posData0;
@@ -66,11 +69,10 @@ public class NewRope {
         float length = posData0.getWorldPos().distance(posData1.getWorldPos());
         float maxAllowedLength = VStuffConfig.MAX_ROPE_LENGTH.get();
         if (length > maxAllowedLength) {
-            NewRopeUtils.sendRopeMessage(player, "length_fail");
-            return null;
+            return new Pair<>(null, "rope.too_long");
         }
 
-        length += 0.5f;
+        length = taut ? length : length + 0.5f;
         float mass0 = BodyUtils.getMassForShip(level, ship0);
         float mass1 = BodyUtils.getMassForShip(level, ship1);
         double effectiveMass = Math.max(Math.min(mass0, mass1), 100.0);
@@ -91,7 +93,7 @@ public class NewRope {
 
         GTPAUtils.addRopeJoint(level, player, rope);
 
-        return rope;
+        return new Pair<>(rope, "rope.created");
     }
 
     public void restoreJoint(ServerLevel level) {
@@ -119,6 +121,34 @@ public class NewRope {
         RopeManager.removeRope(level, this.ropeId);
 
         return true;
+    }
+
+    /**
+     * sets a rope's joint values. any parameters that are given null will not be changed
+     */
+    public void setJointValues(ServerLevel level, VSJointMaxForceTorque maxForceTorque, @Nullable Float  minLength, @Nullable Float  maxLength,
+                               @Nullable Double compliance, @Nullable Float  tolerance, @Nullable Float  stiffness, @Nullable Float  damping) {
+        this.jointValues = this.jointValues.withChanged(maxForceTorque, minLength, maxLength, compliance, tolerance, stiffness, damping);
+
+        GTPAUtils.editJoint(level, this);
+    }
+
+    /**
+     * sets a rope's joint values. any parameters that are given null will not be changed
+     */
+    public void setJointValues(ServerLevel level, @Nullable Float maxForce, @Nullable Float maxTorque, @Nullable Float minLength, @Nullable Float maxLength,
+                               @Nullable Double compliance, @Nullable Float tolerance, @Nullable Float stiffness, @Nullable Float  damping) {
+        if (maxForce == null && maxTorque == null) {
+            setJointValues(level, null, minLength, maxLength, compliance, tolerance, stiffness, damping);
+            return;
+        }
+        VSJointMaxForceTorque maxForceTorque = new VSJointMaxForceTorque(
+                maxForce == null ? jointValues.maxForceTorque().getMaxForce() : maxForce,
+                maxTorque == null ? jointValues.maxForceTorque().getMaxTorque() : maxTorque
+        );
+        this.jointValues = this.jointValues.withChanged(maxForceTorque, minLength, maxLength, compliance, tolerance, stiffness, damping);
+
+        GTPAUtils.editJoint(level, this);
     }
 
     public VSDistanceJoint makeJoint() {

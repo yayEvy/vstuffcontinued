@@ -241,8 +241,6 @@ public class NewRopeUtils {
     static ItemStack lastItem;
 
     static int extraTipWarmup;
-    static boolean wasRendering = false;
-
 
     public static class RopeInfo {
 
@@ -292,11 +290,11 @@ public class NewRopeUtils {
             if (!dimId0.equals(dimId)) return info.withMessage("interdimensional");
             if (info.worldPos0.equals(info.worldPos1)) return info.withMessage("second_point");
             if (length > maxLength) return info.withMessage("too_long");
-            if (PosUtils.isPhysPulley(hitState)) return info.withMessage("second_pulley");
+            if (PosUtils.isPhysPulley(hitState)) return info.withMessage("invalid_second");
             if (PosUtils.isPulleyAnchor(hitState) && PosUtils.isPhysPulley(level, pos)) {
                 info.pulley = true;
             } else if (PosUtils.isPulleyAnchor(hitState)) {
-                return info.withMessage("anchor");
+                return info.withMessage("invalid_second");
             }
 
             info.valid = true;

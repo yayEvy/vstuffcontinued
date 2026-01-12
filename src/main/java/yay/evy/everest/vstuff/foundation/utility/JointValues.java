@@ -19,6 +19,20 @@ public record JointValues(VSJointMaxForceTorque maxForceTorque, Float minLength,
         return new JointValues(maxForceTorque, DEFAULT_MINLENGTH, maxLength, compliance, DEFAULT_TOLERANCE, DEFAULT_STIFFNESS, DEFAULT_DAMPING);
     }
 
+    public JointValues withChanged(@Nullable VSJointMaxForceTorque newMaxForceTorque, @Nullable Float newMinLength,
+                                   @Nullable Float newMaxLength, @Nullable Double newCompliance, @Nullable Float newTolerance,
+                                   @Nullable Float newStiffness, @Nullable Float newDamping) {
+        return new JointValues(
+                newMaxForceTorque == null ? this.maxForceTorque : newMaxForceTorque,
+                newMinLength == null ? this.minLength : newMinLength,
+                newMaxLength == null ? this.maxLength : newMaxLength,
+                newCompliance == null ? this.compliance : newCompliance,
+                newTolerance == null ? this.tolerance : newTolerance,
+                newStiffness == null ? this.stiffness : newStiffness,
+                newDamping == null ? this.damping : newDamping
+        );
+    }
+
     public VSDistanceJoint makeJoint(Long ship0, Vector3f localPos0, Long ship1, Vector3f localPos1) {
         return new VSDistanceJoint(
                 ship0,

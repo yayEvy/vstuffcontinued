@@ -5,6 +5,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import org.valkyrienskies.core.internal.joints.VSDistanceJoint;
+import org.valkyrienskies.core.internal.joints.VSJointAndId;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
@@ -32,6 +33,12 @@ public class GTPAUtils {
                 RopeManager.syncAllRopesToPlayer(serverPlayer);
             }
         });
+    }
+
+    public static void editJoint(ServerLevel level, NewRope rope) {
+        VSDistanceJoint newDistanceJoint = rope.makeJoint();
+        GameToPhysicsAdapter gtpa = getGTPA(level);
+        gtpa.updateJoint(new VSJointAndId(rope.jointId, newDistanceJoint));
     }
 
     public static void restoreJoint(ServerLevel level, NewRope rope) {
