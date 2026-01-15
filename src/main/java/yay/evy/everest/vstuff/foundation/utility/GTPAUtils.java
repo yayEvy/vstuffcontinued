@@ -9,9 +9,8 @@ import org.valkyrienskies.core.internal.joints.VSJointAndId;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
-import yay.evy.everest.vstuff.content.rope.roperework.NewRope;
+import yay.evy.everest.vstuff.content.rope.roperework.Rope;
 import yay.evy.everest.vstuff.content.rope.roperework.RopeManager;
-import yay.evy.everest.vstuff.content.rope.ropes.RopeTracker;
 
 public class GTPAUtils {
 
@@ -20,7 +19,7 @@ public class GTPAUtils {
         return ValkyrienSkiesMod.getOrCreateGTPA(dimId);
     }
 
-    public static void addRopeJoint(ServerLevel level, Player player, NewRope rope) {
+    public static void addRopeJoint(ServerLevel level, Player player, Rope rope) {
         VSDistanceJoint distanceJoint = rope.makeJoint();
         GameToPhysicsAdapter gtpa = getGTPA(level);
         gtpa.addJoint(distanceJoint, 0, (jointId) -> {
@@ -35,13 +34,13 @@ public class GTPAUtils {
         });
     }
 
-    public static void editJoint(ServerLevel level, NewRope rope) {
+    public static void editJoint(ServerLevel level, Rope rope) {
         VSDistanceJoint newDistanceJoint = rope.makeJoint();
         GameToPhysicsAdapter gtpa = getGTPA(level);
         gtpa.updateJoint(new VSJointAndId(rope.jointId, newDistanceJoint));
     }
 
-    public static void restoreJoint(ServerLevel level, NewRope rope) {
+    public static void restoreJoint(ServerLevel level, Rope rope) {
         VSDistanceJoint distanceJoint = rope.makeJoint();
         GameToPhysicsAdapter gtpa = getGTPA(level);
         if (!rope.hasRestored()) {

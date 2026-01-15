@@ -1,5 +1,7 @@
 package yay.evy.everest.vstuff.content.rope.ropethrower;
 
+import kotlin.Pair;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
@@ -11,15 +13,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
-import org.valkyrienskies.core.api.ships.LoadedShip;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.rope.pulley.PhysPulleyBlockEntity;
-import yay.evy.everest.vstuff.content.rope.pulley.PulleyAnchorBlockEntity;
-import yay.evy.everest.vstuff.content.rope.roperework.NewRopeUtils;
+import yay.evy.everest.vstuff.content.rope.roperework.Rope;
+import yay.evy.everest.vstuff.content.rope.roperework.RopeUtil;
+import yay.evy.everest.vstuff.foundation.utility.PosUtils;
 import yay.evy.everest.vstuff.index.VStuffItems;
 
 public class RopeThrowerEntity extends ThrowableItemProjectile {
-
 
     public RopeThrowerEntity(EntityType<? extends ThrowableItemProjectile> entityType, Level level) {
         super(entityType, level);
@@ -29,21 +30,18 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
     private BlockPos startPos;
     private Long startShipId;
     private String startDimension;
-    private NewRopeUtils.SelectType selectType;
-    private PhysPulleyBlockEntity waitingPulley;
+    private RopeUtil.SelectType selectType;
 
     public void setStartData(
             BlockPos pos,
             Long shipId,
             String dimension,
-            NewRopeUtils.SelectType type,
-            PhysPulleyBlockEntity pulley
+            RopeUtil.SelectType type
     ) {
         this.startPos = pos;
         this.startShipId = shipId;
         this.startDimension = dimension;
         this.selectType = type;
-        this.waitingPulley = pulley;
     }
 
     @Override
@@ -53,21 +51,26 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
 
 
     @Override
-    protected void onHitBlock(BlockHitResult result) {
-       // System.out.println("on hit");
+    protected void onHitBlock(BlockHitResult hitResult) {
         if (!(level() instanceof ServerLevel serverLevel)) {
             return;
         }
 
-        if (startPos == null || !serverLevel.dimension().location().toString().equals(startDimension)) {
+        Player owner = null;
+        if (getOwner() instanceof Player player) {
+            owner = player;
+        }
+
+        if (!serverLevel.dimension().location().toString().equals(startDimension)) {
+            if (owner != null) owner.displayClientMessage(VStuff.translate("interdimensional").withStyle(ChatFormatting.RED), true);
             discard();
             return;
         }
 
-        BlockPos hitPos = result.getBlockPos().immutable();
-        Long secondShipId = getShipIdAtPos(serverLevel, hitPos);
+        BlockPos hitPos = hitResult.getBlockPos().immutable();
+        Long secondShipId = PosUtils.getLoadedShipIdAtPos(serverLevel, hitPos);
 
-        if (selectType == NewRopeUtils.SelectType.PULLEY && !(serverLevel.getBlockEntity(hitPos) instanceof PulleyAnchorBlockEntity)) {
+        if (!PosUtils.isCompatibleWithType(serverLevel, hitPos, selectType)) {
             ItemStack ropeDrop = new ItemStack(VStuffItems.ROPE_ITEM.get());
             ItemEntity itemEntity = new ItemEntity(
                     serverLevel,
@@ -82,43 +85,27 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
             return;
         }
 
-            RopeUtil.RopeReturn ropeReturn = Rope.createNew(
-                VStuffItems.ROPE_ITEM.get(),
-                serverLevel,
-                startPos,
-                hitPos,
-                startShipId,
-                secondShipId,
-                getOwner() instanceof Player p ? p : null
-        );
+        Pair<Rope, String> result = Rope.create(serverLevel, startShipId, secondShipId, startPos, hitPos, owner, false);
 
-        if (ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS) {
-
-            if (connectionType == RopeUtil.ConnectionType.PULLEY
-                    && waitingPulley != null
-                    && serverLevel.getBlockEntity(hitPos) instanceof PulleyAnchorBlockEntity) {
-
-                waitingPulley.attachRope(ropeReturn.rope());
+        if (result.component1() == null) {
+            if (serverLevel.getBlockEntity(startPos) instanceof PhysPulleyBlockEntity pulleyBE) {
+                pulleyBE.resetSelf();
             }
-
-
-            serverLevel.playSound(
-                    null,
-                    hitPos,
-                    net.minecraft.sounds.SoundEvents.LEASH_KNOT_PLACE,
-                    SoundSource.PLAYERS,
-                    1.0F,
-                    1.0F
-            );
         }
 
+        if (selectType == RopeUtil.SelectType.PULLEY && serverLevel.getBlockEntity(startPos) instanceof PhysPulleyBlockEntity pulleyBE) {
+            pulleyBE.attachRope(result.component1());
+        }
+
+        serverLevel.playSound(
+                null,
+                hitPos,
+                net.minecraft.sounds.SoundEvents.LEASH_KNOT_PLACE,
+                SoundSource.PLAYERS,
+                1.0F,
+                1.0F
+        );
+
         discard();
-    }
-
-
-
-    private Long getShipIdAtPos(ServerLevel level, BlockPos pos) {
-        LoadedShip loadedShip = VSGameUtilsKt.getLoadedShipManagingPos(level, pos);
-        return loadedShip != null ? loadedShip.getId() : null;
     }
 }

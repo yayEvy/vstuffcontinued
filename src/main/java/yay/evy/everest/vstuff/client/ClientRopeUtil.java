@@ -4,7 +4,6 @@ import net.minecraft.world.level.Level;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.valkyrienskies.core.api.ships.ClientShip;
-import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 public class ClientRopeUtil {

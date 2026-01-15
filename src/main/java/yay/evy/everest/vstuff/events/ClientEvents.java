@@ -12,23 +12,16 @@ import yay.evy.everest.vstuff.content.rope.styler.handler.RopeStyleMenuHandler;
 @EventBusSubscriber(value = Dist.CLIENT, modid = "vstuff")
 public class ClientEvents {
 
-
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase == Phase.START)
-            ClientEvents.onClientTickStart(Minecraft.getInstance());
-        else if (event.phase == Phase.END)
-            ClientEvents.onClientTickEnd(Minecraft.getInstance());
-    }
+        if (!isGameActive()) return;
 
-    public static void onClientTickStart(Minecraft mc) {
-        if (isGameActive()) {
+        if (event.phase == Phase.START) {
             RopeStyleMenuHandler.clientTick();
+            return;
         }
-    }
 
-    public static void onClientTickEnd(Minecraft mc) {
-
+        //NewRopeUtils.clientTick();
     }
 
     protected static boolean isGameActive() {

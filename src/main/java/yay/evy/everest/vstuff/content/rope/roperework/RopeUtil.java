@@ -38,9 +38,22 @@ import java.util.Map;
 
 import static yay.evy.everest.vstuff.foundation.utility.PosUtils.getBlockType;
 
-public class NewRopeUtils {
+public class RopeUtil {
 
     public static Vector3f getRopeConnectionPos(Level level, BlockPos pos) {
+        Vector3f blockPos;
+        try {
+            VoxelShape shape = level.getBlockState(pos).getShape(level, pos);
+            Vector3f vec = shape.bounds().getCenter().add(pos.getCenter()).toVector3f();
+            blockPos = new Vector3f(vec.x - 0.5f, vec.y - 0.5f, vec.z - 0.5f);
+        } catch (UnsupportedOperationException ex) {
+            blockPos = new Vector3f(pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f);
+        }
+
+        return blockPos;
+    }
+
+    public static Vector3f getLocalPos(ServerLevel level, BlockPos pos) {
         Vector3f blockPos;
         try {
             VoxelShape shape = level.getBlockState(pos).getShape(level, pos);
@@ -107,10 +120,10 @@ public class NewRopeUtils {
         double minDistance = Double.MAX_VALUE;
         Integer closestConstraintId = null;
 
-        for (Map.Entry<Integer, NewRope> entry : RopeManager.getActiveRopes().entrySet()) {
+        for (Map.Entry<Integer, Rope> entry : RopeManager.getActiveRopes().entrySet()) {
             Integer constraintId = entry.getKey();
 
-            NewRope rope = entry.getValue();
+            Rope rope = entry.getValue();
 
             Vector3f worldPos0 = rope.posData0.getWorldPos();
             Vector3f worldPos1 = rope.posData1.getWorldPos();
@@ -174,7 +187,7 @@ public class NewRopeUtils {
                 id = null;
             }
             PosType posType = id == null ? PosType.WORLD : PosType.SHIP;
-            Vector3f localPos = getRopeConnectionPos(level, pos);
+            Vector3f localPos = getLocalPos(level, pos);
 
             return new RopePosData(level, id, pos, localPos, posType, getBlockType(level, pos));
         }
@@ -277,16 +290,17 @@ public class NewRopeUtils {
             String dimId0 = tag.getString("dim");
 
             if (level.isClientSide) {
-                info.localPos0 = NewRopeUtils.getRopeConnectionPos(level, blockPos0);
+                info.localPos0 = RopeUtil.getRopeConnectionPos(level, blockPos0);
                 info.worldPos0 = ClientRopeUtil.renderLocalToWorld(level, info.localPos0, ship0);
                 info.ship0 = ship0;
-                info.localPos1 = NewRopeUtils.getRopeConnectionPos(level, blockPos0);
+                info.localPos1 = RopeUtil.getRopeConnectionPos(level, pos);
                 info.worldPos1 = ClientRopeUtil.renderLocalToWorld(level, info.localPos1, ship);
                 info.ship1 = ship;
             }
 
             float length = info.worldPos0.distance(info.worldPos1);
 
+            if (level.isEmptyBlock(blockPos0)) return info.withMessage("missing_first");
             if (!dimId0.equals(dimId)) return info.withMessage("interdimensional");
             if (info.worldPos0.equals(info.worldPos1)) return info.withMessage("second_point");
             if (length > maxLength) return info.withMessage("too_long");
@@ -317,21 +331,21 @@ public class NewRopeUtils {
         int restoreWarmup = extraTipWarmup;
         extraTipWarmup = 0;
 
-        if (hitResult == null && ClientRopeManager.hasPreviewRope()) {
-            ClientRopeManager.clearPreviewRope();
+        if (hitResult == null) {
+            if (ClientRopeManager.hasPreviewRope()) ClientRopeManager.clearPreviewRope();
             return;
         }
-        if (hitResult.getType() != HitResult.Type.BLOCK && ClientRopeManager.hasPreviewRope()) {
-            ClientRopeManager.clearPreviewRope();
+        if (hitResult.getType() != HitResult.Type.BLOCK) {
+            if (ClientRopeManager.hasPreviewRope()) ClientRopeManager.clearPreviewRope();
             return;
         }
-        if (!stack.getItem().equals(VStuffItems.ROPE_ITEM.get()) && ClientRopeManager.hasPreviewRope()) {
-            ClientRopeManager.clearPreviewRope();
+        if (!stack.getItem().equals(VStuffItems.ROPE_ITEM.get())) {
+            if (ClientRopeManager.hasPreviewRope()) ClientRopeManager.clearPreviewRope();
             return;
         }
 
-        if (!stack.hasFoil() && ClientRopeManager.hasPreviewRope()) {
-            ClientRopeManager.clearPreviewRope();
+        if (!stack.hasFoil() ) {
+            if (ClientRopeManager.hasPreviewRope()) ClientRopeManager.clearPreviewRope();
             return;
         }
 

@@ -15,8 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class RopeManager {
 
-    public static Map<Integer, NewRope> activeRopes = new ConcurrentHashMap<>();
-    public static Integer ropeId;
+    public static Map<Integer, Rope> activeRopes = new ConcurrentHashMap<>();
+    public static Integer ropeId = 0;
 
     public static Integer getNextId() {
         return ++ropeId;
@@ -26,7 +26,7 @@ public class RopeManager {
         ropeId = 0;
     }
 
-    public static void addRope(ServerLevel level, NewRope rope) {
+    public static void addRope(ServerLevel level, Rope rope) {
 
         activeRopes.put(rope.ropeId, rope);
 
@@ -36,12 +36,12 @@ public class RopeManager {
         NetworkManager.sendRopeAdd(rope.ropeId, rope.posData0, rope.posData1, rope.jointValues.maxLength(), rope.style.getStyle());
     }
 
-    public static void replaceRope(Integer id, NewRope rope) {
+    public static void replaceRope(Integer id, Rope rope) {
         activeRopes.put(id, rope);
     }
 
     public static void replaceId(Integer oldId, Integer newId) {
-        NewRope rope = activeRopes.remove(oldId);
+        Rope rope = activeRopes.remove(oldId);
         if (rope != null) {
             rope.ropeId = newId;
             activeRopes.put(newId, rope);
@@ -50,7 +50,7 @@ public class RopeManager {
 
     public static void removeRope(ServerLevel level, Integer constraintId) {
 
-        NewRope data = activeRopes.remove(constraintId);
+        Rope data = activeRopes.remove(constraintId);
         if (data != null) {
 
             RopePersistence persistence = RopePersistence.getOrCreate(level);
@@ -69,8 +69,8 @@ public class RopeManager {
     public static void syncAllRopesToPlayer(ServerPlayer player) {
         NetworkManager.sendClearAllRopesToPlayer(player);
 
-        for (Map.Entry<Integer, NewRope> entry : activeRopes.entrySet()) {
-            NewRope data = entry.getValue();
+        for (Map.Entry<Integer, Rope> entry : activeRopes.entrySet()) {
+            Rope data = entry.getValue();
             NetworkManager.sendRopeAddToPlayer(
                     player,
                     entry.getKey(),
@@ -83,12 +83,12 @@ public class RopeManager {
     }
 
 
-    public static Map<Integer, NewRope> getActiveRopes() {
+    public static Map<Integer, Rope> getActiveRopes() {
         return new HashMap<>(activeRopes);
     }
 
 
-    public static void addRopeToManager(NewRope rope) {
+    public static void addRopeToManager(Rope rope) {
         if (rope == null) return;
 
         Integer id = getNextId();

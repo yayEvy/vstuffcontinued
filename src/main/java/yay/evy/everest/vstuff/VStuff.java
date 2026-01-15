@@ -36,7 +36,7 @@ import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberServerAttachment;
-import yay.evy.everest.vstuff.content.rope.roperework.NewRopeUtils;
+import yay.evy.everest.vstuff.content.rope.roperework.RopeUtil;
 import yay.evy.everest.vstuff.content.rope.roperework.RopePersistence;
 import yay.evy.everest.vstuff.content.rope.ropethrower.RopeThrowerEntity;
 import yay.evy.everest.vstuff.content.thrust.ThrusterForceAttachment;
@@ -154,8 +154,7 @@ public class VStuff {
                                 startPos,
                                 startShipId,
                                 serverLevel.dimension().location().toString(),
-                                NewRopeUtils.SelectType.NORMAL,
-                                null
+                                RopeUtil.SelectType.NORMAL
                         );
 
                         rope.shoot(

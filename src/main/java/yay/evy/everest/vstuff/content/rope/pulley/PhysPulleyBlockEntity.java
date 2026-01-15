@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.mod.api.BlockEntityPhysicsListener;
-import yay.evy.everest.vstuff.content.rope.roperework.NewRope;
+import yay.evy.everest.vstuff.content.rope.roperework.Rope;
 import yay.evy.everest.vstuff.content.rope.roperework.RopeManager;
 import yay.evy.everest.vstuff.index.VStuffBlockEntities;
 
@@ -30,7 +30,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     }
 
     private Integer constraintId = null;
-    private NewRope attachedRope = null;
+    private Rope attachedRope = null;
     private Float currentRopeLength = 0f;
     public PulleyState state = PulleyState.OPEN;
 
@@ -47,7 +47,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         }
         return state == PulleyState.OPEN;
     }
-    public void attachRope(NewRope rope) {
+    public void attachRope(Rope rope) {
         if (rope == null) return;
 
         this.state = PulleyState.EXTENDED;
@@ -185,7 +185,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
         this.currentRopeLength = tag.getFloat("length");
 
-        Map<Integer, NewRope> active = RopeManager.getActiveRopes();
+        Map<Integer, Rope> active = RopeManager.getActiveRopes();
         if (active != null && constraintId != null) {
             this.attachedRope = active.get(constraintId);
         }

@@ -6,7 +6,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
-import yay.evy.everest.vstuff.content.rope.roperework.NewRopeUtils;
+import yay.evy.everest.vstuff.content.rope.roperework.RopeUtil;
 import yay.evy.everest.vstuff.foundation.network.packets.OutlinePacket;
 import yay.evy.everest.vstuff.foundation.network.packets.RopeSoundPacket;
 import yay.evy.everest.vstuff.foundation.network.packets.RopeStyleSelectPacket;
@@ -65,17 +65,17 @@ public class NetworkManager {
 
 
 
-    public static void sendRopeRerender(Integer ropeId, NewRopeUtils.RopePosData posData0, NewRopeUtils.RopePosData posData1, float length, String style){
-        Add packet = new Add(ropeId, posData0.localPos(), posData1.localPos(), posData0.shipId(), posData1.shipId(), length, style);
+    public static void sendRopeRerender(Integer ropeId, RopeUtil.RopePosData posData0, RopeUtil.RopePosData posData1, float length, String style){
+        Add packet = new Add(ropeId, posData0.localPos(), posData1.localPos(), posData0.getShipIdSafe(), posData1.getShipIdSafe(), length, style);
         INSTANCE.send(PacketDistributor.ALL.noArg(), packet);
     }
-    public static void sendRopeAdd(Integer ropeId, NewRopeUtils.RopePosData posData0, NewRopeUtils.RopePosData posData1, float length, String style){
-        Add packet = new Add(ropeId, posData0.localPos(), posData1.localPos(), posData0.shipId(), posData1.shipId(), length, style);
+    public static void sendRopeAdd(Integer ropeId, RopeUtil.RopePosData posData0, RopeUtil.RopePosData posData1, float length, String style){
+        Add packet = new Add(ropeId, posData0.localPos(), posData1.localPos(), posData0.getShipIdSafe(), posData1.getShipIdSafe(), length, style);
         INSTANCE.send(PacketDistributor.ALL.noArg(), packet);
     }
 
-    public static void sendRopeAddToPlayer(ServerPlayer player, Integer ropeId, NewRopeUtils.RopePosData posData0, NewRopeUtils.RopePosData posData1, float length, String style) {
-        Add packet = new Add(ropeId, posData0.localPos(), posData1.localPos(), posData0.shipId(), posData1.shipId(), length, style);
+    public static void sendRopeAddToPlayer(ServerPlayer player, Integer ropeId, RopeUtil.RopePosData posData0, RopeUtil.RopePosData posData1, float length, String style) {
+        Add packet = new Add(ropeId, posData0.localPos(), posData1.localPos(), posData0.getShipIdSafe(), posData1.getShipIdSafe(), length, style);
         INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);
     }
 

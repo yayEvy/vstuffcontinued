@@ -14,7 +14,7 @@ import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.content.rope.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.content.rope.pulley.PulleyAnchorBlockEntity;
-import yay.evy.everest.vstuff.content.rope.roperework.NewRopeUtils;
+import yay.evy.everest.vstuff.content.rope.roperework.RopeUtil;
 import yay.evy.everest.vstuff.index.VStuffBlocks;
 
 import static yay.evy.everest.vstuff.foundation.utility.BodyUtils.getGroundBodyId;
@@ -61,19 +61,18 @@ public class PosUtils {
         return VSGameUtilsKt.getShipManagingPos(level, pos);
     }
 
-    public static boolean matchesBlockType(ServerLevel level, BlockPos pos, NewRopeUtils.BlockType posType) {
-        return switch (posType) {
-            case PULLEY -> isPhysPulley(level, pos);
-            case PULLEY_ANCHOR -> isPulleyAnchor(level, pos);
-            case NORMAL -> true; // any other conditions would have triggered so we know it's a normal block
+    public static boolean isCompatibleWithType(ServerLevel level, BlockPos pos, RopeUtil.SelectType type) {
+        return switch (type) {
+            case NORMAL -> !(isPhysPulley(level, pos) || isPulleyAnchor(level, pos));
+            case PULLEY -> isPulleyAnchor(level, pos);
         };
     }
 
-    public static NewRopeUtils.BlockType getBlockType(ServerLevel level, BlockPos pos) {
+    public static RopeUtil.BlockType getBlockType(ServerLevel level, BlockPos pos) {
         BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof PhysPulleyBlockEntity) return NewRopeUtils.BlockType.PULLEY;
-        if (be instanceof PulleyAnchorBlockEntity) return NewRopeUtils.BlockType.PULLEY_ANCHOR;
-        return NewRopeUtils.BlockType.NORMAL;
+        if (be instanceof PhysPulleyBlockEntity) return RopeUtil.BlockType.PULLEY;
+        if (be instanceof PulleyAnchorBlockEntity) return RopeUtil.BlockType.PULLEY_ANCHOR;
+        return RopeUtil.BlockType.NORMAL;
     }
 
     public static boolean isPhysPulley(BlockState state) {

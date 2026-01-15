@@ -28,14 +28,15 @@
   "vstuff.gui.rope_menu.title": "Rope Styles",
 
   "vstuff.rope.reset": "Selection Reset",
-  "vstuff.rope.invalid_first": "Cannot select this block as first position",
-  "vstuff.rope.invalid_second": "Cannot select this block as second position",
+  "vstuff.rope.invalid_first": "Cannot select %1$s as first position",
+  "vstuff.rope.invalid_second": "Cannot select %1$s as second position",
   "vstuff.rope.first": "%1$s selected as first position",
   "vstuff.rope.too_long": "Too far away",
   "vstuff.rope.interdimensional": "Cannot create rope between dimensions",
   "vstuff.rope.second_point": "Click to reset",
   "vstuff.rope.can_connect": "Can Connect \u2714",
   "vstuff.rope.hold_to_pull_taut": "Hold %1$s to pull taut",
+  "vstuff.rope.missing_first": "First block broken, click to reset",
 
   "vstuff.ponder.phys_pulley.text_3": "First, shift-right-click the pulley to start defining the rope's path.",
   "vstuff.ponder.phys_pulley.text_4": "Then, right-click another block to set the rope's anchor point and length.",

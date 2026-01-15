@@ -26,8 +26,6 @@ import yay.evy.everest.vstuff.foundation.RopeStyles;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static yay.evy.everest.vstuff.content.rope.roperework.NewRopeUtils.convertLocalToWorld;
-
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class RopeRendererClient {
 
@@ -149,7 +147,7 @@ public class RopeRendererClient {
                             cameraPos,
                             partialTick,
                             translucentRope.style(),
-                            true
+                            false
                     );
                 }
             } catch (Exception e) {

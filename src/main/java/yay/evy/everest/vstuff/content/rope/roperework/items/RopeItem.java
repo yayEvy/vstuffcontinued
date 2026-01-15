@@ -18,14 +18,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.ClientOutlineHandler;
 import yay.evy.everest.vstuff.content.rope.pulley.PhysPulleyBlockEntity;
-import yay.evy.everest.vstuff.content.rope.roperework.NewRope;
-import yay.evy.everest.vstuff.content.rope.roperework.NewRopeUtils;
+import yay.evy.everest.vstuff.content.rope.roperework.Rope;
+import yay.evy.everest.vstuff.content.rope.roperework.RopeUtil;
 import yay.evy.everest.vstuff.foundation.network.NetworkManager;
 import yay.evy.everest.vstuff.foundation.utility.PosUtils;
 
 
-public class NewRopeItem extends Item {
-    public NewRopeItem(Properties pProperties) {
+public class RopeItem extends Item {
+    public RopeItem(Properties pProperties) {
         super(pProperties);
     }
 
@@ -42,14 +42,16 @@ public class NewRopeItem extends Item {
             return InteractionResult.PASS;
         }
 
+        String blockName = level.getBlockState(clickedPos).getBlock().getName().getString();
+
         if (!isFoil(heldItem)) {
             if (player.isShiftKeyDown()) return InteractionResult.FAIL;
             if (PosUtils.isPulleyAnchor(state)) {
-                if (!level.isClientSide) firstFailWithMessage(player, clickedPos, "invalid_first");
+                if (!level.isClientSide) firstFailWithMessage(player, clickedPos, "invalid_first", blockName);
                 return InteractionResult.SUCCESS;
             }
             if (level.getBlockEntity(clickedPos) instanceof PhysPulleyBlockEntity pulley && !pulley.canAttach()) {
-                if (!level.isClientSide) firstFailWithMessage(player, clickedPos, "invalid_second");
+                if (!level.isClientSide) firstFailWithMessage(player, clickedPos, "invalid_second", blockName);
                 return InteractionResult.SUCCESS;
             }
             firstSelect(serverLevel, clickedPos, player, heldItem);
@@ -66,13 +68,33 @@ public class NewRopeItem extends Item {
 
         boolean taut = Minecraft.getInstance().options.keySprint.isDown();
         CompoundTag tag = heldItem.getTag().getCompound("first");
-        Pair<NewRope, String> result = NewRope.create(serverLevel,
+        BlockPos blockPos0 = NbtUtils.readBlockPos(tag.getCompound("pos"));
+
+        if (clickedPos.equals(blockPos0)) {
+            player.displayClientMessage(VStuff.translate("rope.reset").withStyle(ChatFormatting.GREEN), true);
+            if (serverLevel.getBlockEntity(blockPos0) instanceof PhysPulleyBlockEntity pulleyBE) {
+                pulleyBE.resetSelf();
+            }
+            heldItem.setTag(null);
+            return InteractionResult.SUCCESS;
+        }
+
+        Pair<Rope, String> result = Rope.create(serverLevel,
                 tag.getLong("shipId"), PosUtils.getLoadedShipIdAtPos(serverLevel, clickedPos),
-                NbtUtils.readBlockPos(tag.getCompound("pos")), clickedPos,
-                player, taut);
+                blockPos0, clickedPos, player, taut);
+
+        if (result.component1() == null) {
+            player.displayClientMessage(VStuff.translate(result.component2()).withStyle(ChatFormatting.RED), true);
+            if (serverLevel.getBlockEntity(NbtUtils.readBlockPos(tag.getCompound("pos"))) instanceof PhysPulleyBlockEntity pulleyBE) {
+                pulleyBE.resetSelf();
+            }
+            heldItem.setTag(null);
+            return InteractionResult.SUCCESS;
+
+        }
 
         if (result.component2() != null && !level.isClientSide) {
-            player.displayClientMessage(VStuff.translate(result.component2()), true);
+            player.displayClientMessage(VStuff.translate(result.component2()).withStyle(ChatFormatting.GREEN), true);
         }
 
         if (level.isClientSide) {
@@ -85,10 +107,10 @@ public class NewRopeItem extends Item {
 
 
     private void firstSelect(ServerLevel level, BlockPos clickedPos, Player player, ItemStack heldItem) {
-        NewRopeUtils.SelectType selection = NewRopeUtils.SelectType.NORMAL;
+        RopeUtil.SelectType selection = RopeUtil.SelectType.NORMAL;
         if (level.getBlockEntity(clickedPos) instanceof PhysPulleyBlockEntity pulleyBE && pulleyBE.canAttach()) {
             pulleyBE.setWaiting();
-            selection = NewRopeUtils.SelectType.PULLEY;
+            selection = RopeUtil.SelectType.PULLEY;
         }
 
         String blockName = level.getBlockState(clickedPos).getBlock().getName().getString();
@@ -108,8 +130,8 @@ public class NewRopeItem extends Item {
     }
 
 
-    private void firstFailWithMessage(Player player, BlockPos clickedPos, String message) {
-        player.displayClientMessage(VStuff.translate("rope." + message).withStyle(ChatFormatting.RED), true);
+    private void firstFailWithMessage(Player player, BlockPos clickedPos, String message, Object... args) {
+        player.displayClientMessage(VStuff.translate("rope." + message, args).withStyle(ChatFormatting.RED), true);
         if (player instanceof ServerPlayer serverPlayer) {
             NetworkManager.sendOutlineToPlayer(serverPlayer, clickedPos, ClientOutlineHandler.RED);
         }

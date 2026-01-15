@@ -20,29 +20,36 @@ import yay.evy.everest.vstuff.foundation.RopeStyles;
 import javax.annotation.Nullable;
 
 
-public class NewRope {
+public class Rope {
 
     public Integer ropeId;
     public Integer jointId = null;
-    public NewRopeUtils.RopePosData posData0;
-    public NewRopeUtils.RopePosData posData1;
+    public RopeUtil.RopePosData posData0;
+    public RopeUtil.RopePosData posData1;
     public JointValues jointValues;
     public RopeStyles.RopeStyle style;
-    public NewRopeUtils.RopeType type;
+    public RopeUtil.RopeType type;
     public boolean hasRestored = false;
     public VSDistanceJoint joint;
     public double renderLength;
 
-    public NewRope(Integer ropeId, NewRopeUtils.RopePosData posData0, NewRopeUtils.RopePosData posData1, JointValues jointValues, RopeStyles.RopeStyle style, NewRopeUtils.RopeType type) {
+    public Rope(Integer ropeId, RopeUtil.RopePosData posData0, RopeUtil.RopePosData posData1, JointValues jointValues, RopeStyles.RopeStyle style, RopeUtil.RopeType type) {
         this.ropeId = ropeId;
         this.posData0 = posData0;
         this.posData1 = posData1;
         this.jointValues = jointValues;
         this.style = style;
         this.type = type;
+
+        System.out.println("rope with id " + ropeId);
+        System.out.println(posData0);
+        System.out.println(posData1);
+        System.out.println(jointValues);
+        System.out.println(style);
+        System.out.println(type);
     }
 
-    public NewRope(NewRopeUtils.RopePosData posData0, NewRopeUtils.RopePosData posData1, JointValues jointValues, RopeStyles.RopeStyle style, NewRopeUtils.RopeType type) {
+    public Rope(RopeUtil.RopePosData posData0, RopeUtil.RopePosData posData1, JointValues jointValues, RopeStyles.RopeStyle style, RopeUtil.RopeType type) {
         this.posData0 = posData0;
         this.posData1 = posData1;
         this.jointValues = jointValues;
@@ -50,13 +57,13 @@ public class NewRope {
         this.type = type;
     }
 
-    public static Pair<NewRope, String> create(ServerLevel level, @Nullable Long ship0, @Nullable Long ship1, BlockPos blockPos0, BlockPos blockPos1, Player player, boolean taut) {
+    public static Pair<Rope, String> create(ServerLevel level, @Nullable Long ship0, @Nullable Long ship1, BlockPos blockPos0, BlockPos blockPos1, Player player, boolean taut) {
         ship0 = (BodyUtils.getGroundBodyId(level).equals(ship0)) ? null : ship0;
         ship1 = (BodyUtils.getGroundBodyId(level).equals(ship1)) ? null : ship1;
-        NewRopeUtils.RopePosData posData0tmp = NewRopeUtils.RopePosData.create(level, ship0, blockPos0);
-        NewRopeUtils.RopePosData posData1tmp = NewRopeUtils.RopePosData.create(level, ship1, blockPos1);
-        NewRopeUtils.RopePosData posData0;
-        NewRopeUtils.RopePosData posData1;
+        RopeUtil.RopePosData posData0tmp = RopeUtil.RopePosData.create(level, ship0, blockPos0);
+        RopeUtil.RopePosData posData1tmp = RopeUtil.RopePosData.create(level, ship1, blockPos1);
+        RopeUtil.RopePosData posData0;
+        RopeUtil.RopePosData posData1;
 
         if (posData1tmp.isWorld() && !posData0tmp.isWorld()) {
             posData0 = posData1tmp;
@@ -89,8 +96,14 @@ public class NewRope {
             style = RopeStyles.normal();
         }
 
-        NewRope rope = new NewRope(RopeManager.getNextId(), posData0, posData1, JointValues.withDefault(new VSJointMaxForceTorque(maxForce, maxForce), length, compliance), style, NewRopeUtils.getRopeType(posData0, posData1));
+        System.out.println("rope creation");
 
+
+        Rope rope = new Rope(RopeManager.getNextId(), posData0, posData1, JointValues.withDefault(new VSJointMaxForceTorque(maxForce, maxForce), length, compliance), style, RopeUtil.getRopeType(posData0, posData1));
+
+        if (posData1.getShipIdSafe().equals(posData1.getShipIdSafe())) {
+            return new Pair<>(rope, "rope.created");
+        }
         GTPAUtils.addRopeJoint(level, player, rope);
 
         return new Pair<>(rope, "rope.created");
@@ -178,13 +191,13 @@ public class NewRope {
         return ropeTag;
     }
 
-    public static NewRope fromTag(ServerLevel level, CompoundTag ropeTag) {
-        return new NewRope(
-                NewRopeUtils.RopePosData.fromTag(level, ropeTag.getCompound("posData0")),
-                NewRopeUtils.RopePosData.fromTag(level, ropeTag.getCompound("posData0")),
+    public static Rope fromTag(ServerLevel level, CompoundTag ropeTag) {
+        return new Rope(
+                RopeUtil.RopePosData.fromTag(level, ropeTag.getCompound("posData0")),
+                RopeUtil.RopePosData.fromTag(level, ropeTag.getCompound("posData0")),
                 JointValues.readJointValues(ropeTag.getCompound("jointValues")),
                 RopeStyles.fromString(ropeTag.getString("style")),
-                NewRopeUtils.RopeType.valueOf(ropeTag.getString("type"))
+                RopeUtil.RopeType.valueOf(ropeTag.getString("type"))
         );
     }
 

@@ -16,6 +16,6 @@ public class EmptyEnergyCoreItem extends Item {
     @Override
     @OnlyIn(Dist.CLIENT)
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(SimpleCustomRenderer.create(this, new EmptyCorelikeItemRenderer("item/energy_core/blue_tint.png")));
+        consumer.accept(SimpleCustomRenderer.create(this, new CoreLikeRenderer("item/energy_core/blue_tint.png", false)));
     }
 }

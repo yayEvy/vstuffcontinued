@@ -20,11 +20,11 @@ public class RopeTextOverlay implements IGuiOverlay {
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui || mc.gameMode.getPlayerMode() == GameType.SPECTATOR)
             return;
-        if (NewRopeUtils.hoveringPos == null)
+        if (RopeUtil.hoveringPos == null)
             return;
-        if (NewRopeUtils.cached == null || !NewRopeUtils.cached.valid)
+        if (RopeUtil.cached == null || !RopeUtil.cached.valid)
             return;
-        if (NewRopeUtils.extraTipWarmup < 4)
+        if (RopeUtil.extraTipWarmup < 4)
             return;
 
         boolean active = mc.options.keySprint.isDown();
@@ -35,7 +35,7 @@ public class RopeTextOverlay implements IGuiOverlay {
         int x = (window.getGuiScaledWidth() - gui.getFont()
                 .width(text)) / 2;
         int y = window.getGuiScaledHeight() - 61;
-        Color color = new Color(0x4ADB4A).setAlpha(Mth.clamp((NewRopeUtils.extraTipWarmup - 4) / 3f, 0.1f, 1));
+        Color color = new Color(0x4ADB4A).setAlpha(Mth.clamp((RopeUtil.extraTipWarmup - 4) / 3f, 0.1f, 1));
         guiGraphics.drawString(gui.getFont(), text, x, y, color.getRGB(), false);
     }
 }

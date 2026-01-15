@@ -9,8 +9,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3f;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.rope.roperework.NewRope;
-import yay.evy.everest.vstuff.content.rope.roperework.NewRopeUtils;
+import yay.evy.everest.vstuff.content.rope.roperework.Rope;
+import yay.evy.everest.vstuff.content.rope.roperework.RopeUtil;
 import yay.evy.everest.vstuff.content.rope.roperework.RopeManager;
 import yay.evy.everest.vstuff.index.VStuffItems;
 
@@ -28,13 +28,13 @@ public class RopeBreakHandler {
 
         BlockPos brokenPos = event.getPos();
         List<Integer> constraintsToRemove = new ArrayList<>();
-        Map<Integer, NewRope> toRemove = new HashMap<>();
+        Map<Integer, Rope> toRemove = new HashMap<>();
 
-        for (Map.Entry<Integer, NewRope> entry : RopeManager.getActiveRopes().entrySet()) {
+        for (Map.Entry<Integer, Rope> entry : RopeManager.getActiveRopes().entrySet()) {
             Integer id = entry.getKey();
-            NewRope rope = entry.getValue();
+            Rope rope = entry.getValue();
 
-            if (rope.posData0.blockType() == NewRopeUtils.BlockType.PULLEY) continue;
+            if (rope.posData0.blockType() == RopeUtil.BlockType.PULLEY) continue;
 
             try {
                 BlockPos dropPos = null;
@@ -94,9 +94,9 @@ public class RopeBreakHandler {
             }
         }
 
-        for (Map.Entry<Integer, NewRope> ropeEntry: toRemove.entrySet()) {
+        for (Map.Entry<Integer, Rope> ropeEntry: toRemove.entrySet()) {
             Integer id = ropeEntry.getKey();
-            NewRope rope = ropeEntry.getValue();
+            Rope rope = ropeEntry.getValue();
             try {
                 rope.removeJoint(level);
             } catch (Exception e) {

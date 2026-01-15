@@ -21,13 +21,13 @@ public class RopePersistence extends SavedData {
 
     public static final String NAME = "vstuff_ropes";
 
-    private final Map<Integer, NewRope> persistenceRopes = new HashMap<>();
+    private final Map<Integer, Rope> persistenceRopes = new HashMap<>();
 
     @Override
     public CompoundTag save(@NotNull CompoundTag pCompoundTag) {
         ListTag ropeTag = new ListTag();
 
-        for (Map.Entry<Integer, NewRope> entry : persistenceRopes.entrySet()) {
+        for (Map.Entry<Integer, Rope> entry : persistenceRopes.entrySet()) {
             ropeTag.add(entry.getValue().toTag());
         }
 
@@ -50,7 +50,7 @@ public class RopePersistence extends SavedData {
         ListTag ropeList = tag.getList("constraints", Tag.TAG_COMPOUND);
         for (int i = 0; i < ropeList.size(); i++) {
             CompoundTag constraintTag = ropeList.getCompound(i);
-            NewRope rope = NewRope.fromTag(level, constraintTag);
+            Rope rope = Rope.fromTag(level, constraintTag);
 
             RopeManager.addRopeToManager(rope);
 
@@ -65,7 +65,7 @@ public class RopePersistence extends SavedData {
         level.getDataStorage().save();
     }
 
-    public void addRope(NewRope rope) {
+    public void addRope(Rope rope) {
         persistenceRopes.put(rope.ropeId, rope);
         setDirty();
     }

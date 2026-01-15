@@ -11,8 +11,8 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.rope.roperework.NewRope;
-import yay.evy.everest.vstuff.content.rope.roperework.NewRopeUtils;
+import yay.evy.everest.vstuff.content.rope.roperework.Rope;
+import yay.evy.everest.vstuff.content.rope.roperework.RopeUtil;
 import yay.evy.everest.vstuff.content.rope.roperework.RopeManager;
 import yay.evy.everest.vstuff.content.rope.roperework.RopePersistence;
 import yay.evy.everest.vstuff.foundation.RopeStyles;
@@ -30,14 +30,14 @@ public class ColorHaggler {
             Player player = event.getEntity();
 
             if (level instanceof ServerLevel serverLevel) {
-                Integer targetConstraintId = NewRopeUtils.getTargetedRope(serverLevel, player);
+                Integer targetConstraintId = RopeUtil.getTargetedRope(serverLevel, player);
                 if (player instanceof ServerPlayer serverPlayer) {
                     if (itemStack.is(Tags.Items.DYES)) {
                         if (!event.getLevel().isClientSide) {
 
                             if (ropeIsColorable(serverLevel, player)) {
 
-                                NewRope rope = RopeManager.getActiveRopes().get(targetConstraintId);
+                                Rope rope = RopeManager.getActiveRopes().get(targetConstraintId);
                                 RopePersistence ropePersistence = RopePersistence.getOrCreate(serverLevel);
 
                                 rope.style = getDyedStyle(item.toString(), getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(serverLevel, player));
@@ -67,9 +67,9 @@ public class ColorHaggler {
     }
 
     private static RopeStyles.PrimitiveRopeStyle getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(ServerLevel level, Player player) {
-        Integer targetConstraintId = NewRopeUtils.getTargetedRope(level, player);
+        Integer targetConstraintId = RopeUtil.getTargetedRope(level, player);
 
-        NewRope wizardsWorstKeptSecret = RopeManager.getActiveRopes().get(targetConstraintId);
+        Rope wizardsWorstKeptSecret = RopeManager.getActiveRopes().get(targetConstraintId);
 
         return wizardsWorstKeptSecret.style.getBasicStyle();
     }
