@@ -319,7 +319,7 @@ public class Rope {
                     ConstraintTracker.syncAllConstraintsToPlayer(sp);
                 }
             }
-         //   VStuff.LOGGER.info("Successfully restored Physics Joint for Rope ID: {} (Physics ID: {})", this.ID, newConstraintId);
+            //   VStuff.LOGGER.info("Successfully restored Physics Joint for Rope ID: {} (Physics ID: {})", this.ID, newConstraintId);
         });
     }
 
@@ -395,19 +395,31 @@ public class Rope {
             Vector3d worldPosA, Vector3d worldPosB,
             Player player
     ) {
-        boolean shipAIsWorld = shipA == null;
-        boolean shipBIsWorld = shipB == null;
+        Long groundId = RopeUtil.getGroundBodyId(level);
+
+        boolean shipAIsWorld = (shipA == null || shipA.equals(groundId));
+        boolean shipBIsWorld = (shipB == null || shipB.equals(groundId));
 
         if (!shipAIsWorld && shipBIsWorld) {
             Long tmpShip = shipA; shipA = shipB; shipB = tmpShip;
             Vector3d tmpLocal = localPosA; localPosA = localPosB; localPosB = tmpLocal;
             Vector3d tmpWorld = worldPosA; worldPosA = worldPosB; worldPosB = tmpWorld;
+
+            boolean tmpFlag = shipAIsWorld;
+            shipAIsWorld = shipBIsWorld;
+            shipBIsWorld = tmpFlag;
         }
+
+        if (shipAIsWorld) localPosA = worldPosA;
+        if (shipBIsWorld) localPosB = worldPosB;
 
         double distance = worldPosA.distance(worldPosB);
         double maxAllowedLength = VstuffConfig.MAX_ROPE_LENGTH.get();
         if (distance > maxAllowedLength && player != null) {
-            player.displayClientMessage(Component.literal("§cRope too long! Max length is " + maxAllowedLength + " blocks."), true);
+            player.displayClientMessage(
+                    Component.literal("§cRope too long! Max length is " + maxAllowedLength + " blocks."),
+                    true
+            );
             return RopeUtil.RopeReturn.FAIL;
         }
 
@@ -415,32 +427,57 @@ public class Rope {
         double massA = RopeUtil.getMassForShip(level, shipA);
         double massB = RopeUtil.getMassForShip(level, shipB);
         double effectiveMass = Math.max(Math.min(massA, massB), 100.0);
-        double compliance = (shipAIsWorld || shipBIsWorld) ? 1e-12 / effectiveMass * 0.05 : 1e-12 / effectiveMass;
+        double compliance = (shipAIsWorld || shipBIsWorld)
+                ? 1e-12 / effectiveMass * 0.05
+                : 1e-12 / effectiveMass;
         double massRatio = Math.max(massA, massB) / Math.min(massA, massB);
         double maxForce = 5e13 * Math.min(massRatio, 20.0) * (shipAIsWorld || shipBIsWorld ? 10 : 1);
 
         RopeStyles.RopeStyle ropeStyle = null;
-        if (player instanceof ServerPlayer serverPlayer) {
-            ropeStyle = RopeStyleHandlerServer.getStyle(serverPlayer.getUUID());
+        if (player instanceof ServerPlayer sp) {
+            ropeStyle = RopeStyleHandlerServer.getStyle(sp.getUUID());
         }
         if (ropeStyle == null) {
-            ropeStyle = new RopeStyles.RopeStyle("normal", RopeStyles.PrimitiveRopeStyle.NORMAL, "vstuff.ropes.normal");
+            ropeStyle = new RopeStyles.RopeStyle(
+                    "normal",
+                    RopeStyles.PrimitiveRopeStyle.NORMAL,
+                    "vstuff.ropes.normal"
+            );
         }
 
         int persistentId = ConstraintTracker.getNextId();
+        Long finalShipA = shipAIsWorld ? null : shipA;
+        Long finalShipB = shipBIsWorld ? null : shipB;
 
         if (shipAIsWorld && shipBIsWorld) {
-            Rope rope = new Rope(level, persistentId, null, null, localPosA, localPosB,
-                    maxLength, compliance, maxForce, ConstraintType.GENERIC, null, ropeStyle, null);
+            Rope rope = new Rope(
+                    level,
+                    persistentId,
+                    null,
+                    null,
+                    localPosA,
+                    localPosB,
+                    maxLength,
+                    compliance,
+                    maxForce,
+                    ConstraintType.GENERIC,
+                    null,
+                    ropeStyle,
+                    null
+            );
             rope.hasRestoredJoint = true;
             ConstraintTracker.addConstraintWithPersistence(rope);
-            if (player instanceof ServerPlayer sp) ConstraintTracker.syncAllConstraintsToPlayer(sp);
-            return new RopeReturn(RopeInteractionReturn.SUCCESS, rope);
+            if (player instanceof ServerPlayer sp) {
+                ConstraintTracker.syncAllConstraintsToPlayer(sp);
+            }
+            return new RopeReturn(RopeUtil.RopeInteractionReturn.SUCCESS, rope);
         }
 
         VSDistanceJoint ropeConstraint = new VSDistanceJoint(
-                shipA, new VSJointPose(localPosA, new Quaterniond()),
-                shipB, new VSJointPose(localPosB, new Quaterniond()),
+                finalShipA,
+                new VSJointPose(localPosA, new Quaterniond()),
+                finalShipB,
+                new VSJointPose(localPosB, new Quaterniond()),
                 new VSJointMaxForceTorque((float) maxForce, (float) maxForce),
                 compliance,
                 0f,
@@ -450,8 +487,21 @@ public class Rope {
                 100f
         );
 
-        Rope rope = new Rope(level, persistentId, shipA, shipB, localPosA, localPosB,
-                maxLength, compliance, maxForce, ConstraintType.GENERIC, null, ropeStyle, ropeConstraint);
+        Rope rope = new Rope(
+                level,
+                persistentId,
+                finalShipA,
+                finalShipB,
+                localPosA,
+                localPosB,
+                maxLength,
+                compliance,
+                maxForce,
+                ConstraintType.GENERIC,
+                null,
+                ropeStyle,
+                ropeConstraint
+        );
 
         var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(ValkyrienSkies.getDimensionId(level));
 
@@ -459,11 +509,14 @@ public class Rope {
             rope.physicsId = newConstraintId;
             rope.hasRestoredJoint = true;
             ConstraintTracker.addConstraintWithPersistence(rope);
-            if (player instanceof ServerPlayer sp) ConstraintTracker.syncAllConstraintsToPlayer(sp);
+            if (player instanceof ServerPlayer sp) {
+                ConstraintTracker.syncAllConstraintsToPlayer(sp);
+            }
         });
 
-        return new RopeReturn(RopeInteractionReturn.SUCCESS, rope);
+        return new RopeReturn(RopeUtil.RopeInteractionReturn.SUCCESS, rope);
     }
+
     /**
      * Create a Rope from data in a CompoundTag, except the level and constraint parameters,
      * as those cannot be restored from the tag.

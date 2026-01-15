@@ -90,9 +90,9 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
         RopeUtil.RopeReturn ropeReturn = Rope.createNew(
                 VStuffItems.LEAD_CONSTRAINT_ITEM.get(),
                 serverLevel,
-                startPos,
+                this.startPos,
                 hitPos,
-                startShipId,
+                this.startShipId,
                 secondShipId,
                 getOwner() instanceof Player p ? p : null
         );
