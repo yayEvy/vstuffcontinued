@@ -50,8 +50,8 @@ public class VstuffConfig {
 
         serverBuilder.push("phys grabber");
         PHYS_GRABBER_MAX_MASS = serverBuilder
-                .comment("The maximum weight the Phys Grabber can grab. (default: 20000.0)")
-                .define("grabber_max_mass", 20000.0);
+                .comment("The maximum weight the Phys Grabber can grab. (default: 500000.0)")
+                .define("grabber_max_mass", 500000.0);
         serverBuilder.pop();
 
         SERVER_CONFIG = serverBuilder.build();

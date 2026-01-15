@@ -16,7 +16,7 @@ public final class PhysGrabberServerAttachment implements ShipPhysicsListener {
     private boolean active = false;
     private boolean isCreative = false;
 
-    private static final double MAX_SPEED = 20.0;
+    private static final double MAX_SPEED = 60.0;
 
     @Override
     public void physTick(@NotNull PhysShip physShip, @NotNull PhysLevel physLevel) {
@@ -31,7 +31,7 @@ public final class PhysGrabberServerAttachment implements ShipPhysicsListener {
 
         if (distance < 0.05) return;
 
-        double pullSpeed = Math.min(MAX_SPEED, distance * 2.0);
+        double pullSpeed = Math.min(MAX_SPEED, distance * 5.0);
         Vector3d desiredVel = new Vector3d(toTarget).normalize().mul(pullSpeed);
 
         Vector3d velError = desiredVel.sub(currentVel);
@@ -43,7 +43,7 @@ public final class PhysGrabberServerAttachment implements ShipPhysicsListener {
                 .mul(ship.getMass())
                 .mul(D_GAIN);
 
-        double maxForce = isCreative ? Double.MAX_VALUE : 10000.0;
+        double maxForce = isCreative ? Double.MAX_VALUE : 5000000.0;
 
         force.x = Math.max(Math.min(force.x, maxForce), -maxForce);
         force.y = Math.max(Math.min(force.y, maxForce), -maxForce);
