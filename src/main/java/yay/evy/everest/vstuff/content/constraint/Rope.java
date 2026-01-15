@@ -341,7 +341,7 @@ public class Rope {
                 (float) maxLength,
                 0.1f,
                 1e8f,
-                100f
+                null
         );
     }
 
@@ -484,7 +484,7 @@ public class Rope {
                 (float) maxLength,
                 1f,
                 1e8f,
-                100f
+                null
         );
 
         Rope rope = new Rope(
