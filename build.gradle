@@ -264,7 +264,8 @@ tasks.named('processResources', ProcessResources).configure {
             minecraft_version: minecraft_version, forge_version: forge_version,
             mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, version: mod_version,
             mod_author: mod_author, mod_description: mod_description, issue_tracker: issue_tracker,
-            homepage: homepage, sources: sources, vs2_version: vs2_version
+            homepage: homepage, sources: sources, vs2_version: vs2_version,
+            vs2_min_version: vs2_min_version
     ]
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
