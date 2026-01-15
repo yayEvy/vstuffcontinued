@@ -34,11 +34,10 @@ public class VStuffShapes {
                 .add(3,9.75,7,13,13.75,11) // small bar
                 .forDirectional(),
 
-        PULLEY_ANCHOR = shape(4,4,15,12,12,16)
-                .add(3,3,14,13,13,15)
-                .add(5,5,13,11,11,14)
-                .forDirectional();
-
+    PULLEY_ANCHOR = shape(4, 0, 4, 12, 1, 12)
+            .add(3, 1, 3, 13, 2, 13)
+            .add(5, 2, 5, 11, 3, 11)
+            .forDirectional(Direction.UP);
 
     public static Builder shape(VoxelShape shape) {
         return new Builder(shape);

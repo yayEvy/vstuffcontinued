@@ -56,11 +56,11 @@ public class VStuffBlocks  {
             REGISTRATE.block("pulley_anchor", PulleyAnchorBlock::new)
                     .initialProperties(() -> Blocks.IRON_BLOCK)
                     .transform(pickaxeOnly())
-                    .blockstate(BlockStateGen.horizontalBlockProvider(true))
+                    .blockstate((c, p) -> p.directionalBlock(c.get(), p.models()
+                            .getExistingFile(p.modLoc("block/pulley_anchor/block"))))
                     .item()
-                    .model(AssetLookup.itemModel("pulley_anchor.json"))
+                    .model((c, p) -> p.withExistingParent(c.getName(), p.modLoc("block/pulley_anchor/block")))
                     .build()
                     .register();
-
     public static void register() {}
 }
