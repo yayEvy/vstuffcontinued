@@ -11,6 +11,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.constraint.LeadBreakItem;
 import yay.evy.everest.vstuff.content.constraint.LeadConstraintItem;
+import yay.evy.everest.vstuff.content.expendable_assembler.ExpendableAssemblerItem;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberItem;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.EmptyEnergyCoreItem;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.EnergyCoreItem;
@@ -73,6 +74,16 @@ public class VStuffItems {
                             .rarity(Rarity.UNCOMMON))
                     .model(AssetLookup.itemModelWithPartials())
                     .register();
+
+    public static final ItemEntry<ExpendableAssemblerItem> EXPENDABLE_ASSEMBLER =
+            REGISTRATE.item("expendable_assembler", ExpendableAssemblerItem::new)
+                    .properties(p -> p
+                            .stacksTo(1)
+                            .rarity(Rarity.UNCOMMON)
+                            .durability(1)) // cause funny one use teheheehehehe
+                    .model(AssetLookup.itemModelWithPartials())
+                    .register();
+
 
 
 

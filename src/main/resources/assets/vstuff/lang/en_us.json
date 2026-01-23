@@ -8,11 +8,13 @@
   "item.vstuff.empty_energy_core": "Empty Energy Core",
   "item.vstuff.energy_core": "Energy Core",
   "item.vstuff.rope_thrower": "Rope Thrower",
-  "item.vstuff.rope_thrower.tooltip": "Creates a rope between a block and the block the projectile hits.",
+  "item.vstuff.expendable_assembler": "Expendable Assembler",
+  "vstuff.expendable_assembler.tooltip.summary": "A _single use_ method of assembling ships! Very _fragile!_",
+  "item.vstuff.rope_thrower.tooltip": "Creates a _rope_ between a block and the block the projectile hits.",
   "block.vstuff.pulley_anchor": "Pulley Anchor",
   "item.vstuff.pulley_anchor": "Pulley Anchor",
   "vstuff.pulley_anchor.tooltip": "Use this as a second pos for pulley connections!",
-  "vstuff.pulley_anchor.tooltip.summary": "Acts as an anchor point for pulley rope connections",
+  "vstuff.pulley_anchor.tooltip.summary": "Acts as an _anchor point_ for _pulley_ rope connections",
 
   "block.vstuff.phys_pulley": "Phys Pulley",
   "block.vstuff.rotational_thruster": "Rotational Thruster",
@@ -66,8 +68,8 @@
   "vstuff.rope_thrower.tooltip.condition1": "Right-click the first block as normal",
   "vstuff.rope_thrower.tooltip.behavior1": "Creates a rope between the first block and the block the projectile hits when thrown.",
 
-  "vstuff.lead_break_item.tooltip.summary": "Cuts the rope you are looking at.",
-  "vstuff.phys_grabber.tooltip.summary": "A method of dragging ships around!",
+  "vstuff.lead_break_item.tooltip.summary": "_Cuts the rope_ you are looking at.",
+  "vstuff.phys_grabber.tooltip.summary": "A method of _moving ships_ around!",
   "vstuff.tooltip.hold_for_details": "Hold [%s] for summary",
 
   "vstuff.rope.normal": "Normal",

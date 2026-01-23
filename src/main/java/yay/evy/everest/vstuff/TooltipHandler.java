@@ -81,6 +81,9 @@ public class TooltipHandler {
         tooltipModifications.put(VStuffItems.ROPE_THROWER_ITEM.get(),
                 (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
 
+        tooltipModifications.put(VStuffItems.EXPENDABLE_ASSEMBLER.get(),
+                (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
+
         tooltipModifications.put(VStuffBlocks.PULLEY_ANCHOR.asItem(),
                 (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
     }
