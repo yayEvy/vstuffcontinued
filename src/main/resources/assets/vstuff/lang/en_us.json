@@ -9,7 +9,7 @@
   "item.vstuff.energy_core": "Energy Core",
   "item.vstuff.rope_thrower": "Rope Thrower",
   "item.vstuff.expendable_assembler": "Expendable Assembler",
-  "vstuff.expendable_assembler.tooltip.summary": "A _single use_ method of assembling ships! Very _fragile!_",
+  "vstuff.expendable_assembler.tooltip.summary": "A _single use_ method of assembling ships! Who knows how this thing works... Very _fragile!_",
   "item.vstuff.rope_thrower.tooltip": "Creates a _rope_ between a block and the block the projectile hits.",
   "block.vstuff.pulley_anchor": "Pulley Anchor",
   "item.vstuff.pulley_anchor": "Pulley Anchor",
