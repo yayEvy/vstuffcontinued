@@ -2,22 +2,23 @@ package yay.evy.everest.vstuff.content.physgrabber;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextColor;
-import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
-import org.valkyrienskies.core.api.ships.Ship;
 import yay.evy.everest.vstuff.network.PhysGrabberNetwork;
+import yay.evy.everest.vstuff.index.VStuffSounds;
+
 
 public class PhysGrabberClientHandler {
 
     private static LoadedShip grabbedShip = null;
+    private static SoundInstance humSound = null;
+
 
     public static boolean tryGrabOrRelease(Minecraft mc, Player player) {
         if (grabbedShip == null) {
@@ -34,22 +35,27 @@ public class PhysGrabberClientHandler {
 
             if (ship != null) {
                 Vec3 target = player.getEyePosition(1.0F).add(player.getLookAngle().scale(5.0));
-                boolean creative = player.isCreative();
-
-                PhysGrabberNetwork.sendGrab(ship.getId(), target, creative);
-
+                PhysGrabberNetwork.sendGrab(ship.getId(), target, player.isCreative());
                 grabbedShip = ship;
+
+                if (mc.level != null) {
+                    humSound = new GrabberHum(VStuffSounds.GRABBER_HUM.get(), ship, player);
+                    mc.getSoundManager().play(humSound);
+                }
                 return true;
             }
-
             return false;
         } else {
             PhysGrabberNetwork.sendRelease(grabbedShip.getId());
             grabbedShip = null;
+
+            if (humSound instanceof GrabberHum hum) {
+                hum.startStopping();
+                humSound = null;
+            }
             return true;
         }
     }
-
 
     public static void tickClient(Minecraft mc, Player player) {
         if (grabbedShip == null) return;
@@ -61,11 +67,10 @@ public class PhysGrabberClientHandler {
 
         Vec3 lookDir = player.getLookAngle();
         Vec3 target = eyePos.add(lookDir.scale(5.0)).add(0, 0.5, 0);
-
         boolean creative = player.isCreative();
         PhysGrabberNetwork.sendUpdate(grabbedShip.getId(), target, creative);
-    }
 
+    }
 
     public static Vec3 getGrabbedShipPos(float partialTicks) {
         if (grabbedShip == null) return null;

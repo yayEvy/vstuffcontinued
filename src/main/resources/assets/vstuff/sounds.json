@@ -22,5 +22,14 @@
         "stream": false
       }
     ]
+  },
+  "grabber_hum": {
+    "subtitle": "subtitles.vstuff.grabber_hum",
+    "sounds": [
+      {
+        "name": "vstuff:grabber_hum",
+        "stream": true
+      }
+    ]
   }
 }
