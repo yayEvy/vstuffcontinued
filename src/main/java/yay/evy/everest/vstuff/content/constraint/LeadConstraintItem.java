@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.VstuffConfig;
 import yay.evy.everest.vstuff.client.ClientOutlineHandler;
 import yay.evy.everest.vstuff.client.NetworkHandler;
 import yay.evy.everest.vstuff.content.pulley.*;
@@ -139,26 +140,33 @@ public class LeadConstraintItem extends Item {
 
             if (ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS) {
 
+                if (!player.getAbilities().instabuild) {
+                    heldItem.shrink(1);
+                }
+
                 boolean isChain =
                         RopeStyleHandlerServer.getStyle(player.getUUID())
                                         .getBasicStyle() == RopeStyles.PrimitiveRopeStyle.CHAIN;
 
-                serverLevel.playSound(
-                        null,
-                        clickedPos,
-                        isChain
-                                ? net.minecraft.sounds.SoundEvents.CHAIN_PLACE
-                                : net.minecraft.sounds.SoundEvents.LEASH_KNOT_PLACE,
-                        net.minecraft.sounds.SoundSource.PLAYERS,
-                        1.0F,
-                        1.0F
-                );
+                if (VstuffConfig.ROPE_SOUNDS.get()) {
+                    serverLevel.playSound(
+                            null,
+                            clickedPos,
+                            isChain
+                                    ? net.minecraft.sounds.SoundEvents.CHAIN_PLACE
+                                    : net.minecraft.sounds.SoundEvents.LEASH_KNOT_PLACE,
+                            net.minecraft.sounds.SoundSource.PLAYERS,
+                            1.0F,
+                            1.0F
+                    );
+                }
                 resetStateWithMessage(serverLevel, heldItem, true, player, isChain ? "chain_created" : "rope_created");
             }
 
             int color = ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS ? ClientOutlineHandler.GREEN : ClientOutlineHandler.RED;
             NetworkHandler.sendOutline(clickedPos, color);
             return ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+
         }
     }
 

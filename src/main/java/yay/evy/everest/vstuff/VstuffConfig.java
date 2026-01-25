@@ -17,13 +17,8 @@ public class VstuffConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> MAX_ROPE_LENGTH;
     public static final ForgeConfigSpec.ConfigValue<Double> ROPE_THICKNESS;
     public static final ForgeConfigSpec.BooleanValue ROPE_SOUNDS;
-    public static final ForgeConfigSpec.BooleanValue ROPE_ONLY_FULL_BLOCKS;
 
     public static final ForgeConfigSpec.ConfigValue<Double> PHYS_GRABBER_MAX_MASS;
-
-
-
-    public static final ForgeConfigSpec.ConfigValue<Double> PULLEY_SPEED;
 
     static {
 
@@ -40,13 +35,9 @@ public class VstuffConfig {
 
         serverBuilder.push("rope");
         MAX_ROPE_LENGTH = serverBuilder.define("max_rope_length", 200.0);
-        ROPE_ONLY_FULL_BLOCKS = serverBuilder.define("ropeOnlyFullBlocks", true);
         ROPE_SOUNDS = serverBuilder.define("ropeSounds", true);
         serverBuilder.pop();
 
-        serverBuilder.push("pulley");
-        PULLEY_SPEED = serverBuilder.define("pulley_speed", 0.1);
-        serverBuilder.pop();
 
         serverBuilder.push("phys grabber");
         PHYS_GRABBER_MAX_MASS = serverBuilder
@@ -60,7 +51,7 @@ public class VstuffConfig {
         ForgeConfigSpec.Builder clientBuilder = new ForgeConfigSpec.Builder();
 
         clientBuilder.push("rope_client");
-        ROPE_THICKNESS = clientBuilder.defineInRange("thickness", 0.28, 0.01, 1.0);
+        ROPE_THICKNESS = clientBuilder.defineInRange("rope thickness", 0.28, 0.01, 1.0);
         clientBuilder.pop();
 
         CLIENT_CONFIG = clientBuilder.build();

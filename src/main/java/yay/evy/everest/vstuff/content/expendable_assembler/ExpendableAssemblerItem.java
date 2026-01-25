@@ -8,10 +8,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import org.valkyrienskies.mod.common.assembly.ShipAssembler;
+import yay.evy.everest.vstuff.index.VStuffSounds;
 
 import java.util.Set;
 
 public class ExpendableAssemblerItem extends Item {
+
+    private static final int COOLDOWN_TICKS = 20 * 5;
 
     public ExpendableAssemblerItem(Properties properties) {
         super(properties);
@@ -23,21 +26,37 @@ public class ExpendableAssemblerItem extends Item {
         ItemStack stack = context.getItemInHand();
         BlockPos clickedPos = context.getClickedPos();
 
-        if (!level.isClientSide) {
-            try {
-                if (level instanceof ServerLevel serverLevel) {
-                    Set<BlockPos> blocksToAssemble = Set.of(clickedPos);
-                    ShipAssembler.assembleToShipFull(serverLevel, blocksToAssemble, 1);
-                }
-
-                stack.hurtAndBreak(1, context.getPlayer(), p -> p.broadcastBreakEvent(context.getHand()));
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (!(level instanceof ServerLevel serverLevel) || context.getPlayer() == null) {
+            return InteractionResult.PASS;
         }
 
-        return InteractionResult.sidedSuccess(level.isClientSide);
-    }
+        if (context.getPlayer().getCooldowns().isOnCooldown(this)) {
+            return InteractionResult.CONSUME;
+        }
 
+        try {
+            Set<BlockPos> blocksToAssemble = Set.of(clickedPos);
+            ShipAssembler.assembleToShipFull(serverLevel, blocksToAssemble, 1);
+
+            context.getPlayer().getCooldowns().addCooldown(this, COOLDOWN_TICKS);
+
+            stack.shrink(1);
+
+            serverLevel.playSound(
+                    null,
+                    clickedPos,
+                    VStuffSounds.ASSEMBLE.get(),
+                    net.minecraft.sounds.SoundSource.PLAYERS,
+                    0.8F,
+                    1.0F
+            );
+
+            return InteractionResult.sidedSuccess(level.isClientSide);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return InteractionResult.CONSUME;
+        }
+    }
 }

@@ -78,9 +78,8 @@ public class VStuffItems {
     public static final ItemEntry<ExpendableAssemblerItem> EXPENDABLE_ASSEMBLER =
             REGISTRATE.item("expendable_assembler", ExpendableAssemblerItem::new)
                     .properties(p -> p
-                            .stacksTo(1)
-                            .rarity(Rarity.UNCOMMON)
-                            .durability(1)) // cause funny one use teheheehehehe
+                            .stacksTo(16)
+                            .rarity(Rarity.UNCOMMON))
                     .model(AssetLookup.itemModelWithPartials())
                     .register();
 

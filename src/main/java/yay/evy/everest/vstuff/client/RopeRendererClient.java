@@ -377,82 +377,81 @@ public class RopeRendererClient {
                                         RopeStyles.RopeStyle style) {
         Matrix4f matrix = poseStack.last().pose();
 
-        Vector3d start = curvePoints[0];
-        Vector3d end = curvePoints[ROPE_CURVE_SEGMENTS];
-        Vector3d dir = new Vector3d(end).sub(start).normalize();
-
-        Vector3d worldUp = new Vector3d(0, 1, 0);
-        Vector3d right = new Vector3d();
-        if (Math.abs(dir.dot(worldUp)) > 0.9) right.set(1, 0, 0);
-        else dir.cross(worldUp, right).normalize();
-
-        Vector3d up = new Vector3d();
-        right.cross(dir, up).normalize();
-
-        Vector3d[] topRightStrip = new Vector3d[ROPE_CURVE_SEGMENTS + 1];
-        Vector3d[] topLeftStrip = new Vector3d[ROPE_CURVE_SEGMENTS + 1];
-        Vector3d[] bottomLeftStrip = new Vector3d[ROPE_CURVE_SEGMENTS + 1];
-        Vector3d[] bottomRightStrip = new Vector3d[ROPE_CURVE_SEGMENTS + 1];
-
-        double halfWidth = getRopeWidth() * 5f;
-        Vector3d rightScaled = new Vector3d(right).mul(halfWidth);
-        Vector3d upScaled = new Vector3d(up).mul(halfWidth);
-
-        for (int i = 0; i <= ROPE_CURVE_SEGMENTS; i++) {
-            Vector3d center = curvePoints[i];
-            topRightStrip[i] = new Vector3d(center).add(rightScaled).add(upScaled);
-            topLeftStrip[i] = new Vector3d(center).sub(rightScaled).add(upScaled);
-            bottomLeftStrip[i] = new Vector3d(center).sub(rightScaled).sub(upScaled);
-            bottomRightStrip[i] = new Vector3d(center).add(rightScaled).sub(upScaled);
-        }
-
-        Vector3d diag1 = new Vector3d(right).add(up).normalize();
-        Vector3d diag2 = new Vector3d(right).sub(up).normalize();
-
-        double[] cumulativeDistances = new double[ROPE_CURVE_SEGMENTS + 1];
         double totalLen = 0;
+        double[] cumulativeDistances = new double[ROPE_CURVE_SEGMENTS + 1];
         cumulativeDistances[0] = 0;
         for (int i = 0; i < ROPE_CURVE_SEGMENTS; i++) {
             totalLen += curvePoints[i].distance(curvePoints[i + 1]);
             cumulativeDistances[i + 1] = totalLen;
         }
 
-        renderRopeFaceWithRepeatingUVs(vertexConsumer, matrix, topLeftStrip, bottomRightStrip,
-                diag1, curvePoints, lightValues, cumulativeDistances, CHAIN_ROPE_V_SCALE);
+        double halfWidth = getRopeWidth() * 1.5;
+        double linkLengthInBlocks = 1.0;
+        double textureVScale = 1.2 / linkLengthInBlocks;
 
-        renderRopeFaceWithRepeatingUVs(vertexConsumer, matrix, topRightStrip, bottomLeftStrip,
-                diag2, curvePoints, lightValues, cumulativeDistances, CHAIN_ROPE_V_SCALE);
+        for (int i = 0; i < ROPE_CURVE_SEGMENTS; i++) {
+            Vector3d pStart = curvePoints[i];
+            Vector3d pEnd = curvePoints[i + 1];
+            Vector3d segDir = new Vector3d(pEnd).sub(pStart).normalize();
+
+            Vector3d worldUp = new Vector3d(0, 1, 0);
+            Vector3d right = new Vector3d();
+            if (Math.abs(segDir.dot(worldUp)) > 0.9) right.set(1, 0, 0);
+            else segDir.cross(worldUp, right).normalize();
+
+            Vector3d up = new Vector3d();
+            right.cross(segDir, up).normalize();
+
+            Vector3d rScaled = new Vector3d(right).mul(halfWidth);
+            Vector3d uScaled = new Vector3d(up).mul(halfWidth);
+
+            Vector3d diag1 = new Vector3d(right).add(up).normalize();
+            Vector3d diag2 = new Vector3d(right).sub(up).normalize();
+
+            Vector3d startTR = new Vector3d(pStart).add(rScaled).add(uScaled);
+            Vector3d startBL = new Vector3d(pStart).sub(rScaled).sub(uScaled);
+            Vector3d endTR = new Vector3d(pEnd).add(rScaled).add(uScaled);
+            Vector3d endBL = new Vector3d(pEnd).sub(rScaled).sub(uScaled);
+
+            Vector3d startTL = new Vector3d(pStart).sub(rScaled).add(uScaled);
+            Vector3d startBR = new Vector3d(pStart).add(rScaled).sub(uScaled);
+            Vector3d endTL = new Vector3d(pEnd).sub(rScaled).add(uScaled);
+            Vector3d endBR = new Vector3d(pEnd).add(rScaled).sub(uScaled);
+
+            float vStart = (float) (cumulativeDistances[i] * textureVScale);
+            float vEnd = (float) (cumulativeDistances[i + 1] * textureVScale);
+
+            addRopeVertex(vertexConsumer, matrix, startTL, 0.0f, vStart, lightValues[i], diag1);
+            addRopeVertex(vertexConsumer, matrix, startBR, 1.0f, vStart, lightValues[i], diag1);
+            addRopeVertex(vertexConsumer, matrix, endTL, 0.0f, vEnd, lightValues[i + 1], diag1);
+            addRopeVertex(vertexConsumer, matrix, startBR, 1.0f, vStart, lightValues[i], diag1);
+            addRopeVertex(vertexConsumer, matrix, endBR, 1.0f, vEnd, lightValues[i + 1], diag1);
+            addRopeVertex(vertexConsumer, matrix, endTL, 0.0f, vEnd, lightValues[i + 1], diag1);
+
+            addRopeVertex(vertexConsumer, matrix, startTR, 0.0f, vStart, lightValues[i], diag2);
+            addRopeVertex(vertexConsumer, matrix, startBL, 1.0f, vStart, lightValues[i], diag2);
+            addRopeVertex(vertexConsumer, matrix, endTR, 0.0f, vEnd, lightValues[i + 1], diag2);
+            addRopeVertex(vertexConsumer, matrix, startBL, 1.0f, vStart, lightValues[i], diag2);
+            addRopeVertex(vertexConsumer, matrix, endBL, 1.0f, vEnd, lightValues[i + 1], diag2);
+            addRopeVertex(vertexConsumer, matrix, endTR, 0.0f, vEnd, lightValues[i + 1], diag2);
+        }
     }
 
     private static void renderRopeFaceWithRepeatingUVs(VertexConsumer vertexConsumer, Matrix4f matrix,
                                                        Vector3d[] strip1, Vector3d[] strip2, Vector3d normal,
                                                        Vector3d[] curvePoints, int[] lightValues, double[] cumulativeDistances,
                                                        double textureRepeatScale) {
-        double ropeLength = cumulativeDistances[ROPE_CURVE_SEGMENTS];
-        double textureScalePerBlock = textureRepeatScale;
-        double linkLength = 1.0;
-        double leftover = ropeLength % linkLength;
-        double uvOffset = -(leftover * 0.5 * textureScalePerBlock);
-
         for (int i = 0; i < ROPE_CURVE_SEGMENTS; i++) {
-            float vStart = (float) (cumulativeDistances[i] * textureScalePerBlock + uvOffset);
-            float vEnd = (float) (cumulativeDistances[i + 1] * textureScalePerBlock + uvOffset);
+            float vStart = (float) (cumulativeDistances[i] * textureRepeatScale);
+            float vEnd = (float) (cumulativeDistances[i + 1] * textureRepeatScale);
 
-            int lightStart = lightValues[i];
-            int lightEnd = lightValues[i + 1];
+            addRopeVertex(vertexConsumer, matrix, strip1[i], 0.0f, vStart, lightValues[i], normal);
+            addRopeVertex(vertexConsumer, matrix, strip2[i], 1.0f, vStart, lightValues[i], normal);
+            addRopeVertex(vertexConsumer, matrix, strip1[i + 1], 0.0f, vEnd, lightValues[i + 1], normal);
 
-            Vector3d p1 = strip1[i];
-            Vector3d p2 = strip2[i];
-            Vector3d p3 = strip2[i + 1];
-            Vector3d p4 = strip1[i + 1];
-
-            addRopeVertex(vertexConsumer, matrix, p1, 0.0f, vStart, lightStart, normal);
-            addRopeVertex(vertexConsumer, matrix, p2, 1.0f, vStart, lightStart, normal);
-            addRopeVertex(vertexConsumer, matrix, p4, 0.0f, vEnd, lightEnd, normal);
-
-            addRopeVertex(vertexConsumer, matrix, p2, 1.0f, vStart, lightStart, normal);
-            addRopeVertex(vertexConsumer, matrix, p3, 1.0f, vEnd, lightEnd, normal);
-            addRopeVertex(vertexConsumer, matrix, p4, 0.0f, vEnd, lightEnd, normal);
+            addRopeVertex(vertexConsumer, matrix, strip2[i], 1.0f, vStart, lightValues[i], normal);
+            addRopeVertex(vertexConsumer, matrix, strip2[i + 1], 1.0f, vEnd, lightValues[i + 1], normal);
+            addRopeVertex(vertexConsumer, matrix, strip1[i + 1], 0.0f, vEnd, lightValues[i + 1], normal);
         }
     }
 
