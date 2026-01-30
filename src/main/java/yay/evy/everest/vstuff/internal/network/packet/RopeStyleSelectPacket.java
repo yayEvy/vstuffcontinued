@@ -1,10 +1,10 @@
-package yay.evy.everest.vstuff.util.packet;
+package yay.evy.everest.vstuff.internal.network.packet;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
-import yay.evy.everest.vstuff.util.RopeStyles;
+import yay.evy.everest.vstuff.internal.RopeStyles;
 
 import java.util.function.Supplier;
 

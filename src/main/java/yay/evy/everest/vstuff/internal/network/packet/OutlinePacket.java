@@ -1,9 +1,8 @@
-package yay.evy.everest.vstuff.util.packet;
+package yay.evy.everest.vstuff.internal.network.packet;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
-import org.valkyrienskies.core.impl.shadow.Bl;
 import yay.evy.everest.vstuff.client.ClientOutlineHandler;
 import java.util.function.Supplier;
 

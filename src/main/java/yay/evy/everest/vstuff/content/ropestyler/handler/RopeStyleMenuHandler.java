@@ -8,7 +8,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import yay.evy.everest.vstuff.content.ropestyler.RopeStylerScreen;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.index.VStuffKeys;
-import yay.evy.everest.vstuff.util.EntityUtils;
+import yay.evy.everest.vstuff.internal.utility.EntityUtils;
 
 public class RopeStyleMenuHandler {
 

@@ -2,7 +2,7 @@ package yay.evy.everest.vstuff;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 
-public class VstuffConfig {
+public class VStuffConfig {
 
     public static final ForgeConfigSpec SERVER_CONFIG;
     public static final ForgeConfigSpec CLIENT_CONFIG;

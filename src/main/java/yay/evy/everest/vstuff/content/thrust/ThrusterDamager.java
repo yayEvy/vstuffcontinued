@@ -15,8 +15,8 @@ import org.joml.Math;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
-import yay.evy.everest.vstuff.MathUtility;
-import yay.evy.everest.vstuff.VstuffConfig;
+import yay.evy.everest.vstuff.internal.utility.MathUtility;
+import yay.evy.everest.vstuff.VStuffConfig;
 
 import java.util.List;
 
@@ -39,7 +39,7 @@ public class ThrusterDamager {
     }
 
     private boolean shouldDamageEntities() {
-        return VstuffConfig.THRUSTER_DAMAGE_ENTITIES.get()
+        return VStuffConfig.THRUSTER_DAMAGE_ENTITIES.get()
                 && thruster.isWorking();
     }
 

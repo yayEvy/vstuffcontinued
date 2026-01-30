@@ -1,9 +1,6 @@
 package yay.evy.everest.vstuff.content.ropestyler.handler;
 
-import org.jetbrains.annotations.Nullable;
-
-import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.util.RopeStyles;
+import yay.evy.everest.vstuff.internal.RopeStyles;
 
 import java.util.HashMap;
 import java.util.UUID;

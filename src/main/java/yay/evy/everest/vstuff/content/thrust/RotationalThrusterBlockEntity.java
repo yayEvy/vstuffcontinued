@@ -22,7 +22,7 @@ import org.joml.Math;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
-import yay.evy.everest.vstuff.VstuffConfig;
+import yay.evy.everest.vstuff.VStuffConfig;
 import yay.evy.everest.vstuff.particles.ParticleTypes;
 import yay.evy.everest.vstuff.particles.PlumeParticleData;
 
@@ -102,7 +102,7 @@ public class RotationalThrusterBlockEntity extends KineticBlockEntity {
         }
         currentTick++;
         damager.tick(currentTick);
-        int tick_rate = VstuffConfig.THRUSTER_TICKS_PER_UPDATE.get();
+        int tick_rate = VStuffConfig.THRUSTER_TICKS_PER_UPDATE.get();
 
         if (currentTick % (tick_rate * 2) == 0) {
             int previousEmptyBlocks = emptyBlocks;
@@ -130,7 +130,7 @@ public class RotationalThrusterBlockEntity extends KineticBlockEntity {
         float obstructionEffect = calculateObstructionEffect(); // 0..1
         float powerPercentage = Math.min(Math.abs(speed) / MAX_SPEED, 1f); // scale rotation to 0..1
 
-        float thrustMultiplier = VstuffConfig.THRUSTER_THRUST_MULTIPLIER.get().floatValue(); // user-configurable
+        float thrustMultiplier = VStuffConfig.THRUSTER_THRUST_MULTIPLIER.get().floatValue(); // user-configurable
 
         float softPower = (float) java.lang.Math.pow(powerPercentage, 1.2);
 
@@ -187,7 +187,7 @@ public class RotationalThrusterBlockEntity extends KineticBlockEntity {
     }
 
     protected boolean shouldDamageEntities() {
-        return VstuffConfig.THRUSTER_DAMAGE_ENTITIES.get() && isWorking();
+        return VStuffConfig.THRUSTER_DAMAGE_ENTITIES.get() && isWorking();
     }
 
     protected void addSpecificGoggleInfo(List<Component> tooltip, boolean isPlayerSneaking) {}
@@ -209,7 +209,7 @@ public class RotationalThrusterBlockEntity extends KineticBlockEntity {
 
         double particleCountMultiplier = org.joml.Math.clamp(
                 0.0, 2.0,
-                VstuffConfig.THRUSTER_PARTICLE_COUNT_MULTIPLIER.get() * getSpeedScalar()
+                VStuffConfig.THRUSTER_PARTICLE_COUNT_MULTIPLIER.get() * getSpeedScalar()
         );
         if (particleCountMultiplier <= 0) return;
 
@@ -246,7 +246,7 @@ public class RotationalThrusterBlockEntity extends KineticBlockEntity {
                 double shipVelComponentAlongRotatedEjectionNormalized = normalizedVelocity.dot(particleEjectionUnitVecJOML);
 
                 double effect = org.joml.Math.clamp(0.0, 1.0, shipVelComponentAlongRotatedEjectionNormalized);
-                double additionalOffset = shipVelComponentAlongRotatedEjection * VstuffConfig.THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER.get();
+                double additionalOffset = shipVelComponentAlongRotatedEjection * VStuffConfig.THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER.get();
                 currentNozzleOffset += additionalOffset * effect;
                 additionalVel = new Vector3d(shipVelocity).mul(SHIP_VELOCITY_INHERITANCE * effect);
             }

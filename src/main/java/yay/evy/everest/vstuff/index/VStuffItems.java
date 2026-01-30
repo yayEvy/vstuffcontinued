@@ -3,14 +3,10 @@ package yay.evy.everest.vstuff.index;
 import com.simibubi.create.foundation.data.AssetLookup;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.ItemEntry;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.constraint.LeadBreakItem;
-import yay.evy.everest.vstuff.content.constraint.LeadConstraintItem;
+import yay.evy.everest.vstuff.content.ropes.RopeCutterItem;
+import yay.evy.everest.vstuff.content.ropes.RopeItem;
 import yay.evy.everest.vstuff.content.expendable_assembler.ExpendableAssemblerItem;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberItem;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.EmptyEnergyCoreItem;
@@ -27,8 +23,8 @@ public class VStuffItems {
     }
 
 
-    public static final ItemEntry<LeadConstraintItem> LEAD_CONSTRAINT_ITEM =
-            REGISTRATE.item("lead_constraint_item", LeadConstraintItem::new)
+    public static final ItemEntry<RopeItem> LEAD_CONSTRAINT_ITEM =
+            REGISTRATE.item("rope", RopeItem::new)
                     .properties(p -> p
                             .stacksTo(64))
                     .defaultModel()
@@ -41,8 +37,8 @@ public class VStuffItems {
                     .defaultModel()
                     .register();
 
-    public static final ItemEntry<LeadBreakItem> LEAD_BREAK_ITEM =
-            REGISTRATE.item("lead_break_item", LeadBreakItem::new)
+    public static final ItemEntry<RopeCutterItem> LEAD_BREAK_ITEM =
+            REGISTRATE.item("rope_cutter", RopeCutterItem::new)
                     .properties(p -> p
                             .stacksTo(1)
                             .durability(238))

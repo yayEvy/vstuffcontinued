@@ -1124,9 +1124,9 @@ java.lang.IllegalAccessException: class io.netty.util.internal.PlatformDependent
 [18Dec2025 10:44:03.928] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber/LOADING]: Auto-subscribing net.minecraftforge.client.ForgeHooksClient$ClientEvents to MOD
 [18Dec2025 10:44:03.938] [modloading-worker-0/INFO] [yay.evy.everest.vstuff.VStuff/]: VStuff mod initialized
 [18Dec2025 10:44:03.938] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber/LOADING]: Attempting to inject @EventBusSubscriber classes into the eventbus for vstuff
-[18Dec2025 10:44:03.938] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber/LOADING]: Auto-subscribing yay.evy.everest.vstuff.client.ClientConstraintTracker to FORGE
+[18Dec2025 10:44:03.938] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber/LOADING]: Auto-subscribing yay.evy.everest.vstuff.client.ClientRopeManager to FORGE
 [18Dec2025 10:44:03.940] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber/LOADING]: Auto-subscribing yay.evy.everest.vstuff.client.RopeRendererClient to FORGE
-[18Dec2025 10:44:03.944] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber/LOADING]: Auto-subscribing yay.evy.everest.vstuff.content.constraint.ConstraintTracker to FORGE
+[18Dec2025 10:44:03.944] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber/LOADING]: Auto-subscribing yay.evy.everest.vstuff.content.ropes.RopeManager to FORGE
 [18Dec2025 10:44:03.950] [modloading-worker-0/DEBUG] [mixin/]: Mixing client.accessor.GameRendererAccessor from ponder-common.mixins.json into net.minecraft.client.renderer.GameRenderer
 [18Dec2025 10:44:03.954] [modloading-worker-0/DEBUG] [mixin/]: Mixing client.renderer.MixinGameRenderer from valkyrienskies-common.mixins.json into net.minecraft.client.renderer.GameRenderer
 [18Dec2025 10:44:03.959] [modloading-worker-0/DEBUG] [mixin/]: Mixing client.GameRendererMixin from create.mixins.json into net.minecraft.client.renderer.GameRenderer

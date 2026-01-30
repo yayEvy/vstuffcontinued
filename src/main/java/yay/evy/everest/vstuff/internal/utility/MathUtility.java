@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff;
+package yay.evy.everest.vstuff.internal.utility;
 
 import org.joml.Quaterniond;
 import org.joml.Quaterniondc;

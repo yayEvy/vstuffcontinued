@@ -1,16 +1,25 @@
 package yay.evy.everest.vstuff.events;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleMenuHandler;
+import yay.evy.everest.vstuff.index.VStuffEntities;
 
 @EventBusSubscriber(value = Dist.CLIENT, modid = "vstuff")
 public class ClientEvents {
+
+    @SubscribeEvent
+    public static void onClientSetup(FMLClientSetupEvent event) {
+        EntityRenderers.register(VStuffEntities.ROPE_THROWER.get(), ThrownItemRenderer::new);
+    }
 
 
     @SubscribeEvent

@@ -10,7 +10,7 @@ import net.minecraft.world.phys.Vec3;
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
-import yay.evy.everest.vstuff.network.PhysGrabberNetwork;
+import yay.evy.everest.vstuff.internal.network.PhysGrabberNetwork;
 import yay.evy.everest.vstuff.index.VStuffSounds;
 
 

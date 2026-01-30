@@ -1,20 +1,17 @@
-package yay.evy.everest.vstuff.network;
+package yay.evy.everest.vstuff.internal.network;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.simple.SimpleChannel;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
-import org.valkyrienskies.core.api.ships.ShipForcesInducer;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberServerAttachment;
-
-import java.util.Optional;
+import yay.evy.everest.vstuff.internal.network.packet.PhysGrabberPackets;
 
 public class PhysGrabberNetwork {
 

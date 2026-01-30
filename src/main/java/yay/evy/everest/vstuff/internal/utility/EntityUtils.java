@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.util;
+package yay.evy.everest.vstuff.internal.utility;
 
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;

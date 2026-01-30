@@ -5,13 +5,12 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.createmod.catnip.gui.AbstractSimiScreen;
 import net.minecraft.world.entity.player.Player;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.client.NetworkHandler;
+import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import yay.evy.everest.vstuff.content.ropestyler.components.RopeStyleCategory;
 import yay.evy.everest.vstuff.index.VStuffRopeStyles;
-import yay.evy.everest.vstuff.util.RopeStyles.RopeStyle;
-import yay.evy.everest.vstuff.util.client.ClientTextUtils;
+import yay.evy.everest.vstuff.internal.RopeStyles.RopeStyle;
+import yay.evy.everest.vstuff.internal.utility.ClientTextUtils;
 import yay.evy.everest.vstuff.index.VStuffGuiTextures;
-import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
 import yay.evy.everest.vstuff.content.ropestyler.components.RopeStyleButton;
 
 import com.simibubi.create.AllSoundEvents;
@@ -26,7 +25,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
-import yay.evy.everest.vstuff.util.packet.RopeStyleSelectPacket;
+import yay.evy.everest.vstuff.internal.network.packet.RopeStyleSelectPacket;
 
 import java.util.List;
 

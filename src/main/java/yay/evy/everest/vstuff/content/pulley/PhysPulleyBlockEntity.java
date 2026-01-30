@@ -13,9 +13,8 @@ import org.jetbrains.annotations.Nullable;
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.mod.api.BlockEntityPhysicsListener;
-import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.constraint.ConstraintTracker;
-import yay.evy.everest.vstuff.content.constraint.Rope;
+import yay.evy.everest.vstuff.content.ropes.RopeManager;
+import yay.evy.everest.vstuff.content.ropes.Rope;
 import yay.evy.everest.vstuff.index.VStuffBlockEntities;
 
 import java.util.List;
@@ -40,7 +39,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
     public boolean canAttach() {
         if (state == PulleyState.EXTENDED || state == PulleyState.WAITING) {
-            if (constraintId == null || !ConstraintTracker.getActiveRopes().containsKey(constraintId)) {
+            if (constraintId == null || !RopeManager.getActiveRopes().containsKey(constraintId)) {
                 resetSelf();
                 return true;
             }
@@ -97,14 +96,14 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         if (state != PulleyState.EXTENDED) return;
 
 
-        if (constraintId != null && !ConstraintTracker.getActiveRopes().containsKey(constraintId)) {
+        if (constraintId != null && !RopeManager.getActiveRopes().containsKey(constraintId)) {
             resetSelf();
             serverLevel.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
             return;
         }
 
         if (attachedRope == null && constraintId != null) {
-            attachedRope = ConstraintTracker.getActiveRopes().get(constraintId);
+            attachedRope = RopeManager.getActiveRopes().get(constraintId);
         }
 
         if (attachedRope == null) {
@@ -196,7 +195,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
         this.currentRopeLength = tag.getDouble("length");
 
-        Map<Integer, Rope> active = ConstraintTracker.getActiveRopes();
+        Map<Integer, Rope> active = RopeManager.getActiveRopes();
         if (active != null && constraintId != null) {
             this.attachedRope = active.get(constraintId);
         }

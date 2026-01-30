@@ -1,17 +1,12 @@
-package yay.evy.everest.vstuff.content.constraint;
+package yay.evy.everest.vstuff.content.ropes;
 
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 import org.joml.Quaterniond;
@@ -21,17 +16,14 @@ import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.VstuffConfig;
-import yay.evy.everest.vstuff.client.NetworkHandler;
-import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlockEntity;
+import yay.evy.everest.vstuff.VStuffConfig;
+import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
-import yay.evy.everest.vstuff.index.VStuffSounds;
-import yay.evy.everest.vstuff.util.RopeStyles;
+import yay.evy.everest.vstuff.internal.RopeStyles;
 import org.valkyrienskies.core.internal.joints.*;
-import yay.evy.everest.vstuff.content.constraint.RopeUtil.*;
+import yay.evy.everest.vstuff.content.ropes.RopeUtil.*;
 
 import javax.annotation.Nullable;
-import java.util.UUID;
 
 public class Rope {
 
@@ -214,7 +206,7 @@ public class Rope {
         this.constraint = null;
         this.hasRestoredJoint = false;
 
-        ConstraintTracker.removeConstraintWithPersistence(level, this.ID);
+        RopeManager.removeConstraintWithPersistence(level, this.ID);
 
         return true;
     }
@@ -256,7 +248,7 @@ public class Rope {
             MinecraftServer server = level.getServer();
             if (server != null) {
                 for (ServerPlayer sp : server.getPlayerList().getPlayers()) {
-                    ConstraintTracker.syncAllConstraintsToPlayer(sp);
+                    RopeManager.syncAllConstraintsToPlayer(sp);
                 }
             }
 
@@ -311,16 +303,16 @@ public class Rope {
             this.physicsId = newConstraintId;
             this.constraint = ropeConstraint;
 
-            if (!ConstraintTracker.getActiveRopes().containsKey(this.ID)) {
-                ConstraintTracker.addConstraintWithPersistence(this);
+            if (!RopeManager.getActiveRopes().containsKey(this.ID)) {
+                RopeManager.addConstraintWithPersistence(this);
             } else {
-                ConstraintTracker.getActiveRopes().put(this.ID, this);
+                RopeManager.getActiveRopes().put(this.ID, this);
             }
 
             MinecraftServer server = level.getServer();
             if (server != null) {
                 for (ServerPlayer sp : server.getPlayerList().getPlayers()) {
-                    ConstraintTracker.syncAllConstraintsToPlayer(sp);
+                    RopeManager.syncAllConstraintsToPlayer(sp);
                 }
             }
             //   VStuff.LOGGER.info("Successfully restored Physics Joint for Rope ID: {} (Physics ID: {})", this.ID, newConstraintId);
@@ -368,7 +360,7 @@ public class Rope {
      * @return yes
      */
     public static RopeReturn createNew(
-            LeadConstraintItem ropeItem,
+            RopeItem ropeItem,
             ServerLevel level,
             BlockPos firstClickedPos,
             BlockPos secondClickedPos,
@@ -392,7 +384,7 @@ public class Rope {
     }
 
     public static RopeReturn createNew(
-            LeadConstraintItem ropeItem,
+            RopeItem ropeItem,
             ServerLevel level,
             Long shipA, Long shipB,
             Vector3d localPosA, Vector3d localPosB,
@@ -418,7 +410,7 @@ public class Rope {
         if (shipBIsWorld) localPosB = worldPosB;
 
         double distance = worldPosA.distance(worldPosB);
-        double maxAllowedLength = VstuffConfig.MAX_ROPE_LENGTH.get();
+        double maxAllowedLength = VStuffConfig.MAX_ROPE_LENGTH.get();
         if (distance > maxAllowedLength && player != null) {
             player.displayClientMessage(
                     Component.literal("§cRope too long! Max length is " + maxAllowedLength + " blocks."),
@@ -449,7 +441,7 @@ public class Rope {
             );
         }
 
-        int persistentId = ConstraintTracker.getNextId();
+        int persistentId = RopeManager.getNextId();
         Long finalShipA = shipAIsWorld ? null : shipA;
         Long finalShipB = shipBIsWorld ? null : shipB;
 
@@ -470,9 +462,9 @@ public class Rope {
                     null
             );
             rope.hasRestoredJoint = true;
-            ConstraintTracker.addConstraintWithPersistence(rope);
+            RopeManager.addConstraintWithPersistence(rope);
             if (player instanceof ServerPlayer sp) {
-                ConstraintTracker.syncAllConstraintsToPlayer(sp);
+                RopeManager.syncAllConstraintsToPlayer(sp);
             }
             return new RopeReturn(RopeUtil.RopeInteractionReturn.SUCCESS, rope);
         }
@@ -512,9 +504,9 @@ public class Rope {
         gtpa.addJoint(ropeConstraint, 0, newConstraintId -> {
             rope.physicsId = newConstraintId;
             rope.hasRestoredJoint = true;
-            ConstraintTracker.addConstraintWithPersistence(rope);
+            RopeManager.addConstraintWithPersistence(rope);
             if (player instanceof ServerPlayer sp) {
-                ConstraintTracker.syncAllConstraintsToPlayer(sp);
+                RopeManager.syncAllConstraintsToPlayer(sp);
             }
         });
 

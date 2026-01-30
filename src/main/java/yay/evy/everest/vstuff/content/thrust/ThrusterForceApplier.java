@@ -8,7 +8,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import net.minecraft.core.BlockPos;
-import yay.evy.everest.vstuff.VstuffConfig;
+import yay.evy.everest.vstuff.VStuffConfig;
 
 
 public class ThrusterForceApplier {
@@ -38,7 +38,7 @@ public class ThrusterForceApplier {
         float thrust = data.getThrust();
         if (thrust == 0) return;
 
-        final int maxSpeed = VstuffConfig.THRUSTER_MAX_SPEED.get();
+        final int maxSpeed = VStuffConfig.THRUSTER_MAX_SPEED.get();
         final ShipTransform transform = ship.getTransform();
         final Vector3dc shipCenterOfMass = transform.getPositionInShip();
 

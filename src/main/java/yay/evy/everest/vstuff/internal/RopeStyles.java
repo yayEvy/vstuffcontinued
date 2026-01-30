@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.util;
+package yay.evy.everest.vstuff.internal;
 
 import net.minecraft.resources.ResourceLocation;
 import yay.evy.everest.vstuff.VStuff;

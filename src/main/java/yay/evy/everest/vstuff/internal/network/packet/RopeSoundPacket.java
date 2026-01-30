@@ -1,5 +1,5 @@
 // RopeSoundPacket.java
-package yay.evy.everest.vstuff.util.packet;
+package yay.evy.everest.vstuff.internal.network.packet;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
@@ -7,7 +7,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.network.NetworkEvent;
 import yay.evy.everest.vstuff.sound.RopeSoundHandler;
-import yay.evy.everest.vstuff.util.RopeStyles;
+import yay.evy.everest.vstuff.internal.RopeStyles;
 
 import java.util.function.Supplier;
 
