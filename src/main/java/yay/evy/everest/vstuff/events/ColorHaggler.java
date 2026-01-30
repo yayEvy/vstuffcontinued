@@ -31,27 +31,19 @@ public class ColorHaggler {
 
             if (level instanceof ServerLevel serverLevel) {
                 Integer targetConstraintId = RopeUtil.getTargetedRope(serverLevel, player);
-                if (player instanceof ServerPlayer serverPlayer) {
-                    if (itemStack.is(Tags.Items.DYES)) {
-                        if (!event.getLevel().isClientSide) {
+                if (player instanceof ServerPlayer serverPlayer && (itemStack.is(Tags.Items.DYES)) && ropeIsColorable(serverLevel, player)) {
+                    Rope rope = RopeManager.getActiveRopes().get(targetConstraintId);
+                    RopePersistence ropePersistence = RopePersistence.getOrCreate(serverLevel);
 
-                            if (ropeIsColorable(serverLevel, player)) {
+                    rope.style = getDyedStyle(item.toString(), getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(serverLevel, player));
 
-                                Rope rope = RopeManager.getActiveRopes().get(targetConstraintId);
-                                RopePersistence ropePersistence = RopePersistence.getOrCreate(serverLevel);
+                    RopeManager.replaceRope(rope.ropeId, rope);
 
-                                rope.style = getDyedStyle(item.toString(), getStyleOfTargetedRopeSoWeCanJudgeItAndDecideItsFate(serverLevel, player));
+                    NetworkManager.sendRopeRerender(targetConstraintId, rope.posData0, rope.posData1, rope.jointValues.maxLength(), rope.style.getStyle());
+                    ropePersistence.addRope(rope);
+                    RopeManager.syncAllRopesToPlayer(serverPlayer);
 
-                                RopeManager.replaceRope(rope.ropeId, rope);
-
-                                NetworkManager.sendRopeRerender(targetConstraintId, rope.posData0, rope.posData1, rope.jointValues.maxLength(), rope.style.getStyle());
-                                ropePersistence.addRope(rope);
-                                RopeManager.syncAllRopesToPlayer(serverPlayer);
-
-                                RopePersistence.getOrCreate(serverLevel).saveNow(serverLevel);
-                            }
-                        }
-                    }
+                    RopePersistence.getOrCreate(serverLevel).saveNow(serverLevel);
                 }
             }
         }

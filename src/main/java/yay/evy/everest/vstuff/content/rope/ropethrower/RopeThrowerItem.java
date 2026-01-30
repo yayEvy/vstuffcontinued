@@ -108,7 +108,7 @@ public class RopeThrowerItem extends Item {
             ItemStack thrown = stack.copy();
             thrown.setCount(1);
 
-            RopeThrowerEntity entity = new RopeThrowerEntity(VStuffEntities.ROPE_THROWER.get(), level);
+            RopeThrowerEntity entity = new RopeThrowerEntity(VStuffEntities.ROPE_THROWER.get(), serverLevel);
             entity.setOwner(player);
             entity.setPos(player.getX(), player.getEyeY() - 0.1, player.getZ());
 
@@ -130,7 +130,7 @@ public class RopeThrowerItem extends Item {
             entity.setItem(thrown);
             entity.shootFromRotation(player, player.getXRot(), player.getYRot(), 0, 1.5F, 1.0F);
 
-            level.addFreshEntity(entity);
+            serverLevel.addFreshEntity(entity);
 
             stack.setTag(null);
 
@@ -138,7 +138,7 @@ public class RopeThrowerItem extends Item {
                 stack.shrink(1);
             }
 
-            level.playSound(
+            serverLevel.playSound(
                     null,
                     player.getX(), player.getY(), player.getZ(),
                     VStuffSounds.ROPE_THROW.get(),

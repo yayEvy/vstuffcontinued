@@ -31,7 +31,6 @@ public class Rope {
     public RopeUtil.RopeType type;
     public boolean hasRestored = false;
     public VSDistanceJoint joint;
-    public double renderLength;
 
     public Rope(Integer ropeId, RopeUtil.RopePosData posData0, RopeUtil.RopePosData posData1, JointValues jointValues, RopeStyles.RopeStyle style, RopeUtil.RopeType type) {
         this.ropeId = ropeId;
@@ -119,7 +118,7 @@ public class Rope {
     }
 
     public boolean removeJoint(ServerLevel level) {
-        if (this.jointId == null || this.joint == null || !this.hasRestored) {
+        if (this.jointId == null || this.joint == null || !this.hasRestored()) {
             VStuff.LOGGER.warn("Cannot remove joint for rope id {} because the joint or joint id is null, or the rope has not restored its joint.", this.ropeId);
             return false;
         }
@@ -176,7 +175,7 @@ public class Rope {
     }
 
     public boolean hasRestored() {
-        return this.hasRestored || this.joint != null || (this.jointId != null && this.jointId != -1);
+        return this.hasRestored || (this.jointId != null && this.jointId != -1);
     }
 
     public CompoundTag toTag() {

@@ -21,7 +21,7 @@ public class CoreLikeRenderer extends CustomRenderedItemModelRenderer {
 
     private static final ResourceLocation EMPTY = VStuff.asTextureResource("item/energy_core/empty.png");
     private final ResourceLocation TINT;
-    private final boolean core;
+    private final boolean renderCore;
 
     private static final PartialModel CORE = PartialModel.of(VStuff.asResource("item/energy_core/core"));
     private static final PartialModel CORE_INNER = PartialModel.of(VStuff.asResource("item/energy_core/core_inner"));
@@ -30,7 +30,7 @@ public class CoreLikeRenderer extends CustomRenderedItemModelRenderer {
 
     public CoreLikeRenderer(String colorTint, boolean core) {
         TINT = VStuff.asTextureResource(colorTint);
-        this.core = core;
+        renderCore = core;
     }
 
     protected void render(ItemStack stack, CustomRenderedItemModel model, PartialItemModelRenderer renderer, ItemDisplayContext transformType, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
@@ -40,7 +40,7 @@ public class CoreLikeRenderer extends CustomRenderedItemModelRenderer {
         TransformData innerData = new TransformData(new Vector3f(0.0F, -0.65F, 0.0F), new Vector3f(35.0F, -25.0F, 0.0F));
 
         renderOuterCore(ms, renderer, outerData, light);
-        if (core) renderInnerCore(ms, renderer, innerData, light);
+        if (renderCore) renderInnerCore(ms, renderer, innerData, light);
 
         ms.popPose();
     }

@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.rope.roperework;
+package yay.evy.everest.vstuff.content.rope.roperework.client;
 
 import com.mojang.blaze3d.platform.Window;
 import net.createmod.catnip.theme.Color;
@@ -14,17 +14,18 @@ import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import yay.evy.everest.vstuff.VStuff;
 
 public class RopeTextOverlay implements IGuiOverlay {
+    public static final RopeTextOverlay INSTANCE = new RopeTextOverlay();
 
     @Override
     public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui || mc.gameMode.getPlayerMode() == GameType.SPECTATOR)
             return;
-        if (RopeUtil.hoveringPos == null)
+        if (RopeHovering.hoveringPos == null)
             return;
-        if (RopeUtil.cached == null || !RopeUtil.cached.valid)
+        if (RopeHovering.cached == null || !RopeHovering.cached.valid)
             return;
-        if (RopeUtil.extraTipWarmup < 4)
+        if (RopeHovering.extraTipWarmup < 4)
             return;
 
         boolean active = mc.options.keySprint.isDown();
@@ -35,7 +36,7 @@ public class RopeTextOverlay implements IGuiOverlay {
         int x = (window.getGuiScaledWidth() - gui.getFont()
                 .width(text)) / 2;
         int y = window.getGuiScaledHeight() - 61;
-        Color color = new Color(0x4ADB4A).setAlpha(Mth.clamp((RopeUtil.extraTipWarmup - 4) / 3f, 0.1f, 1));
+        Color color = new Color(0x4ADB4A).setAlpha(Mth.clamp((RopeHovering.extraTipWarmup - 4) / 3f, 0.1f, 1));
         guiGraphics.drawString(gui.getFont(), text, x, y, color.getRGB(), false);
     }
 }

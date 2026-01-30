@@ -3,6 +3,7 @@ package yay.evy.everest.vstuff.events;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -35,6 +36,11 @@ public class ClientEvents {
         int key = event.getKey();
         boolean pressed = event.getAction() != 0;
         RopeStyleMenuHandler.onKeyInput(key, pressed);
+    }
+
+    @SubscribeEvent
+    public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
+        //event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "rope_overlay", RopeTextOverlay.INSTANCE);
     }
 
 }

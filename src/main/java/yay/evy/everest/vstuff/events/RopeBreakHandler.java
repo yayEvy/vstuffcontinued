@@ -5,6 +5,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.level.PistonEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3f;
@@ -23,11 +24,17 @@ import java.util.Map;
 public class RopeBreakHandler {
 
     @SubscribeEvent
+    public static void onPistonPush(PistonEvent event) {
+
+    }
+
+    //TODO: method that fires on contraption assembly and ship assembly
+
+    @SubscribeEvent
     public static void onBlockBreak(BlockEvent.BreakEvent event) {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
 
         BlockPos brokenPos = event.getPos();
-        List<Integer> constraintsToRemove = new ArrayList<>();
         Map<Integer, Rope> toRemove = new HashMap<>();
 
         for (Map.Entry<Integer, Rope> entry : RopeManager.getActiveRopes().entrySet()) {

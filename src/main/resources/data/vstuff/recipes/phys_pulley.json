@@ -8,7 +8,7 @@
   "key": {
     "S": { "item": "create:shaft" },
     "A": { "item": "create:brass_casing" },
-    "R": { "item": "vstuff:lead_constraint_item" },
+    "R": { "item": "vstuff:rope_item" },
     "C": { "item": "create:cogwheel" }
   },
   "result": {

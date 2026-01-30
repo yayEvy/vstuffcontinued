@@ -51,7 +51,7 @@ public class RopeItem extends Item {
                 return InteractionResult.SUCCESS;
             }
             if (level.getBlockEntity(clickedPos) instanceof PhysPulleyBlockEntity pulley && !pulley.canAttach()) {
-                if (!level.isClientSide) firstFailWithMessage(player, clickedPos, "invalid_second", blockName);
+                if (!level.isClientSide) firstFailWithMessage(player, clickedPos, "invalid_first", blockName);
                 return InteractionResult.SUCCESS;
             }
             firstSelect(serverLevel, clickedPos, player, heldItem);
