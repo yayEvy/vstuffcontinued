@@ -1,7 +1,7 @@
 {
   "block.vstuff.phys_pulley": "Phys Pulley",
   "block.vstuff.pulley_anchor": "Pulley Anchor",
-  "block.vstuff.rotational_thruster": "Rotational Thruster",
+  "block.vstuff.rotational_thruster": "Mechanical Thruster",
   "item.vstuff.empty_energy_core": "Empty Energy Core",
   "item.vstuff.energy_core": "Energy Core",
   "item.vstuff.lead_break_item": "Lead Break Item",

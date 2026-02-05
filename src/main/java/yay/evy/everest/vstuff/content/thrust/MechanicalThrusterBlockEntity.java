@@ -30,7 +30,7 @@ import java.util.List;
 
 import static com.simibubi.create.content.kinetics.motor.CreativeMotorBlockEntity.MAX_SPEED;
 @SuppressWarnings({"deprecation", "unchecked"})
-public class RotationalThrusterBlockEntity extends KineticBlockEntity {
+public class MechanicalThrusterBlockEntity extends KineticBlockEntity {
 
     public static final int BASE_MAX_THRUST = 100_000;
     // Constants
@@ -58,7 +58,7 @@ public class RotationalThrusterBlockEntity extends KineticBlockEntity {
     public boolean overridePower = false;
     public int overridenPower;
 
-    public RotationalThrusterBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
+    public MechanicalThrusterBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
         thrusterData = new ThrusterData();
         particleType = (ParticleType<PlumeParticleData>) ParticleTypes.getPlumeType();
@@ -76,7 +76,7 @@ public class RotationalThrusterBlockEntity extends KineticBlockEntity {
     public void initialize() {
         super.initialize();
         if (!level.isClientSide) {
-            calculateObstruction(level, worldPosition, getBlockState().getValue(RotationalThrusterBlock.FACING));
+            calculateObstruction(level, worldPosition, getBlockState().getValue(MechanicalThrusterBlock.FACING));
         }
     }
 
@@ -106,7 +106,7 @@ public class RotationalThrusterBlockEntity extends KineticBlockEntity {
 
         if (currentTick % (tick_rate * 2) == 0) {
             int previousEmptyBlocks = emptyBlocks;
-            calculateObstruction(level, worldPosition, currentBlockState.getValue(RotationalThrusterBlock.FACING));
+            calculateObstruction(level, worldPosition, currentBlockState.getValue(MechanicalThrusterBlock.FACING));
             if (previousEmptyBlocks != emptyBlocks) {
                 isThrustDirty = true;
                 setChanged();
@@ -224,7 +224,7 @@ public class RotationalThrusterBlockEntity extends KineticBlockEntity {
         if (particlesToSpawn == 0) return;
         this.particleSpawnAccumulator -= particlesToSpawn;
 
-        Direction direction = state.getValue(RotationalThrusterBlock.FACING);
+        Direction direction = state.getValue(MechanicalThrusterBlock.FACING);
         Direction oppositeDirection = direction.getOpposite();
 
         double currentNozzleOffset = NOZZLE_OFFSET_FROM_CENTER;
@@ -286,7 +286,7 @@ public class RotationalThrusterBlockEntity extends KineticBlockEntity {
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);
 
         boolean wasThrustDirty = isThrustDirty;
-        calculateObstruction(getLevel(), worldPosition, getBlockState().getValue(RotationalThrusterBlock.FACING));
+        calculateObstruction(getLevel(), worldPosition, getBlockState().getValue(MechanicalThrusterBlock.FACING));
         isThrustDirty = wasThrustDirty;
 
         tooltip.add(Component.translatable("create.gui.goggles.thruster.status")
@@ -352,7 +352,7 @@ public class RotationalThrusterBlockEntity extends KineticBlockEntity {
                 if (attachment != null) {
                     ThrusterData data = getThrusterData();
                     data.setDirection(VectorConversionsMCKt.toJOMLD(
-                            getBlockState().getValue(RotationalThrusterBlock.FACING).getNormal()
+                            getBlockState().getValue(MechanicalThrusterBlock.FACING).getNormal()
                     ));
 
                     ThrusterForceApplier applier = new ThrusterForceApplier(data);
@@ -363,7 +363,7 @@ public class RotationalThrusterBlockEntity extends KineticBlockEntity {
     }
 
     private void recalcThruster() {
-        calculateObstruction(level, worldPosition, getBlockState().getValue(RotationalThrusterBlock.FACING));
+        calculateObstruction(level, worldPosition, getBlockState().getValue(MechanicalThrusterBlock.FACING));
         isThrustDirty = true;
         updateThrust(getBlockState());
         setChanged();

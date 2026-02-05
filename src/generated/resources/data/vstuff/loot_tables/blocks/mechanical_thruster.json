@@ -11,11 +11,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "vstuff:rotational_thruster"
+          "name": "vstuff:mechanical_thruster"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "vstuff:blocks/rotational_thruster"
+  "random_sequence": "vstuff:blocks/mechanical_thruster"
 }

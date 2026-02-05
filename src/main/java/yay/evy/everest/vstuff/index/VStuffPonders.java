@@ -28,7 +28,7 @@ public class VStuffPonders implements PonderPlugin {
         PonderSceneRegistrationHelper<ItemProviderEntry<?>> HELPER = helper.withKeyFunction(RegistryEntry::getId);
 
         HELPER.addStoryBoard(VStuffBlocks.PHYS_PULLEY, "phys_ponder", PhysPulleyPonder::physPulley);
-        HELPER.addStoryBoard(VStuffBlocks.ROTATIONAL_THRUSTER, "thruster_ponder", RotationalThrusterPonder::rotationalThruster);
+        HELPER.addStoryBoard(VStuffBlocks.MECHANICAL_THRUSTER, "thruster_ponder", RotationalThrusterPonder::rotationalThruster);
 
 
     }

@@ -80,7 +80,9 @@ public class VStuff {
 
         modEventBus.addListener(this::commonSetup);
 
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> VStuffClient::initialize);
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            modEventBus.addListener(VStuffClient::initialize);
+        });
 
         ValkyrienSkiesMod.getApi().getShipLoadEvent().on(RopePersistence::onShipLoad);
 

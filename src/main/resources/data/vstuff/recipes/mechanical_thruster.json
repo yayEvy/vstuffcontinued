@@ -11,7 +11,7 @@
     "C": { "item": "create:brass_casing" }
   },
   "result": {
-    "item": "vstuff:rotational_thruster",
+    "item": "vstuff:mechanical_thruster",
     "count": 1
   }
 }
