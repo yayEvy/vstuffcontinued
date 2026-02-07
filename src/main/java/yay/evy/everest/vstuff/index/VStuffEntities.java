@@ -7,7 +7,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.ropethrower.RopeThrowerEntity;
+import yay.evy.everest.vstuff.content.ropes.thrower.RopeThrowerEntity;
 
 public class VStuffEntities {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =

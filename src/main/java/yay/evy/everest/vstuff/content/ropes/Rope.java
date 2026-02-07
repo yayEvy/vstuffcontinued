@@ -3,6 +3,7 @@ package yay.evy.everest.vstuff.content.ropes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -17,18 +18,17 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.VStuffConfig;
+import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
-import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
-import yay.evy.everest.vstuff.internal.RopeStyles;
+import yay.evy.everest.vstuff.content.ropes.styler.handler.RopeStyleHandlerServer;
 import org.valkyrienskies.core.internal.joints.*;
-import yay.evy.everest.vstuff.content.ropes.RopeUtil.*;
+import yay.evy.everest.vstuff.internal.utility.RopeUtils;
+import yay.evy.everest.vstuff.internal.utility.ShipUtils;
 
 import javax.annotation.Nullable;
 
 public class Rope {
 
-    private @Nullable ServerLevel level;
-    String levelId;
     public Integer ID;
     public Long shipA;
     public Long shipB;
@@ -39,10 +39,10 @@ public class Rope {
     public double maxLength;
     public double compliance;
     public double maxForce;
-    public ConstraintType constraintType;
+    public RopeUtils.ConstraintType constraintType;
     public net.minecraft.core.BlockPos sourceBlockPos;
-    public RopeType type;
-    public RopeStyles.RopeStyle style;
+    public RopeUtils.RopeType type;
+    public ResourceLocation style;
     boolean hasPhysicalImpact = true;
     public boolean hasRestoredJoint = false;
     private Integer physicsId = null;
@@ -54,12 +54,9 @@ public class Rope {
      * yes rope very cool wow
      * this is used for anything with ropes, it stores all data
      */
-    private Rope(@Nullable ServerLevel level, Integer constraintId, Long shipA, Long shipB, Vector3d localPosA,
-                 Vector3d localPosB, double maxLength, double compliance, double maxForce, ConstraintType constraintType,
-                 net.minecraft.core.BlockPos sourceBlockPos, RopeStyles.RopeStyle style, @Nullable VSDistanceJoint constraint) {
-        this.level = level;
-        this.levelId = RopeUtil.registerLevel(level);
-
+    private Rope(Integer constraintId, Long shipA, Long shipB, Vector3d localPosA,
+                 Vector3d localPosB, double maxLength, double compliance, double maxForce, RopeUtils.ConstraintType constraintType,
+                 net.minecraft.core.BlockPos sourceBlockPos, ResourceLocation style, @Nullable VSDistanceJoint constraint) {
         this.ID = constraintId;
 
         this.shipA = shipA;
@@ -80,14 +77,14 @@ public class Rope {
         this.style = style;
         this.constraint = constraint;
 
-        this.type = RopeType.SS;
+        this.type = RopeUtils.RopeType.SS;
         if (shipA == null) {
-            this.type = RopeType.WS;
+            this.type = RopeUtils.RopeType.WS;
             this.shipAIsGround = true;
         }
 
         if (shipB == null) {
-            this.type =  RopeType.WW;
+            this.type =  RopeUtils.RopeType.WW;
             this.shipBIsGround = true;
         }
 
@@ -98,13 +95,10 @@ public class Rope {
         }
     }
 
-    private Rope(@Nullable ServerLevel level, Integer constraintId, Long shipA, Long shipB, boolean shipAIsGround,
-                 boolean shipBIsGround,Vector3d localPosA, Vector3d localPosB, double maxLength, double compliance,
-                 double maxForce, ConstraintType constraintType, net.minecraft.core.BlockPos sourceBlockPos,
-                 RopeStyles.RopeStyle style, @Nullable VSDistanceJoint constraint) {
-        this.level = level;
-        this.levelId = RopeUtil.registerLevel(level);
-
+    private Rope(Integer constraintId, Long shipA, Long shipB, boolean shipAIsGround,
+                 boolean shipBIsGround, Vector3d localPosA, Vector3d localPosB, double maxLength, double compliance,
+                 double maxForce, RopeUtils.ConstraintType constraintType, net.minecraft.core.BlockPos sourceBlockPos,
+                 ResourceLocation style, @Nullable VSDistanceJoint constraint) {
         this.ID = constraintId;
 
         this.shipA = shipA;
@@ -127,10 +121,6 @@ public class Rope {
 
         this.renderLength = maxLength;
 
-    }
-
-    public @NotNull ServerLevel getLevel() {
-        return level == null ? RopeUtil.getRegisteredLevel(levelId) : level;
     }
 
     public Vector3d getWorldPosA(ServerLevel level) {
@@ -185,9 +175,6 @@ public class Rope {
      * @return if the method succeeded
      */
     public boolean removeJoint(ServerLevel level) {
-        this.level = level;
-        this.levelId = RopeUtil.registerLevel(level);
-
         if (this.ID != null) {
             NetworkHandler.sendConstraintRemove(this.ID);
         }
@@ -278,8 +265,6 @@ public class Rope {
         if (!hasPhysicalImpact) return;
         if (hasRestoredJoint && this.physicsId != null) return;
 
-        this.level = level;
-        this.levelId = RopeUtil.registerLevel(level);
         this.hasRestoredJoint = true;
         this.physicsId = null;
 
@@ -304,7 +289,7 @@ public class Rope {
             this.constraint = ropeConstraint;
 
             if (!RopeManager.getActiveRopes().containsKey(this.ID)) {
-                RopeManager.addConstraintWithPersistence(this);
+                RopeManager.addConstraintWithPersistence(level, this);
             } else {
                 RopeManager.getActiveRopes().put(this.ID, this);
             }
@@ -359,7 +344,7 @@ public class Rope {
      * @param player player
      * @return yes
      */
-    public static RopeReturn createNew(
+    public static RopeUtils.RopeReturn createNew(
             RopeItem ropeItem,
             ServerLevel level,
             BlockPos firstClickedPos,
@@ -368,11 +353,11 @@ public class Rope {
             Long secondShipId,
             Player player
     ) {
-        Vector3d firstWorldPos = RopeUtil.getWorldPosition(level, firstClickedPos, firstShipId);
-        Vector3d firstLocalPos = RopeUtil.getLocalPos(level, firstClickedPos);
+        Vector3d firstWorldPos = RopeUtils.getWorldPos(level, firstClickedPos, firstShipId);
+        Vector3d firstLocalPos = RopeUtils.getLocalPos(level, firstClickedPos);
 
-        Vector3d secondWorldPos = RopeUtil.getWorldPosition(level, secondClickedPos, secondShipId);
-        Vector3d secondLocalPos = RopeUtil.getLocalPos(level, secondClickedPos);
+        Vector3d secondWorldPos = RopeUtils.getWorldPos(level, secondClickedPos, secondShipId);
+        Vector3d secondLocalPos = RopeUtils.getLocalPos(level, secondClickedPos);
 
         return createNew(
                 ropeItem, level,
@@ -383,7 +368,7 @@ public class Rope {
         );
     }
 
-    public static RopeReturn createNew(
+    public static RopeUtils.RopeReturn createNew(
             RopeItem ropeItem,
             ServerLevel level,
             Long shipA, Long shipB,
@@ -391,7 +376,7 @@ public class Rope {
             Vector3d worldPosA, Vector3d worldPosB,
             Player player
     ) {
-        Long groundId = RopeUtil.getGroundBodyId(level);
+        Long groundId = ShipUtils.getGroundBodyId(level);
 
         boolean shipAIsWorld = (shipA == null || shipA.equals(groundId));
         boolean shipBIsWorld = (shipB == null || shipB.equals(groundId));
@@ -416,12 +401,12 @@ public class Rope {
                     Component.literal("§cRope too long! Max length is " + maxAllowedLength + " blocks."),
                     true
             );
-            return RopeUtil.RopeReturn.FAIL;
+            return RopeUtils.RopeReturn.FAIL;
         }
 
         double maxLength = distance + 0.5;
-        double massA = RopeUtil.getMassForShip(level, shipA);
-        double massB = RopeUtil.getMassForShip(level, shipB);
+        double massA = ShipUtils.getMassForShip(level, shipA);
+        double massB = ShipUtils.getMassForShip(level, shipB);
         double effectiveMass = Math.max(Math.min(massA, massB), 100.0);
         double compliance = (shipAIsWorld || shipBIsWorld)
                 ? 1e-12 / effectiveMass * 0.05
@@ -429,17 +414,9 @@ public class Rope {
         double massRatio = Math.max(massA, massB) / Math.min(massA, massB);
         double maxForce = 5e13 * Math.min(massRatio, 20.0) * (shipAIsWorld || shipBIsWorld ? 10 : 1);
 
-        RopeStyles.RopeStyle ropeStyle = null;
-        if (player instanceof ServerPlayer sp) {
-            ropeStyle = RopeStyleHandlerServer.getStyle(sp.getUUID());
-        }
-        if (ropeStyle == null) {
-            ropeStyle = new RopeStyles.RopeStyle(
-                    "normal",
-                    RopeStyles.PrimitiveRopeStyle.NORMAL,
-                    "vstuff.ropes.normal"
-            );
-        }
+        ResourceLocation ropeStyle = RopeStyleManager.defaultId;
+        if (player instanceof ServerPlayer sp) ropeStyle = RopeStyleHandlerServer.getStyle(sp.getUUID());
+
 
         int persistentId = RopeManager.getNextId();
         Long finalShipA = shipAIsWorld ? null : shipA;
@@ -447,7 +424,6 @@ public class Rope {
 
         if (shipAIsWorld && shipBIsWorld) {
             Rope rope = new Rope(
-                    level,
                     persistentId,
                     null,
                     null,
@@ -456,17 +432,17 @@ public class Rope {
                     maxLength,
                     compliance,
                     maxForce,
-                    ConstraintType.GENERIC,
+                    RopeUtils.ConstraintType.GENERIC,
                     null,
                     ropeStyle,
                     null
             );
             rope.hasRestoredJoint = true;
-            RopeManager.addConstraintWithPersistence(rope);
+            RopeManager.addConstraintWithPersistence(level, rope);
             if (player instanceof ServerPlayer sp) {
                 RopeManager.syncAllConstraintsToPlayer(sp);
             }
-            return new RopeReturn(RopeUtil.RopeInteractionReturn.SUCCESS, rope);
+            return new RopeUtils.RopeReturn(RopeUtils.RopeInteractionReturn.SUCCESS, rope);
         }
 
         VSDistanceJoint ropeConstraint = new VSDistanceJoint(
@@ -484,7 +460,6 @@ public class Rope {
         );
 
         Rope rope = new Rope(
-                level,
                 persistentId,
                 finalShipA,
                 finalShipB,
@@ -493,7 +468,7 @@ public class Rope {
                 maxLength,
                 compliance,
                 maxForce,
-                ConstraintType.GENERIC,
+                RopeUtils.ConstraintType.GENERIC,
                 null,
                 ropeStyle,
                 ropeConstraint
@@ -504,13 +479,13 @@ public class Rope {
         gtpa.addJoint(ropeConstraint, 0, newConstraintId -> {
             rope.physicsId = newConstraintId;
             rope.hasRestoredJoint = true;
-            RopeManager.addConstraintWithPersistence(rope);
+            RopeManager.addConstraintWithPersistence(level, rope);
             if (player instanceof ServerPlayer sp) {
                 RopeManager.syncAllConstraintsToPlayer(sp);
             }
         });
 
-        return new RopeReturn(RopeUtil.RopeInteractionReturn.SUCCESS, rope);
+        return new RopeUtils.RopeReturn(RopeUtils.RopeInteractionReturn.SUCCESS, rope);
     }
 
     /**
@@ -520,7 +495,7 @@ public class Rope {
      * @return the Rope restored from the tag data
      */
     public static Rope fromTag(CompoundTag tag) {
-        ConstraintType constraintType = ConstraintType.GENERIC;
+        RopeUtils.ConstraintType constraintType = RopeUtils.ConstraintType.GENERIC;
 
         long shipALong = tag.getLong("shipA");
         long shipBLong = tag.getLong("shipB");
@@ -529,7 +504,7 @@ public class Rope {
 
         if (tag.contains("constraintType")) {
             try {
-                constraintType = ConstraintType.valueOf(tag.getString("constraintType"));
+                constraintType = RopeUtils.ConstraintType.valueOf(tag.getString("constraintType"));
             } catch (IllegalArgumentException e) {
                 // VStuff.LOGGER.warn("Invalid constraint type in save data, defaulting to GENERIC: {}", e.getMessage());
             }
@@ -545,14 +520,9 @@ public class Rope {
             );
         }
 
-        String style = tag.contains("style") ? tag.getString("style") : "normal";
-
-        RopeStyles.RopeStyle ropeStyle = RopeStyles.fromString(style);
-
-        String levelId = tag.getString("levelId");
+        ResourceLocation ropeStyle = new ResourceLocation(tag.getString("namespace"), tag.getString("path"));
 
         Rope rope = new Rope(
-                RopeUtil.getRegisteredLevel(levelId),
                 tag.getInt("id"),
                 shipA,
                 shipB,
@@ -585,7 +555,6 @@ public class Rope {
         CompoundTag constraintTag = new CompoundTag();
 
         constraintTag.putInt("id", ID);
-        constraintTag.putString("levelId", levelId);
         constraintTag.putLong("shipA", shipA != null ? shipA : 0L);
         constraintTag.putLong("shipB", shipB != null ? shipB : 0L);
         constraintTag.putBoolean("shipAIsGround", shipAIsGround);
@@ -613,7 +582,8 @@ public class Rope {
             constraintTag.putInt("sourceBlockPos_z", sourceBlockPos.getZ());
         }
 
-        constraintTag.putString("style", style.getStyle());
+        constraintTag.putString("namespace", style.getNamespace());
+        constraintTag.putString("path", style.getPath());
 
         return constraintTag;
     }

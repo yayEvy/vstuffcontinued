@@ -17,11 +17,15 @@ import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.VStuffConfig;
 import yay.evy.everest.vstuff.client.ClientOutlineHandler;
+import yay.evy.everest.vstuff.content.ropes.pulley.PhysPulleyBlockEntity;
+import yay.evy.everest.vstuff.content.ropes.pulley.PulleyAnchorBlockEntity;
+import yay.evy.everest.vstuff.internal.RopeStyle;
+import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
-import yay.evy.everest.vstuff.content.pulley.*;
-import yay.evy.everest.vstuff.content.ropestyler.handler.RopeStyleHandlerServer;
-import yay.evy.everest.vstuff.internal.RopeStyles;
-import yay.evy.everest.vstuff.content.ropes.RopeUtil.ConnectionType;
+import yay.evy.everest.vstuff.content.ropes.styler.handler.RopeStyleHandlerServer;
+import yay.evy.everest.vstuff.internal.utility.RopeUtils;
+import yay.evy.everest.vstuff.internal.utility.RopeUtils.ConnectionType;
+import yay.evy.everest.vstuff.internal.utility.ShipUtils;
 
 import java.util.Objects;
 
@@ -74,7 +78,7 @@ public class RopeItem extends Item {
             }
 
             Long tempId = getShipIdAtPos(serverLevel, clickedPos);
-            Long actualId = tempId != null ? tempId : RopeUtil.getGroundBodyId(serverLevel);
+            Long actualId = tempId != null ? tempId : ShipUtils.getGroundBodyId(serverLevel);
 
             CompoundTag tag = heldItem.getOrCreateTagElement("first");
             tag.putBoolean("waiting", true);
@@ -105,10 +109,10 @@ public class RopeItem extends Item {
                 return InteractionResult.FAIL;
             }
 
-            firstShipId = RopeUtil.whythefuckisitsupposedtobenullwhyyyyy(firstShipId, serverLevel);
-            secondShipId = RopeUtil.whythefuckisitsupposedtobenullwhyyyyy(secondShipId, serverLevel);
+            firstShipId = ShipUtils.whythefuckisitsupposedtobenullwhyyyyy(firstShipId, serverLevel);
+            secondShipId = ShipUtils.whythefuckisitsupposedtobenullwhyyyyy(secondShipId, serverLevel);
 
-            RopeUtil.RopeReturn ropeReturn;
+            RopeUtils.RopeReturn ropeReturn;
 
             if (connectionType == ConnectionType.NORMAL) {
                 ropeReturn = Rope.createNew(this, serverLevel, firstClickedPos, clickedPos, firstShipId, secondShipId, player);
@@ -123,7 +127,7 @@ public class RopeItem extends Item {
                     }
 
                     ropeReturn = Rope.createNew(this, serverLevel, firstClickedPos, clickedPos, firstShipId, secondShipId, player);
-                    if (ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS) {
+                    if (ropeReturn.result() == RopeUtils.RopeInteractionReturn.SUCCESS) {
                         PhysPulleyBlockEntity waitingPulley = (PhysPulleyBlockEntity) serverLevel.getBlockEntity(firstClickedPos);
                         waitingPulley.attachRope(ropeReturn.rope());
                         ropeReturn.rope().setSourceBlockPos(firstClickedPos);
@@ -137,15 +141,13 @@ public class RopeItem extends Item {
                 }
             }
 
-            if (ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS) {
+            if (ropeReturn.result() == RopeUtils.RopeInteractionReturn.SUCCESS) {
 
                 if (!player.getAbilities().instabuild) {
                     heldItem.shrink(1);
                 }
 
-                boolean isChain =
-                        RopeStyleHandlerServer.getStyle(player.getUUID())
-                                        .getBasicStyle() == RopeStyles.PrimitiveRopeStyle.CHAIN;
+                boolean isChain = RopeStyleManager.get(RopeStyleHandlerServer.getStyle(player.getUUID())).renderStyle() == RopeStyle.RenderStyle.CHAIN;
 
                 if (VStuffConfig.ROPE_SOUNDS.get()) {
                     serverLevel.playSound(
@@ -162,9 +164,9 @@ public class RopeItem extends Item {
                 resetStateWithMessage(serverLevel, heldItem, true, player, isChain ? "chain_created" : "rope_created");
             }
 
-            int color = ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS ? ClientOutlineHandler.GREEN : ClientOutlineHandler.RED;
+            int color = ropeReturn.result() == RopeUtils.RopeInteractionReturn.SUCCESS ? ClientOutlineHandler.GREEN : ClientOutlineHandler.RED;
             NetworkHandler.sendOutline(clickedPos, color);
-            return ropeReturn.result() == RopeUtil.RopeInteractionReturn.SUCCESS ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+            return ropeReturn.result() == RopeUtils.RopeInteractionReturn.SUCCESS ? InteractionResult.SUCCESS : InteractionResult.FAIL;
 
         }
     }

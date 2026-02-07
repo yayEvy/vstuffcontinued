@@ -12,9 +12,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import yay.evy.everest.vstuff.VStuff;
 
-/*
-Copied from Create
- */
+
 public enum VStuffGuiTextures implements ScreenElement {
 
     ROPE_STYLER("rope_styler", 0, 0, 182, 184),

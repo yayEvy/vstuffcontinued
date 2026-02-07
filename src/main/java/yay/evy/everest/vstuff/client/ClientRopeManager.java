@@ -1,6 +1,7 @@
 package yay.evy.everest.vstuff.client;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.common.Mod;
@@ -8,7 +9,7 @@ import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import yay.evy.everest.vstuff.internal.RopeStyles;
+import yay.evy.everest.vstuff.internal.RopeStyle;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +19,8 @@ public class ClientRopeManager {
     private static final Map<Integer, ClientRopeData> clientConstraints = new HashMap<>();
 
     public record ClientRopeData(Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB, double maxLength,
-                                 RopeStyles.RopeStyle style) {
-            public ClientRopeData(Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle style) {
+                                 ResourceLocation style) {
+            public ClientRopeData(Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB, double maxLength, ResourceLocation style) {
                 this.shipA = shipA;
                 this.shipB = shipB;
                 this.localPosA = new Vector3d(localPosA);
@@ -148,7 +149,7 @@ public class ClientRopeManager {
     }
 
     public static void addClientConstraint(Integer constraintId, Long shipA, Long shipB,
-                                           Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle style) {
+                                           Vector3d localPosA, Vector3d localPosB, double maxLength, ResourceLocation style) {
         clientConstraints.put(constraintId, new ClientRopeData(shipA, shipB, localPosA, localPosB, maxLength, style));
     }
 

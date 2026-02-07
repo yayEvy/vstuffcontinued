@@ -11,7 +11,7 @@ import yay.evy.everest.vstuff.content.expendable_assembler.ExpendableAssemblerIt
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberItem;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.EmptyEnergyCoreItem;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.EnergyCoreItem;
-import yay.evy.everest.vstuff.content.ropethrower.RopeThrowerItem;
+import yay.evy.everest.vstuff.content.ropes.thrower.RopeThrowerItem;
 
 
 public class VStuffItems {
@@ -76,7 +76,7 @@ public class VStuffItems {
                     .properties(p -> p
                             .stacksTo(16)
                             .rarity(Rarity.UNCOMMON))
-                    .model(AssetLookup.itemModelWithPartials())
+                    .defaultModel()
                     .register();
 
 

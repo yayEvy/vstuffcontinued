@@ -1,14 +1,12 @@
 {
+  "block.vstuff.mechanical_thruster": "ɹǝʇsnɹɥ⟘ ןɐɔıuɐɥɔǝW",
   "block.vstuff.phys_pulley": "ʎǝןןnԀ sʎɥԀ",
   "block.vstuff.pulley_anchor": "ɹoɥɔuⱯ ʎǝןןnԀ",
-  "block.vstuff.rotational_thruster": "ɹǝʇsnɹɥ⟘ ןɐuoıʇɐʇoᴚ",
   "item.vstuff.empty_energy_core": "ǝɹoƆ ʎbɹǝuƎ ʎʇdɯƎ",
   "item.vstuff.energy_core": "ǝɹoƆ ʎbɹǝuƎ",
-  "item.vstuff.lead_break_item": "ɯǝʇI ʞɐǝɹᗺ pɐǝꞀ",
-  "item.vstuff.lead_constraint_item": "ɯǝʇI ʇuıɐɹʇsuoƆ pɐǝꞀ",
+  "item.vstuff.expendable_assembler": "ɹǝןqɯǝssⱯ ǝןqɐpuǝdxƎ",
   "item.vstuff.phys_grabber": "ɹǝqqɐɹ⅁ sʎɥԀ",
-  "item.vstuff.rope_thrower": "ɹǝʍoɹɥ⟘ ǝdoᴚ",
-  "what.the.fuck.is.ts.wilted.rose.emoji": "wilted rose"
-
+  "item.vstuff.rope": "ǝdoᴚ",
+  "item.vstuff.rope_cutter": "ɹǝʇʇnƆ ǝdoᴚ",
+  "item.vstuff.rope_thrower": "ɹǝʍoɹɥ⟘ ǝdoᴚ"
 }
-

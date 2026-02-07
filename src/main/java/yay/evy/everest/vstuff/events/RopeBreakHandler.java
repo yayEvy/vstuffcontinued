@@ -10,8 +10,8 @@ import net.minecraftforge.fml.common.Mod;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.ropes.RopeManager;
 import yay.evy.everest.vstuff.content.ropes.Rope;
-import yay.evy.everest.vstuff.content.ropes.RopeUtil;
 import yay.evy.everest.vstuff.index.VStuffItems;
+import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +33,7 @@ public class RopeBreakHandler {
             Integer id = entry.getKey();
             Rope rope = entry.getValue();
 
-            if (rope.constraintType == RopeUtil.ConstraintType.PULLEY) continue;
+            if (rope.constraintType == RopeUtils.ConstraintType.PULLEY) continue;
 
             try {
                 BlockPos dropPos = null;

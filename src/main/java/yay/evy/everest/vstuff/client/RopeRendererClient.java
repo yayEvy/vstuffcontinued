@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -20,8 +21,9 @@ import org.joml.Vector3d;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.VStuffConfig;
+import yay.evy.everest.vstuff.internal.RopeStyle;
+import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.rendering.RopeRendererType;
-import yay.evy.everest.vstuff.internal.RopeStyles;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -150,7 +152,7 @@ public class RopeRendererClient {
 
     private static void renderClientRope(PoseStack poseStack, MultiBufferSource bufferSource,
                                          Integer constraintId, ClientRopeManager.ClientRopeData ropeData,
-                                         Level level, Vec3 cameraPos, float partialTick, RopeStyles.RopeStyle style) {
+                                         Level level, Vec3 cameraPos, float partialTick, ResourceLocation style) {
         if (!level.isClientSide) return;
 
         if (!ropeData.isRenderable(level)) {
@@ -175,7 +177,7 @@ public class RopeRendererClient {
 
     private static void renderRope(PoseStack poseStack, MultiBufferSource bufferSource,
                                    Vector3d startPos, Vector3d endPos, double actualRopeLength,
-                                   double maxRopeLength, Vec3 cameraPos, float partialTick, Level level, RopeStyles.RopeStyle style) {
+                                   double maxRopeLength, Vec3 cameraPos, float partialTick, Level level, ResourceLocation style) {
 
         Vector3d startRelative = new Vector3d(startPos.x - cameraPos.x, startPos.y - cameraPos.y, startPos.z - cameraPos.z);
         Vector3d endRelative = new Vector3d(endPos.x - cameraPos.x, endPos.y - cameraPos.y, endPos.z - cameraPos.z);
@@ -248,12 +250,13 @@ public class RopeRendererClient {
         }
 
         RenderType renderType;
-        if (style.getRenderStyle() == RopeStyles.RenderStyle.CHAIN) {
-            renderType = RopeRendererType.ropeRendererChainStyle(style.getTexture());
+        if (RopeStyleManager.get(style).renderStyle() == RopeStyle.RenderStyle.CHAIN) {
+            renderType = RopeRendererType.ropeRendererChainStyle(style);
             renderChainRope(poseStack, bufferSource.getBuffer(renderType), curvePoints, lightValues, currentDistance, style);
         } else {
-            renderType = RopeRendererType.ropeRenderer(style.getTexture());
-            renderNormalRope(poseStack, bufferSource.getBuffer(renderType), curvePoints, lightValues, currentDistance, startRelative, endRelative);        }
+            renderType = RopeRendererType.ropeRenderer(RopeStyleManager.get(style).texture());
+            renderNormalRope(poseStack, bufferSource.getBuffer(renderType), curvePoints, lightValues, currentDistance, startRelative, endRelative);
+        }
 
         poseStack.popPose();
     }
@@ -373,7 +376,7 @@ public class RopeRendererClient {
 
     private static void renderChainRope(PoseStack poseStack, VertexConsumer vertexConsumer,
                                         Vector3d[] curvePoints, int[] lightValues, double ropeLen,
-                                        RopeStyles.RopeStyle style) {
+                                        ResourceLocation style) {
         Matrix4f matrix = poseStack.last().pose();
 
         double totalLen = 0;

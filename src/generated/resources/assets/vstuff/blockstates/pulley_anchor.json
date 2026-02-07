@@ -1,10 +1,30 @@
 {
   "variants": {
-    "facing=up":    { "model": "vstuff:block/pulley_anchor/block" },
-    "facing=down":  { "model": "vstuff:block/pulley_anchor/block", "x": 180 },
-    "facing=north": { "model": "vstuff:block/pulley_anchor/block", "x": 90 },
-    "facing=south": { "model": "vstuff:block/pulley_anchor/block", "x": 90, "y": 180 },
-    "facing=east":  { "model": "vstuff:block/pulley_anchor/block", "x": 90, "y": 90 },
-    "facing=west":  { "model": "vstuff:block/pulley_anchor/block", "x": 90, "y": 270 }
+    "facing=down": {
+      "model": "vstuff:block/pulley_anchor/block",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "vstuff:block/pulley_anchor/block",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north": {
+      "model": "vstuff:block/pulley_anchor/block",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "vstuff:block/pulley_anchor/block",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up": {
+      "model": "vstuff:block/pulley_anchor/block"
+    },
+    "facing=west": {
+      "model": "vstuff:block/pulley_anchor/block",
+      "x": 90,
+      "y": 270
+    }
   }
 }

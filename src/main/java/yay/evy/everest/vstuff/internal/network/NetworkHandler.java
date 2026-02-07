@@ -7,10 +7,10 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import org.joml.Vector3d;
+import yay.evy.everest.vstuff.internal.RopeStyle;
 import yay.evy.everest.vstuff.internal.network.packet.RopeSyncPacket;
 import yay.evy.everest.vstuff.internal.network.packet.OutlinePacket;
 import yay.evy.everest.vstuff.internal.network.packet.RopeSoundPacket;
-import yay.evy.everest.vstuff.internal.RopeStyles;
 import yay.evy.everest.vstuff.internal.network.packet.RopeStyleSelectPacket;
 
 public class NetworkHandler {
@@ -54,12 +54,12 @@ public class NetworkHandler {
 
 
     public static void sendConstraintRerender(Integer constraintId, Long shipA, Long shipB,
-                                              Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle style){
+                                              Vector3d localPosA, Vector3d localPosB, double maxLength, ResourceLocation style){
         RopeSyncPacket packet = new RopeSyncPacket(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
         INSTANCE.send(PacketDistributor.ALL.noArg(),packet );
     }
     public static void sendConstraintAdd(Integer constraintId, Long shipA, Long shipB,
-                                         Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle style) {
+                                         Vector3d localPosA, Vector3d localPosB, double maxLength, ResourceLocation style) {
         RopeSyncPacket packet = new RopeSyncPacket(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
         INSTANCE.send(PacketDistributor.ALL.noArg(), packet);
     }
@@ -76,7 +76,7 @@ public class NetworkHandler {
 
 
     public static void sendConstraintAddToPlayer(ServerPlayer player, Integer constraintId, Long shipA, Long shipB,
-                                                 Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle style) {
+                                                 Vector3d localPosA, Vector3d localPosB, double maxLength, ResourceLocation style) {
         RopeSyncPacket packet = new RopeSyncPacket(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
         INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);
     }

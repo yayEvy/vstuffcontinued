@@ -1,0 +1,22 @@
+{
+  "name": "Wool Styles",
+  "order": 1,
+  "styles": [
+    "vstuff:red_wool",
+    "vstuff:orange_wool",
+    "vstuff:yellow_wool",
+    "vstuff:lime_wool",
+    "vstuff:green_wool",
+    "vstuff:cyan_wool",
+    "vstuff:blue_wool",
+    "vstuff:light_blue_wool",
+    "vstuff:purple_wool",
+    "vstuff:pink_wool",
+    "vstuff:magenta_wool",
+    "vstuff:brown_wool",
+    "vstuff:black_wool",
+    "vstuff:gray_wool",
+    "vstuff:light_gray_wool",
+    "vstuff:white_wool"
+  ]
+}

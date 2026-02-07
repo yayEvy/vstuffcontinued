@@ -1,51 +1,51 @@
 {
   "variants": {
     "axis_along_first=false,facing=down": {
-      "model": "vstuff:block/mechanical_thruster/mechanical_thruster",
+      "model": "vstuff:block/mechanical_thruster/horizontal",
       "x": 270,
       "y": 90
     },
     "axis_along_first=false,facing=east": {
-      "model": "vstuff:block/mechanical_thruster/mechanical_thruster",
+      "model": "vstuff:block/mechanical_thruster/horizontal",
       "y": 270
     },
     "axis_along_first=false,facing=north": {
-      "model": "vstuff:block/mechanical_thruster/mechanical_thruster",
+      "model": "vstuff:block/mechanical_thruster/vertical",
       "y": 180
     },
     "axis_along_first=false,facing=south": {
-      "model": "vstuff:block/mechanical_thruster/mechanical_thruster"
+      "model": "vstuff:block/mechanical_thruster/vertical"
     },
     "axis_along_first=false,facing=up": {
-      "model": "vstuff:block/mechanical_thruster/mechanical_thruster",
+      "model": "vstuff:block/mechanical_thruster/horizontal",
       "x": 90,
       "y": 90
     },
     "axis_along_first=false,facing=west": {
-      "model": "vstuff:block/mechanical_thruster/mechanical_thruster",
+      "model": "vstuff:block/mechanical_thruster/horizontal",
       "y": 90
     },
     "axis_along_first=true,facing=down": {
-      "model": "vstuff:block/mechanical_thruster/mechanical_thruster",
+      "model": "vstuff:block/mechanical_thruster/horizontal",
       "x": 270
     },
     "axis_along_first=true,facing=east": {
-      "model": "vstuff:block/mechanical_thruster/mechanical_thruster",
+      "model": "vstuff:block/mechanical_thruster/vertical",
       "y": 270
     },
     "axis_along_first=true,facing=north": {
-      "model": "vstuff:block/mechanical_thruster/mechanical_thruster",
+      "model": "vstuff:block/mechanical_thruster/horizontal",
       "y": 180
     },
     "axis_along_first=true,facing=south": {
-      "model": "vstuff:block/mechanical_thruster/mechanical_thruster"
+      "model": "vstuff:block/mechanical_thruster/horizontal"
     },
     "axis_along_first=true,facing=up": {
-      "model": "vstuff:block/mechanical_thruster/mechanical_thruster",
+      "model": "vstuff:block/mechanical_thruster/horizontal",
       "x": 90
     },
     "axis_along_first=true,facing=west": {
-      "model": "vstuff:block/mechanical_thruster/mechanical_thruster",
+      "model": "vstuff:block/mechanical_thruster/vertical",
       "y": 90
     }
   }

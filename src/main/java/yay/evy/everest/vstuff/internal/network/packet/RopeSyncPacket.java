@@ -1,11 +1,14 @@
 package yay.evy.everest.vstuff.internal.network.packet;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkEvent;
 import org.joml.Vector3d;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.ClientRopeManager;
-import yay.evy.everest.vstuff.internal.RopeStyles;
+import yay.evy.everest.vstuff.internal.RopeStyle;
+import yay.evy.everest.vstuff.internal.RopeStyleManager;
 
 import java.util.function.Supplier;
 
@@ -21,11 +24,10 @@ public class RopeSyncPacket {
     private final Vector3d localPosA;
     private final Vector3d localPosB;
     private final double maxLength;
-    private final RopeStyles.RopeStyle ropeStyle;
-    private final String style;
+    private final ResourceLocation ropeStyle;
 
     public RopeSyncPacket(Integer constraintId, Long shipA, Long shipB,
-                          Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyles.RopeStyle ropeStyle) {
+                          Vector3d localPosA, Vector3d localPosB, double maxLength, ResourceLocation ropeStyle) {
         this.action = Action.ADD;
         this.constraintId = constraintId;
         this.shipA = shipA;
@@ -35,10 +37,9 @@ public class RopeSyncPacket {
         this.maxLength = maxLength;
 
         if (ropeStyle == null) {
-            ropeStyle = RopeStyles.fromString("normal");
+            ropeStyle = RopeStyleManager.defaultId;
         }
         this.ropeStyle = ropeStyle;
-        this.style = ropeStyle.getStyle();
     }
 
     public RopeSyncPacket() {
@@ -49,8 +50,7 @@ public class RopeSyncPacket {
         this.localPosA = null;
         this.localPosB = null;
         this.maxLength = 0;
-        this.ropeStyle = RopeStyles.fromString("normal");
-        this.style = ropeStyle.getStyle();
+        this.ropeStyle = RopeStyleManager.defaultId;
     }
 
     public RopeSyncPacket(Integer constraintId) {
@@ -61,8 +61,7 @@ public class RopeSyncPacket {
         this.localPosA = null;
         this.localPosB = null;
         this.maxLength = 0;
-        this.ropeStyle = RopeStyles.fromString("normal");
-        this.style = ropeStyle.getStyle();
+        this.ropeStyle = RopeStyleManager.defaultId;
     }
 
     public RopeSyncPacket(FriendlyByteBuf buf) {
@@ -78,9 +77,8 @@ public class RopeSyncPacket {
                 this.localPosB = new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
                 this.maxLength = buf.readDouble();
 
-                this.style = buf.readUtf();
 
-                this.ropeStyle = RopeStyles.fromString(this.style);
+                this.ropeStyle = buf.readResourceLocation();
                 break;
             case REMOVE:
                 this.constraintId = buf.readInt();
@@ -89,8 +87,7 @@ public class RopeSyncPacket {
                 this.localPosA = null;
                 this.localPosB = null;
                 this.maxLength = 0;
-                this.style = "normal";
-                this.ropeStyle = RopeStyles.fromString(this.style);
+                this.ropeStyle = RopeStyleManager.defaultId;
                 break;
             case CLEAR_ALL:
             default:
@@ -100,8 +97,7 @@ public class RopeSyncPacket {
                 this.localPosA = null;
                 this.localPosB = null;
                 this.maxLength = 0;
-                this.style = "normal";
-                this.ropeStyle = RopeStyles.fromString(this.style);
+                this.ropeStyle = RopeStyleManager.defaultId;
                 break;
         }
     }
@@ -135,7 +131,7 @@ public class RopeSyncPacket {
                 buf.writeDouble(localPosB.z);
                 buf.writeDouble(maxLength);
 
-                buf.writeUtf(style);
+                buf.writeResourceLocation(ropeStyle);
                 break;
             case REMOVE:
                 if (constraintId == null) {

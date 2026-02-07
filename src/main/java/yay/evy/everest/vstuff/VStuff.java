@@ -2,8 +2,6 @@ package yay.evy.everest.vstuff;
 
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
-import net.minecraft.client.renderer.entity.EntityRenderers;
-import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
@@ -25,7 +23,6 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
@@ -34,14 +31,13 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.client.VStuffClient;
 import yay.evy.everest.vstuff.content.ropes.RopePersistence;
-import yay.evy.everest.vstuff.content.ropes.RopeUtil;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberServerAttachment;
-import yay.evy.everest.vstuff.content.ropethrower.RopeThrowerEntity;
+import yay.evy.everest.vstuff.content.ropes.thrower.RopeThrowerEntity;
 import yay.evy.everest.vstuff.content.thrust.ThrusterForceAttachment;
-import yay.evy.everest.vstuff.events.ColorHaggler;
 import yay.evy.everest.vstuff.index.*;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import yay.evy.everest.vstuff.internal.network.PhysGrabberNetwork;
+import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 import yay.evy.everest.vstuff.particles.ParticleTypes;
 import org.valkyrienskies.core.api.VsBeta;
 
@@ -71,8 +67,6 @@ public class VStuff {
         VStuffItems.register();
         VStuffEntities.register(modEventBus);
         VStuffBlockEntities.register();
-        VStuffRopeStyles.register();
-
 
         MinecraftForge.EVENT_BUS.register(this);
         NetworkHandler.registerPackets();
@@ -147,7 +141,7 @@ public class VStuff {
                                 startPos,
                                 startShipId,
                                 serverLevel.dimension().location().toString(),
-                                RopeUtil.ConnectionType.NORMAL,
+                                RopeUtils.ConnectionType.NORMAL,
                                 null
                         );
 

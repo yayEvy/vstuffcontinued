@@ -1,0 +1,22 @@
+{
+  "name": "Dyed Styles",
+  "order": 2,
+  "styles": [
+    "vstuff:red_dye",
+    "vstuff:orange_dye",
+    "vstuff:yellow_dye",
+    "vstuff:lime_dye",
+    "vstuff:green_dye",
+    "vstuff:cyan_dye",
+    "vstuff:blue_dye",
+    "vstuff:light_blue_dye",
+    "vstuff:purple_dye",
+    "vstuff:pink_dye",
+    "vstuff:magenta_dye",
+    "vstuff:brown_dye",
+    "vstuff:black_dye",
+    "vstuff:gray_dye",
+    "vstuff:light_gray_dye",
+    "vstuff:white_dye"
+  ]
+}

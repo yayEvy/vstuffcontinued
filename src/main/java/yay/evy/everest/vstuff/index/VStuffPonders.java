@@ -5,8 +5,8 @@ import com.tterrag.registrate.util.entry.RegistryEntry;
 import net.createmod.ponder.api.registration.PonderPlugin;
 import net.minecraft.resources.ResourceLocation;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.ponder.PhysPulleyPonder;
-import yay.evy.everest.vstuff.content.ponder.RotationalThrusterPonder;
+import yay.evy.everest.vstuff.client.ponder.PhysPulleyPonder;
+import yay.evy.everest.vstuff.client.ponder.RotationalThrusterPonder;
 import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper;
 
 public class VStuffPonders implements PonderPlugin {

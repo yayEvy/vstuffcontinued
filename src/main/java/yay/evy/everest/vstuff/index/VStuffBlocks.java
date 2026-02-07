@@ -11,8 +11,8 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import net.minecraft.world.level.material.MapColor;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.pulley.PhysPulleyBlock;
-import yay.evy.everest.vstuff.content.pulley.PulleyAnchorBlock;
+import yay.evy.everest.vstuff.content.ropes.pulley.PhysPulleyBlock;
+import yay.evy.everest.vstuff.content.ropes.pulley.PulleyAnchorBlock;
 import yay.evy.everest.vstuff.content.thrust.MechanicalThrusterBlock;
 
 import static com.simibubi.create.foundation.data.ModelGen.customItemModel;

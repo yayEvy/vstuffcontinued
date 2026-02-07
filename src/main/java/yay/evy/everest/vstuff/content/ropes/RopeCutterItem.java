@@ -12,9 +12,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import yay.evy.everest.vstuff.VStuffConfig;
+import yay.evy.everest.vstuff.internal.RopeStyle;
+import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import yay.evy.everest.vstuff.index.VStuffItems;
-import yay.evy.everest.vstuff.internal.RopeStyles;
+import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
 public class RopeCutterItem extends Item {
     public RopeCutterItem(Properties pProperties) {
@@ -28,23 +30,23 @@ public class RopeCutterItem extends Item {
             return InteractionResultHolder.pass(itemStack);
         }
 
-        Integer targetConstraintId = RopeUtil.findTargetedLead(serverLevel, player);
+        Integer targetConstraintId = RopeUtils.findTargetedLead(serverLevel, player);
         if (targetConstraintId == null) return InteractionResultHolder.pass(itemStack);
 
         try {
             Rope data = RopeManager.getActiveRopes().get(targetConstraintId);
             if (data == null) return InteractionResultHolder.pass(itemStack);
 
-            RopeStyles.PrimitiveRopeStyle style = data.style.getBasicStyle();
+            RopeStyle.RenderStyle style = RopeStyleManager.get(data.style).renderStyle();
             BlockPos soundPos = data.sourceBlockPos;
 
-            Component notif = style == RopeStyles.PrimitiveRopeStyle.CHAIN
+            Component notif = style == RopeStyle.RenderStyle.CHAIN
                     ? Component.translatable("vstuff.message.chain_break")
                     : Component.translatable("vstuff.message.rope_break");
             player.displayClientMessage(notif, true);
 
             if (VStuffConfig.ROPE_SOUNDS.get()) {
-                var sound = (style == RopeStyles.PrimitiveRopeStyle.CHAIN)
+                var sound = (style == RopeStyle.RenderStyle.CHAIN)
                         ? SoundEvents.CHAIN_BREAK
                         : SoundEvents.LEASH_KNOT_BREAK;
                 serverLevel.playSound(

@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
+import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,11 +36,11 @@ public class RopeManager {
            // VStuff.LOGGER.info("ConstraintTracker ID counter updated to {}", lastUsedId);
         }
     }
-    public static void addConstraintWithPersistence(Rope rope) {
+    public static void addConstraintWithPersistence(ServerLevel level, Rope rope) {
 
-        if (rope.constraintType == RopeUtil.ConstraintType.PULLEY && rope.sourceBlockPos != null) {
+        if (rope.constraintType == RopeUtils.ConstraintType.PULLEY && rope.sourceBlockPos != null) {
             boolean existingConstraintFound = activeRopes.values().stream()
-                    .anyMatch(existing -> existing.constraintType == RopeUtil.ConstraintType.PULLEY
+                    .anyMatch(existing -> existing.constraintType == RopeUtils.ConstraintType.PULLEY
                             && existing.sourceBlockPos != null
                             && existing.sourceBlockPos.equals(rope.sourceBlockPos)
                             && existing.style == rope.style);
@@ -50,7 +51,7 @@ public class RopeManager {
 
         activeRopes.put(rope.ID, rope);
 
-        RopePersistence persistence = RopePersistence.get(rope.getLevel());
+        RopePersistence persistence = RopePersistence.get(level);
 
         persistence.addConstraint(rope);
         NetworkHandler.sendConstraintAdd(rope.ID, rope.shipA, rope.shipB, rope.localPosA, rope.localPosB, rope.maxLength, rope.style);
@@ -79,7 +80,7 @@ public class RopeManager {
 
             NetworkHandler.sendConstraintRemove(constraintId);
 
-            if (data.constraintType == RopeUtil.ConstraintType.GENERIC && data.sourceBlockPos != null) {
+            if (data.constraintType == RopeUtils.ConstraintType.GENERIC && data.sourceBlockPos != null) {
                 cleanupOrphanedConstraints(level, data.sourceBlockPos);
             }
         }
@@ -153,7 +154,7 @@ public class RopeManager {
             Integer constraintId = entry.getKey();
             Rope rope = entry.getValue();
 
-            if (rope.constraintType == RopeUtil.ConstraintType.PULLEY &&
+            if (rope.constraintType == RopeUtils.ConstraintType.PULLEY &&
                     rope.sourceBlockPos != null &&
                     rope.sourceBlockPos.equals(sourceBlockPos)) {
                 constraintsToRemove.add(constraintId);

@@ -6,16 +6,16 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.network.NetworkEvent;
+import yay.evy.everest.vstuff.internal.RopeStyle;
 import yay.evy.everest.vstuff.sound.RopeSoundHandler;
-import yay.evy.everest.vstuff.internal.RopeStyles;
 
 import java.util.function.Supplier;
 
 public class RopeSoundPacket {
     private final boolean breakSound;
-    private final RopeStyles.PrimitiveRopeStyle style;
+    private final RopeStyle.RenderStyle style;
 
-    public RopeSoundPacket(boolean breakSound, RopeStyles.PrimitiveRopeStyle style) {
+    public RopeSoundPacket(boolean breakSound, RopeStyle.RenderStyle style) {
         this.breakSound = breakSound;
         this.style = style;
     }
@@ -28,7 +28,7 @@ public class RopeSoundPacket {
     public static RopeSoundPacket decode(FriendlyByteBuf buf) {
         return new RopeSoundPacket(
                 buf.readBoolean(),
-                buf.readEnum(RopeStyles.PrimitiveRopeStyle.class)
+                buf.readEnum(RopeStyle.RenderStyle.class)
         );
     }
 
@@ -38,10 +38,10 @@ public class RopeSoundPacket {
                 Minecraft mc = Minecraft.getInstance();
                 if (mc.player != null && mc.level != null) {
                     var sound = msg.breakSound
-                            ? (msg.style == RopeStyles.PrimitiveRopeStyle.CHAIN
+                            ? (msg.style == RopeStyle.RenderStyle.CHAIN
                             ? SoundEvents.CHAIN_BREAK
                             : SoundEvents.LEASH_KNOT_BREAK)
-                            : (msg.style == RopeStyles.PrimitiveRopeStyle.CHAIN
+                            : (msg.style == RopeStyle.RenderStyle.CHAIN
                             ? SoundEvents.CHAIN_PLACE
                             : SoundEvents.LEASH_KNOT_PLACE);
 
