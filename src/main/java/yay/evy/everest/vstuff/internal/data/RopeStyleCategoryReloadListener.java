@@ -61,7 +61,9 @@ public class RopeStyleCategoryReloadListener extends SimpleJsonResourceReloadLis
                             .findFirst()
                             .orElse(null);
 
-            if (category == null) continue;
+            if (category == null) {
+                continue;
+            }
 
             JsonArray styles = entry.getValue()
                     .getAsJsonObject()

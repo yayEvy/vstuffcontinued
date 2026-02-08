@@ -1,5 +1,5 @@
 {
   "name": "Light Gray",
   "render_type": "normal",
-  "texture": "minecraft:textures/block/light_gray_wool"
+  "texture": "minecraft:textures/block/light_gray_wool.png"
 }

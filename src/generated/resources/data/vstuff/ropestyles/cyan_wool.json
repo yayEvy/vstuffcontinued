@@ -1,5 +1,5 @@
 {
   "name": "Cyan",
   "render_type": "normal",
-  "texture": "minecraft:textures/block/cyan_wool"
+  "texture": "minecraft:textures/block/cyan_wool.png"
 }

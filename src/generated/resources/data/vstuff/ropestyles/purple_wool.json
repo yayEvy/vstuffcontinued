@@ -1,5 +1,5 @@
 {
   "name": "Purple",
   "render_type": "normal",
-  "texture": "minecraft:textures/block/purple_wool"
+  "texture": "minecraft:textures/block/purple_wool.png"
 }

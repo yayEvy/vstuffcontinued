@@ -1,5 +1,5 @@
 {
   "name": "Chain",
   "render_type": "chain",
-  "texture": "vstuff:textures/rope/rope_chain"
+  "texture": "vstuff:textures/rope/rope_chain.png"
 }

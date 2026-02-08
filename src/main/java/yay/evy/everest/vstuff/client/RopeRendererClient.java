@@ -251,7 +251,7 @@ public class RopeRendererClient {
 
         RenderType renderType;
         if (RopeStyleManager.get(style).renderStyle() == RopeStyle.RenderStyle.CHAIN) {
-            renderType = RopeRendererType.ropeRendererChainStyle(style);
+            renderType = RopeRendererType.ropeRendererChainStyle(RopeStyleManager.get(style).texture());
             renderChainRope(poseStack, bufferSource.getBuffer(renderType), curvePoints, lightValues, currentDistance, style);
         } else {
             renderType = RopeRendererType.ropeRenderer(RopeStyleManager.get(style).texture());

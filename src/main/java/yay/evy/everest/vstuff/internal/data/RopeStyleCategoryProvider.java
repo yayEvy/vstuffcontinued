@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class RopeStyleCategoryProvider implements DataProvider {
 
@@ -31,6 +32,7 @@ public class RopeStyleCategoryProvider implements DataProvider {
         futures.add(category(output, 2, "Dyed Styles", colors("dye")));
         futures.add(category(output, 3, "Pride Styles", "vstuff:pride", "vstuff:gay",
                 "vstuff:lesbian", "vstuff:bisexual", "vstuff:transgender", "vstuff:nonbinary", "vstuff:asexual"));
+        futures.add(category(output, 4, "Log Styles", logs()));
 
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
     }
@@ -41,6 +43,17 @@ public class RopeStyleCategoryProvider implements DataProvider {
         return colors.stream().map(color -> {
             String path = color.toLowerCase(Locale.ROOT).replace(" ", "_");
             return "vstuff:" + path + "_" + suffix;
+        }).toArray(String[]::new);
+    }
+
+    private String[] logs() {
+        List<String> logs = List.of("Oak", "Birch", "Dark Oak", "Jungle", "Acacia", "Mangrove", "Cherry",
+                "Stripped Oak", "Stripped Birch", "Stripped Dark Oak", "Stripped Jungle", "Stripped Acacia",
+                "Stripped Mangrove", "Stripped Cherry");
+
+        return logs.stream().map(log -> {
+            String path = log.toLowerCase(Locale.ROOT).replace(" ", "_");
+            return "vstuff:" + path + "_log";
         }).toArray(String[]::new);
     }
 
@@ -64,7 +77,7 @@ public class RopeStyleCategoryProvider implements DataProvider {
         Path path = generator.getPackOutput().getOutputFolder()
                 .resolve("data")
                 .resolve(id.getNamespace())
-                .resolve("rope_style_categories")
+                .resolve("ropestyle_categories")
                 .resolve(id.getPath() + ".json");
 
         return DataProvider.saveStable(output, json, path);

@@ -1,5 +1,5 @@
 {
   "name": "Normal",
   "render_type": "normal",
-  "texture": "vstuff:textures/rope/rope_normal"
+  "texture": "vstuff:textures/rope/rope_normal.png"
 }

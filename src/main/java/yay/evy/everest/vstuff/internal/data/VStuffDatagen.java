@@ -16,10 +16,11 @@ public class VStuffDatagen {
 
     @SubscribeEvent
     public static void gatherData(GatherDataEvent event) {
-        VStuff.LOGGER.info("Running VStuff datagen");
         DataGenerator generator = event.getGenerator();
 
         generator.addProvider(event.includeServer(), new RopeStyleProvider(generator));
         generator.addProvider(event.includeServer(), new RopeStyleCategoryProvider(generator));
+
+        generator.addProvider(event.includeClient(), new RopeStyleLangProvider(generator));
     }
 }
