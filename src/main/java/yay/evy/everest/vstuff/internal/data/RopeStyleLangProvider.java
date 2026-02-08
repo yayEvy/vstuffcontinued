@@ -2,47 +2,25 @@ package yay.evy.everest.vstuff.internal.data;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.DataProvider;
 import yay.evy.everest.vstuff.VStuff;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 
-public class RopeStyleLangProvider implements DataProvider {
+public class RopeStyleLangProvider {
 
-    final DataGenerator generator;
-
-    public RopeStyleLangProvider(DataGenerator generator) {
-        this.generator = generator;
+    public static void provideLang(DataGenerator generator, BiConsumer<String, String> consumer) {
+        styleLang(generator, consumer, "ropestyles", "ropestyle");
+        styleLang(generator, consumer, "ropestyle_categories", "ropestyle.category");
     }
 
-    @Override
-    public CompletableFuture<?> run(CachedOutput output) {
-        JsonObject langJson = new JsonObject();
-
-        lang(langJson, "ropestyles", "ropestyle");
-        lang(langJson, "ropestyle_categories", "ropestyle.category");
-
-        Path path = generator.getPackOutput().getOutputFolder()
-                .resolve("assets")
-                .resolve(VStuff.MOD_ID)
-                .resolve("lang")
-                .resolve("en_us.json");
-
-        return DataProvider.saveStable(output, langJson, path);
-    }
-
-
-    private void lang(JsonObject langJson, String dir, String keyFirst) {
+    private static void styleLang(DataGenerator generator, BiConsumer<String, String> consumer, String dir, String keyFirst) {
         Path root = generator.getPackOutput().getOutputFolder()
                 .resolve("data")
                 .resolve(VStuff.MOD_ID)
@@ -58,16 +36,10 @@ public class RopeStyleLangProvider implements DataProvider {
             throw new RuntimeException(e);
         }
 
-        langData.forEach(langJson::addProperty);
+        langData.forEach(consumer);
     }
 
-    @Override
-    public String getName() {
-        return "vstuff_ropestyle_lang";
-    }
-
-
-    private void readFile(Path path, Map<String, String> langData, String keyFirst) {
+    private static void readFile(Path path, Map<String, String> langData, String keyFirst) {
         try (Reader reader = Files.newBufferedReader(path)) {
             JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
 

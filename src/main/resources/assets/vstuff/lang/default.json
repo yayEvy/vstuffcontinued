@@ -1,23 +1,11 @@
 {
-  "item.vstuff.lead_constraint_item": "Rope",
   "item.vstuff.lead_constraint_item.tooltip": "Creates rope constraints between ships and world.",
-  "item.vstuff.lead_break_item": "Rope Cutter",
   "item.vstuff.lead_break_item.tooltip": "Look at a rope and right-click to cut it.",
-  "item.vstuff.phys_grabber": "Phys Grabber",
   "item.vstuff.phys_grabber.tooltip": "A method of dragging ships around!.",
-  "item.vstuff.empty_energy_core": "Empty Energy Core",
-  "item.vstuff.energy_core": "Energy Core",
-  "item.vstuff.rope_thrower": "Rope Thrower",
-  "item.vstuff.expendable_assembler": "Expendable Assembler",
   "vstuff.expendable_assembler.tooltip.summary": "A _single use_ method of assembling ships! Who knows how this thing works... Very _fragile!_",
   "item.vstuff.rope_thrower.tooltip": "Creates a _rope_ between a block and the block the projectile hits.",
-  "block.vstuff.pulley_anchor": "Pulley Anchor",
-  "item.vstuff.pulley_anchor": "Pulley Anchor",
   "vstuff.pulley_anchor.tooltip": "Use this as a second pos for pulley connections!",
   "vstuff.pulley_anchor.tooltip.summary": "Acts as an _anchor point_ for _pulley_ rope connections",
-
-  "block.vstuff.phys_pulley": "Phys Pulley",
-  "block.vstuff.mechanical_thruster": "Mechanical Thruster",
 
   "creativetabs.main": "VStuff",
 
@@ -72,15 +60,7 @@
   "vstuff.phys_grabber.tooltip.summary": "A method of _moving ships_ around!",
   "vstuff.tooltip.hold_for_details": "Hold [%s] for summary",
 
-
-  "vstuff.rope.christmas_candycane": "Candy Cane",
-  "vstuff.rope.christmas_christmas_tree": "Christmas Tree",
-
-  "vstuff.rope_category.logs": "Log Styles",
-  "vstuff.rope_category.vstuffmas":"Merry VStuffmas Textures",
-
   "ropestyle.category.vstuff.uncategorized": "Uncategorized",
-
 
   "vstuff.keyinfo.rope_menu_open": "Open Rope Styler",
 
