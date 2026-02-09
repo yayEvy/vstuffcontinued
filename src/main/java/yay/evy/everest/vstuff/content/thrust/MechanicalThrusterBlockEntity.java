@@ -25,12 +25,22 @@ import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import yay.evy.everest.vstuff.VStuffConfig;
 import yay.evy.everest.vstuff.particles.ParticleTypes;
 import yay.evy.everest.vstuff.particles.PlumeParticleData;
+import com.simibubi.create.content.kinetics.fan.IAirCurrentSource;
+import com.simibubi.create.content.kinetics.fan.AirCurrent;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 import static com.simibubi.create.content.kinetics.motor.CreativeMotorBlockEntity.MAX_SPEED;
 @SuppressWarnings({"deprecation", "unchecked"})
-public class MechanicalThrusterBlockEntity extends KineticBlockEntity {
+public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements IAirCurrentSource{
+
+
+
+    // hey vsauce air current here
+    @Nullable
+    private AirCurrent airCurrent;
+
 
     public static final int BASE_MAX_THRUST = 100_000;
     // Constants
@@ -44,7 +54,6 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity {
     protected ThrusterData thrusterData;
     protected int emptyBlocks;
     protected boolean isThrustDirty = false;
-    private final ThrusterDamager damager;
 
     // Ticking
     private int currentTick = 0;
@@ -62,7 +71,6 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity {
         super(typeIn, pos, state);
         thrusterData = new ThrusterData();
         particleType = (ParticleType<PlumeParticleData>) ParticleTypes.getPlumeType();
-        this.damager = new ThrusterDamager(this);
     }
 
 
@@ -93,15 +101,20 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity {
         }
 
         super.tick();
+        updateAirCurrent();
         BlockState currentBlockState = getBlockState();
+        // DFNSALKJDKJDKLAJLASJFLAJFSKD famil guy
+        /*
         if (level.isClientSide) {
             if (shouldEmitParticles()) {
                 emitParticles(level, worldPosition, currentBlockState);
             }
             return;
         }
+
+         */
         currentTick++;
-        damager.tick(currentTick);
+       // damager.tick(currentTick);
         int tick_rate = VStuffConfig.THRUSTER_TICKS_PER_UPDATE.get();
 
         if (currentTick % (tick_rate * 2) == 0) {
@@ -182,13 +195,6 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity {
         isThrustDirty = true;
     }
 
-    protected boolean shouldEmitParticles() {
-        return isWorking();
-    }
-
-    protected boolean shouldDamageEntities() {
-        return VStuffConfig.THRUSTER_DAMAGE_ENTITIES.get() && isWorking();
-    }
 
     protected void addSpecificGoggleInfo(List<Component> tooltip, boolean isPlayerSneaking) {}
 
@@ -200,72 +206,7 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity {
         return Math.abs(getSpeed() / 256);
     }
 
-    public void emitParticles(Level level, BlockPos pos, BlockState state) {
-        if (emptyBlocks == 0) return;
 
-        if (!(level instanceof ClientLevel clientLevel)) {
-            return;
-        }
-
-        double particleCountMultiplier = org.joml.Math.clamp(
-                0.0, 2.0,
-                VStuffConfig.THRUSTER_PARTICLE_COUNT_MULTIPLIER.get() * getSpeedScalar()
-        );
-        if (particleCountMultiplier <= 0) return;
-
-        clientTick++;
-        if (clientTick % 2 == 0) {
-            clientTick = 0;
-            return;
-        }
-
-        this.particleSpawnAccumulator += particleCountMultiplier;
-        int particlesToSpawn = (int) this.particleSpawnAccumulator;
-        if (particlesToSpawn == 0) return;
-        this.particleSpawnAccumulator -= particlesToSpawn;
-
-        Direction direction = state.getValue(MechanicalThrusterBlock.FACING);
-        Direction oppositeDirection = direction.getOpposite();
-
-        double currentNozzleOffset = NOZZLE_OFFSET_FROM_CENTER;
-        Vector3d additionalVel = new Vector3d();
-
-        ClientShip ship = VSGameUtilsKt.getShipObjectManagingPos(clientLevel, pos);
-        if (ship != null) {
-            Vector3dc shipWorldVelocityJOML = ship.getVelocity();
-            Matrix4dc transform = ship.getRenderTransform().getShipToWorld();
-            Matrix4dc invTransform = ship.getRenderTransform().getWorldToShip();
-
-            Vector3d shipVelocity = invTransform.transformDirection(new Vector3d(shipWorldVelocityJOML));
-            Vector3d particleEjectionUnitVecJOML = transform.transformDirection(VectorConversionsMCKt.toJOMLD(oppositeDirection.getNormal()));
-
-            double shipVelComponentAlongRotatedEjection = shipWorldVelocityJOML.dot(particleEjectionUnitVecJOML);
-            if (shipVelComponentAlongRotatedEjection > 0.0) {
-                Vector3d normalizedVelocity = new Vector3d();
-                shipWorldVelocityJOML.normalize(normalizedVelocity);
-                double shipVelComponentAlongRotatedEjectionNormalized = normalizedVelocity.dot(particleEjectionUnitVecJOML);
-
-                double effect = org.joml.Math.clamp(0.0, 1.0, shipVelComponentAlongRotatedEjectionNormalized);
-                double additionalOffset = shipVelComponentAlongRotatedEjection * VStuffConfig.THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER.get();
-                currentNozzleOffset += additionalOffset * effect;
-                additionalVel = new Vector3d(shipVelocity).mul(SHIP_VELOCITY_INHERITANCE * effect);
-            }
-        }
-
-        double particleX = pos.getX() + 0.5 + oppositeDirection.getStepX() * currentNozzleOffset;
-        double particleY = pos.getY() + 0.5 + oppositeDirection.getStepY() * currentNozzleOffset;
-        double particleZ = pos.getZ() + 0.5 + oppositeDirection.getStepZ() * currentNozzleOffset;
-
-        Vector3d particleVelocity = new Vector3d(oppositeDirection.getStepX(), oppositeDirection.getStepY(), oppositeDirection.getStepZ())
-                .mul(PARTICLE_VELOCITY * getSpeedScalar())
-                .add(additionalVel);
-
-        for (int i = 0; i < particlesToSpawn; i++) {
-            clientLevel.addParticle(new PlumeParticleData(particleType), true,
-                    particleX, particleY, particleZ,
-                    particleVelocity.x, particleVelocity.y, particleVelocity.z);
-        }
-    }
 
     public void calculateObstruction(Level level, BlockPos pos, Direction forwardDirection){
         //Starting from the block behind and iterate OBSTRUCTION_LENGTH blocks in that direction
@@ -368,6 +309,69 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity {
         updateThrust(getBlockState());
         setChanged();
     }
+
+    private void updateAirCurrent() {
+        float speed = Math.abs(getSpeed());
+        if (speed == 0) {
+            airCurrent = null;
+            return;
+        }
+
+        if (airCurrent == null) {
+            airCurrent = new AirCurrent(this);
+        }
+
+        if (currentTick % 10 == 0) {
+            airCurrent.rebuild();
+        }
+
+        if (currentTick % TICKS_PER_ENTITY_CHECK == 0) {
+            airCurrent.findEntities();
+        }
+
+        airCurrent.tick();
+    }
+
+    @Override
+    public float getMaxDistance() {
+        float speed = Math.abs(getSpeed());
+        return Math.min(VStuffConfig.THRUSTER_MAX_AIR_PUSH_DISTANCE.get(), speed / 16.0f);
+    }
+
+    @Override
+    public @Nullable AirCurrent getAirCurrent() {
+        return airCurrent;
+    }
+
+    @Override
+    public Level getAirCurrentWorld() {
+        return level;
+    }
+
+    @Override
+    public BlockPos getAirCurrentPos() {
+        return worldPosition;
+    }
+
+    @Override
+    public Direction getAirflowOriginSide() {
+        // did you knwo your thruster is  fdpkasdjmfkldsmfmkldkdlamfs
+        return getBlockState()
+                .getValue(MechanicalThrusterBlock.FACING)
+                .getOpposite();    }
+
+    @Override
+    public boolean isSourceRemoved() {
+        return isRemoved();
+    }
+
+    @Override
+    public Direction getAirFlowDirection() {
+        return getBlockState()
+                .getValue(MechanicalThrusterBlock.FACING)
+                .getOpposite();
+    }
+
 
 
 }
