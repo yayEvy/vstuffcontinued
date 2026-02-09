@@ -23,8 +23,8 @@ public class VStuffConfig {
         ForgeConfigSpec.Builder serverBuilder = new ForgeConfigSpec.Builder();
 
         serverBuilder.push("thruster");
-        THRUSTER_THRUST_MULTIPLIER = serverBuilder.define("thrustMultiplier", 0.5);
-        THRUSTER_MAX_SPEED = serverBuilder.define("maxSpeed", 20);
+        THRUSTER_THRUST_MULTIPLIER = serverBuilder.define("thrustMultiplier", 0.3);
+        THRUSTER_MAX_SPEED = serverBuilder.define("maxSpeed", 10);
         THRUSTER_TICKS_PER_UPDATE = serverBuilder.define("ticksPerUpdate", 1);
         THRUSTER_MAX_AIR_PUSH_DISTANCE = serverBuilder
                 .comment("The maximum distance the thruster air current can reach & push")
