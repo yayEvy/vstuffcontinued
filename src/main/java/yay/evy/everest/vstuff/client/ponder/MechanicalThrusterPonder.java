@@ -7,10 +7,10 @@ import net.createmod.ponder.api.scene.Selection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 
-public class RotationalThrusterPonder {
+public class MechanicalThrusterPonder {
 
-    public static void rotationalThruster(SceneBuilder scene, SceneBuildingUtil util) {
-        scene.title("rotational_thruster", "Using the Rotational Thruster");
+    public static void mechanicalThruster(SceneBuilder scene, SceneBuildingUtil util) {
+        scene.title("mechanical_thruster", "Using the Mechanical Thruster");
         scene.configureBasePlate(0, 0, 5);
         scene.scaleSceneView(0.7f);
         scene.setSceneOffsetY(-1);
@@ -25,19 +25,19 @@ public class RotationalThrusterPonder {
         BlockPos motorPos = util.grid().at(1, 1, 2);
 
         scene.overlay().showText(30)
-                .text("vstuff.ponder.rotational_thruster.title")
+                .text("vstuff.ponder.mechanical_thruster.title")
                 .pointAt(util.vector().topOf(thrusterPos))
                 .placeNearTarget();
         scene.idle(40);
 
         scene.overlay().showText(30)
-                .text("vstuff.ponder.rotational_thruster.how")
+                .text("vstuff.ponder.mechanical_thruster.how")
                 .pointAt(util.vector().topOf(motorPos))
                 .placeNearTarget();
         scene.idle(40);
 
         scene.overlay().showText(30)
-                .text("vstuff.ponder.rotational_thruster.effect")
+                .text("vstuff.ponder.mechanical_thruster.effect")
                 .pointAt(util.vector().blockSurface(thrusterPos, Direction.NORTH))
                 .placeNearTarget();
         scene.idle(40);

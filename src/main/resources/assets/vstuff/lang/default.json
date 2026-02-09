@@ -41,10 +41,10 @@
   "vstuff.ponder.phys_pulley.text_1": "Right click your first position with the rope, as normal",
   "vstuff.ponder.phys_pulley.text_2": "Right click an Anchor (as the second position) to connect the Rope",
 
-  "vstuff.ponder.rotational_thruster.text_1": "This is the Rotational Thruster!",
-  "vstuff.ponder.rotational_thruster.text_2": "By giving it rotational force...",
-  "vstuff.ponder.rotational_thruster.text_3": "...it produces thrust!",
-  "vstuff.ponder.rotational_thruster.header": "Rotational Thruster",
+  "vstuff.ponder.mechanical_thruster.text_1": "This is the Mechanical Thruster!",
+  "vstuff.ponder.mechanical_thruster.text_2": "By giving it rotational force...",
+  "vstuff.ponder.mechanical_thruster.text_3": "...it produces a bit of thrust! (massive news)",
+  "vstuff.ponder.mechanical_thruster.header": "Mechanical Thruster",
 
   "vstuff.lead_constraint_item.tooltip.summary": "A rope for VS2 ships! Press the _Open Rope Styler_ key (default _ALT_) to change the rope texture.",
   "vstuff.lead_constraint_item.tooltip.condition1": "When Used on two different blocks",
