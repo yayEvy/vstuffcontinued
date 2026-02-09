@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import net.minecraft.world.level.material.MapColor;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff.LevituffBlock;
 import yay.evy.everest.vstuff.content.ropes.pulley.PhysPulleyBlock;
 import yay.evy.everest.vstuff.content.ropes.pulley.PulleyAnchorBlock;
 import yay.evy.everest.vstuff.content.thrust.MechanicalThrusterBlock;
@@ -65,5 +66,13 @@ public class VStuffBlocks  {
                     .model((c, p) -> p.withExistingParent(c.getName(), p.modLoc("block/pulley_anchor/block")))
                     .build()
                     .register();
+
+    public static final BlockEntry<LevituffBlock> LEVITUFF =
+            REGISTRATE.block("levituff", LevituffBlock::new)
+                    .initialProperties(() -> Blocks.TUFF)
+                    .transform(pickaxeOnly())
+                    .simpleItem()
+                    .register();
+
     public static void register() {}
 }
