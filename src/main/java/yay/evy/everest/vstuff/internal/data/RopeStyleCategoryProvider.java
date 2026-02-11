@@ -33,6 +33,7 @@ public class RopeStyleCategoryProvider implements DataProvider {
         futures.add(category(output, 3, "Pride Styles", "vstuff:pride", "vstuff:gay",
                 "vstuff:lesbian", "vstuff:bisexual", "vstuff:transgender", "vstuff:nonbinary", "vstuff:asexual"));
         futures.add(category(output, 4, "Log Styles", logs()));
+        futures.add(category(output, 5, "Merry VStuffmas", "vstuff:christmas_tree", "vstuff:candycane"));
 
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
     }
