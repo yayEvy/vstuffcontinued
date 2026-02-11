@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
@@ -21,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class RopeManager {
 
-    public static final Map<Integer, Rope> activeRopes = new ConcurrentHashMap<>();
+    public static final Map<Integer, ReworkedRope> activeRopes = new ConcurrentHashMap<>();
     private static long lastJoinTime = 0L;
     private static int lastUsedId = 0;
 
@@ -33,38 +34,26 @@ public class RopeManager {
     public static void setLastUsedId(int id) {
         if (id > lastUsedId) {
             lastUsedId = id;
-           // VStuff.LOGGER.info("ConstraintTracker ID counter updated to {}", lastUsedId);
+            //VStuff.LOGGER.info("ConstraintTracker ID counter updated to {}", lastUsedId);
         }
     }
-    public static void addConstraintWithPersistence(ServerLevel level, Rope rope) {
-
-        if (rope.constraintType == RopeUtils.ConstraintType.PULLEY && rope.sourceBlockPos != null) {
-            boolean existingConstraintFound = activeRopes.values().stream()
-                    .anyMatch(existing -> existing.constraintType == RopeUtils.ConstraintType.PULLEY
-                            && existing.sourceBlockPos != null
-                            && existing.sourceBlockPos.equals(rope.sourceBlockPos)
-                            && existing.style == rope.style);
-
-            if (existingConstraintFound) return;
-        }
-
-
-        activeRopes.put(rope.ID, rope);
+    public static void addRopeWithPersistence(ServerLevel level, ReworkedRope rope) {
+        activeRopes.put(rope.ropeId, rope);
 
         RopePersistence persistence = RopePersistence.get(level);
 
         persistence.addConstraint(rope);
-        NetworkHandler.sendConstraintAdd(rope.ID, rope.shipA, rope.shipB, rope.localPosA, rope.localPosB, rope.maxLength, rope.style);
-        //VStuff.LOGGER.info("Adding constraint with id {} to persistence", rope.ID);
+        NetworkHandler.sendConstraintAdd(rope.ropeId, rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.style);
+        //VStuff.LOGGER.info("Adding constraint with id {} to persistence", rope.ropeId);
     }
 
-    public static void replaceConstraint(Integer id, Rope rope) {
+    public static void replaceRope(Integer id, ReworkedRope rope) {
         activeRopes.put(id, rope);
     }
 
-    public static void removeConstraintWithPersistence(ServerLevel level, Integer constraintId) {
+    public static void removeRopeWithPersistence(ServerLevel level, Integer constraintId) {
 
-        Rope data = activeRopes.remove(constraintId);
+        ReworkedRope data = activeRopes.remove(constraintId);
         if (data != null) {
 
             RopePersistence persistence = RopePersistence.get(level);
@@ -80,46 +69,43 @@ public class RopeManager {
 
             NetworkHandler.sendConstraintRemove(constraintId);
 
-            if (data.constraintType == RopeUtils.ConstraintType.GENERIC && data.sourceBlockPos != null) {
-                cleanupOrphanedConstraints(level, data.sourceBlockPos);
-            }
         }
     }
 
 
 
-    public static void syncAllConstraintsToPlayer(ServerPlayer player) {
+    public static void syncAllRopesToPlayer(ServerPlayer player) {
         NetworkHandler.sendClearAllConstraintsToPlayer(player);
-      //  VStuff.LOGGER.info("Attempting to sync all constraints to player {}", player.getName());
+        //VStuff.LOGGER.info("Attempting to sync all constraints to player {}", player.getName());
 
-        for (Map.Entry<Integer, Rope> entry : activeRopes.entrySet()) {
-            Rope data = entry.getValue();
+        for (Map.Entry<Integer, ReworkedRope> entry : activeRopes.entrySet()) {
+            ReworkedRope data = entry.getValue();
             NetworkHandler.sendConstraintAddToPlayer(
                     player,
                     entry.getKey(),
-                    data.shipA,
-                    data.shipB,
-                    data.localPosA,
-                    data.localPosB,
-                    data.maxLength,
+                    data.posData0.shipId(),
+                    data.posData1.shipId(),
+                    data.posData0.localPos(),
+                    data.posData1.localPos(),
+                    data.jointValues.maxLength(),
                     data.style
             );
         }
     }
 
 
-    public static Map<Integer, Rope> getActiveRopes() {
+    public static Map<Integer, ReworkedRope> getActiveRopes() {
         return new HashMap<>(activeRopes);
     }
 
 
-    public static void addConstraintToTracker(Rope rope) {
-        if (rope == null || rope.ID == null) return;
+    public static void addRopeToManager(ReworkedRope rope) {
+        if (rope == null || rope.ropeId == null) return;
 
 
-        activeRopes.put(rope.ID, rope);
+        activeRopes.put(rope.ropeId, rope);
 
-        setLastUsedId(rope.ID);
+        setLastUsedId(rope.ropeId);
     }
 
     @SubscribeEvent
@@ -128,39 +114,7 @@ public class RopeManager {
 
         NetworkHandler.sendClearAllConstraintsToPlayer(player);
 
-        syncAllConstraintsToPlayer(player);
-    }
-
-
-
-
-    public static void cleanupOrphanedConstraints(ServerLevel level, BlockPos sourceBlockPos) {
-        List<Integer> constraintsToRemove = getIDsToRemove(sourceBlockPos);
-
-        var gtpa = ValkyrienSkiesMod.getOrCreateGTPA(ValkyrienSkies.getDimensionId(level));
-
-        for (Integer constraintId : constraintsToRemove) {
-            try {
-                gtpa.removeJoint(constraintId);
-                removeConstraintWithPersistence(level, constraintId);
-            } catch (Exception ignored) {}
-        }
-    }
-
-    private static @NotNull List<Integer> getIDsToRemove(BlockPos sourceBlockPos) {
-        List<Integer> constraintsToRemove = new java.util.ArrayList<>();
-
-        for (Map.Entry<Integer, Rope> entry : activeRopes.entrySet()) {
-            Integer constraintId = entry.getKey();
-            Rope rope = entry.getValue();
-
-            if (rope.constraintType == RopeUtils.ConstraintType.PULLEY &&
-                    rope.sourceBlockPos != null &&
-                    rope.sourceBlockPos.equals(sourceBlockPos)) {
-                constraintsToRemove.add(constraintId);
-            }
-        }
-        return constraintsToRemove;
+        syncAllRopesToPlayer(player);
     }
 
 

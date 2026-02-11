@@ -1,6 +1,7 @@
 package yay.evy.everest.vstuff.content.ropes;
 
 
+import kotlin.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -28,6 +29,8 @@ import yay.evy.everest.vstuff.internal.utility.RopeUtils.ConnectionType;
 import yay.evy.everest.vstuff.internal.utility.ShipUtils;
 
 import java.util.Objects;
+
+import static yay.evy.everest.vstuff.internal.utility.ShipUtils.getShipIdAtPos;
 
 public class RopeItem extends Item {
 
@@ -112,36 +115,40 @@ public class RopeItem extends Item {
             firstShipId = ShipUtils.whythefuckisitsupposedtobenullwhyyyyy(firstShipId, serverLevel);
             secondShipId = ShipUtils.whythefuckisitsupposedtobenullwhyyyyy(secondShipId, serverLevel);
 
-            RopeUtils.RopeReturn ropeReturn;
 
-            if (connectionType == ConnectionType.NORMAL) {
-                ropeReturn = Rope.createNew(this, serverLevel, firstClickedPos, clickedPos, firstShipId, secondShipId, player);
-            } else {
-                if (serverLevel.getBlockEntity(clickedPos) instanceof PulleyAnchorBlockEntity && connectionType == ConnectionType.PULLEY) {
-                    if (Objects.equals(secondShipId, firstShipId)) { // pulley and anchor cannot be in same body
-                        resetStateWithMessage(serverLevel, heldItem, false, player, "pulley_body_fail");
-                        PhysPulleyBlockEntity waitingPulley = (PhysPulleyBlockEntity) serverLevel.getBlockEntity(firstClickedPos);
-                        waitingPulley.resetSelf();
-                        NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.RED);
-                        return InteractionResult.FAIL;
-                    }
+            Pair<ReworkedRope, String> createResult;
 
-                    ropeReturn = Rope.createNew(this, serverLevel, firstClickedPos, clickedPos, firstShipId, secondShipId, player);
-                    if (ropeReturn.result() == RopeUtils.RopeInteractionReturn.SUCCESS) {
-                        PhysPulleyBlockEntity waitingPulley = (PhysPulleyBlockEntity) serverLevel.getBlockEntity(firstClickedPos);
-                        waitingPulley.attachRope(ropeReturn.rope());
-                        ropeReturn.rope().setSourceBlockPos(firstClickedPos);
+            createResult = ReworkedRope.create(serverLevel, firstShipId, secondShipId, firstClickedPos, clickedPos, player, false);
 
-                        serverLevel.sendBlockUpdated(firstClickedPos, waitingPulley.getBlockState(), waitingPulley.getBlockState(), 3);
-                    }
-                } else {
-                    resetStateWithMessage(serverLevel, heldItem, false, player, "pulley_fail");
-                    NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.RED);
-                    return InteractionResult.FAIL;
-                }
-            }
+//            if (connectionType == ConnectionType.NORMAL) {
+//                createResult = ReworkedRope.create(serverLevel, firstShipId, secondShipId, firstClickedPos, clickedPos, player, false);
+//            } else {
+//                if (serverLevel.getBlockEntity(clickedPos) instanceof PulleyAnchorBlockEntity && connectionType == ConnectionType.PULLEY) {
+//                    if (Objects.equals(secondShipId, firstShipId)) { // pulley and anchor cannot be in same body
+//                        resetStateWithMessage(serverLevel, heldItem, false, player, "pulley_body_fail");
+//                        PhysPulleyBlockEntity waitingPulley = (PhysPulleyBlockEntity) serverLevel.getBlockEntity(firstClickedPos);
+//                        waitingPulley.resetSelf();
+//                        NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.RED);
+//                        return InteractionResult.FAIL;
+//                    }
+//
+//                    ropeReturn = Rope.createNew(this, serverLevel, firstClickedPos, clickedPos, firstShipId, secondShipId, player);
+//                    createResult = ReworkedRope.create(serverLevel, firstShipId, secondShipId, firstClickedPos, clickedPos, player, false);
+//                    if (createResult.component1() != null) {
+//                        PhysPulleyBlockEntity waitingPulley = (PhysPulleyBlockEntity) serverLevel.getBlockEntity(firstClickedPos);
+//                        waitingPulley.attachRope(ropeReturn.rope());
+//                        ropeReturn.rope().setSourceBlockPos(firstClickedPos);
+//
+//                        serverLevel.sendBlockUpdated(firstClickedPos, waitingPulley.getBlockState(), waitingPulley.getBlockState(), 3);
+//                    }
+//                } else {
+//                    resetStateWithMessage(serverLevel, heldItem, false, player, "pulley_fail");
+//                    NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.RED);
+//                    return InteractionResult.FAIL;
+//                }
+//            }
 
-            if (ropeReturn.result() == RopeUtils.RopeInteractionReturn.SUCCESS) {
+            if (createResult.component1() != null) {
 
                 if (!player.getAbilities().instabuild) {
                     heldItem.shrink(1);
@@ -164,16 +171,11 @@ public class RopeItem extends Item {
                 resetStateWithMessage(serverLevel, heldItem, true, player, isChain ? "chain_created" : "rope_created");
             }
 
-            int color = ropeReturn.result() == RopeUtils.RopeInteractionReturn.SUCCESS ? ClientOutlineHandler.GREEN : ClientOutlineHandler.RED;
+            int color = createResult.component1() != null ? ClientOutlineHandler.GREEN : ClientOutlineHandler.RED;
             NetworkHandler.sendOutline(clickedPos, color);
-            return ropeReturn.result() == RopeUtils.RopeInteractionReturn.SUCCESS ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+            return createResult.component1() != null ? InteractionResult.SUCCESS : InteractionResult.FAIL;
 
         }
-    }
-
-    private Long getShipIdAtPos(ServerLevel level, BlockPos pos) {
-        LoadedShip loadedShip = VSGameUtilsKt.getLoadedShipManagingPos(level, pos);
-        return loadedShip != null ? loadedShip.getId() : null;
     }
 
     @Override

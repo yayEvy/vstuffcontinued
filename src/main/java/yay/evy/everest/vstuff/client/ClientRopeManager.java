@@ -6,6 +6,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3d;
+import org.joml.Vector3f;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -17,6 +18,7 @@ import java.util.Map;
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientRopeManager {
     private static final Map<Integer, ClientRopeData> clientConstraints = new HashMap<>();
+    private static ClientRopeData translucentRope = null;
 
     public record ClientRopeData(Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB, double maxLength,
                                  ResourceLocation style) {
@@ -148,6 +150,18 @@ public class ClientRopeManager {
 
     }
 
+    public static boolean hasPreviewRope() {
+        return !(translucentRope == null);
+    }
+
+    public static void setPreviewRope(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, float maxLength, ResourceLocation style) {
+        translucentRope = new ClientRopeData(ship0, ship1, localPos0, localPos1, maxLength, style);
+    }
+
+    public static void clearPreviewRope() {
+        translucentRope = null;
+    }
+
     public static void addClientConstraint(Integer constraintId, Long shipA, Long shipB,
                                            Vector3d localPosA, Vector3d localPosB, double maxLength, ResourceLocation style) {
         clientConstraints.put(constraintId, new ClientRopeData(shipA, shipB, localPosA, localPosB, maxLength, style));
@@ -168,6 +182,7 @@ public class ClientRopeManager {
 
     public static void clearAllClientConstraints() {
         clientConstraints.clear();
+        translucentRope = null;
         RopeRendererClient.clearCache();
     }
 

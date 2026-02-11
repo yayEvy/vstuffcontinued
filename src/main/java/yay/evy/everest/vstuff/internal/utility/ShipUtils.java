@@ -2,6 +2,7 @@ package yay.evy.everest.vstuff.internal.utility;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -20,6 +21,11 @@ public class ShipUtils {
     }
 
     public static Long getShipIdAtPos(ServerLevel level, BlockPos pos) {
+        LoadedShip loadedShip = VSGameUtilsKt.getLoadedShipManagingPos(level, pos);
+        return loadedShip != null ? loadedShip.getId() : null;
+    }
+
+    public static Long getShipIdAtPos(Level level, BlockPos pos) {
         LoadedShip loadedShip = VSGameUtilsKt.getLoadedShipManagingPos(level, pos);
         return loadedShip != null ? loadedShip.getId() : null;
     }

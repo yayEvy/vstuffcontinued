@@ -13,13 +13,14 @@ import org.valkyrienskies.core.api.events.ShipLoadEvent;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.internal.utility.ShipUtils;
 
 import java.util.*;
 
 public class RopePersistence extends SavedData {
     private static final String DATA_NAME = "vstuff_constraints";
 
-    private final Map<Integer, Rope> persistedConstraints = new HashMap<>();
+    private final Map<Integer, ReworkedRope> persistedConstraints = new HashMap<>();
 
     public static RopePersistence get(ServerLevel level) {
         DimensionDataStorage storage = level.getDataStorage();
@@ -42,13 +43,13 @@ public class RopePersistence extends SavedData {
         ListTag constraintsList = tag.getList("constraints", Tag.TAG_COMPOUND);
         for (int i = 0; i < constraintsList.size(); i++) {
             CompoundTag constraintTag = constraintsList.getCompound(i);
-            Rope rope = Rope.fromTag(constraintTag);
+            ReworkedRope rope = ReworkedRope.fromTag(constraintTag);
 
-            data.persistedConstraints.put(rope.ID, rope);
+            data.persistedConstraints.put(rope.ropeId, rope);
 
-            RopeManager.addConstraintToTracker(rope);
+            RopeManager.addRopeToManager(rope);
         }
-        VStuff.LOGGER.info("VStuff Persistence: Loaded {} ropes from disk.", data.persistedConstraints.size());
+        VStuff.LOGGER.info("RopePersistence loaded {} ropes from saved data", data.persistedConstraints.size());
         return data;
     }
     @Override
@@ -57,7 +58,7 @@ public class RopePersistence extends SavedData {
         tag.putInt("lastUsedId", RopeManager.getNextId() - 1);
 
         ListTag constraintsList = new ListTag();
-        for (Map.Entry<Integer, Rope> entry : persistedConstraints.entrySet()) {
+        for (Map.Entry<Integer, ReworkedRope> entry : persistedConstraints.entrySet()) {
             constraintsList.add(entry.getValue().toTag());
         }
         tag.put("constraints", constraintsList);
@@ -69,25 +70,24 @@ public class RopePersistence extends SavedData {
         level.getDataStorage().save();
     }
 
-    public void addConstraint(Rope rope) {
-        persistedConstraints.put(rope.ID, rope);
+    public void addConstraint(ReworkedRope rope) {
+        persistedConstraints.put(rope.ropeId, rope);
         setDirty();
     }
 
     public void removeConstraint(Integer id) {
-        Rope data = persistedConstraints.get(id);
+        ReworkedRope data = persistedConstraints.get(id);
         if (data == null) return;
 
         persistedConstraints.remove(id);
         setDirty();
 
-       // VStuff.LOGGER.info("Removed constraint {} from persistence", id);
+        //VStuff.LOGGER.info("Removed constraint {} from persistence", id);
     }
 
 
     public static void onShipLoad(ShipLoadEvent shipLoadEvent, RegisteredListener registeredListener) {
         Long loadedId = shipLoadEvent.getShip().getId();
-        //System.out.println("loaded ship " + loadedId);
 
         MinecraftServer server = ValkyrienSkiesMod.getCurrentServer();
         if (server == null) return;
@@ -98,10 +98,10 @@ public class RopePersistence extends SavedData {
         RopePersistence ropePersistence = RopePersistence.get(level);
 
         ropePersistence.persistedConstraints.values().stream()
-                .filter(rope -> (Objects.equals(rope.shipA, loadedId) || Objects.equals(rope.shipB, loadedId))
-                        && !rope.hasRestoredJoint)
+                .filter(rope -> (Objects.equals(rope.posData0.shipId(), loadedId) || Objects.equals(rope.posData1.shipId(), loadedId))
+                        && !rope.hasRestored) // shallow check just for the boolean, not ids
                 .forEach(rope -> {
-                  //  VStuff.LOGGER.info("Restoring rope with ID {}", rope.ID);
+                    //VStuff.LOGGER.info("Restoring rope with ropeId {} type {} id0: {}, id1: {} due to ship {} load", rope.ropeId, rope.type, rope.posData0.getShipIdSafe(level), rope.posData1.getShipIdSafe(level), loadedId);
                     rope.restoreJoint(level);
                 });
 

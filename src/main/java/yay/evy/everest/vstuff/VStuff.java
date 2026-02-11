@@ -2,11 +2,14 @@ package yay.evy.everest.vstuff;
 
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
+import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
 import net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -40,6 +43,8 @@ import yay.evy.everest.vstuff.internal.network.PhysGrabberNetwork;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 import yay.evy.everest.vstuff.particles.ParticleTypes;
 import org.valkyrienskies.core.api.VsBeta;
+
+import static yay.evy.everest.vstuff.internal.utility.ShipUtils.getShipIdAtPos;
 
 @Mod(VStuff.MOD_ID)
 public class VStuff {
@@ -162,11 +167,6 @@ public class VStuff {
                     protected Projectile getProjectile(Level level, Position position, ItemStack stack) {
                         return null;
                     }
-
-                    private Long getShipIdAtPos(ServerLevel level, BlockPos pos) {
-                        LoadedShip ship = VSGameUtilsKt.getLoadedShipManagingPos(level, pos);
-                        return ship != null ? ship.getId() : null;
-                    }
                 }
         );
     }
@@ -186,6 +186,11 @@ public class VStuff {
 
     public static ResourceLocation asModelResource(String path) {
         return new ResourceLocation(MOD_ID, "models/" + path);
+    }
+
+    public static MutableComponent translate(String key, Object... args) {
+        Object[] args1 = LangBuilder.resolveBuilders(args);
+        return Component.translatable(VStuff.MOD_ID + "." + key, args1);
     }
 
 

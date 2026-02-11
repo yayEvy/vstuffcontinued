@@ -34,11 +34,10 @@ public class RopeCutterItem extends Item {
         if (targetConstraintId == null) return InteractionResultHolder.pass(itemStack);
 
         try {
-            Rope data = RopeManager.getActiveRopes().get(targetConstraintId);
+            ReworkedRope data = RopeManager.getActiveRopes().get(targetConstraintId);
             if (data == null) return InteractionResultHolder.pass(itemStack);
 
             RopeStyle.RenderStyle style = RopeStyleManager.get(data.style).renderStyle();
-            BlockPos soundPos = data.sourceBlockPos;
 
             Component notif = style == RopeStyle.RenderStyle.CHAIN
                     ? Component.translatable("vstuff.message.chain_break")
@@ -60,17 +59,6 @@ public class RopeCutterItem extends Item {
             }
 
             data.removeJoint(serverLevel);
-
-            RopeManager.getActiveRopes().remove(targetConstraintId);
-
-
-
-            NetworkHandler.sendConstraintRemove(targetConstraintId);
-
-
-            if (soundPos != null) {
-                RopeManager.cleanupOrphanedConstraints(serverLevel, soundPos);
-            }
 
             if (!player.isCreative()) {
                 itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));

@@ -1,5 +1,6 @@
 package yay.evy.everest.vstuff.content.ropes.thrower;
 
+import kotlin.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
@@ -13,11 +14,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import yay.evy.everest.vstuff.content.ropes.Rope;
+import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 import yay.evy.everest.vstuff.content.ropes.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.content.ropes.pulley.PulleyAnchorBlockEntity;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
+
+import static yay.evy.everest.vstuff.internal.utility.ShipUtils.getShipIdAtPos;
 
 public class RopeThrowerEntity extends ThrowableItemProjectile {
 
@@ -83,23 +86,15 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
             return;
         }
 
-        RopeUtils.RopeReturn ropeReturn = Rope.createNew(
-                VStuffItems.LEAD_CONSTRAINT_ITEM.get(),
-                serverLevel,
-                this.startPos,
-                hitPos,
-                this.startShipId,
-                secondShipId,
-                getOwner() instanceof Player p ? p : null
-        );
+        Pair<ReworkedRope, String> ropeResult = ReworkedRope.create(serverLevel, startShipId, secondShipId, startPos, hitPos, getOwner() instanceof Player p ? p : null, false);
 
-        if (ropeReturn.result() == RopeUtils.RopeInteractionReturn.SUCCESS) {
+        if (ropeResult.component1() != null) {
 
             if (connectionType == RopeUtils.ConnectionType.PULLEY
                     && waitingPulley != null
                     && serverLevel.getBlockEntity(hitPos) instanceof PulleyAnchorBlockEntity) {
 
-                waitingPulley.attachRope(ropeReturn.rope());
+                waitingPulley.attachRope(ropeResult.component1());
             }
 
 
@@ -114,12 +109,5 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
         }
 
         discard();
-    }
-
-
-
-    private Long getShipIdAtPos(ServerLevel level, BlockPos pos) {
-        LoadedShip loadedShip = VSGameUtilsKt.getLoadedShipManagingPos(level, pos);
-        return loadedShip != null ? loadedShip.getId() : null;
     }
 }

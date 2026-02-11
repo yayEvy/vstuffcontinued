@@ -302,7 +302,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
 
         RopeStyle style = selectedStyle;
 
-        VStuff.LOGGER.info("Attempting to set player [{}] selected rope style to {}", player.getName(), selectedStyle.id());
+        VStuff.LOGGER.info("Setting player {} ({}) selected rope style to {}", player.getName().getString(), player.getUUID(), selectedStyle.id());
 
         NetworkHandler.INSTANCE.sendToServer(new RopeStyleSelectPacket(style.id()));
 
