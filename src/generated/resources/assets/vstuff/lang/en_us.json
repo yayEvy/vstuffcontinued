@@ -125,5 +125,6 @@
   "vstuff.rope_thrower.tooltip.behavior1": "Creates a rope between the first block and the block the projectile hits when thrown.",
   "vstuff.rope_thrower.tooltip.condition1": "Right-click the first block as normal",
   "vstuff.rope_thrower.tooltip.summary": "A _Throwable_ rope! Press the _Open Rope Styler_ key (default _ALT_) to change the rope texture.",
-  "vstuff.tooltip.hold_for_details": "Hold [%s] for summary"
+  "vstuff.tooltip.hold_for_details": "Hold [%s] for summary",
+  "subtitles.vstuff.assemble": "Assembler Assembles Tragically"
 }
