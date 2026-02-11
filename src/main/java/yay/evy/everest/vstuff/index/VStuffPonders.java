@@ -6,7 +6,7 @@ import net.createmod.ponder.api.registration.PonderPlugin;
 import net.minecraft.resources.ResourceLocation;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.ponder.PhysPulleyPonder;
-import yay.evy.everest.vstuff.client.ponder.RotationalThrusterPonder;
+import yay.evy.everest.vstuff.client.ponder.MechanicalThrusterPonder;
 import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper;
 
 public class VStuffPonders implements PonderPlugin {
@@ -28,7 +28,7 @@ public class VStuffPonders implements PonderPlugin {
         PonderSceneRegistrationHelper<ItemProviderEntry<?>> HELPER = helper.withKeyFunction(RegistryEntry::getId);
 
         HELPER.addStoryBoard(VStuffBlocks.PHYS_PULLEY, "phys_ponder", PhysPulleyPonder::physPulley);
-        HELPER.addStoryBoard(VStuffBlocks.MECHANICAL_THRUSTER, "thruster_ponder", RotationalThrusterPonder::rotationalThruster);
+        HELPER.addStoryBoard(VStuffBlocks.MECHANICAL_THRUSTER, "mechanical_thruster_ponder", MechanicalThrusterPonder::mechanicalThruster);
 
 
     }

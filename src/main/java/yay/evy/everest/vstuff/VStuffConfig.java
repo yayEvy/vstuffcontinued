@@ -10,9 +10,7 @@ public class VStuffConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> THRUSTER_THRUST_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Integer> THRUSTER_MAX_SPEED;
     public static final ForgeConfigSpec.ConfigValue<Integer> THRUSTER_TICKS_PER_UPDATE;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> THRUSTER_DAMAGE_ENTITIES;
-    public static final ForgeConfigSpec.ConfigValue<Double> THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER;
-    public static final ForgeConfigSpec.ConfigValue<Double> THRUSTER_PARTICLE_COUNT_MULTIPLIER;
+    public static final ForgeConfigSpec.ConfigValue<Float> THRUSTER_MAX_AIR_PUSH_DISTANCE;
 
     public static final ForgeConfigSpec.ConfigValue<Double> MAX_ROPE_LENGTH;
     public static final ForgeConfigSpec.ConfigValue<Double> ROPE_THICKNESS;
@@ -25,12 +23,12 @@ public class VStuffConfig {
         ForgeConfigSpec.Builder serverBuilder = new ForgeConfigSpec.Builder();
 
         serverBuilder.push("thruster");
-        THRUSTER_THRUST_MULTIPLIER = serverBuilder.define("thrustMultiplier", 0.5);
-        THRUSTER_MAX_SPEED = serverBuilder.define("maxSpeed", 20);
+        THRUSTER_THRUST_MULTIPLIER = serverBuilder.define("thrustMultiplier", 0.3);
+        THRUSTER_MAX_SPEED = serverBuilder.define("maxSpeed", 10);
         THRUSTER_TICKS_PER_UPDATE = serverBuilder.define("ticksPerUpdate", 1);
-        THRUSTER_DAMAGE_ENTITIES = serverBuilder.define("damageEntities", true);
-        THRUSTER_PARTICLE_OFFSET_INCOMING_VEL_MODIFIER = serverBuilder.define("particleOffsetIncomingVelModifier", 1.0);
-        THRUSTER_PARTICLE_COUNT_MULTIPLIER = serverBuilder.define("particleCountMultiplier", 1.0);
+        THRUSTER_MAX_AIR_PUSH_DISTANCE = serverBuilder
+                .comment("The maximum distance the thruster air current can reach & push")
+                .define("maxAirPushDistance", 32.0f);
         serverBuilder.pop();
 
         serverBuilder.push("rope");
