@@ -7,6 +7,8 @@ import com.simibubi.create.content.kinetics.base.ShaftRenderer;
 
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff.LevituffBlockEntity;
+import yay.evy.everest.vstuff.content.reaction_wheel.ReactionWheelBlockEntity;
+import yay.evy.everest.vstuff.content.reaction_wheel.ReactionWheelRenderer;
 import yay.evy.everest.vstuff.content.ropes.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.content.ropes.pulley.PulleyAnchorBlockEntity;
 import yay.evy.everest.vstuff.content.thrust.MechanicalThrusterBlockEntity;
@@ -33,6 +35,15 @@ public class VStuffBlockEntities {
             REGISTRATE.blockEntity("pulley_anchor", PulleyAnchorBlockEntity::new)
                     .validBlocks(VStuffBlocks.PULLEY_ANCHOR)
                     .register();
+
+
+    public static final BlockEntityEntry<ReactionWheelBlockEntity> REACTION_WHEEL_BL0CK_ENTITY =
+            REGISTRATE.blockEntity("reaction_wheel", ReactionWheelBlockEntity::new)
+                    .validBlocks(VStuffBlocks.REACTION_WHEEL_BLOCK)
+                    .renderer(() -> ReactionWheelRenderer::new)
+                    .register();
+
+
 
 
 

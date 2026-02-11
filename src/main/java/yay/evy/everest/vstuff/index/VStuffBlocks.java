@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff.LevituffBlock;
+import yay.evy.everest.vstuff.content.reaction_wheel.ReactionWheelBlock;
 import yay.evy.everest.vstuff.content.ropes.pulley.PhysPulleyBlock;
 import yay.evy.everest.vstuff.content.ropes.pulley.PulleyAnchorBlock;
 import yay.evy.everest.vstuff.content.thrust.MechanicalThrusterBlock;
@@ -64,6 +65,14 @@ public class VStuffBlocks  {
                             .getExistingFile(p.modLoc("block/pulley_anchor/block"))))
                     .item()
                     .model((c, p) -> p.withExistingParent(c.getName(), p.modLoc("block/pulley_anchor/block")))
+                    .build()
+                    .register();
+
+    public static final BlockEntry<ReactionWheelBlock> REACTION_WHEEL_BLOCK =
+            REGISTRATE.block("reaction_wheel", ReactionWheelBlock::new)
+                    .transform(pickaxeOnly())
+                    .properties(p -> p.noOcclusion())
+                    .item()
                     .build()
                     .register();
 
