@@ -34,10 +34,11 @@ public class VStuffBlockEntities {
                     .validBlocks(VStuffBlocks.PULLEY_ANCHOR)
                     .register();
 
+
+
     public static final BlockEntityEntry<LevituffBlockEntity> LEVITUFF_BE =
             REGISTRATE.blockEntity("levituff", LevituffBlockEntity::new)
                     .validBlocks(VStuffBlocks.LEVITUFF)
                     .register();
-
     public static void register() {}
 }

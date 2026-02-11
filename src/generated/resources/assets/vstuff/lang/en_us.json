@@ -3,6 +3,7 @@
   "block.vstuff.mechanical_thruster": "Mechanical Thruster",
   "block.vstuff.phys_pulley": "Phys Pulley",
   "block.vstuff.pulley_anchor": "Pulley Anchor",
+  "block.vstuff.reaction_wheel": "Reaction Wheel",
   "create.gui.goggles.thruster.efficiency": "Efficiency",
   "create.gui.goggles.thruster.obstructed": "Obstructed",
   "create.gui.goggles.thruster.speed": "Speed",
