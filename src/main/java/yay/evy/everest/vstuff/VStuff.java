@@ -30,6 +30,7 @@ import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.client.VStuffClient;
+import yay.evy.everest.vstuff.content.reaction_wheel.ReactionWheelAttachment;
 import yay.evy.everest.vstuff.content.ropes.RopePersistence;
 import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberServerAttachment;
 import yay.evy.everest.vstuff.content.ropes.thrower.RopeThrowerEntity;
@@ -67,6 +68,8 @@ public class VStuff {
         VStuffItems.register();
         VStuffEntities.register(modEventBus);
         VStuffBlockEntities.register();
+        VStuffPartials.register();
+
 
         MinecraftForge.EVENT_BUS.register(this);
         NetworkHandler.registerPackets();
@@ -108,6 +111,15 @@ public class VStuff {
                     return null;
                 }
         );
+
+        // robbing john propulsion :3dsmile:
+        ValkyrienSkiesMod.getApi().registerAttachment(
+                ReactionWheelAttachment.class, builder -> {
+                    builder.build();
+                    return null;
+                }
+        );
+
 
 
         // Add other attachments when needed :3
