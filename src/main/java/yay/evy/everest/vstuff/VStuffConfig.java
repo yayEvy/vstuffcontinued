@@ -16,6 +16,9 @@ public class VStuffConfig {
     public static final ForgeConfigSpec.ConfigValue<Double> ROPE_THICKNESS;
     public static final ForgeConfigSpec.BooleanValue ROPE_SOUNDS;
 
+    public static final ForgeConfigSpec.ConfigValue<Double> REACTION_WHEEL_TORQUE_STRENGTH;
+    public static final ForgeConfigSpec.ConfigValue<Double> REACTION_WHEEL_MAX_SPEED;
+
     public static final ForgeConfigSpec.ConfigValue<Double> PHYS_GRABBER_MAX_MASS;
 
     static {
@@ -42,6 +45,19 @@ public class VStuffConfig {
                 .comment("The maximum weight the Phys Grabber can grab. (default: 500000.0)")
                 .define("grabber_max_mass", 500000.0);
         serverBuilder.pop();
+
+        serverBuilder.push("reaction_wheel");
+
+        REACTION_WHEEL_TORQUE_STRENGTH = serverBuilder
+                .comment("Maximum torque applied by Reaction Wheel at max RPM")
+                .define("torqueStrength", 50000.0);
+
+        REACTION_WHEEL_MAX_SPEED = serverBuilder
+                .comment("Maximum RPM the Reaction Wheel scales torque against")
+                .define("maxSpeed", 256.0);
+
+        serverBuilder.pop();
+
 
         SERVER_CONFIG = serverBuilder.build();
 

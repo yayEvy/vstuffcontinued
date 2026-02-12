@@ -1,0 +1,22 @@
+[
+  {
+    "block": "vstuff:mechanical_thruster",
+    "mass": 2000.0,
+    "friction": 0.6
+  },
+  {
+    "block": "vstuff:phys_pulley",
+    "mass": 4000.0,
+    "friction": 0.6
+  },
+  {
+    "block": "vstuff:pulley_anchor",
+    "mass": 10.0,
+    "friction": 0.2
+  },
+  {
+    "block": "vstuff:reaction_wheel",
+    "mass": 4000.0,
+    "friction": 0.6
+  }
+]

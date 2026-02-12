@@ -7,6 +7,7 @@ import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 
 
 import net.minecraft.core.BlockPos;
+import yay.evy.everest.vstuff.VStuffConfig;
 
 @JsonAutoDetect(
         fieldVisibility = JsonAutoDetect.Visibility.ANY
@@ -35,11 +36,27 @@ public class ReactionWheelForceApplier {
     }
 
     private void applyDirectTorque(PhysShipImpl ship) {
-        double torqueMagnitude = (data.rotationSpeed / MAX_SPEED) * TORQUE_STRENGTH;
-        Vector3d worldTorque = new Vector3d(data.facing.x(), data.facing.y(), data.facing.z()).mul(torqueMagnitude);
-        Vector3d shipTorque = ship.getTransform().getWorldToShip().transformDirection(worldTorque, new Vector3d());
+
+        double maxSpeed = VStuffConfig.REACTION_WHEEL_MAX_SPEED.get();
+        double torqueStrength = VStuffConfig.REACTION_WHEEL_TORQUE_STRENGTH.get();
+
+        if (maxSpeed <= 0) return;
+
+        double torqueMagnitude = (data.rotationSpeed / maxSpeed) * torqueStrength;
+
+        Vector3d worldTorque = new Vector3d(
+                data.facing.x(),
+                data.facing.y(),
+                data.facing.z()
+        ).mul(torqueMagnitude);
+
+        Vector3d shipTorque =
+                ship.getTransform().getWorldToShip()
+                        .transformDirection(worldTorque, new Vector3d());
+
         ship.applyInvariantTorque(shipTorque);
     }
+
 
     private void applyStabilizationTorque(PhysShipImpl ship) {
 
