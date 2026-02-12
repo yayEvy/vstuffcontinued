@@ -6,6 +6,7 @@ import com.mojang.math.Axis;
 import com.simibubi.create.AllPartialModels;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntityRenderer;
 
+import net.createmod.catnip.animation.AnimationTickHolder;
 import net.createmod.catnip.render.CachedBuffers;
 import net.createmod.catnip.render.SuperByteBuffer;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -22,34 +23,41 @@ public class ReactionWheelRenderer extends KineticBlockEntityRenderer<ReactionWh
         super(context);
     }
 
-    @SuppressWarnings("null")
     @Override
-    protected void renderSafe(ReactionWheelBlockEntity be, float partialTicks, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
-        Direction direction = be.getBlockState().getValue(ReactionWheelBlock.FACING);
-        VertexConsumer vb = buffer.getBuffer(RenderType.cutoutMipped());
-        int lightBehind = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(direction));
-        SuperByteBuffer shaftHalf = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, be.getBlockState(), direction);
+    protected void renderSafe(ReactionWheelBlockEntity be, float partialTicks,
+                              PoseStack ms, MultiBufferSource buffer,
+                              int light, int overlay) {
 
-        //Shaft
-        standardKineticRotationTransform(shaftHalf, be, lightBehind).renderInto(ms, vb);
-        //Core
-        renderCore(be, partialTicks, ms, buffer, light, overlay);
-    }
-
-    private void renderCore(ReactionWheelBlockEntity be, float partialTicks, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
         BlockState state = be.getBlockState();
         Direction direction = state.getValue(ReactionWheelBlock.FACING);
-
-        SuperByteBuffer coreModel = CachedBuffers.partial(VStuffPartials.REACTION_WHEEL_CORE, state);
         VertexConsumer vb = buffer.getBuffer(RenderType.cutoutMipped());
 
-        //TODO: Very likely that wheel weird shading is caused by its rotation. Maybe try remove disableDiffuse and change rotation (270 or smth like that?)
-        ms.pushPose();
-        ms.translate(0.5, 0.5, 0.5);
-        ms.mulPose(direction.getRotation());
-        ms.mulPose(Axis.XP.rotationDegrees(90));
-        ms.translate(-0.5, -0.5, -0.5);
-        coreModel.disableDiffuse().light(light).overlay(overlay).color(255, 255, 255, 255).renderInto(ms, vb);
-        ms.popPose();
+        int lightBehind = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(direction));
+        SuperByteBuffer shaftHalf = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, state, direction);
+        standardKineticRotationTransform(shaftHalf, be, lightBehind).renderInto(ms, vb);
+
+        renderCore(be, state, direction, ms, vb, light, overlay);
     }
+
+    private void renderCore(ReactionWheelBlockEntity be,
+                            BlockState state,
+                            Direction direction,
+                            PoseStack ms,
+                            VertexConsumer vb,
+                            int light,
+                            int overlay) {
+
+        SuperByteBuffer coreModel = CachedBuffers.partialFacing(VStuffPartials.REACTION_WHEEL_CORE, state, direction);
+
+        float degreesPerTick = (be.visualRPM * 6f) / 20f;
+        float renderAngle = be.visualAngle + (degreesPerTick * AnimationTickHolder.getPartialTicks());
+
+        coreModel
+                .rotateCentered(renderAngle * (float) Math.PI / 180f, direction.getAxis())
+                .light(light)
+                .overlay(overlay)
+                .renderInto(ms, vb);
+    }
+
 }
+

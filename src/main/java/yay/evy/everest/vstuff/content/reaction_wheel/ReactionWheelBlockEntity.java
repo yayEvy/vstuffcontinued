@@ -12,12 +12,16 @@ import net.minecraft.world.level.block.state.BlockState;
 public class ReactionWheelBlockEntity extends KineticBlockEntity {
 
     protected ReactionWheelData reactionWheelData;
+    public float visualRPM = 0;
+    public float visualAngle = 0;
+
 
     public ReactionWheelBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
         reactionWheelData = new ReactionWheelData();
         reactionWheelData.mode = ReactionWheelData.ReactionWheelMode.DIRECT;
     }
+
 
     @SuppressWarnings("null")
     @Override
@@ -52,4 +56,22 @@ public class ReactionWheelBlockEntity extends KineticBlockEntity {
     public void read(CompoundTag compound, boolean clientPacket) {
         super.read(compound, clientPacket);
     }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        if (level.isClientSide) {
+            float targetRPM = getSpeed();
+            float smoothing = 0.1f;
+            visualRPM += (targetRPM - visualRPM) * smoothing;
+
+            float degreesPerTick = (visualRPM * 6f) / 20f;
+            visualAngle = (visualAngle + degreesPerTick) % 360f;
+        }
+    }
+
+
+
+
 }
