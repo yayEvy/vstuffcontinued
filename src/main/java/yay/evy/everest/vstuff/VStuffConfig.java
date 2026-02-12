@@ -65,7 +65,10 @@ public class VStuffConfig {
         ForgeConfigSpec.Builder clientBuilder = new ForgeConfigSpec.Builder();
 
         clientBuilder.push("rope_client");
-        ROPE_THICKNESS = clientBuilder.defineInRange("rope thickness", 0.28, 0.01, 1.0);
+        ROPE_THICKNESS = clientBuilder
+                .comment("How thick a rope is rendered. Usually never needed but here you go.")
+                .defineInRange("rope thickness", 0.28, 0.01, 1.0);
+
         clientBuilder.pop();
 
         CLIENT_CONFIG = clientBuilder.build();

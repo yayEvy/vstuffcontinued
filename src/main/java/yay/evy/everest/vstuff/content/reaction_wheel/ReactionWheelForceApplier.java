@@ -14,10 +14,6 @@ import yay.evy.everest.vstuff.VStuffConfig;
 )
 public class ReactionWheelForceApplier {
     private ReactionWheelData data;
-    @JsonIgnore
-    private static final double TORQUE_STRENGTH = 50000.0;
-    @JsonIgnore
-    private static final double MAX_SPEED = 256.0;
 
     public ReactionWheelForceApplier(ReactionWheelData data) {
         this.data = data;
