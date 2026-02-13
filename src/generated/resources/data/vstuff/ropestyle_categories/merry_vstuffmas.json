@@ -1,0 +1,8 @@
+{
+  "name": "Merry VStuffmas",
+  "order": 5,
+  "styles": [
+    "vstuff:christmas_tree",
+    "vstuff:candycane"
+  ]
+}
