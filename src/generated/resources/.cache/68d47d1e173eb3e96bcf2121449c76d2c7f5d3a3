@@ -1,11 +1,11 @@
-// 1.20.1	2026-02-14T13:42:48.2334725	Registrate Provider for vstuff [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2026-02-15T16:57:30.5967756	Registrate Provider for vstuff [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 0572043c2b1a5eddd5ac0c12fa42a14309dfbbd2 assets/vstuff/blockstates/levituff.json
 b045f74c278468123d2dac0558237694d4d67284 assets/vstuff/blockstates/mechanical_thruster.json
 3de0141dc1648493d282cfed69d208f84b090065 assets/vstuff/blockstates/phys_pulley.json
 0897bab4583dec406115e1aa8c739af071935116 assets/vstuff/blockstates/pulley_anchor.json
 ece9ba61a595718a45867e95aad583fb47547ba6 assets/vstuff/blockstates/reaction_wheel.json
-f52ba350f8a3d89fd371ea38ee84e3abffc613ed assets/vstuff/lang/en_ud.json
-c8e8da314f46f163d381acbbf38b042b843115a6 assets/vstuff/lang/en_us.json
+df7f09e960ae5c7b572767e76c3d5827ad7379f7 assets/vstuff/lang/en_ud.json
+0a0e6f291e3dadf637e5d4aa7af492a3d0e3da84 assets/vstuff/lang/en_us.json
 b94e5ca8cebb9cfe92510f063c73b3f2437e1b31 assets/vstuff/models/block/levituff.json
 9b44a3149e9510b87bc03dc8c6f19ce472cb09d4 assets/vstuff/models/item/creative_rope_editor.json
 be5937ff5de8a51366cf82b9c7f5b34c4496d60c assets/vstuff/models/item/empty_energy_core.json
