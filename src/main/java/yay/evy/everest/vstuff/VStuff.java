@@ -1,7 +1,11 @@
 package yay.evy.everest.vstuff;
 
 import com.mojang.logging.LogUtils;
+import com.simibubi.create.api.stress.BlockStressValues;
 import com.simibubi.create.foundation.data.CreateRegistrate;
+import com.tterrag.registrate.builders.BlockBuilder;
+import com.tterrag.registrate.util.nullness.NonNullFunction;
+import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
 import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockSource;
@@ -16,6 +20,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -45,6 +50,7 @@ import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 import yay.evy.everest.vstuff.particles.ParticleTypes;
 import org.valkyrienskies.core.api.VsBeta;
 
+import static yay.evy.everest.vstuff.internal.utility.ShipUtils.getLoadedShipIdAtPos;
 import static yay.evy.everest.vstuff.internal.utility.ShipUtils.getShipIdAtPos;
 
 @Mod(VStuff.MOD_ID)
@@ -75,7 +81,6 @@ public class VStuff {
         VStuffBlockEntities.register();
         VStuffPartials.register();
 
-
         MinecraftForge.EVENT_BUS.register(this);
         NetworkHandler.registerPackets();
         PhysGrabberNetwork.register();
@@ -88,7 +93,7 @@ public class VStuff {
 
         ValkyrienSkiesMod.getApi().getShipLoadEvent().on(RopePersistence::onShipLoad);
 
-        LOGGER.info("VStuff mod initialized");
+        LOGGER.info("{} ({}) initialized", VStuff.NAME, VStuff.MOD_ID);
     }
 
     @VsBeta
@@ -99,7 +104,7 @@ public class VStuff {
         });
     }
     public static void registerAttachments() {
-        LOGGER.info("Registering vstuff attachments...");
+        LOGGER.info("Registering {} attachments...", VStuff.MOD_ID);
 
         // thruster attachment ! yippee
         ValkyrienSkiesMod.getApi().registerAttachment(
@@ -109,7 +114,7 @@ public class VStuff {
                 }
         );
 
-// Phy Grabber (idk its bein silly rn :c)
+        // phys grabber aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
         ValkyrienSkiesMod.getApi().registerAttachment(
                 PhysGrabberServerAttachment.class, builder -> {
                     builder.build();
@@ -124,16 +129,12 @@ public class VStuff {
                     return null;
                 }
         );
-
-
-
-        // Add other attachments when needed :3
     }
 
 
     public static void registerDispenserBehaviors() {
         DispenserBlock.registerBehavior(
-                VStuffItems.ROPE_THROWER_ITEM.get(),
+                VStuffItems.ROPE_THROWER.get(),
                 new AbstractProjectileDispenseBehavior() {
 
                     @Override
@@ -146,8 +147,7 @@ public class VStuff {
                         BlockPos dispenserPos = source.getPos();
                         Direction direction = source.getBlockState().getValue(DispenserBlock.FACING);
 
-                        BlockPos startPos = dispenserPos;
-                        Long startShipId = getShipIdAtPos(serverLevel, startPos);
+                        Long startShipId = getLoadedShipIdAtPos(serverLevel, dispenserPos);
 
                         Position dispensePos = DispenserBlock.getDispensePosition(source);
 
@@ -155,7 +155,7 @@ public class VStuff {
                         rope.setPos(dispensePos.x(), dispensePos.y(), dispensePos.z());
 
                         rope.setStartData(
-                                startPos,
+                                dispenserPos,
                                 startShipId,
                                 serverLevel.dimension().location().toString(),
                                 RopeUtils.ConnectionType.NORMAL,
@@ -205,6 +205,9 @@ public class VStuff {
         return Component.translatable(VStuff.MOD_ID + "." + key, args1);
     }
 
+    public static <T extends Block> NonNullFunction<BlockBuilder<T, CreateRegistrate>, BlockBuilder<T, CreateRegistrate>> registerImpact(int speed) {
+        return builder -> builder.onRegister(block -> BlockStressValues.setGeneratorSpeed(speed).accept(block));
+    }
 
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {

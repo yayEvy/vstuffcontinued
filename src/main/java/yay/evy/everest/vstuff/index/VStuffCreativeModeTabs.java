@@ -1,5 +1,6 @@
 package yay.evy.everest.vstuff.index;
 
+import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.RegistryEntry;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
@@ -24,7 +25,7 @@ public class VStuffCreativeModeTabs {
     public static final RegistryObject<CreativeModeTab> VSTUFF_MAIN = CREATIVE_TAB_REGISTER.register("main",
             () -> CreativeModeTab.builder()
                     .title(Component.translatable("creativetabs.main"))
-                    .icon(VStuffItems.LEAD_CONSTRAINT_ITEM::asStack)
+                    .icon(VStuffItems.ROPE::asStack)
                     .displayItems(new MainDisplayItemsGen())
                     .build());
 
@@ -37,7 +38,7 @@ public class VStuffCreativeModeTabs {
         private List<Item> collectBlocks(RegistryObject<CreativeModeTab> tab, Predicate<Item> exclusionPredicate) {
             List<Item> items = new ReferenceArrayList<>();
             for (RegistryEntry<Block> entry : VStuff.REGISTRATE.getAll(Registries.BLOCK)) {
-                if (!VStuff.REGISTRATE.isInCreativeTab(entry, tab))
+                if (!CreateRegistrate.isInCreativeTab(entry, tab))
                     continue;
                 Item item = entry.get().asItem();
                 if (item == Items.AIR)
@@ -53,7 +54,7 @@ public class VStuffCreativeModeTabs {
             List<Item> items = new ReferenceArrayList<>();
 
             for (RegistryEntry<Item> entry : VStuff.REGISTRATE.getAll(Registries.ITEM)) {
-                if (!VStuff.REGISTRATE.isInCreativeTab(entry, tab))
+                if (!CreateRegistrate.isInCreativeTab(entry, tab))
                     continue;
                 Item item = entry.get();
                 if (item instanceof BlockItem)

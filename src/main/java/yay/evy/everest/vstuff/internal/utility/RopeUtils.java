@@ -12,6 +12,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 import yay.evy.everest.vstuff.content.ropes.RopeManager;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 public class RopeUtils {
@@ -90,7 +91,7 @@ public class RopeUtils {
         return minDistanceToRope;
     }
 
-    public static Integer findTargetedLead(ServerLevel level, Player player) {
+    public static @Nullable Integer findTargetedLead(ServerLevel level, Player player) {
         Vec3 eyePos = player.getEyePosition();
         Vec3 lookVec = player.getViewVector(1.0f);
         double maxDistance = player.getBlockReach();

@@ -52,7 +52,7 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
 
     @Override
     protected Item getDefaultItem() {
-        return VStuffItems.ROPE_THROWER_ITEM.get();
+        return VStuffItems.ROPE_THROWER.get();
     }
 
 
@@ -72,7 +72,7 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
         Long secondShipId = getShipIdAtPos(serverLevel, hitPos);
 
         if (connectionType == RopeUtils.ConnectionType.PULLEY && !(serverLevel.getBlockEntity(hitPos) instanceof PulleyAnchorBlockEntity)) {
-            ItemStack ropeDrop = new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get());
+            ItemStack ropeDrop = new ItemStack(VStuffItems.ROPE.get());
             ItemEntity itemEntity = new ItemEntity(
                     serverLevel,
                     hitPos.getX() + 0.5,

@@ -39,6 +39,7 @@ public class ReworkedRope {
     public ResourceLocation style;
     public RopeUtils.RopeType type;
     public boolean hasRestored = false;
+    public boolean shouldRestore = true;
     public VSDistanceJoint joint;
 
     /**
@@ -52,6 +53,8 @@ public class ReworkedRope {
         this.jointValues = values;
         this.style = style;
         this.type = type;
+
+        if (this.type == RopeUtils.RopeType.SS) this.shouldRestore = false;
     }
 
     public static Pair<ReworkedRope, String> create(ServerLevel level, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1, Player player, boolean taut) {
@@ -107,7 +110,11 @@ public class ReworkedRope {
             return;
         }
 
-        GTPAUtils.restoreJoint(level, this);
+        if (!this.shouldRestore) {
+            this.shouldRestore = true;
+        } else {
+            GTPAUtils.restoreJoint(level, this);
+        }
     }
 
     public void removeJoint(ServerLevel level) {
@@ -127,6 +134,7 @@ public class ReworkedRope {
             RopeManager.removeRopeWithPersistence(level, this.ropeId);
         } else {
             RopeManager.removeRopeWithPersistence(level, this.ropeId);
+            this.hasRestored = false;
         }
     }
 
@@ -138,26 +146,8 @@ public class ReworkedRope {
     /**
      * sets a rope's joint values. any parameters that are given null will not be changed
      */
-    public void setJointValues(ServerLevel level, VSJointMaxForceTorque maxForceTorque, @Nullable Float  minLength, @Nullable Float  maxLength,
+    public void setJointValues(ServerLevel level, @Nullable VSJointMaxForceTorque maxForceTorque, @Nullable Float  minLength, @Nullable Float  maxLength,
                                @Nullable Double compliance, @Nullable Float  tolerance, @Nullable Float  stiffness, @Nullable Float  damping) {
-        this.jointValues = this.jointValues.withChanged(maxForceTorque, minLength, maxLength, compliance, tolerance, stiffness, damping);
-
-        GTPAUtils.editJoint(level, this);
-    }
-
-    /**
-     * sets a rope's joint values. any parameters that are given null will not be changed
-     */
-    public void setJointValues(ServerLevel level, @Nullable Float maxForce, @Nullable Float maxTorque, @Nullable Float minLength, @Nullable Float maxLength,
-                               @Nullable Double compliance, @Nullable Float tolerance, @Nullable Float stiffness, @Nullable Float  damping) {
-        if (maxForce == null && maxTorque == null) {
-            setJointValues(level, null, minLength, maxLength, compliance, tolerance, stiffness, damping);
-            return;
-        }
-        VSJointMaxForceTorque maxForceTorque = new VSJointMaxForceTorque(
-                maxForce == null ? jointValues.maxForceTorque().getMaxForce() : maxForce,
-                maxTorque == null ? jointValues.maxForceTorque().getMaxTorque() : maxTorque
-        );
         this.jointValues = this.jointValues.withChanged(maxForceTorque, minLength, maxLength, compliance, tolerance, stiffness, damping);
 
         GTPAUtils.editJoint(level, this);

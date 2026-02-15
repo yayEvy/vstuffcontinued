@@ -1,0 +1,9 @@
+{
+  "sources": [
+    {
+      "type": "directory",
+      "source": "rope",
+      "prefix": "rope/"
+    }
+  ]
+}

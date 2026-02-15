@@ -60,7 +60,7 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        Direction facing = context.getHorizontalDirection().getOpposite();
+        Direction facing = context.getHorizontalDirection();
         return this.defaultBlockState()
                 .setValue(HORIZONTAL_FACING, facing)
                 .setValue(POWERED, false);
@@ -70,7 +70,7 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
     @Override
     public boolean hasShaftTowards(LevelReader world, BlockPos pos, BlockState state, Direction face) {
         Direction facing = state.getValue(HORIZONTAL_FACING);
-        return face == facing.getClockWise() || face ==facing.getCounterClockWise();
+        return face == facing.getClockWise() || face == facing.getCounterClockWise();
     }
 
     @Override
@@ -107,16 +107,14 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
 
     @Override
     @ParametersAreNonnullByDefault
-    public @NotNull VoxelShape getShape(BlockState state, BlockGetter p_220053_2_, BlockPos p_220053_3_,
-                                        CollisionContext p_220053_4_) {
+    public @NotNull VoxelShape getShape(BlockState state, BlockGetter blockGetter, BlockPos blockPos, CollisionContext collisionContext) {
         return VStuffShapes.PHYS_PULLEY.get(state.getValue(HORIZONTAL_FACING));
     }
 
     @Override
     @ParametersAreNonnullByDefault
-    public @NotNull VoxelShape getCollisionShape(BlockState state, BlockGetter p_220071_2_, BlockPos p_220071_3_,
-                                                 CollisionContext p_220071_4_) {
-        return getShape(state, p_220071_2_, p_220071_3_, p_220071_4_);
+    public @NotNull VoxelShape getCollisionShape(BlockState state, BlockGetter blockGetter, BlockPos blockPos, CollisionContext collisionContext) {
+        return getShape(state, blockGetter, blockPos, collisionContext);
     }
 
 
@@ -127,7 +125,7 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
 
     @Override
     public BlockEntityType<? extends PhysPulleyBlockEntity> getBlockEntityType() {
-        return VStuffBlockEntities.PHYS_PULLEY_BE.get(); // change later
+        return VStuffBlockEntities.PHYS_PULLEY_BE.get();
     }
 
     @Override

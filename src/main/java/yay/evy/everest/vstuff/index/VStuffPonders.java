@@ -30,7 +30,7 @@ public class VStuffPonders implements PonderPlugin {
 
         HELPER.addStoryBoard(VStuffBlocks.PHYS_PULLEY, "phys_ponder", PhysPulleyPonder::physPulley);
         HELPER.addStoryBoard(VStuffBlocks.MECHANICAL_THRUSTER, "mechanical_thruster_ponder", MechanicalThrusterPonder::mechanicalThruster);
-        HELPER.addStoryBoard(VStuffBlocks.REACTION_WHEEL_BLOCK, "reaction_wheel_ponder", ReactionWheelPonder::reactionWheel);
+        HELPER.addStoryBoard(VStuffBlocks.REACTION_WHEEL, "reaction_wheel_ponder", ReactionWheelPonder::reactionWheel);
 
 
     }

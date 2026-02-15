@@ -1,6 +1,5 @@
 package yay.evy.everest.vstuff.index;
 
-import com.simibubi.create.api.stress.BlockStressValues;
 import com.simibubi.create.foundation.data.AssetLookup;
 import com.simibubi.create.foundation.data.BlockStateGen;
 import com.simibubi.create.foundation.data.CreateRegistrate;
@@ -20,6 +19,7 @@ import yay.evy.everest.vstuff.content.thrust.MechanicalThrusterBlock;
 import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
 import static com.simibubi.create.foundation.data.TagGen.axeOrPickaxe;
 import static com.simibubi.create.foundation.data.TagGen.pickaxeOnly;
+import static yay.evy.everest.vstuff.VStuff.registerImpact;
 
 public class VStuffBlocks  {
 
@@ -32,48 +32,45 @@ public class VStuffBlocks  {
     public static final BlockEntry<MechanicalThrusterBlock> MECHANICAL_THRUSTER =
             REGISTRATE.block("mechanical_thruster", MechanicalThrusterBlock::new)
                     .initialProperties(() -> Blocks.IRON_BLOCK)
-                    .properties(p -> p.mapColor(MapColor.COLOR_YELLOW)
+                    .properties(p -> p
+                            .mapColor(MapColor.COLOR_YELLOW)
                             .noOcclusion())
-                    .addLayer(() -> RenderType::cutout)
                     .transform(axeOrPickaxe())
                     .blockstate(BlockStateGen.directionalAxisBlockProvider())
-                    .transform(b -> b
-                            .onRegister(block -> BlockStressValues.setGeneratorSpeed(32).accept(block)))
+                    .transform(registerImpact(8))
                     .item()
-                    .model(AssetLookup.itemModel("mechanical_thruster.json"))
-                    .build()
+                    .transform(customItemModel())
                     .register();
 
     public static final BlockEntry<PhysPulleyBlock> PHYS_PULLEY =
             REGISTRATE.block("phys_pulley", PhysPulleyBlock::new)
                     .initialProperties(() -> Blocks.IRON_BLOCK)
-                    .properties(props -> BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK))
+                    .properties(p -> p
+                            .mapColor(MapColor.TERRACOTTA_WHITE)
+                            .noOcclusion())
                     .transform(axeOrPickaxe())
                     .blockstate(BlockStateGen.horizontalBlockProvider(true))
-                    .transform(b -> b
-                            .onRegister(block -> BlockStressValues.setGeneratorSpeed(4).accept(block)))
+                    .transform(registerImpact(4))
                     .item()
-                    .model(AssetLookup.itemModel("phys_pulley.json"))
-                    .build()
+                    .transform(customItemModel())
                     .register();
 
     public static final BlockEntry<PulleyAnchorBlock> PULLEY_ANCHOR =
             REGISTRATE.block("pulley_anchor", PulleyAnchorBlock::new)
                     .initialProperties(() -> Blocks.IRON_BLOCK)
                     .transform(pickaxeOnly())
-                    .blockstate((c, p) -> p.directionalBlock(c.get(), p.models()
-                            .getExistingFile(p.modLoc("block/pulley_anchor/block"))))
+                    .blockstate(BlockStateGen.directionalBlockProvider(false))
                     .item()
-                    .model((c, p) -> p.withExistingParent(c.getName(), p.modLoc("block/pulley_anchor/block")))
                     .build()
                     .register();
 
-    public static final BlockEntry<ReactionWheelBlock> REACTION_WHEEL_BLOCK =
+    public static final BlockEntry<ReactionWheelBlock> REACTION_WHEEL =
             REGISTRATE.block("reaction_wheel", ReactionWheelBlock::new)
                     .transform(pickaxeOnly())
-                    .properties(p -> p.noOcclusion())
+                    .properties(BlockBehaviour.Properties::noOcclusion)
+                    .blockstate(BlockStateGen.directionalBlockProvider(true))
                     .item()
-                    .build()
+                    .transform(customItemModel())
                     .register();
 
     public static final BlockEntry<LevituffBlock> LEVITUFF =

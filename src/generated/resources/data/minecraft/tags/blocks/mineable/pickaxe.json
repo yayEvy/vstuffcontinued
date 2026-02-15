@@ -3,6 +3,7 @@
     "vstuff:mechanical_thruster",
     "vstuff:phys_pulley",
     "vstuff:pulley_anchor",
+    "vstuff:reaction_wheel",
     "vstuff:levituff"
   ]
 }

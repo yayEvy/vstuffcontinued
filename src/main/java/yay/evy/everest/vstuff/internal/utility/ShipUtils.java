@@ -3,6 +3,7 @@ package yay.evy.everest.vstuff.internal.utility;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -20,14 +21,32 @@ public class ShipUtils {
         return shipId;
     }
 
-    public static Long getShipIdAtPos(ServerLevel level, BlockPos pos) {
+    public static Long getShipIdAtPos(Level level, BlockPos pos) {
+        Ship loadedShip = VSGameUtilsKt.getShipManagingPos(level, pos);
+        return loadedShip != null ? loadedShip.getId() : null;
+    }
+
+    public static Long getLoadedShipIdAtPos(Level level, BlockPos pos) {
         LoadedShip loadedShip = VSGameUtilsKt.getLoadedShipManagingPos(level, pos);
         return loadedShip != null ? loadedShip.getId() : null;
     }
 
-    public static Long getShipIdAtPos(Level level, BlockPos pos) {
+    public static @NotNull Long getSafeLoadedShipIdAtPos(ServerLevel level, BlockPos pos) {
         LoadedShip loadedShip = VSGameUtilsKt.getLoadedShipManagingPos(level, pos);
-        return loadedShip != null ? loadedShip.getId() : null;
+        return loadedShip != null ? loadedShip.getId() : getGroundBodyId(level);
+    }
+
+    public static @NotNull Long getSafeShipIdAtPos(ServerLevel level, BlockPos pos) {
+        Ship ship = VSGameUtilsKt.getShipManagingPos(level, pos);
+        return ship != null ? ship.getId() : getGroundBodyId(level);
+    }
+
+    public static LoadedShip getLoadedShipAtPos(ServerLevel level, BlockPos pos) {
+        return VSGameUtilsKt.getLoadedShipManagingPos(level, pos);
+    }
+
+    public static Ship getShipAtPos(Level level, BlockPos pos) {
+        return VSGameUtilsKt.getShipManagingPos(level, pos);
     }
 
     public static Double getMassForShip(ServerLevel level, Long shipId) {

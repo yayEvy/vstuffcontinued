@@ -33,14 +33,11 @@ import java.util.List;
 
 import static com.simibubi.create.content.kinetics.motor.CreativeMotorBlockEntity.MAX_SPEED;
 @SuppressWarnings({"deprecation", "unchecked"})
-public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements IAirCurrentSource{
-
-
+public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements IAirCurrentSource {
 
     // hey vsauce air current here
     @Nullable
     private AirCurrent airCurrent;
-
 
     public static final int BASE_MAX_THRUST = 100_000;
     // Constants
@@ -63,21 +60,12 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
     // Particles
     protected ParticleType<PlumeParticleData> particleType;
 
-    public AbstractComputerBehaviour computerBehaviour;
-    public boolean overridePower = false;
-    public int overridenPower;
-
     public MechanicalThrusterBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
         thrusterData = new ThrusterData();
         particleType = (ParticleType<PlumeParticleData>) ParticleTypes.getPlumeType();
     }
 
-
-    @Override
-    public float calculateStressApplied() {
-        return 64.0f;
-    }
 
     @SuppressWarnings("null")
     @Override
@@ -94,7 +82,7 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
         if (this.isRemoved()) {
             return;
         }
-        //This part should ACTUALLY fix the issue with particle emission
+
         if (level.getBlockState(worldPosition).getBlock() != this.getBlockState().getBlock()) {
             this.setRemoved();
             return;
@@ -103,18 +91,9 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
         super.tick();
         updateAirCurrent();
         BlockState currentBlockState = getBlockState();
-        // DFNSALKJDKJDKLAJLASJFLAJFSKD famil guy
-        /*
-        if (level.isClientSide) {
-            if (shouldEmitParticles()) {
-                emitParticles(level, worldPosition, currentBlockState);
-            }
-            return;
-        }
 
-         */
         currentTick++;
-       // damager.tick(currentTick);
+
         int tick_rate = VStuffConfig.THRUSTER_TICKS_PER_UPDATE.get();
 
         if (currentTick % (tick_rate * 2) == 0) {
@@ -206,14 +185,12 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
         return Math.abs(getSpeed() / 256);
     }
 
-
-
     public void calculateObstruction(Level level, BlockPos pos, Direction forwardDirection){
         //Starting from the block behind and iterate OBSTRUCTION_LENGTH blocks in that direction
         //Can't really use level.clip as we explicitly want to check for obstruction only in ship space
         int oldEmptyBlocks = this.emptyBlocks;
         for (emptyBlocks = 0; emptyBlocks < OBSTRUCTION_LENGTH; emptyBlocks++){
-            BlockPos checkPos = pos.relative(forwardDirection.getOpposite(), emptyBlocks + 1);
+            BlockPos checkPos = pos.relative(forwardDirection, emptyBlocks + 1);
             BlockState state = level.getBlockState(checkPos);
             if (!(state.isAir() || !state.isSolid())) break;
         }
@@ -292,9 +269,7 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
 
                 if (attachment != null) {
                     ThrusterData data = getThrusterData();
-                    data.setDirection(VectorConversionsMCKt.toJOMLD(
-                            getBlockState().getValue(MechanicalThrusterBlock.FACING).getNormal()
-                    ));
+                    data.setDirection(VectorConversionsMCKt.toJOMLD(getBlockState().getValue(MechanicalThrusterBlock.FACING).getOpposite().getNormal()));
 
                     ThrusterForceApplier applier = new ThrusterForceApplier(data);
                     attachment.addApplier(worldPosition, applier);
@@ -355,10 +330,8 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
 
     @Override
     public Direction getAirflowOriginSide() {
-        // did you knwo your thruster is  fdpkasdjmfkldsmfmkldkdlamfs
-        return getBlockState()
-                .getValue(MechanicalThrusterBlock.FACING)
-                .getOpposite();    }
+        return getBlockState().getValue(MechanicalThrusterBlock.FACING);
+    }
 
     @Override
     public boolean isSourceRemoved() {
@@ -367,9 +340,7 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
 
     @Override
     public Direction getAirFlowDirection() {
-        return getBlockState()
-                .getValue(MechanicalThrusterBlock.FACING)
-                .getOpposite();
+        return getBlockState().getValue(MechanicalThrusterBlock.FACING);
     }
 
 

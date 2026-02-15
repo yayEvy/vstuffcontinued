@@ -21,7 +21,7 @@ public class ReactionWheelBlock extends DirectionalKineticBlock implements IBE<R
 
     @Override
     public boolean hasShaftTowards(LevelReader world, BlockPos pos, BlockState state, Direction face) {
-        return face == state.getValue(FACING);
+        return face == state.getValue(FACING).getOpposite();
     }
 
     @Override
@@ -63,7 +63,7 @@ public class ReactionWheelBlock extends DirectionalKineticBlock implements IBE<R
 
     @Override
     public BlockEntityType<? extends ReactionWheelBlockEntity> getBlockEntityType() {
-        return VStuffBlockEntities.REACTION_WHEEL_BL0CK_ENTITY.get();
+        return VStuffBlockEntities.REACTION_WHEEL_BE.get();
     }
 
 }

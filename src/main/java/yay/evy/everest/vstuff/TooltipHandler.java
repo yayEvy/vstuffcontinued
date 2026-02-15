@@ -69,16 +69,16 @@ public class TooltipHandler {
     }
 
     private static void populateModifiables() {
-        tooltipModifications.put(VStuffItems.LEAD_CONSTRAINT_ITEM.get(),
+        tooltipModifications.put(VStuffItems.ROPE.get(),
                 (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
 
-        tooltipModifications.put(VStuffItems.LEAD_BREAK_ITEM.get(),
+        tooltipModifications.put(VStuffItems.ROPE_CUTTER.get(),
                 (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
 
         tooltipModifications.put(VStuffItems.PHYS_GRABBER.get(),
                 (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
 
-        tooltipModifications.put(VStuffItems.ROPE_THROWER_ITEM.get(),
+        tooltipModifications.put(VStuffItems.ROPE_THROWER.get(),
                 (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
 
         tooltipModifications.put(VStuffItems.EXPENDABLE_ASSEMBLER.get(),

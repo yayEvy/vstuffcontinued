@@ -40,11 +40,6 @@ public class MechanicalThrusterBlock extends DirectionalAxisKineticBlock impleme
     }
 
     @Override
-    protected void createBlockStateDefinition(@Nonnull StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, AXIS_ALONG_FIRST_COORDINATE);
-    }
-
-    @Override
     public BlockEntity newBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
         return new MechanicalThrusterBlockEntity(VStuffBlockEntities.MECHANICAL_THRUSTER_BE.get(), pos, state);
     }
@@ -69,7 +64,7 @@ public class MechanicalThrusterBlock extends DirectionalAxisKineticBlock impleme
         ThrusterForceAttachment attachment = ThrusterForceAttachment.get(level, pos);
 
         ThrusterData data = thrusterBE.getThrusterData();
-        data.setDirection(VectorConversionsMCKt.toJOMLD(state.getValue(FACING).getNormal()));
+        data.setDirection(VectorConversionsMCKt.toJOMLD(state.getValue(FACING).getOpposite().getNormal()));
         data.setThrust(0);
 
         if (attachment != null) {
@@ -99,7 +94,6 @@ public class MechanicalThrusterBlock extends DirectionalAxisKineticBlock impleme
         ItemStack stack = player.getMainHandItem();
         return stack.getItem() instanceof TieredItem tieredItem && tieredItem.getTier().getLevel() >= 1;
     }
-
 
     @Override
     public void onRemove(@Nonnull BlockState state, @Nonnull Level level, @Nonnull BlockPos pos, @Nonnull BlockState newState, boolean isMoving) {
@@ -141,16 +135,14 @@ public class MechanicalThrusterBlock extends DirectionalAxisKineticBlock impleme
 
     @Override
     @ParametersAreNonnullByDefault
-    public @NotNull VoxelShape getShape(BlockState state, BlockGetter p_220053_2_, BlockPos p_220053_3_,
-                                        CollisionContext p_220053_4_) {
-        return VStuffShapes.ROTATIONAL_THRUSTER.get(state.getValue(FACING));
+    public @NotNull VoxelShape getShape(BlockState state, BlockGetter blockGetter, BlockPos blockPos, CollisionContext collisionContext) {
+        return VStuffShapes.MECHANICAL_THRUSTER.get(state.getValue(FACING));
     }
 
     @Override
     @ParametersAreNonnullByDefault
-    public @NotNull VoxelShape getCollisionShape(BlockState state, BlockGetter p_220071_2_, BlockPos p_220071_3_,
-                                                 CollisionContext p_220071_4_) {
-        return getShape(state, p_220071_2_, p_220071_3_, p_220071_4_);
+    public @NotNull VoxelShape getCollisionShape(BlockState state, BlockGetter blockGetter, BlockPos blockPos, CollisionContext collisionContext) {
+        return getShape(state, blockGetter, blockPos, collisionContext);
     }
 
     @Override

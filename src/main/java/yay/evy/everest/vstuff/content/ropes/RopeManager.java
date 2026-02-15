@@ -47,6 +47,10 @@ public class RopeManager {
         //VStuff.LOGGER.info("Adding constraint with id {} to persistence", rope.ropeId);
     }
 
+    public static ReworkedRope getRope(Integer id) {
+        return activeRopes.get(id);
+    }
+
     public static void replaceRope(Integer id, ReworkedRope rope) {
         activeRopes.put(id, rope);
     }

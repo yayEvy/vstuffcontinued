@@ -62,7 +62,7 @@ public class RopeCutterItem extends Item {
 
             if (!player.isCreative()) {
                 itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
-                player.drop(new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get()), false);
+                player.drop(new ItemStack(VStuffItems.ROPE.get()), false);
             }
 
             return InteractionResultHolder.success(itemStack);

@@ -43,7 +43,6 @@ public class GTPAUtils {
     public static void restoreJoint(ServerLevel level, ReworkedRope rope) {
         VSDistanceJoint distanceJoint = rope.makeJoint();
         GameToPhysicsAdapter gtpa = getGTPA(level);
-        System.out.println("restore");
         if (!rope.hasRestored()) {
             gtpa.addJoint(distanceJoint, 0, (jointId) -> {
                 if (jointId != -1) {

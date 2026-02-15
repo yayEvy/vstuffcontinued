@@ -9,9 +9,14 @@ import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff.LevituffBlockEntity;
 import yay.evy.everest.vstuff.content.reaction_wheel.ReactionWheelBlockEntity;
 import yay.evy.everest.vstuff.content.reaction_wheel.ReactionWheelRenderer;
+import yay.evy.everest.vstuff.content.reaction_wheel.ReactionWheelVisual;
 import yay.evy.everest.vstuff.content.ropes.pulley.PhysPulleyBlockEntity;
+import yay.evy.everest.vstuff.content.ropes.pulley.PhysPulleyRenderer;
+import yay.evy.everest.vstuff.content.ropes.pulley.PhysPulleyVisual;
 import yay.evy.everest.vstuff.content.ropes.pulley.PulleyAnchorBlockEntity;
 import yay.evy.everest.vstuff.content.thrust.MechanicalThrusterBlockEntity;
+import yay.evy.everest.vstuff.content.thrust.MechanicalThrusterRenderer;
+import yay.evy.everest.vstuff.content.thrust.MechanicalThrusterVisual;
 
 public class VStuffBlockEntities {
 
@@ -19,16 +24,16 @@ public class VStuffBlockEntities {
 
     public static final BlockEntityEntry<MechanicalThrusterBlockEntity> MECHANICAL_THRUSTER_BE =
             REGISTRATE.blockEntity("mechanical_thruster", MechanicalThrusterBlockEntity::new)
-                    .visual(() -> SingleAxisRotatingVisual::shaft, false)
+                    .visual(() -> MechanicalThrusterVisual::new, false)
                     .validBlocks(VStuffBlocks.MECHANICAL_THRUSTER)
-                    .renderer(() -> ShaftRenderer::new)
+                    .renderer(() -> MechanicalThrusterRenderer::new)
                     .register();
 
     public static final BlockEntityEntry<PhysPulleyBlockEntity> PHYS_PULLEY_BE =
             REGISTRATE.blockEntity("phys_pulley", PhysPulleyBlockEntity::new)
-                    .visual(() -> SingleAxisRotatingVisual::shaft, false)
+                    .visual(() -> PhysPulleyVisual::new, false)
                     .validBlocks(VStuffBlocks.PHYS_PULLEY)
-                    .renderer(() -> ShaftRenderer::new)
+                    .renderer(() -> PhysPulleyRenderer::new)
                     .register();
 
     public static final BlockEntityEntry<PulleyAnchorBlockEntity> PULLEY_ANCHOR_BE =
@@ -36,20 +41,17 @@ public class VStuffBlockEntities {
                     .validBlocks(VStuffBlocks.PULLEY_ANCHOR)
                     .register();
 
-
-    public static final BlockEntityEntry<ReactionWheelBlockEntity> REACTION_WHEEL_BL0CK_ENTITY =
+    public static final BlockEntityEntry<ReactionWheelBlockEntity> REACTION_WHEEL_BE =
             REGISTRATE.blockEntity("reaction_wheel", ReactionWheelBlockEntity::new)
-                    .validBlocks(VStuffBlocks.REACTION_WHEEL_BLOCK)
+                    .visual(() -> ReactionWheelVisual::new, false)
+                    .validBlocks(VStuffBlocks.REACTION_WHEEL)
                     .renderer(() -> ReactionWheelRenderer::new)
                     .register();
-
-
-
-
 
     public static final BlockEntityEntry<LevituffBlockEntity> LEVITUFF_BE =
             REGISTRATE.blockEntity("levituff", LevituffBlockEntity::new)
                     .validBlocks(VStuffBlocks.LEVITUFF)
                     .register();
+
     public static void register() {}
 }

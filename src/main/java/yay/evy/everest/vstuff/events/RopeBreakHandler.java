@@ -73,7 +73,7 @@ public class RopeBreakHandler {
                 if (remove) {
                     toRemove.put(id, rope);
 
-                    ItemStack ropeDrop = new ItemStack(VStuffItems.LEAD_CONSTRAINT_ITEM.get());
+                    ItemStack ropeDrop = new ItemStack(VStuffItems.ROPE.get());
                     ItemEntity itemEntity = new ItemEntity(
                             level,
                             dropPos.getX() + 0.5,

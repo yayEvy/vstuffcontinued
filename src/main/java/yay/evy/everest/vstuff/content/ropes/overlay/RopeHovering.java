@@ -119,7 +119,7 @@ public class RopeHovering {
             if (ClientRopeManager.hasPreviewRope()) ClientRopeManager.clearPreviewRope();
             return;
         }
-        if (!stack.getItem().equals(VStuffItems.LEAD_BREAK_ITEM.get())) {
+        if (!stack.getItem().equals(VStuffItems.ROPE_CUTTER.get())) {
             if (ClientRopeManager.hasPreviewRope()) ClientRopeManager.clearPreviewRope();
             return;
         }

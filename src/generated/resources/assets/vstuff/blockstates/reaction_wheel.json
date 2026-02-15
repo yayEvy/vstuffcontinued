@@ -1,10 +1,30 @@
 {
   "variants": {
-    "facing=north": { "model": "vstuff:block/reaction_wheel/reaction_wheel"           },
-    "facing=south": { "model": "vstuff:block/reaction_wheel/reaction_wheel", "y": 180 },
-    "facing=west" : { "model": "vstuff:block/reaction_wheel/reaction_wheel", "y": 270 },
-    "facing=east" : { "model": "vstuff:block/reaction_wheel/reaction_wheel", "y": 90  },
-    "facing=up"   : { "model": "vstuff:block/reaction_wheel/reaction_wheel", "x": 270 },
-    "facing=down" : { "model": "vstuff:block/reaction_wheel/reaction_wheel", "x": 90  }
+    "facing=down": {
+      "model": "vstuff:block/reaction_wheel/block",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "vstuff:block/reaction_wheel/block",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north": {
+      "model": "vstuff:block/reaction_wheel/block",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "vstuff:block/reaction_wheel/block",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up": {
+      "model": "vstuff:block/reaction_wheel/block"
+    },
+    "facing=west": {
+      "model": "vstuff:block/reaction_wheel/block",
+      "x": 90,
+      "y": 270
+    }
   }
 }

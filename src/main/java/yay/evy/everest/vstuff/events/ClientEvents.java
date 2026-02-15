@@ -25,9 +25,9 @@ public class ClientEvents {
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase == Phase.START)
-            ClientEvents.onClientTickStart(Minecraft.getInstance());
+            onClientTickStart(Minecraft.getInstance());
         else if (event.phase == Phase.END)
-            ClientEvents.onClientTickEnd(Minecraft.getInstance());
+            onClientTickEnd(Minecraft.getInstance());
     }
 
     public static void onClientTickStart(Minecraft mc) {
