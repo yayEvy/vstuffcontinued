@@ -17,6 +17,12 @@
   "create.gui.goggles.thruster.speed": "Speed",
   "vstuff.gui.rope_menu.title": "Rope Styles",
 
+  "vstuff.ponder.reaction_wheel.header": "The Reaction Wheel",
+  "vstuff.ponder.reaction_wheel.title": "The Reaction Wheel",
+  "vstuff.ponder.reaction_wheel.text_1": "This is the Reaction Wheel!",
+  "vstuff.ponder.reaction_wheel.text_2": "It will produce Direct Torque when given rotation.",
+  "vstuff.ponder.reaction_wheel.text_3": "The amount of force applied to the ship depends on the RPM and RPM direction.",
+
   "vstuff.message.rope_reset": "§aRope selection reset.",
   "vstuff.message.rope_created": "§aSuccessfully created rope!",
   "vstuff.message.chain_created": "§aSuccessfully created chain!",
