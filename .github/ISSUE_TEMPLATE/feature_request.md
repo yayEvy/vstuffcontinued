@@ -1,10 +1,8 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
+about: Suggest an idea for the mod
 title: ''
 labels: enhancement
-assignees: 'illucc'
-
 ---
 
 **Is your feature request related to a problem? Please describe.**
