@@ -324,8 +324,8 @@ public class RopeRendererClient {
         renderRopeFaceWithGapFilling(vertexConsumer, matrix, bottomRightStrip, bottomLeftStrip, negUp, curvePoints, lightValues, totalCurveLength, textureScale);
         renderRopeFaceWithGapFilling(vertexConsumer, matrix, bottomLeftStrip, topLeftStrip, negRight, curvePoints, lightValues, totalCurveLength, textureScale);
 
-        renderRopeFaceWithGapFilling(vertexConsumer, matrix, topLeftStrip, bottomRightStrip, diag1, curvePoints, lightValues, totalCurveLength, textureScale);
-        renderRopeFaceWithGapFilling(vertexConsumer, matrix, topRightStrip, bottomLeftStrip, diag2, curvePoints, lightValues, totalCurveLength, textureScale);
+       // renderRopeFaceWithGapFilling(vertexConsumer, matrix, topLeftStrip, bottomRightStrip, diag1, curvePoints, lightValues, totalCurveLength, textureScale);
+       // renderRopeFaceWithGapFilling(vertexConsumer, matrix, topRightStrip, bottomLeftStrip, diag2, curvePoints, lightValues, totalCurveLength, textureScale);
     }
 
     private static void renderRopeFaceWithGapFilling(VertexConsumer vertexConsumer, Matrix4f matrix,
