@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff;
+package yay.evy.everest.vstuff.infrastructure.config;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 

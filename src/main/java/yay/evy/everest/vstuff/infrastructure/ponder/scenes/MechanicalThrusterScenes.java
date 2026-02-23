@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.client.ponder;
+package yay.evy.everest.vstuff.infrastructure.ponder.scenes;
 
 
 import net.createmod.ponder.api.scene.SceneBuilder;
@@ -7,7 +7,7 @@ import net.createmod.ponder.api.scene.Selection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 
-public class MechanicalThrusterPonder {
+public class MechanicalThrusterScenes {
 
     public static void mechanicalThruster(SceneBuilder scene, SceneBuildingUtil util) {
         scene.title("mechanical_thruster", "Using the Mechanical Thruster");

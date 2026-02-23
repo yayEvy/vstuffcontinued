@@ -30,7 +30,7 @@ public class RopeUtils {
         return blockPos;
     }
 
-    public static Vector3d getWorldPos(ServerLevel level, BlockPos pos, Long shipId) {
+    public static Vector3d getWorldPos(Level level, BlockPos pos, Long shipId) {
         Vector3d localPos = getLocalPos(level, pos);
         if (shipId != null) {
             Ship shipObject = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
@@ -116,21 +116,11 @@ public class RopeUtils {
         return closestConstraintId;
     }
 
-    public enum RopeInteractionReturn {
-        SUCCESS,
-        FAIL,
-        RESET
-    }
-
     public enum ConnectionType {
         NORMAL,
         PULLEY
     }
 
-    public enum ConstraintType {
-        GENERIC,
-        PULLEY
-    }
 
     public enum RopeType {
         WW,

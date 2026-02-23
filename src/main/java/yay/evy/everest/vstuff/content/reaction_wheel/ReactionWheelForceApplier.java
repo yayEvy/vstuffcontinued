@@ -1,13 +1,12 @@
 package yay.evy.everest.vstuff.content.reaction_wheel;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 
 
 import net.minecraft.core.BlockPos;
-import yay.evy.everest.vstuff.VStuffConfig;
+import yay.evy.everest.vstuff.infrastructure.config.VStuffConfig;
 
 @JsonAutoDetect(
         fieldVisibility = JsonAutoDetect.Visibility.ANY

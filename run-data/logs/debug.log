@@ -1436,7 +1436,7 @@ java.lang.IllegalAccessException: class io.netty.util.internal.PlatformDependent
 [15Feb2026 16:57:27.495] [modloading-worker-0/DEBUG] [com.tterrag.registrate.AbstractRegistrate/REGISTRATE.REGISTER]: Captured registration for entry fake_track of type minecraft:block
 [15Feb2026 16:57:27.496] [modloading-worker-0/DEBUG] [com.tterrag.registrate.AbstractRegistrate/REGISTRATE.REGISTER]: Captured registration for entry railway_casing of type minecraft:item
 [15Feb2026 16:57:27.502] [modloading-worker-0/DEBUG] [com.tterrag.registrate.AbstractRegistrate/REGISTRATE.REGISTER]: Captured registration for entry railway_casing of type minecraft:block
-[15Feb2026 16:57:27.502] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber/LOADING]: Auto-subscribing yay.evy.everest.vstuff.internal.data.VStuffDatagen to MOD
+[15Feb2026 16:57:27.502] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber/LOADING]: Auto-subscribing yay.evy.everest.vstuff.infrastructure.data.VStuffDatagen to MOD
 [15Feb2026 16:57:27.505] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber/LOADING]: Auto-subscribing yay.evy.everest.vstuff.particles.ParticleTypes to MOD
 [15Feb2026 16:57:27.508] [modloading-worker-0/DEBUG] [mixin/]: Mixing client.accessor.ParticleEngineAccessor from ponder.mixins.json into net.minecraft.client.particle.ParticleEngine
 [15Feb2026 16:57:27.516] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber/LOADING]: Auto-subscribing yay.evy.everest.vstuff.TooltipHandler to FORGE

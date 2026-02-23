@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.internal.data;
+package yay.evy.everest.vstuff.infrastructure.data;
 
 import com.google.gson.JsonObject;
 import net.minecraft.data.CachedOutput;

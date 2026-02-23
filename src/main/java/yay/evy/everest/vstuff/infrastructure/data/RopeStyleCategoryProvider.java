@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.internal.data;
+package yay.evy.everest.vstuff.infrastructure.data;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 public class RopeStyleCategoryProvider implements DataProvider {
 

@@ -37,7 +37,7 @@ public class VStuffCreativeModeTabs {
 
         private List<Item> collectBlocks(RegistryObject<CreativeModeTab> tab, Predicate<Item> exclusionPredicate) {
             List<Item> items = new ReferenceArrayList<>();
-            for (RegistryEntry<Block> entry : VStuff.REGISTRATE.getAll(Registries.BLOCK)) {
+            for (RegistryEntry<Block> entry : VStuff.registrate().getAll(Registries.BLOCK)) {
                 if (!CreateRegistrate.isInCreativeTab(entry, tab))
                     continue;
                 Item item = entry.get().asItem();
@@ -53,7 +53,7 @@ public class VStuffCreativeModeTabs {
         private List<Item> collectItems(RegistryObject<CreativeModeTab> tab, Predicate<Item> exclusionPredicate) {
             List<Item> items = new ReferenceArrayList<>();
 
-            for (RegistryEntry<Item> entry : VStuff.REGISTRATE.getAll(Registries.ITEM)) {
+            for (RegistryEntry<Item> entry : VStuff.registrate().getAll(Registries.ITEM)) {
                 if (!CreateRegistrate.isInCreativeTab(entry, tab))
                     continue;
                 Item item = entry.get();

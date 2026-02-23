@@ -48,33 +48,4 @@ public record JointValues(VSJointMaxForceTorque maxForceTorque, Float minLength,
                 this.damping
         );
     }
-
-    public static CompoundTag writeJointValues(JointValues jointValues) {
-        CompoundTag tag = new CompoundTag();
-
-        tag.putFloat("maxForce", jointValues.maxForceTorque.getMaxForce());
-        tag.putFloat("maxTorque", jointValues.maxForceTorque.getMaxTorque());
-        tag.putFloat("minLength", jointValues.minLength);
-        tag.putFloat("maxLength", jointValues.maxLength);
-        tag.putDouble("compliance", jointValues.compliance);
-        tag.putFloat("tolerance", jointValues.tolerance == null ? -1 : jointValues.tolerance);
-        tag.putFloat("stiffness", jointValues.stiffness == null ? -1 : jointValues.stiffness);
-        tag.putFloat("damping", jointValues.damping == null ? -1 : jointValues.damping);
-
-        return tag;
-    }
-
-    public static JointValues readJointValues(CompoundTag tag) {
-
-        VSJointMaxForceTorque maxForceTorque = new VSJointMaxForceTorque(tag.getFloat("maxForce"), tag.getFloat("maxTorque"));
-        Float tolerance = tag.getFloat("tolerance");
-        Float stiffness = tag.getFloat("stiffness");
-        Float damping = tag.getFloat("damping");
-
-        if (tolerance == -1) tolerance = null;
-        if (stiffness == -1) stiffness = null;
-        if (damping == -1) damping = null;
-
-        return new JointValues(maxForceTorque, tag.getFloat("minLength"), tag.getFloat("maxLength"), tag.getDouble("compliance"), tolerance, stiffness, damping);
-    }
 }

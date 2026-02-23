@@ -39,41 +39,6 @@ public record RopePosData(@Nullable Long shipId, BlockPos blockPos, Vector3d loc
         return RopeUtils.getWorldPos(level, blockPos, shipId);
     }
 
-    public CompoundTag toTag() {
-        CompoundTag tag = new CompoundTag();
-
-        tag.putLong("shipId", shipId == null ? -1 : shipId); // use ground body id for tag
-        tag.put("blockPos", NbtUtils.writeBlockPos(blockPos));
-        tag.put("localPos", writeVector3d(localPos));
-        tag.putString("posType", posType.name());
-        tag.putString("blockType", blockType.name());
-
-        return tag;
-    }
-
-    public static RopePosData fromTag(CompoundTag tag) {
-        Long shipId = tag.getLong("shipId");
-        shipId = shipId == -1 ? null : shipId;
-        BlockPos blockPos = NbtUtils.readBlockPos(tag.getCompound("blockPos"));
-        Vector3d localPos = readVector3d(tag.getCompound("localPos"));
-        PosType posType = PosType.valueOf(tag.getString("posType"));
-        BlockType blockType = BlockType.valueOf(tag.getString("blockType"));
-
-        return new RopePosData(shipId, blockPos, localPos, posType, blockType);
-    }
-
-    public static CompoundTag writeVector3d(Vector3d vector3d) {
-        CompoundTag tag = new CompoundTag();
-        tag.putDouble("X", vector3d.x);
-        tag.putDouble("Y", vector3d.y);
-        tag.putDouble("Z", vector3d.z);
-        return tag;
-    }
-
-    public static Vector3d readVector3d(CompoundTag tag) {
-        return new Vector3d(tag.getDouble("X"), tag.getDouble("Y"), tag.getDouble("Z"));
-    }
-
     @Override
     public @NotNull String toString() {
         return "RopePosData with shipId " + shipId + ", blockPos " + blockPos + ", localPos " + localPos + ", posType " + posType + ", blockType " + blockType;

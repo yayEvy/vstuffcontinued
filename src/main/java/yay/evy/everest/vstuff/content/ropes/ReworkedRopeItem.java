@@ -7,7 +7,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -17,22 +16,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.VStuffConfig;
 import yay.evy.everest.vstuff.client.ClientOutlineHandler;
 import yay.evy.everest.vstuff.content.ropes.pulley.PhysPulleyBlockEntity;
-import yay.evy.everest.vstuff.content.ropes.pulley.PulleyAnchorBlockEntity;
-import yay.evy.everest.vstuff.content.ropes.styler.handler.RopeStyleHandlerServer;
-import yay.evy.everest.vstuff.internal.RopeStyle;
-import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import yay.evy.everest.vstuff.internal.utility.PosUtils;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
-import yay.evy.everest.vstuff.internal.utility.RopeUtils.ConnectionType;
 import yay.evy.everest.vstuff.internal.utility.ShipUtils;
-
-import static yay.evy.everest.vstuff.internal.utility.ShipUtils.getShipIdAtPos;
+import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
 public class ReworkedRopeItem extends Item {
 
@@ -130,8 +121,11 @@ public class ReworkedRopeItem extends Item {
 
         CompoundTag tag = heldItem.getOrCreateTagElement("first");
 
-        tag.putLong("shipId", ShipUtils.getSafeLoadedShipIdAtPos(level, clickedPos));
-        tag.put("pos", NbtUtils.writeBlockPos(clickedPos));
+        Long shipId = ShipUtils.getLoadedShipIdAtPos(level, clickedPos);
+
+        tag.putLong("shipId", shipId == null ? -1 : shipId);
+        tag.put("blockPos", NbtUtils.writeBlockPos(clickedPos));
+        tag.put("worldPos", TagUtils.writeVector3d(RopeUtils.getWorldPos(level, clickedPos, shipId)));
         tag.putString("dim", level.dimension().location().toString());
         tag.putString("type", selection.name());
 

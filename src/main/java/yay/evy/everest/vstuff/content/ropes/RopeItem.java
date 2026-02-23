@@ -14,9 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
-import org.valkyrienskies.core.api.ships.LoadedShip;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import yay.evy.everest.vstuff.VStuffConfig;
+import yay.evy.everest.vstuff.infrastructure.config.VStuffConfig;
 import yay.evy.everest.vstuff.client.ClientOutlineHandler;
 import yay.evy.everest.vstuff.content.ropes.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.content.ropes.pulley.PulleyAnchorBlockEntity;
@@ -24,11 +22,8 @@ import yay.evy.everest.vstuff.internal.RopeStyle;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import yay.evy.everest.vstuff.content.ropes.styler.handler.RopeStyleHandlerServer;
-import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils.ConnectionType;
 import yay.evy.everest.vstuff.internal.utility.ShipUtils;
-
-import java.util.Objects;
 
 import static yay.evy.everest.vstuff.internal.utility.ShipUtils.getShipIdAtPos;
 

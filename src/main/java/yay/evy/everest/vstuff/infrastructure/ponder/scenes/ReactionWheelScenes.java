@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.client.ponder;
+package yay.evy.everest.vstuff.infrastructure.ponder.scenes;
 
 import com.simibubi.create.foundation.ponder.CreateSceneBuilder;
 import net.createmod.ponder.api.scene.SceneBuilder;
@@ -7,7 +7,7 @@ import net.createmod.ponder.api.scene.Selection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 
-public class ReactionWheelPonder {
+public class ReactionWheelScenes {
 
     public static void reactionWheel(SceneBuilder scene, SceneBuildingUtil util) {
         CreateSceneBuilder cscene = new CreateSceneBuilder(scene);

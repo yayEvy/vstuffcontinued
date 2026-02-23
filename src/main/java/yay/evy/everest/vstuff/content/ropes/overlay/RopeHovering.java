@@ -17,7 +17,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.joml.Vector3d;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.VStuffConfig;
+import yay.evy.everest.vstuff.infrastructure.config.VStuffConfig;
 import yay.evy.everest.vstuff.client.ClientRopeManager;
 import yay.evy.everest.vstuff.client.ClientRopeUtil;
 import yay.evy.everest.vstuff.index.VStuffItems;

@@ -20,7 +20,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3d;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.VStuffConfig;
+import yay.evy.everest.vstuff.infrastructure.config.VStuffConfig;
 import yay.evy.everest.vstuff.internal.RopeStyle;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.rendering.RopeRendererType;

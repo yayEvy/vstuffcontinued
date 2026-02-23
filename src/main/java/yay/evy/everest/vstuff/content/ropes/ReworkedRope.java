@@ -3,26 +3,16 @@ package yay.evy.everest.vstuff.content.ropes;
 import kotlin.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import org.jetbrains.annotations.NotNull;
-import org.joml.Quaterniond;
-import org.joml.Vector3d;
 import org.valkyrienskies.core.internal.joints.*;
-import org.valkyrienskies.core.internal.world.VsiServerShipWorld;
-import org.valkyrienskies.mod.api.ValkyrienSkies;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.VStuffConfig;
+import yay.evy.everest.vstuff.infrastructure.config.VStuffConfig;
 import yay.evy.everest.vstuff.content.ropes.styler.handler.RopeStyleHandlerServer;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
-import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import yay.evy.everest.vstuff.internal.utility.*;
 
 import javax.annotation.Nullable;
@@ -172,9 +162,9 @@ public class ReworkedRope {
         CompoundTag ropeTag = new CompoundTag();
 
         ropeTag.putInt("ropeId", ropeId);
-        ropeTag.put("posData0", posData0.toTag());
-        ropeTag.put("posData1", posData1.toTag());
-        ropeTag.put("jointValues", JointValues.writeJointValues(jointValues));
+        ropeTag.put("posData0", TagUtils.writePosData(posData0));
+        ropeTag.put("posData1", TagUtils.writePosData(posData1));
+        ropeTag.put("jointValues", TagUtils.writeJointValues(jointValues));
         ropeTag.putString("namespace", style.getNamespace());
         ropeTag.putString("path", style.getPath());
         ropeTag.putString("type", type.name());
@@ -185,18 +175,11 @@ public class ReworkedRope {
     public static ReworkedRope fromTag(CompoundTag ropeTag) {
         return new ReworkedRope(
                 ropeTag.getInt("ropeId"),
-                RopePosData.fromTag(ropeTag.getCompound("posData0")),
-                RopePosData.fromTag(ropeTag.getCompound("posData1")),
-                JointValues.readJointValues(ropeTag.getCompound("jointValues")),
+                TagUtils.readPosData(ropeTag.getCompound("posData0")),
+                TagUtils.readPosData(ropeTag.getCompound("posData1")),
+                TagUtils.readJointValues(ropeTag.getCompound("jointValues")),
                 new ResourceLocation(ropeTag.getString("namespace"), ropeTag.getString("path")),
                 RopeUtils.RopeType.valueOf(ropeTag.getString("type"))
         );
     }
 }
-
-/*
-hidden devlog 1
-wren here
-i've been lost in the rope forest for so many days now... i don't know if i'll ever get out
-so many ropes...
- */

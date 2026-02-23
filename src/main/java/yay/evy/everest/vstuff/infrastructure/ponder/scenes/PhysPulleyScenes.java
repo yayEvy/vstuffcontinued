@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.client.ponder;
+package yay.evy.everest.vstuff.infrastructure.ponder.scenes;
 
 import net.createmod.catnip.math.Pointing;
 import net.createmod.ponder.api.PonderPalette;
@@ -10,7 +10,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import yay.evy.everest.vstuff.index.VStuffItems;
 
-public class PhysPulleyPonder {
+public class PhysPulleyScenes {
 
     public static void physPulley(SceneBuilder scene, SceneBuildingUtil util) {
         scene.title("phys_pulley", "The Phys Pulley");

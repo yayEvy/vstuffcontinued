@@ -5,7 +5,6 @@ import com.simibubi.create.api.stress.BlockStressValues;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.builders.BlockBuilder;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
-import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
 import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockSource;
@@ -34,8 +33,6 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
-import org.valkyrienskies.core.api.ships.LoadedShip;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.client.VStuffClient;
 import yay.evy.everest.vstuff.content.reaction_wheel.ReactionWheelAttachment;
@@ -44,6 +41,7 @@ import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberServerAttachment;
 import yay.evy.everest.vstuff.content.ropes.thrower.RopeThrowerEntity;
 import yay.evy.everest.vstuff.content.thrust.ThrusterForceAttachment;
 import yay.evy.everest.vstuff.index.*;
+import yay.evy.everest.vstuff.infrastructure.config.VStuffConfig;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import yay.evy.everest.vstuff.internal.network.PhysGrabberNetwork;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
@@ -51,7 +49,6 @@ import yay.evy.everest.vstuff.particles.ParticleTypes;
 import org.valkyrienskies.core.api.VsBeta;
 
 import static yay.evy.everest.vstuff.internal.utility.ShipUtils.getLoadedShipIdAtPos;
-import static yay.evy.everest.vstuff.internal.utility.ShipUtils.getShipIdAtPos;
 
 @Mod(VStuff.MOD_ID)
 public class VStuff {
@@ -59,7 +56,7 @@ public class VStuff {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String NAME = "VStuff";
 
-    public static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MOD_ID);
+    private static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MOD_ID);
 
     public VStuff() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
