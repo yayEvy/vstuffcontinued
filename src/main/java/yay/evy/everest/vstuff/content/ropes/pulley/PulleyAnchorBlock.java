@@ -19,21 +19,27 @@ import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.index.VStuffBlockEntities;
 import yay.evy.everest.vstuff.index.VStuffShapes;
 
+import static yay.evy.everest.vstuff.content.ropes.IRopeActor.CONNECTED;
+
 public class PulleyAnchorBlock extends DirectionalBlock implements IBE<PulleyAnchorBlockEntity> {
 
     public PulleyAnchorBlock(Properties pProperties) {
         super(pProperties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.UP));
+        this.registerDefaultState(this.stateDefinition.any()
+                .setValue(FACING, Direction.UP)
+                .setValue(CONNECTED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
+        builder.add(FACING, CONNECTED);
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(FACING, context.getClickedFace());
+        return this.defaultBlockState()
+                .setValue(FACING, context.getClickedFace())
+                .setValue(CONNECTED, false);
     }
     @Override
     public @NotNull VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {

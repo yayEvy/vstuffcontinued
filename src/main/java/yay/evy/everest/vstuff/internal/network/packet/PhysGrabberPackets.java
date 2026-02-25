@@ -9,7 +9,7 @@ import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.infrastructure.config.VStuffConfig;
-import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberServerAttachment;
+import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.PhysGrabberServerAttachment;
 
 import java.util.function.Supplier;
 

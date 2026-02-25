@@ -34,18 +34,18 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
-import yay.evy.everest.vstuff.client.VStuffClient;
-import yay.evy.everest.vstuff.content.reaction_wheel.ReactionWheelAttachment;
+import yay.evy.everest.vstuff.content.ships.reactionwheel.ReactionWheelAttachment;
 import yay.evy.everest.vstuff.content.ropes.RopePersistence;
-import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberServerAttachment;
+import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.PhysGrabberServerAttachment;
 import yay.evy.everest.vstuff.content.ropes.thrower.RopeThrowerEntity;
-import yay.evy.everest.vstuff.content.thrust.ThrusterForceAttachment;
+import yay.evy.everest.vstuff.content.ships.thrust.ThrusterForceAttachment;
 import yay.evy.everest.vstuff.index.*;
 import yay.evy.everest.vstuff.infrastructure.config.VStuffConfig;
+import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import yay.evy.everest.vstuff.internal.network.PhysGrabberNetwork;
+import yay.evy.everest.vstuff.internal.network.VStuffPackets;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
-import yay.evy.everest.vstuff.particles.ParticleTypes;
 import org.valkyrienskies.core.api.VsBeta;
 
 import static yay.evy.everest.vstuff.internal.utility.ShipUtils.getLoadedShipIdAtPos;
@@ -70,13 +70,16 @@ public class VStuff {
         REGISTRATE.setCreativeTab(VStuffCreativeModeTabs.VSTUFF_MAIN);
 
         VStuffSounds.register(modEventBus);
-        ParticleTypes.register(modEventBus);
+        VStuffRenderTypes.register();
 
         VStuffBlocks.register();
         VStuffItems.register();
         VStuffEntities.register(modEventBus);
         VStuffBlockEntities.register();
         VStuffPartials.register();
+        //VStuffPackets.registerPackets();
+
+        //VStuffConfigs.register(ModLoadingContext.get());
 
         MinecraftForge.EVENT_BUS.register(this);
         NetworkHandler.registerPackets();
@@ -84,9 +87,7 @@ public class VStuff {
 
         modEventBus.addListener(this::commonSetup);
 
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            modEventBus.addListener(VStuffClient::initialize);
-        });
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> VStuffClient.initVStuffClient(modEventBus));
 
         ValkyrienSkiesMod.getApi().getShipLoadEvent().on(RopePersistence::onShipLoad);
 

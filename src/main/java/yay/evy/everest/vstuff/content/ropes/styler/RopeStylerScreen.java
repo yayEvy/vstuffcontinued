@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.createmod.catnip.gui.AbstractSimiScreen;
 import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.internal.RopeStyle;
 import yay.evy.everest.vstuff.internal.RopeStyleCategory;
@@ -11,7 +12,6 @@ import yay.evy.everest.vstuff.internal.RopeStyleCategoryManager;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import yay.evy.everest.vstuff.internal.utility.ClientTextUtils;
 import yay.evy.everest.vstuff.index.VStuffGuiTextures;
-import yay.evy.everest.vstuff.content.ropes.styler.components.RopeStyleButton;
 
 import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.foundation.gui.AllIcons;
@@ -308,5 +308,17 @@ public class RopeStylerScreen extends AbstractSimiScreen {
 
         onClose();
     }
+
+    public static class RopeStyleButton extends Button {
+
+        public RopeStyleButton(int x, int y, int width, int height, OnPress onPress) {
+            super(x, y, width, height, Component.empty(), onPress, Button.DEFAULT_NARRATION);
+        }
+
+        @Override
+        public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) { }
+
+    }
+
 
 }

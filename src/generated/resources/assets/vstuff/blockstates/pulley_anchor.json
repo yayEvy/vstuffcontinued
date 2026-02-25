@@ -1,27 +1,53 @@
 {
   "variants": {
-    "facing=down": {
+    "connected=false,facing=down": {
       "model": "vstuff:block/pulley_anchor",
       "x": 180
     },
-    "facing=east": {
+    "connected=false,facing=east": {
       "model": "vstuff:block/pulley_anchor",
       "x": 90,
       "y": 90
     },
-    "facing=north": {
+    "connected=false,facing=north": {
       "model": "vstuff:block/pulley_anchor",
       "x": 90
     },
-    "facing=south": {
+    "connected=false,facing=south": {
       "model": "vstuff:block/pulley_anchor",
       "x": 90,
       "y": 180
     },
-    "facing=up": {
+    "connected=false,facing=up": {
       "model": "vstuff:block/pulley_anchor"
     },
-    "facing=west": {
+    "connected=false,facing=west": {
+      "model": "vstuff:block/pulley_anchor",
+      "x": 90,
+      "y": 270
+    },
+    "connected=true,facing=down": {
+      "model": "vstuff:block/pulley_anchor",
+      "x": 180
+    },
+    "connected=true,facing=east": {
+      "model": "vstuff:block/pulley_anchor",
+      "x": 90,
+      "y": 90
+    },
+    "connected=true,facing=north": {
+      "model": "vstuff:block/pulley_anchor",
+      "x": 90
+    },
+    "connected=true,facing=south": {
+      "model": "vstuff:block/pulley_anchor",
+      "x": 90,
+      "y": 180
+    },
+    "connected=true,facing=up": {
+      "model": "vstuff:block/pulley_anchor"
+    },
+    "connected=true,facing=west": {
       "model": "vstuff:block/pulley_anchor",
       "x": 90,
       "y": 270

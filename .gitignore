@@ -1,6 +1,7 @@
 build/
 *.ipr
 run/
+run-data/
 *.iws
 out/
 *.iml
@@ -17,5 +18,3 @@ classes/
 .vscode
 .settings
 *.launch
-/run-data/logs/
-/run-data

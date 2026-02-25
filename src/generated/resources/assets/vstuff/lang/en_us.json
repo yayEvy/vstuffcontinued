@@ -12,8 +12,6 @@
   "create.gui.goggles.thruster.thrust": "Thrust",
   "creativetabs.main": "VStuff",
   "item.vstuff.creative_rope_editor": "Creative Rope Editor",
-  "item.vstuff.empty_energy_core": "Empty Energy Core",
-  "item.vstuff.energy_core": "Energy Core",
   "item.vstuff.expendable_assembler": "Expendable Assembler",
   "item.vstuff.phys_grabber": "Phys Grabber",
   "item.vstuff.phys_grabber.tooltip": "A method of dragging ships around!.",

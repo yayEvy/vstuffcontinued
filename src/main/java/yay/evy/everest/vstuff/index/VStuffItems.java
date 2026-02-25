@@ -7,10 +7,8 @@ import net.minecraft.world.item.Rarity;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.ropes.RopeCutterItem;
 import yay.evy.everest.vstuff.content.ropes.RopeItem;
-import yay.evy.everest.vstuff.content.expendable_assembler.ExpendableAssemblerItem;
-import yay.evy.everest.vstuff.content.physgrabber.PhysGrabberItem;
-import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.EmptyEnergyCoreItem;
-import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.EnergyCoreItem;
+import yay.evy.everest.vstuff.content.ships.assembly.ExpendableAssemblerItem;
+import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.PhysGrabberItem;
 import yay.evy.everest.vstuff.content.ropes.editor.RopeEditorItem;
 import yay.evy.everest.vstuff.content.ropes.thrower.RopeThrowerItem;
 
@@ -52,21 +50,6 @@ public class VStuffItems {
                 .stacksTo(1)
                 .rarity(Rarity.UNCOMMON)
                 .durability(1096))
-            .model(AssetLookup.itemModelWithPartials())
-            .register();
-
-    public static final ItemEntry<EmptyEnergyCoreItem> EMPTY_ENERGY_CORE =
-        REGISTRATE.item("empty_energy_core", EmptyEnergyCoreItem::new)
-            .properties(p -> p
-                .stacksTo(64))
-            .model(AssetLookup.itemModelWithPartials())
-            .register();
-
-    public static final ItemEntry<EnergyCoreItem> ENERGY_CORE =
-        REGISTRATE.item("energy_core", EnergyCoreItem::new)
-            .properties(p -> p
-                .stacksTo(64)
-                .rarity(Rarity.UNCOMMON))
             .model(AssetLookup.itemModelWithPartials())
             .register();
 
