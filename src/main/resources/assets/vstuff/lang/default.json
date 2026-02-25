@@ -1,6 +1,6 @@
 {
-  "item.vstuff.lead_constraint_item.tooltip": "Creates rope constraints between ships and world.",
-  "item.vstuff.lead_break_item.tooltip": "Look at a rope and right-click to cut it.",
+  "item.vstuff.rope.tooltip": "Creates rope constraints between ships and world.",
+  "item.vstuff.rope_cutter.tooltip": "Look at a rope and right-click to cut it.",
   "item.vstuff.phys_grabber.tooltip": "A method of dragging ships around!.",
   "vstuff.expendable_assembler.tooltip.summary": "A _single use_ method of assembling ships! Who knows how this thing works... Very _fragile!_",
   "item.vstuff.rope_thrower.tooltip": "Creates a _rope_ between a block and the block the projectile hits.",
@@ -53,17 +53,17 @@
   "vstuff.ponder.mechanical_thruster.text_4": "Entities can also be pushed around like Encased Fans.",
   "vstuff.ponder.mechanical_thruster.header": "Mechanical Thruster",
 
-  "vstuff.lead_constraint_item.tooltip.summary": "A rope for VS2 ships! Press the _Open Rope Styler_ key (default _ALT_) to change the rope texture.",
-  "vstuff.lead_constraint_item.tooltip.condition1": "When Used on two different blocks",
-  "vstuff.lead_constraint_item.tooltip.behavior1": "_Creates_ a _Rope Constraint_ between two blocks.",
-  "vstuff.lead_constraint_item.tooltip.condition2": "When Used on any block while Sneaking",
-  "vstuff.lead_constraint_item.tooltip.behavior2": "_Resets_ the selected position.",
+  "vstuff.rope.tooltip.summary": "A rope for VS2 ships! Press the _Open Rope Styler_ key (default _ALT_) to change the rope texture.",
+  "vstuff.rope.tooltip.condition1": "When Used on two different blocks",
+  "vstuff.rope.tooltip.behavior1": "_Creates_ a _Rope Constraint_ between two blocks.",
+  "vstuff.rope.tooltip.condition2": "When Used on any block while Sneaking",
+  "vstuff.rope.tooltip.behavior2": "_Resets_ the selected position.",
 
   "vstuff.rope_thrower.tooltip.summary": "A _Throwable_ rope! Press the _Open Rope Styler_ key (default _ALT_) to change the rope texture.",
   "vstuff.rope_thrower.tooltip.condition1": "Right-click the first block as normal",
   "vstuff.rope_thrower.tooltip.behavior1": "Creates a rope between the first block and the block the projectile hits when thrown.",
 
-  "vstuff.lead_break_item.tooltip.summary": "_Cuts the rope_ you are looking at.",
+  "vstuff.rope_cutter.tooltip.summary": "_Cuts the rope_ you are looking at.",
   "vstuff.phys_grabber.tooltip.summary": "A method of _moving ships_ around!",
   "vstuff.tooltip.hold_for_details": "Hold [%s] for summary",
 
