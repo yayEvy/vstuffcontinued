@@ -50,6 +50,7 @@
   "vstuff.ponder.mechanical_thruster.text_1": "This is the Mechanical Thruster!",
   "vstuff.ponder.mechanical_thruster.text_2": "By giving it rotational force...",
   "vstuff.ponder.mechanical_thruster.text_3": "...it produces a bit of thrust! (massive news)",
+  "vstuff.ponder.mechanical_thruster.text_4": "Entities can also be pushed around like Encased Fans.",
   "vstuff.ponder.mechanical_thruster.header": "Mechanical Thruster",
 
   "vstuff.lead_constraint_item.tooltip.summary": "A rope for VS2 ships! Press the _Open Rope Styler_ key (default _ALT_) to change the rope texture.",
