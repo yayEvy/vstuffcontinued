@@ -1,6 +1,5 @@
 buildscript {
     repositories {
-        // These repositories are only for Gradle plugins, put any other repositories in the repository block further below
         maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
         maven {
             url "https://plugins.gradle.org/m2/"
@@ -13,26 +12,18 @@ buildscript {
         classpath 'org.parchmentmc:librarian:1.+'
         classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.0'
         classpath "org.jlleitschuh.gradle:ktlint-gradle:12.1.1"
-
-        // OPTIONAL Gradle plugin for Kotlin Serialization
-        //classpath 'org.jetbrains.kotlin:kotlin-serialization:1.6.10'
-
     }
 }
 
 plugins {
-    // Adds the Kotlin Gradle plugin
-    id "org.jetbrains.kotlin.jvm" version "1.9.22"
-    // OPTIONAL Kotlin Serialization plugin
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.9.22'
-
+    id 'org.jetbrains.kotlin.jvm' version '1.9.22'
     id 'eclipse'
     id 'idea'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
 
-apply plugin: "org.jlleitschuh.gradle.ktlint"
+apply plugin: 'org.jlleitschuh.gradle.ktlint'
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
@@ -40,44 +31,15 @@ apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: "org.jetbrains.kotlin.jvm"
 
 
-String gitRevision = "git rev-parse HEAD".execute().text.trim()
+String gitRevision = 'git rev-parse HEAD'.execute().text.trim()
 if (gitRevision.length() >= 10) {
     version = mod_version + '+' + gitRevision.substring(0, 10)
 } else {
     version = mod_version + '+unknown'
 }
 
-
-publishing {
-    publications {
-        mavenCommon(MavenPublication) {
-            groupId = "net.illuc.vs_addon_template"
-            version = project.version
-            artifactId = project.archives_base_name.toLowerCase()
-            from components.java
-        }
-    }
-
-    repositories {
-        if (System.getenv("GITHUB_ACTOR") != null) {
-            println "Publishing to Github Packages ($version)"
-            maven {
-                name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/illucc/Kontraption")
-                credentials {
-                    username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-                    password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
-                }
-            }
-        }
-    }
-}
-
-
-//group = mod_version
-
 base {
-    archivesName = mod_id //+ version
+    archivesName = mod_id
 }
 
 java {
@@ -86,25 +48,15 @@ java {
 
 minecraft {
 
-    mappings channel: 'parchment', version: '2023.09.03-1.20.1'
+    mappings channel: mappings_channel, version: mappings_version
 
     copyIdeResources = true
     runs {
-        // applies to all the run configs below
         configureEach {
             workingDirectory project.file('run')
 
-            // Recommended logging data for a userdev environment
-            // The markers can be added/remove as needed separated by commas.
-            // "SCAN": For mods scan.
-            // "REGISTRIES": For firing of registry events.
-            // "REGISTRYDUMP": For getting the contents of all registries.
             property 'forge.logging.markers', 'REGISTRIES'
 
-
-            // Recommended logging level for the console
-            // You can set various levels here.
-            // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
             property 'forge.logging.console.level', 'info'
 
             mods {
@@ -115,7 +67,6 @@ minecraft {
         }
 
         client {
-            // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             property 'forge.enabledGameTestNamespaces', mod_id
             jvmArgs '-Dforge.logging.markers=REGISTRIES'
             property("mixin.env.refMapRemappingFile", "${projectDir}/build/createSrgToMcp/output.srg")
@@ -129,9 +80,6 @@ minecraft {
             property("mixin.env.refMapRemappingFile", "${projectDir}/build/createSrgToMcp/output.srg")
         }
 
-        // This run config launches GameTestServer and runs all registered gametests, then exits.
-        // By default, the server will crash when no gametests are provided.
-        // The gametest system is also enabled by default for other run configs under the /test command.
         gameTestServer {
             property 'forge.enabledGameTestNamespaces', mod_id
 
@@ -140,10 +88,8 @@ minecraft {
         }
 
         data {
-            // example of overriding the workingDirectory set in configureEach above
             workingDirectory project.file('run-data')
 
-            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
             args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
             property("mixin.env.refMapRemappingFile", "${projectDir}/build/createSrgToMcp/output.srg")
@@ -151,35 +97,10 @@ minecraft {
     }
 }
 
-mixin {
-    add sourceSets.main, "mixins.vstuff.refmap.json"
-
-    config "vstuff.mixins.json"
-}
-
-// Include resources generated by data generators.
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
     mavenCentral()
-
-    maven { url 'https://modmaven.dev/' }
-
-
-
-    maven {
-        url "https://cursemaven.com"
-        content {
-            includeGroup "curse.maven"
-        }
-    }
-
-
-
-    maven {
-        name = "ParchmentMC"
-        url = "https://maven.parchmentmc.org"
-    }
 
     maven {
         name = 'Kotlin for Forge'
@@ -190,28 +111,11 @@ repositories {
         name = "Valkyrien Skies Internal"
         url = 'https://maven.valkyrienskies.org'
     }
-    maven {
-        name = "Modrinth"
-        url = "https://api.modrinth.com/maven"
-    }
-
-
-    flatDir {
-        dir 'libs'
-    }
-
-    mavenLocal()
 
     maven { url = "https://maven.createmod.net" } // Create, Ponder, Flywheel
     maven { url = "https://maven.ithundxr.dev/mirror" } // Registrate
     maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // ForgeConfigAPIPort
     maven { url = "https://maven.blamejared.com" } // JEI
-
-    maven { url = "https://maven.bawnorton.com/releases" }
-    maven { url = "https://maven.enjarai.dev/mirrors" }
-
-    maven { url = "https://maven.bawnorton.com/releases" }
-
 }
 
 dependencies {
@@ -227,20 +131,12 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-annotations:2.13.3"
     implementation 'thedarkcolour:kotlinforforge:4.10.0'
 
-    implementation(fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false })
+    implementation(fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_major_version}-${create_minor_version}:slim") { transitive = false })
     implementation(fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}"))
     compileOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}"))
     runtimeOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}"))
     implementation(fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}"))
-
-    // just mods that are nice in the dev env
-    //implementation(fg.deobf("maven.modrinth:u6dRKJwZ:92XfryJj")) // jei
-    //implementation(fg.deobf("maven.modrinth:aC3cM3Vq:7JVXOe3K")) // mouse tweaks
 }
-
-
-
-
 
 configurations {
     shade
@@ -254,18 +150,13 @@ minecraft.runs.all {
     }
 }
 
-
-// This block of code expands all declared replace properties in the specified resource targets.
-// A missing property will result in an error. Properties are expanded using ${} Groovy notation.
-// When "copyIdeResources" is enabled, this will also run before the game launches in IDE environments.
-// See https://docs.gradle.org/current/dsl/org.gradle.language.jvm.tasks.ProcessResources.html
 tasks.named('processResources', ProcessResources).configure {
     var replaceProperties = [
-            minecraft_version: minecraft_version, forge_version: forge_version,
-            mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, version: mod_version,
-            mod_author: mod_author, mod_description: mod_description, issue_tracker: issue_tracker,
-            homepage: homepage, sources: sources, vs2_version: vs2_version,
-            vs2_min_version: vs2_min_version
+            minecraft_version: minecraft_version, forge_version: forge_version, forge_version_range: forge_version_range,
+            mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
+            mod_authors: mod_authors, mod_description: mod_description, issue_tracker: issue_tracker,
+            homepage: homepage, vs2_version: vs2_version, vs2_min_version: vs2_min_version,
+            create_major_version: create_major_version, create_minor_version: create_minor_version
     ]
 
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
@@ -275,24 +166,22 @@ tasks.named('processResources', ProcessResources).configure {
         expand replaceProperties + [project: project]
     }}
 
-// Example for how to get properties into the manifest for reading at runtime.
 tasks.named('jar', Jar).configure {
     manifest {
         attributes([
                 "Specification-Title": mod_id,
-                "Specification-Vendor": mod_author,
-                "Specification-Version": "1", // We are version 1 of ourselves
+                "Specification-Vendor": mod_authors,
+                "Specification-Version": "1",
                 "Implementation-Title": project.name,
                 "Implementation-Version": project.jar.archiveVersion,
-                "Implementation-Vendor": mod_author,
+                "Implementation-Vendor": mod_authors,
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
 
-    // This is the preferred method to reobfuscate your jar file
     //finalizedBy 'reobfJar'
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+    options.encoding = 'UTF-8'
 }
