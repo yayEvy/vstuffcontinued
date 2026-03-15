@@ -18,5 +18,10 @@
     "block": "vstuff:reaction_wheel",
     "mass": 4000.0,
     "friction": 0.6
+  },
+  {
+    "block": "vstuff:levituff",
+    "mass": 200.0,
+    "friction": 0.6
   }
 ]
