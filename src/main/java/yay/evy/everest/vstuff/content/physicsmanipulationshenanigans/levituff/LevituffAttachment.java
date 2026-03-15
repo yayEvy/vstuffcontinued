@@ -12,7 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 
-import yay.evy.everest.vstuff.content.thrust.AttachmentUtils;
+import yay.evy.everest.vstuff.content.ships.thrust.AttachmentUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

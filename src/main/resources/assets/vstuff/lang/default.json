@@ -7,6 +7,8 @@
   "vstuff.pulley_anchor.tooltip": "Use this as a second pos for pulley connections!",
   "vstuff.pulley_anchor.tooltip.summary": "Acts as an _anchor point_ for _pulley_ rope connections",
 
+  "vstuff.levituff.tooltip.summary": "Whimsical _levitating_ block that gets _weaker_ the higher the _Y_ level. Mostly the result of a running joke, will update this more _later_",
+
   "creativetabs.main": "VStuff",
 
   "create.gui.goggles.thruster.status": "Thruster Status",

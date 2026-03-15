@@ -86,6 +86,9 @@ public class TooltipHandler {
 
         tooltipModifications.put(VStuffBlocks.PULLEY_ANCHOR.asItem(),
                 (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
+
+        tooltipModifications.put(VStuffBlocks.LEVITUFF.asItem(),
+                (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
     }
 
     private static class SummaryPayload {
