@@ -24,7 +24,7 @@ public class RopeManager {
 
     public static final Map<Integer, ReworkedRope> activeRopes = new ConcurrentHashMap<>();
     private static long lastJoinTime = 0L;
-    private static int lastUsedId = 0;
+    private static int lastUsedId = 1;
 
 
     public static int getNextId() {
@@ -49,6 +49,10 @@ public class RopeManager {
 
     public static ReworkedRope getRope(Integer id) {
         return activeRopes.get(id);
+    }
+
+    public static boolean hasRope(Integer id) {
+        return activeRopes.containsKey(id);
     }
 
     public static void replaceRope(Integer id, ReworkedRope rope) {

@@ -21,7 +21,6 @@ import yay.evy.everest.vstuff.content.ropes.pulley.PulleyAnchorBlockEntity;
 import yay.evy.everest.vstuff.internal.RopeStyle;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
-import yay.evy.everest.vstuff.content.ropes.styler.handler.RopeStyleHandlerServer;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils.ConnectionType;
 import yay.evy.everest.vstuff.internal.utility.ShipUtils;
 
@@ -51,14 +50,13 @@ public class RopeItem extends Item {
             if (serverLevel.getBlockEntity(clickedPos) instanceof PhysPulleyBlockEntity pulleyBE) {
                 if (player.isShiftKeyDown()) { // nothing
                     return InteractionResult.FAIL;
-                } else if (!pulleyBE.canAttach()) {
-                    resetStateWithMessage(serverLevel, heldItem, false, player, "pulley_attach_fail");
-                    pulleyBE.resetSelf();
-                    NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.RED);
-                    return InteractionResult.SUCCESS;
+//                } else if (!pulleyBE.canAttach()) {
+//                    resetStateWithMessage(serverLevel, heldItem, false, player, "pulley_attach_fail");
+//                    pulleyBE.resetSelf();
+//                    NetworkHandler.sendOutline(clickedPos, ClientOutlineHandler.RED);
+//                    return InteractionResult.SUCCESS;
 
                 } else {
-                    pulleyBE.setWaiting();
                     connectionType = ConnectionType.PULLEY;
                 }
             }
@@ -149,7 +147,7 @@ public class RopeItem extends Item {
                     heldItem.shrink(1);
                 }
 
-                boolean isChain = RopeStyleManager.get(RopeStyleHandlerServer.getStyle(player.getUUID())).renderStyle() == RopeStyle.RenderStyle.CHAIN;
+                boolean isChain = RopeStyleManager.get(RopeStyleManager.getStyle(player)).renderStyle() == RopeStyle.RenderStyle.CHAIN;
 
                 if (VStuffConfig.ROPE_SOUNDS.get()) {
                     serverLevel.playSound(
@@ -184,7 +182,6 @@ public class RopeItem extends Item {
 
             if (ConnectionType.valueOf(tag.getString("type")) == ConnectionType.PULLEY && !didSucceed) {
                 PhysPulleyBlockEntity pulleyBE = (PhysPulleyBlockEntity) level.getBlockEntity(NbtUtils.readBlockPos(tag.getCompound("pos")));
-                if (pulleyBE != null) pulleyBE.open();
             }
 
             stack.setTag(null);

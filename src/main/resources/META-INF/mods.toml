@@ -1,44 +1,41 @@
 modLoader = "javafml"
-loaderVersion = "[47,)"
+loaderVersion = "${forge_version_range}"
 issueTrackerURL = "${issue_tracker}"
 license = "${mod_license}"
 
 [[mods]]
 modId = "${mod_id}"
-version = "${version}"
+version = "${mod_version}"
 displayName = "${mod_name}"
-isplayURL = "${homepage}"
-authors = ["${mod_author}"]
-description = '''
-${mod_description}
-'''
+displayURL = "${homepage}"
+authors = "${mod_authors}"
+description = '''${mod_description}'''
 logoFile = "icon.png"
 
 [[dependencies.${mod_id}]]
-modId = "forge"
-mandatory = true
-versionRange = "[47,)"
-ordering = "NONE"
-side = "BOTH"
+    modId = "forge"
+    mandatory = true
+    versionRange = "${forge_version_range}"
+    ordering = "NONE"
+    side = "BOTH"
 
 [[dependencies.${mod_id}]]
-modId = "minecraft"
-mandatory = true
-versionRange = "[${minecraft_version},)"
-ordering = "NONE"
-side = "BOTH"
+    modId="minecraft"
+    mandatory=true
+    versionRange="[${minecraft_version},)"
+    ordering="NONE"
+    side="BOTH"
 
 [[dependencies.${mod_id}]]
-modId = "valkyrienskies"
-mandatory = true
-versionRange = "[${vs2_min_version},)"
-ordering = "AFTER"
-side = "BOTH"
-
+    modId="valkyrienskies"
+    mandatory=true
+    versionRange="[${vs2_min_version},)"
+    ordering="AFTER"
+    side="BOTH"
 
 [[dependencies.${mod_id}]]
-modId="create_sa"
-mandatory=false
-versionRange="[2.0.8,)"
-ordering="AFTER"
-side="CLIENT"
+    modId="create"
+    mandatory=true
+    versionRange="[${create_major_version},)"
+    ordering="AFTER"
+    side="BOTH"

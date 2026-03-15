@@ -33,13 +33,14 @@ import yay.evy.everest.vstuff.index.VStuffShapes;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import static yay.evy.everest.vstuff.content.ropes.IRopeActor.CONNECTED;
+
 public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysPulleyBlockEntity>, IWrenchable {
 
     public PhysPulleyBlock(Properties properties) {
         super(properties.strength(3.0f).requiresCorrectToolForDrops());
     }
     public static final BooleanProperty POWERED = BooleanProperty.create("powered");
-
 
     @Override
     public boolean canHarvestBlock(BlockState state, BlockGetter world, BlockPos pos, Player player) {
@@ -55,7 +56,7 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(POWERED);
+        builder.add(POWERED, CONNECTED);
     }
 
     @Override
@@ -63,8 +64,8 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
         Direction facing = context.getHorizontalDirection();
         return this.defaultBlockState()
                 .setValue(HORIZONTAL_FACING, facing)
-                .setValue(POWERED, false);
-
+                .setValue(POWERED, false)
+                .setValue(CONNECTED, false);
     }
 
     @Override
@@ -144,7 +145,4 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
             }
         }
     }
-
-
-
 }

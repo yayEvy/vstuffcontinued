@@ -2,21 +2,19 @@ package yay.evy.everest.vstuff.index;
 
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
-import com.simibubi.create.content.kinetics.base.SingleAxisRotatingVisual;
-import com.simibubi.create.content.kinetics.base.ShaftRenderer;
 
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff.LevituffBlockEntity;
-import yay.evy.everest.vstuff.content.reaction_wheel.ReactionWheelBlockEntity;
-import yay.evy.everest.vstuff.content.reaction_wheel.ReactionWheelRenderer;
-import yay.evy.everest.vstuff.content.reaction_wheel.ReactionWheelVisual;
+import yay.evy.everest.vstuff.content.ships.reactionwheel.ReactionWheelBlockEntity;
+import yay.evy.everest.vstuff.content.ships.reactionwheel.ReactionWheelRenderer;
+import yay.evy.everest.vstuff.content.ships.reactionwheel.ReactionWheelVisual;
 import yay.evy.everest.vstuff.content.ropes.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.content.ropes.pulley.PhysPulleyRenderer;
 import yay.evy.everest.vstuff.content.ropes.pulley.PhysPulleyVisual;
 import yay.evy.everest.vstuff.content.ropes.pulley.PulleyAnchorBlockEntity;
-import yay.evy.everest.vstuff.content.thrust.MechanicalThrusterBlockEntity;
-import yay.evy.everest.vstuff.content.thrust.MechanicalThrusterRenderer;
-import yay.evy.everest.vstuff.content.thrust.MechanicalThrusterVisual;
+import yay.evy.everest.vstuff.content.ships.thrust.MechanicalThrusterBlockEntity;
+import yay.evy.everest.vstuff.content.ships.thrust.MechanicalThrusterRenderer;
+import yay.evy.everest.vstuff.content.ships.thrust.MechanicalThrusterVisual;
 
 public class VStuffBlockEntities {
 

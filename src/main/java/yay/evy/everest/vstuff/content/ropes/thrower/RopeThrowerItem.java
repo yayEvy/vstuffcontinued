@@ -52,12 +52,11 @@ public class RopeThrowerItem extends Item {
         RopeUtils.ConnectionType type = RopeUtils.ConnectionType.NORMAL;
 
         if (serverLevel.getBlockEntity(pos) instanceof PhysPulleyBlockEntity pulley) {
-            if (!pulley.canAttach()) {
-                sendRopeMessage(player, "pulley_attach_fail");
-                return InteractionResult.FAIL;
-            }
+//            if (!pulley.canAttach()) {
+//                sendRopeMessage(player, "pulley_attach_fail");
+//                return InteractionResult.FAIL;
+//            }
 
-            pulley.setWaiting();
             type = RopeUtils.ConnectionType.PULLEY;
             sendRopeMessage(player, "pulley_first");
         } else {
@@ -171,7 +170,6 @@ public class RopeThrowerItem extends Item {
 
             if (RopeUtils.ConnectionType.valueOf(tag.getString("type")) == RopeUtils.ConnectionType.PULLEY) {
                 PhysPulleyBlockEntity pulleyBE = (PhysPulleyBlockEntity) level.getBlockEntity(NbtUtils.readBlockPos(tag.getCompound("pos")));
-                if (pulleyBE != null) pulleyBE. open();
             }
 
             stack.setTag(null);

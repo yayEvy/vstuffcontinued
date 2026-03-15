@@ -2,12 +2,17 @@ package yay.evy.everest.vstuff.internal.utility;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
+import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.core.internal.world.VsiShipWorld;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 import yay.evy.everest.vstuff.content.ropes.RopeManager;
@@ -47,25 +52,32 @@ public class RopeUtils {
         return BlockPos.containing(pos.x, pos.y, pos.z);
     }
 
-    public static Vector3d convertLocalToWorld(ServerLevel level, Vector3d localPos, Long ship) {
+    public static Vector3d convertLocalToWorld(Level level, Vector3d localPos, Long ship) {
+        if (ship == null || level == null) return localPos;
+
         try {
-            Long groundBodyId = VSGameUtilsKt.getShipObjectWorld(level)
-                    .getDimensionToGroundBodyIdImmutable()
-                    .get(VSGameUtilsKt.getDimensionId(level));
-            if (ship.equals(groundBodyId)) {
-                return new Vector3d(localPos);
-            } else {
-                Ship shipObject = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(ship);
-                if (shipObject != null) {
-                    Vector3d worldPos = new Vector3d();
-                    shipObject.getTransform().getShipToWorld().transformPosition(localPos, worldPos);
-                    return worldPos;
-                }
+            Ship shipObject = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(ship);
+            if (shipObject != null) {
+                Vector3d worldPos = new Vector3d();
+                shipObject.getTransform().getShipToWorld().transformPosition(localPos, worldPos);
+                return worldPos;
             }
+
             return new Vector3d(localPos);
         } catch (Exception e) {
             return new Vector3d(localPos);
         }
+    }
+
+    public static Vector3d renderLocalToWorld(Level level, Vector3d localPos, Long ship) {
+        if (ship == null || level == null) return localPos;
+
+        var shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
+
+        ClientShip clientShip = (ClientShip) shipWorld.getAllShips().getById(ship);
+        if (clientShip == null) return localPos;
+        Vector3d transformedPos = clientShip.getRenderTransform().getShipToWorld().transformPosition(new Vector3d(localPos), new Vector3d());
+        return new Vector3d(transformedPos.x, transformedPos.y, transformedPos.z);
     }
 
     public static double getDistanceToRope(Vec3 eyePos, Vec3 lookVec, Vector3d ropeStart, Vector3d ropeEnd, double maxDistance) {
@@ -128,12 +140,6 @@ public class RopeUtils {
         SS
     }
 
-    public enum BlockType {
-        NORMAL,
-        PULLEY,
-        PULLEY_ANCHOR
-    }
-
     public enum PosType {
         SHIP,
         WORLD,
@@ -141,7 +147,7 @@ public class RopeUtils {
 
     public enum SelectType {
         NORMAL,
-        PULLEY
+        ACTOR
     }
 
     public static RopeType getRopeType(RopePosData posData0, RopePosData posData1) {

@@ -94,7 +94,7 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
                     && waitingPulley != null
                     && serverLevel.getBlockEntity(hitPos) instanceof PulleyAnchorBlockEntity) {
 
-                waitingPulley.attachRope(ropeResult.component1());
+                waitingPulley.connectRope(ropeResult.component1().ropeId, serverLevel.getBlockState(hitPos), serverLevel, hitPos);
             }
 
 

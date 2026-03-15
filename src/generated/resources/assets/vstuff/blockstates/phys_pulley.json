@@ -1,32 +1,62 @@
 {
   "variants": {
-    "facing=east,powered=false": {
+    "connected=false,facing=east,powered=false": {
       "model": "vstuff:block/phys_pulley/block",
       "y": 90
     },
-    "facing=east,powered=true": {
+    "connected=false,facing=east,powered=true": {
       "model": "vstuff:block/phys_pulley/block",
       "y": 90
     },
-    "facing=north,powered=false": {
+    "connected=false,facing=north,powered=false": {
       "model": "vstuff:block/phys_pulley/block"
     },
-    "facing=north,powered=true": {
+    "connected=false,facing=north,powered=true": {
       "model": "vstuff:block/phys_pulley/block"
     },
-    "facing=south,powered=false": {
+    "connected=false,facing=south,powered=false": {
       "model": "vstuff:block/phys_pulley/block",
       "y": 180
     },
-    "facing=south,powered=true": {
+    "connected=false,facing=south,powered=true": {
       "model": "vstuff:block/phys_pulley/block",
       "y": 180
     },
-    "facing=west,powered=false": {
+    "connected=false,facing=west,powered=false": {
       "model": "vstuff:block/phys_pulley/block",
       "y": 270
     },
-    "facing=west,powered=true": {
+    "connected=false,facing=west,powered=true": {
+      "model": "vstuff:block/phys_pulley/block",
+      "y": 270
+    },
+    "connected=true,facing=east,powered=false": {
+      "model": "vstuff:block/phys_pulley/block",
+      "y": 90
+    },
+    "connected=true,facing=east,powered=true": {
+      "model": "vstuff:block/phys_pulley/block",
+      "y": 90
+    },
+    "connected=true,facing=north,powered=false": {
+      "model": "vstuff:block/phys_pulley/block"
+    },
+    "connected=true,facing=north,powered=true": {
+      "model": "vstuff:block/phys_pulley/block"
+    },
+    "connected=true,facing=south,powered=false": {
+      "model": "vstuff:block/phys_pulley/block",
+      "y": 180
+    },
+    "connected=true,facing=south,powered=true": {
+      "model": "vstuff:block/phys_pulley/block",
+      "y": 180
+    },
+    "connected=true,facing=west,powered=false": {
+      "model": "vstuff:block/phys_pulley/block",
+      "y": 270
+    },
+    "connected=true,facing=west,powered=true": {
       "model": "vstuff:block/phys_pulley/block",
       "y": 270
     }

@@ -11,7 +11,6 @@ import org.valkyrienskies.core.internal.joints.*;
 import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.infrastructure.config.VStuffConfig;
-import yay.evy.everest.vstuff.content.ropes.styler.handler.RopeStyleHandlerServer;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.utility.*;
 
@@ -44,7 +43,7 @@ public class ReworkedRope {
         this.style = style;
         this.type = type;
 
-        if (this.type == RopeUtils.RopeType.SS) this.shouldRestore = false;
+        if (this.type == RopeUtils.RopeType.SS) this.shouldRestore = false; // used to make ship-to-ship ropes only restore on the second try
     }
 
     public static Pair<ReworkedRope, String> create(ServerLevel level, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1, Player player, boolean taut) {
@@ -77,7 +76,7 @@ public class ReworkedRope {
         double massRatio = Math.max(mass0, mass1) / Math.min(mass0, mass1);
         double maxForce = 5e13f * Math.min(massRatio, 20.0f) * (posData0.isWorld() || posData1.isWorld() ? 10f : 1f);
 
-        ResourceLocation style = player != null ? RopeStyleHandlerServer.getStyle(player.getUUID()) : RopeStyleManager.defaultId;
+        ResourceLocation style = RopeStyleManager.getStyle(player);
 
         ReworkedRope rope = new ReworkedRope(RopeManager.getNextId(), posData0, posData1, JointValues.withDefault(new VSJointMaxForceTorque((float) maxForce, (float) maxForce), (float) length, compliance), style, getRopeType(posData0, posData1));
 
