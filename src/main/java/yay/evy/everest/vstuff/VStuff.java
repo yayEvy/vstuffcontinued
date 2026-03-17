@@ -59,6 +59,7 @@ public class VStuff {
 
     private static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MOD_ID);
 
+    @SuppressWarnings("removal") // sybau
     public VStuff() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
@@ -79,7 +80,7 @@ public class VStuff {
         VStuffBlockEntities.register();
         VStuffPartials.register();
         //VStuffPackets.registerPackets();
-
+        // todo fix these / make sure they work
         //VStuffConfigs.register(ModLoadingContext.get());
 
         MinecraftForge.EVENT_BUS.register(this);
@@ -97,10 +98,7 @@ public class VStuff {
 
     @VsBeta
     private void commonSetup(final FMLCommonSetupEvent event) {
-        event.enqueueWork(() -> {
-            registerAttachments();
-            registerDispenserBehaviors();
-        });
+        event.enqueueWork(VStuff::registerAttachments);
     }
     public static void registerAttachments() {
         LOGGER.info("Registering {} attachments...", VStuff.MOD_ID);
@@ -129,6 +127,7 @@ public class VStuff {
                 }
         );
 
+        System.out.println("vstuff more like vs tuff");
         ValkyrienSkiesMod.getApi().registerAttachment(
                 LevituffAttachment.class, builder -> {
                     builder.build();
@@ -137,82 +136,21 @@ public class VStuff {
         );
     }
 
-
-    public static void registerDispenserBehaviors() {
-        DispenserBlock.registerBehavior(
-                VStuffItems.ROPE_THROWER.get(),
-                new AbstractProjectileDispenseBehavior() {
-
-                    @Override
-                    public ItemStack execute(BlockSource source, ItemStack stack) {
-                        Level level = source.getLevel();
-                        if (!(level instanceof ServerLevel serverLevel)) {
-                            return stack;
-                        }
-
-                        BlockPos dispenserPos = source.getPos();
-                        Direction direction = source.getBlockState().getValue(DispenserBlock.FACING);
-
-                        Long startShipId = getLoadedShipIdAtPos(serverLevel, dispenserPos);
-
-                        Position dispensePos = DispenserBlock.getDispensePosition(source);
-
-                        RopeThrowerEntity rope = new RopeThrowerEntity(VStuffEntities.ROPE_THROWER.get(), serverLevel);
-                        rope.setPos(dispensePos.x(), dispensePos.y(), dispensePos.z());
-
-                        rope.setStartData(
-                                dispenserPos,
-                                startShipId,
-                                serverLevel.dimension().location().toString(),
-                                RopeUtils.ConnectionType.NORMAL,
-                                null
-                        );
-
-                        rope.shoot(
-                                direction.getStepX(),
-                                direction.getStepY(),
-                                direction.getStepZ(),
-                                1.1F,
-                                6.0F
-                        );
-
-                        serverLevel.addFreshEntity(rope);
-                        stack.shrink(1);
-                        return stack;
-                    }
-
-                    @Override
-                    protected Projectile getProjectile(Level level, Position position, ItemStack stack) {
-                        return null;
-                    }
-                }
-        );
-    }
-
-
     public static CreateRegistrate registrate() {
         return REGISTRATE;
     }
 
     public static ResourceLocation asResource(String path) {
-        return new ResourceLocation(MOD_ID, path);
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 
     public static ResourceLocation asTextureResource(String path) {
-        return new ResourceLocation(MOD_ID, "textures/" + path);
-    }
-
-    public static ResourceLocation asModelResource(String path) {
-        return new ResourceLocation(MOD_ID, "models/" + path);
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/" + path);
     }
 
     public static MutableComponent translate(String key, Object... args) {
         Object[] args1 = LangBuilder.resolveBuilders(args);
         return Component.translatable(VStuff.MOD_ID + "." + key, args1);
-    }
-
-    public static <T extends Block> NonNullFunction<BlockBuilder<T, CreateRegistrate>, BlockBuilder<T, CreateRegistrate>> registerImpact(int speed) {
-        return builder -> builder.onRegister(block -> BlockStressValues.setGeneratorSpeed(speed).accept(block));
     }
 
     @SubscribeEvent

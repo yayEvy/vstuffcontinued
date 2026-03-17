@@ -14,6 +14,7 @@ import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.internal.world.VsiShipWorld;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import yay.evy.everest.vstuff.content.ropes.IRopeActor;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 import yay.evy.everest.vstuff.content.ropes.RopeManager;
 
@@ -128,11 +129,17 @@ public class RopeUtils {
         return closestConstraintId;
     }
 
+    public static SelectType getSelectType(Level level, BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof IRopeActor) {
+            return SelectType.ACTOR;
+        }
+        return SelectType.NORMAL;
+    }
+
     public enum ConnectionType {
         NORMAL,
         PULLEY
     }
-
 
     public enum RopeType {
         WW,

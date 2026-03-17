@@ -64,7 +64,7 @@ public class ReworkedRopeItem extends Item {
 
         boolean taut = Minecraft.getInstance().options.keySprint.isDown();
         CompoundTag tag = heldItem.getTag().getCompound("first");
-        BlockPos blockPos0 = NbtUtils.readBlockPos(tag.getCompound("pos"));
+        BlockPos blockPos0 = NbtUtils.readBlockPos(tag.getCompound("blockPos"));
 
         if (clickedPos.equals(blockPos0)) {
             player.displayClientMessage(VStuff.translate("rope.reset").withStyle(ChatFormatting.GREEN), true);
@@ -83,19 +83,19 @@ public class ReworkedRopeItem extends Item {
                 taut
         );
 
-        Pair<ReworkedRope, String> result = ReworkedRope.create(serverLevel,
-                tag.getLong("shipId"), ShipUtils.getLoadedShipIdAtPos(serverLevel, clickedPos),
-                blockPos0, clickedPos, player, taut);
+        if (info.valid) {
 
-        if (result.component1() == null) {
-            player.displayClientMessage(VStuff.translate(result.component2()).withStyle(ChatFormatting.RED), true);
-            heldItem.setTag(null);
-            return InteractionResult.SUCCESS;
+            Long ship0 = tag.getLong("shipId") == -1 ? null : tag.getLong("shipId");
 
-        }
+            ReworkedRope result = ReworkedRope.create(serverLevel,
+                    ship0, ShipUtils.getLoadedShipIdAtPos(serverLevel, clickedPos),
+                    blockPos0, clickedPos, player, taut);
 
-        if (result.component2() != null && !level.isClientSide) {
-            player.displayClientMessage(VStuff.translate(result.component2()).withStyle(ChatFormatting.GREEN), true);
+            player.displayClientMessage(VStuff.translate("rope.created").withStyle(ChatFormatting.GREEN), true);
+        } else {
+            player.displayClientMessage(VStuff.translate(info.message).withStyle(ChatFormatting.RED), true);
+
+            return InteractionResult.FAIL;
         }
 
         if (level.isClientSide) {

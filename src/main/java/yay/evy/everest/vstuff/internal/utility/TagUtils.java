@@ -55,6 +55,7 @@ public class TagUtils {
         tag.put("blockPos", NbtUtils.writeBlockPos(posData.blockPos()));
         tag.put("localPos", writeVector3d(posData.localPos()));
         tag.putString("posType", posData.posType().name());
+        tag.putString("selectType", posData.selectType().name());
 
         return tag;
     }
@@ -65,7 +66,8 @@ public class TagUtils {
         BlockPos blockPos = NbtUtils.readBlockPos(tag.getCompound("blockPos"));
         Vector3d localPos = readVector3d(tag.getCompound("localPos"));
         RopeUtils.PosType posType = RopeUtils.PosType.valueOf(tag.getString("posType"));
+        RopeUtils.SelectType selectType = RopeUtils.SelectType.valueOf(tag.getString("selectType"));
 
-        return new RopePosData(shipId, blockPos, localPos, posType);
+        return new RopePosData(shipId, blockPos, localPos, posType, selectType);
     }
 }

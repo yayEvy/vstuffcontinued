@@ -1,6 +1,12 @@
 package yay.evy.everest.vstuff.content.ropes.thrower;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.BlockSource;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Position;
+import net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior;
+import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
+import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
@@ -10,11 +16,13 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.DispenserBlock;
 import yay.evy.everest.vstuff.client.ClientOutlineHandler;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import yay.evy.everest.vstuff.content.ropes.pulley.PhysPulleyBlockEntity;
@@ -23,10 +31,57 @@ import yay.evy.everest.vstuff.index.VStuffSounds;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 import yay.evy.everest.vstuff.internal.utility.ShipUtils;
 
+import static yay.evy.everest.vstuff.internal.utility.ShipUtils.getLoadedShipIdAtPos;
+
 public class RopeThrowerItem extends Item {
 
     public RopeThrowerItem(Properties properties) {
         super(properties);
+        DispenserBlock.registerBehavior(this, DISPENSE_ITEM_BEHAVIOR);
+    }
+
+    public static final DispenseItemBehavior DISPENSE_ITEM_BEHAVIOR = new AbstractProjectileDispenseBehavior() {
+        public ItemStack execute(BlockSource source, ItemStack stack) {
+            return dispenseRope(source, stack);
+        }
+
+        @Override
+        protected Projectile getProjectile(Level pLevel, Position pPosition, ItemStack pStack) {
+            return null;
+        }
+    };
+
+    public static ItemStack dispenseRope(BlockSource source, ItemStack stack) {
+        ServerLevel level = source.getLevel();
+
+        BlockPos dispenserPos = source.getPos();
+        Direction direction = source.getBlockState().getValue(DispenserBlock.FACING);
+
+        Long startShipId = getLoadedShipIdAtPos(level, dispenserPos);
+
+        Position dispensePos = DispenserBlock.getDispensePosition(source);
+
+        RopeThrowerEntity rope = new RopeThrowerEntity(VStuffEntities.ROPE_THROWER.get(), level);
+        rope.setPos(dispensePos.x(), dispensePos.y(), dispensePos.z());
+
+        rope.setStartData(
+                dispenserPos,
+                startShipId,
+                level.dimension().location().toString(),
+                RopeUtils.ConnectionType.NORMAL,
+                null
+        );
+
+        rope.shoot(
+                direction.getStepX(),
+                direction.getStepY(),
+                direction.getStepZ(),
+                1.1F,
+                6.0F
+        );
+
+        level.addFreshEntity(rope);
+        return stack.split(1);
     }
 
     @Override

@@ -24,9 +24,11 @@ public class GTPAUtils {
         GameToPhysicsAdapter gtpa = getGTPA(level);
         gtpa.addJoint(distanceJoint, 0, (jointId) -> {
             rope.jointId = jointId;
-            rope.joint = distanceJoint;
 
             RopeManager.addRopeWithPersistence(level, rope);
+
+            rope.posData0.attach(level, rope.ropeId);
+            rope.posData1.attach(level, rope.ropeId);
 
             if (player instanceof ServerPlayer serverPlayer) {
                 RopeManager.syncAllRopesToPlayer(serverPlayer);
@@ -47,8 +49,10 @@ public class GTPAUtils {
             gtpa.addJoint(distanceJoint, 0, (jointId) -> {
                 if (jointId != -1) {
                     rope.jointId = jointId;
-                    rope.joint = distanceJoint;
                     rope.hasRestored = true;
+
+                    rope.posData0.attach(level, rope.ropeId);
+                    rope.posData1.attach(level, rope.ropeId);
 
                     MinecraftServer server = level.getServer();
                     for (ServerPlayer sp : server.getPlayerList().getPlayers()) {
@@ -57,6 +61,20 @@ public class GTPAUtils {
                 }
             });
         }
+    }
+
+    public static void removeJoint(ServerLevel level, ReworkedRope rope) {
+        GameToPhysicsAdapter gtpa = getGTPA(level);
+
+        gtpa.removeJoint(rope.jointId);
+
+        rope.jointId = null;
+        rope.hasRestored = false;
+
+        rope.posData0.remove(level, rope.ropeId);
+        rope.posData1.remove(level, rope.ropeId);
+
+        RopeManager.removeRopeWithPersistence(level, rope.ropeId);
     }
 
 }

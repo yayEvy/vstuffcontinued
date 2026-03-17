@@ -86,15 +86,15 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
             return;
         }
 
-        Pair<ReworkedRope, String> ropeResult = ReworkedRope.create(serverLevel, startShipId, secondShipId, startPos, hitPos, getOwner() instanceof Player p ? p : null, false);
+        ReworkedRope ropeResult = ReworkedRope.create(serverLevel, startShipId, secondShipId, startPos, hitPos, getOwner() instanceof Player p ? p : null, false);
 
-        if (ropeResult.component1() != null) {
+        if (ropeResult != null) {
 
             if (connectionType == RopeUtils.ConnectionType.PULLEY
                     && waitingPulley != null
                     && serverLevel.getBlockEntity(hitPos) instanceof PulleyAnchorBlockEntity) {
 
-                waitingPulley.connectRope(ropeResult.component1().ropeId, serverLevel.getBlockState(hitPos), serverLevel, hitPos);
+                waitingPulley.connectRope(ropeResult.ropeId, serverLevel.getBlockState(hitPos), serverLevel, hitPos);
             }
 
 

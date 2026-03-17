@@ -53,6 +53,10 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         setChanged();
     }
 
+    @Override
+    public BlockState getActorBlockState() {
+        return getBlockState();
+    }
 
     public static PhysPulleyBlockEntity create(BlockPos pos, BlockState state) {
         return new PhysPulleyBlockEntity(VStuffBlockEntities.PHYS_PULLEY_BE.get(), pos, state);

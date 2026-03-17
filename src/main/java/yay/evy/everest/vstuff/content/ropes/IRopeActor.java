@@ -13,6 +13,7 @@ public interface IRopeActor {
 
     void connectRope(Integer rope, BlockState state, Level level, BlockPos pos);
     void removeRope(Integer ropeId, BlockState state, Level level, BlockPos pos);
+    BlockState getActorBlockState();
 
     default void blockConnect(BlockState state, Level level, BlockPos pos) {
         level.sendBlockUpdated(pos, state, state.setValue(CONNECTED, true), 3);

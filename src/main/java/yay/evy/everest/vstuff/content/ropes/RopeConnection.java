@@ -89,7 +89,7 @@ public class RopeConnection {
             return info.withMessage("click_to_reset");
         if (length > VStuffConfig.MAX_ROPE_LENGTH.get())
             return info.withMessage("too_long");
-        if (!IRopeActor.canActorAttach(hitState))
+        if (!IRopeActor.canAttach(hitState))
             return info.withMessage("actor_connected");
 
         info.valid = true;

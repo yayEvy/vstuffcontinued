@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.valkyrienskies.core.internal.joints.*;
 import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
 import yay.evy.everest.vstuff.VStuff;
@@ -29,7 +30,6 @@ public class ReworkedRope {
     public RopeUtils.RopeType type;
     public boolean hasRestored = false;
     public boolean shouldRestore = true;
-    public VSDistanceJoint joint;
 
     /**
      * yes rope very cool wow
@@ -46,13 +46,16 @@ public class ReworkedRope {
         if (this.type == RopeUtils.RopeType.SS) this.shouldRestore = false; // used to make ship-to-ship ropes only restore on the second try
     }
 
-    public static Pair<ReworkedRope, String> create(ServerLevel level, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1, Player player, boolean taut) {
+    public static ReworkedRope create(ServerLevel level, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1, Player player, boolean taut) {
         ship0 = (ShipUtils.getGroundBodyId(level).equals(ship0)) ? null : ship0;
         ship1 = (ShipUtils.getGroundBodyId(level).equals(ship1)) ? null : ship1;
         RopePosData posData0tmp = RopePosData.create(level, ship0, blockPos0);
         RopePosData posData1tmp = RopePosData.create(level, ship1, blockPos1);
         RopePosData posData0;
         RopePosData posData1;
+
+        System.out.println(posData0tmp);
+        System.out.println(posData1tmp);
 
         if (posData1tmp.isWorld() && !posData0tmp.isWorld()) {
             posData0 = posData1tmp;
@@ -62,13 +65,8 @@ public class ReworkedRope {
             posData1 = posData1tmp;
         }
 
-        double length = posData0.getWorldPos(level).distance(posData1.getWorldPos(level));
-        double maxAllowedLength = VStuffConfig.MAX_ROPE_LENGTH.get();
-        if (length > maxAllowedLength) {
-            return new Pair<>(null, "rope.too_long");
-        }
+        double length = posData0.getWorldPos(level).distance(posData1.getWorldPos(level)) + (taut ? 0.0 : 0.5);
 
-        length = taut ? length : length + 0.5f;
         double mass0 = ShipUtils.getMassForShip(level, ship0);
         double mass1 = ShipUtils.getMassForShip(level, ship1);
         double effectiveMass = Math.max(Math.min(mass0, mass1), 100.0);
@@ -86,11 +84,11 @@ public class ReworkedRope {
             if (player instanceof ServerPlayer serverPlayer) {
                 RopeManager.syncAllRopesToPlayer(serverPlayer);
             }
-            return new Pair<>(rope, "rope.created");
+        } else {
+            GTPAUtils.addRopeJoint(level, player, rope);
         }
-        GTPAUtils.addRopeJoint(level, player, rope);
 
-        return new Pair<>(rope, "rope.created");
+        return rope;
     }
 
     public void restoreJoint(ServerLevel level) {
@@ -113,14 +111,7 @@ public class ReworkedRope {
                 return;
             }
 
-            GameToPhysicsAdapter gtpa = GTPAUtils.getGTPA(level);
-            gtpa.removeJoint(this.jointId);
-
-            this.jointId = null;
-            this.joint = null;
-            this.hasRestored = false;
-
-            RopeManager.removeRopeWithPersistence(level, this.ropeId);
+            GTPAUtils.removeJoint(level, this);
         } else {
             RopeManager.removeRopeWithPersistence(level, this.ropeId);
             this.hasRestored = false;
@@ -135,8 +126,8 @@ public class ReworkedRope {
     /**
      * sets a rope's joint values. any parameters that are given null will not be changed
      */
-    public void setJointValues(ServerLevel level, @Nullable VSJointMaxForceTorque maxForceTorque, @Nullable Float  minLength, @Nullable Float  maxLength,
-                               @Nullable Double compliance, @Nullable Float  tolerance, @Nullable Float  stiffness, @Nullable Float  damping) {
+    public void setJointValues(ServerLevel level, @Nullable VSJointMaxForceTorque maxForceTorque, @Nullable Float minLength, @Nullable Float maxLength,
+                               @Nullable Double compliance, @Nullable Float tolerance, @Nullable Float stiffness, @Nullable Float damping) {
         this.jointValues = this.jointValues.withChanged(maxForceTorque, minLength, maxLength, compliance, tolerance, stiffness, damping);
 
         GTPAUtils.editJoint(level, this);
@@ -144,13 +135,6 @@ public class ReworkedRope {
 
     public VSDistanceJoint makeJoint() {
         return this.jointValues.makeJoint(posData0.shipId(), posData0.localPos(), posData1.shipId(), posData1.localPos());
-    }
-
-    public boolean isRopeOnShip(ServerLevel level, Long shipId) {
-        if (shipId == null) {
-            return this.posData0.isWorld() || this.posData1.isWorld();
-        }
-        return this.posData0.getShipIdSafe(level).equals(shipId) || this.posData1.getShipIdSafe(level).equals(shipId);
     }
 
     public boolean hasRestored() {
@@ -177,7 +161,7 @@ public class ReworkedRope {
                 TagUtils.readPosData(ropeTag.getCompound("posData0")),
                 TagUtils.readPosData(ropeTag.getCompound("posData1")),
                 TagUtils.readJointValues(ropeTag.getCompound("jointValues")),
-                new ResourceLocation(ropeTag.getString("namespace"), ropeTag.getString("path")),
+                ResourceLocation.fromNamespaceAndPath(ropeTag.getString("namespace"), ropeTag.getString("path")),
                 RopeUtils.RopeType.valueOf(ropeTag.getString("type"))
         );
     }
