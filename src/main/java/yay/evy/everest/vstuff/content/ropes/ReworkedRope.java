@@ -1,17 +1,13 @@
 package yay.evy.everest.vstuff.content.ropes;
 
-import kotlin.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import org.valkyrienskies.core.internal.joints.*;
-import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.infrastructure.config.VStuffConfig;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.utility.*;
 
@@ -45,6 +41,8 @@ public class ReworkedRope {
 
         if (this.type == RopeUtils.RopeType.SS) this.shouldRestore = false; // used to make ship-to-ship ropes only restore on the second try
     }
+
+    // todo todo todo todo for later make the rope creation use a consumer of Integer, then RopeManager gives the consumer the id
 
     public static ReworkedRope create(ServerLevel level, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1, Player player, boolean taut) {
         ship0 = (ShipUtils.getGroundBodyId(level).equals(ship0)) ? null : ship0;
@@ -144,25 +142,23 @@ public class ReworkedRope {
     public CompoundTag toTag() {
         CompoundTag ropeTag = new CompoundTag();
 
-        ropeTag.putInt("ropeId", ropeId);
         ropeTag.put("posData0", TagUtils.writePosData(posData0));
         ropeTag.put("posData1", TagUtils.writePosData(posData1));
         ropeTag.put("jointValues", TagUtils.writeJointValues(jointValues));
-        ropeTag.putString("namespace", style.getNamespace());
-        ropeTag.putString("path", style.getPath());
+        ropeTag.put("style", TagUtils.writeResourceLocation(style));
         ropeTag.putString("type", type.name());
 
         return ropeTag;
     }
 
-    public static ReworkedRope fromTag(CompoundTag ropeTag) {
+    public static ReworkedRope fromTag(CompoundTag ropeTag, int id) {
         return new ReworkedRope(
-                ropeTag.getInt("ropeId"),
-                TagUtils.readPosData(ropeTag.getCompound("posData0")),
-                TagUtils.readPosData(ropeTag.getCompound("posData1")),
-                TagUtils.readJointValues(ropeTag.getCompound("jointValues")),
-                ResourceLocation.fromNamespaceAndPath(ropeTag.getString("namespace"), ropeTag.getString("path")),
-                RopeUtils.RopeType.valueOf(ropeTag.getString("type"))
+            id,
+            TagUtils.readPosData(ropeTag.getCompound("posData0")),
+            TagUtils.readPosData(ropeTag.getCompound("posData1")),
+            TagUtils.readJointValues(ropeTag.getCompound("jointValues")),
+            TagUtils.readResourceLocation(ropeTag.getCompound("style")),
+            RopeUtils.RopeType.valueOf(ropeTag.getString("type"))
         );
     }
 }

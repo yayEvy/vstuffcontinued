@@ -1,20 +1,14 @@
 package yay.evy.everest.vstuff.content.ropes;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.jetbrains.annotations.NotNull;
-import org.valkyrienskies.mod.api.ValkyrienSkies;
-import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
-import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -22,29 +16,25 @@ import java.util.concurrent.ConcurrentHashMap;
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class RopeManager {
 
-    public static final Map<Integer, ReworkedRope> activeRopes = new ConcurrentHashMap<>();
-    private static long lastJoinTime = 0L;
-    private static int lastUsedId = 1;
+    private static final Map<Integer, ReworkedRope> activeRopes = new ConcurrentHashMap<>();
+    private static int nextId = 1;
 
 
     public static int getNextId() {
-        return ++lastUsedId;
+        return ++nextId;
     }
 
-    public static void setLastUsedId(int id) {
-        if (id > lastUsedId) {
-            lastUsedId = id;
-            //VStuff.LOGGER.info("ConstraintTracker ID counter updated to {}", lastUsedId);
-        }
+    public static void resetId() {
+        nextId = 1;
     }
+
     public static void addRopeWithPersistence(ServerLevel level, ReworkedRope rope) {
         activeRopes.put(rope.ropeId, rope);
 
         RopePersistence persistence = RopePersistence.get(level);
 
-        persistence.addConstraint(rope);
+        persistence.addRope(rope);
         NetworkHandler.sendConstraintAdd(rope.ropeId, rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.style);
-        //VStuff.LOGGER.info("Adding constraint with id {} to persistence", rope.ropeId);
     }
 
     public static ReworkedRope getRope(Integer id) {
@@ -65,14 +55,10 @@ public class RopeManager {
         if (data != null) {
 
             RopePersistence persistence = RopePersistence.get(level);
-                persistence.markConstraintAsRemoved(constraintId);
-                persistence.setDirty();
+            persistence.removeRope(constraintId);
 
-            if (level.getServer() != null) {
-                for (ServerPlayer player : level.getServer().getPlayerList().getPlayers()) {
-                    NetworkHandler.sendConstraintRemoveToPlayer(player, constraintId);
-                }
-
+            for (ServerPlayer player : level.getServer().getPlayerList().getPlayers()) {
+                NetworkHandler.sendConstraintRemoveToPlayer(player, constraintId);
             }
 
             NetworkHandler.sendConstraintRemove(constraintId);
@@ -80,11 +66,9 @@ public class RopeManager {
         }
     }
 
-
-
     public static void syncAllRopesToPlayer(ServerPlayer player) {
         NetworkHandler.sendClearAllConstraintsToPlayer(player);
-        //VStuff.LOGGER.info("Attempting to sync all constraints to player {}", player.getName());
+        VStuff.LOGGER.info("Syncing all ropes to player {}", player.getName().getString());
 
         for (Map.Entry<Integer, ReworkedRope> entry : activeRopes.entrySet()) {
             ReworkedRope data = entry.getValue();
@@ -101,20 +85,16 @@ public class RopeManager {
         }
     }
 
-
     public static Map<Integer, ReworkedRope> getActiveRopes() {
         return new HashMap<>(activeRopes);
     }
 
-
     public static void addRopeToManager(ReworkedRope rope) {
         if (rope == null || rope.ropeId == null) return;
 
-
         activeRopes.put(rope.ropeId, rope);
-
-        setLastUsedId(rope.ropeId);
     }
+
 
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
@@ -124,6 +104,4 @@ public class RopeManager {
 
         syncAllRopesToPlayer(player);
     }
-
-
 }

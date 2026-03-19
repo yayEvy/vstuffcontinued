@@ -18,50 +18,41 @@ import yay.evy.everest.vstuff.internal.utility.ShipUtils;
 import java.util.*;
 
 public class RopePersistence extends SavedData {
-    private static final String DATA_NAME = "vstuff_constraints";
+    private static final String DATA_NAME = "vstuff_ropes";
 
-    private final Map<Integer, ReworkedRope> persistedConstraints = new HashMap<>();
+    private final Map<Integer, ReworkedRope> ropes = new HashMap<>();
 
     public static RopePersistence get(ServerLevel level) {
         DimensionDataStorage storage = level.getDataStorage();
         return storage.computeIfAbsent(RopePersistence::load, RopePersistence::new, DATA_NAME);
     }
 
-    public void markConstraintAsRemoved(Integer id) {
-        persistedConstraints.remove(id);
-        setDirty();
-    }
-
-
     public static RopePersistence load(CompoundTag tag) {
         RopePersistence data = new RopePersistence();
 
-        if (tag.contains("lastUsedId")) {
-            RopeManager.setLastUsedId(tag.getInt("lastUsedId"));
-        }
+        RopeManager.resetId();
 
-        ListTag constraintsList = tag.getList("constraints", Tag.TAG_COMPOUND);
-        for (int i = 0; i < constraintsList.size(); i++) {
-            CompoundTag constraintTag = constraintsList.getCompound(i);
-            ReworkedRope rope = ReworkedRope.fromTag(constraintTag);
+        ListTag ropeList = tag.getList("ropes", Tag.TAG_COMPOUND);
+        for (Tag ropeTag : ropeList) {
+            int nextId = RopeManager.getNextId();
+            ReworkedRope rope = ReworkedRope.fromTag((CompoundTag) ropeTag, nextId);
 
-            data.persistedConstraints.put(rope.ropeId, rope);
+            data.ropes.put(nextId, rope);
 
             RopeManager.addRopeToManager(rope);
         }
-        VStuff.LOGGER.info("RopePersistence loaded {} ropes from saved data", data.persistedConstraints.size());
+
+        VStuff.LOGGER.info("RopePersistence loaded {} ropes from saved data", data.ropes.size());
         return data;
     }
+
     @Override
     public @NotNull CompoundTag save(@NotNull CompoundTag tag) {
-
-        tag.putInt("lastUsedId", RopeManager.getNextId() - 1);
-
-        ListTag constraintsList = new ListTag();
-        for (Map.Entry<Integer, ReworkedRope> entry : persistedConstraints.entrySet()) {
-            constraintsList.add(entry.getValue().toTag());
+        ListTag ropeList = new ListTag();
+        for (Map.Entry<Integer, ReworkedRope> entry : ropes.entrySet()) {
+            ropeList.add(entry.getValue().toTag());
         }
-        tag.put("constraints", constraintsList);
+        tag.put("ropes", ropeList);
         return tag;
     }
 
@@ -70,19 +61,14 @@ public class RopePersistence extends SavedData {
         level.getDataStorage().save();
     }
 
-    public void addConstraint(ReworkedRope rope) {
-        persistedConstraints.put(rope.ropeId, rope);
+    public void addRope(ReworkedRope rope) {
+        ropes.put(rope.ropeId, rope);
         setDirty();
     }
 
-    public void removeConstraint(Integer id) {
-        ReworkedRope data = persistedConstraints.get(id);
-        if (data == null) return;
-
-        persistedConstraints.remove(id);
+    public void removeRope(Integer id) {
+        ropes.remove(id);
         setDirty();
-
-        //VStuff.LOGGER.info("Removed constraint {} from persistence", id);
     }
 
 
@@ -97,7 +83,7 @@ public class RopePersistence extends SavedData {
 
         RopePersistence ropePersistence = RopePersistence.get(level);
 
-        ropePersistence.persistedConstraints.values().stream()
+        ropePersistence.ropes.values().stream()
                 .filter(rope -> (Objects.equals(rope.posData0.shipId(), loadedId) || Objects.equals(rope.posData1.shipId(), loadedId))
                         && !rope.hasRestored) // shallow check just for the boolean, not ids
                 .forEach(rope -> {

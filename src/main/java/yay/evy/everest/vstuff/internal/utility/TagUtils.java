@@ -3,6 +3,7 @@ package yay.evy.everest.vstuff.internal.utility;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
 
@@ -69,5 +70,18 @@ public class TagUtils {
         RopeUtils.SelectType selectType = RopeUtils.SelectType.valueOf(tag.getString("selectType"));
 
         return new RopePosData(shipId, blockPos, localPos, posType, selectType);
+    }
+
+    public static CompoundTag writeResourceLocation(ResourceLocation resourceLocation) {
+        CompoundTag tag = new CompoundTag();
+
+        tag.putString("namespace", resourceLocation.getNamespace());
+        tag.putString("path", resourceLocation.getPath());
+
+        return tag;
+    }
+
+    public static ResourceLocation readResourceLocation(CompoundTag tag) {
+        return ResourceLocation.fromNamespaceAndPath(tag.getString("namespace"), tag.getString("path"));
     }
 }
