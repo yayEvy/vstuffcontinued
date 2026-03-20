@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class LevituffForceApplier {
 
-    public double baseStrength = 100000.0;
+    public double baseStrength = 500;
 
     public LevituffForceApplier() {}
 
@@ -35,7 +35,7 @@ public class LevituffForceApplier {
             return lerp(0.9, 0.5, t);
         }
 
-        return 0.3;
+        return 0.1;
     }
 
     private double lerp(double a, double b, double t) {
