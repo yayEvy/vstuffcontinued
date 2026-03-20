@@ -72,7 +72,6 @@ public class VStuff {
         REGISTRATE.setCreativeTab(VStuffCreativeModeTabs.VSTUFF_MAIN);
 
         VStuffSounds.register(modEventBus);
-        VStuffRenderTypes.register();
 
         VStuffBlocks.register();
         VStuffItems.register();

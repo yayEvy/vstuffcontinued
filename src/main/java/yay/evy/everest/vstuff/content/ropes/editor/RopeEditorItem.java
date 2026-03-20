@@ -30,7 +30,7 @@ public class RopeEditorItem extends Item {
             return InteractionResultHolder.success(stack);
         }
 
-        ScreenOpener.open(new RopeEditorScreen(RopeManager.getRope(ropeId)));
+        ///ScreenOpener.open(new RopeEditorScreen(RopeManager.getRope(ropeId)));
 
         return InteractionResultHolder.success(stack);
     }

@@ -6,6 +6,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import yay.evy.everest.vstuff.index.VStuffEntities;
+import yay.evy.everest.vstuff.index.VStuffRenderTypes;
 import yay.evy.everest.vstuff.infrastructure.ponder.VStuffPonders;
 
 public class VStuffClient {
@@ -22,5 +23,7 @@ public class VStuffClient {
         ));
 
         PonderIndex.addPlugin(new VStuffPonders());
+        VStuffRenderTypes.register();
+
     }
 }
