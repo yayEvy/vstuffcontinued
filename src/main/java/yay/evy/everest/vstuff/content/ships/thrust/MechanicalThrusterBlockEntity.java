@@ -81,6 +81,8 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
 
         currentTick++;
 
+        int tick_rate = VStuffConfig.THRUSTER_TICKS_PER_UPDATE.get();
+
         int previousEmptyBlocks = emptyBlocks;
         calculateObstruction(level, worldPosition, currentBlockState.getValue(MechanicalThrusterBlock.FACING));
         if (previousEmptyBlocks != emptyBlocks) {
@@ -90,7 +92,7 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
         }
 
 
-        if (isThrustDirty) {
+        if (isThrustDirty || currentTick % tick_rate == 0) {
             updateThrust(currentBlockState);
         }
     }
