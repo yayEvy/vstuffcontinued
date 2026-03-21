@@ -62,7 +62,7 @@ public class ReworkedRopeItem extends Item {
             return InteractionResult.SUCCESS;
         }
 
-        boolean taut = Minecraft.getInstance().options.keySprint.isDown();
+        boolean taut = player.isSprinting();
         CompoundTag tag = heldItem.getTag().getCompound("first");
         BlockPos blockPos0 = NbtUtils.readBlockPos(tag.getCompound("blockPos"));
 
