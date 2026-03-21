@@ -42,7 +42,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
             .map(RopeStyleCategory::getName)
             .toList();
     // The category that is currently selected
-    private RopeStyleCategory selectedCategory = RopeStyleCategoryManager.getSortedList().get(0);
+    private RopeStyleCategory selectedCategory;
     private int categoryIndex = 0; // for the scroll input on window resize
     // The list of bogies being displayed
     RopeStyle[] displayedStyles = new RopeStyle[6];
@@ -66,14 +66,28 @@ public class RopeStylerScreen extends AbstractSimiScreen {
         int x = guiLeft;
         int y = guiTop;
 
-        // Need buttons first, otherwise setupList will crash
         for (int i = 0; i < 6; i++) {
             addRenderableWidget(styleButtons[i] = new RopeStyleButton(x + 19, y + 41 + (i * 18), 145, 17, bogeySelection(i)));
         }
 
+        List<RopeStyleCategory> categories = RopeStyleCategoryManager.getSortedList();
+
         // Initial setup
+        if (categories.isEmpty()) {
+            selectedCategory = null;
+            selectedStyle = null;
+            return;
+        }
+
+        selectedCategory = categories.get(0);
+
         setupList(selectedCategory);
-        selectedStyle = selectedCategory.styles.get(0);
+
+        if (!selectedCategory.styles.isEmpty()) {
+            selectedStyle = selectedCategory.styles.get(0);
+        } else {
+            selectedStyle = null;
+        }
 
         // Scrolling Initial setup
         scrollOffs = 0;
@@ -89,7 +103,16 @@ public class RopeStylerScreen extends AbstractSimiScreen {
                     scrollOffs = 0.0F;
                     scrollTo(0.0F);
                     this.categoryIndex = categoryIndex;
-                    setupList(selectedCategory = RopeStyleCategoryManager.getSortedList().get(categoryIndex));
+
+                    List<RopeStyleCategory> updatedCategories = RopeStyleCategoryManager.getSortedList();
+                    if (updatedCategories.isEmpty()) {
+                        selectedCategory = null;
+                        selectedStyle = null;
+                        return;
+                    }
+
+                    selectedCategory = updatedCategories.get(categoryIndex);
+                    setupList(selectedCategory);
 
                     if (!selectedCategory.styles.isEmpty()) {
                         selectedStyle = selectedCategory.styles.get(0);
