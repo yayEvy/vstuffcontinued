@@ -70,11 +70,14 @@ public class VStuffItems {
             .defaultModel()
             .register();
 
+    /*
     public static final ItemEntry<Item> REFINED_LEVITUFF =
             REGISTRATE.item("refined_levituff", Item::new)
                     .properties(p -> p.rarity(Rarity.UNCOMMON))
                     .defaultModel()
                     .register();
+
+     */
 
     public static void register() {}
 }
