@@ -9,6 +9,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -19,6 +21,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.ClientOutlineHandler;
 import yay.evy.everest.vstuff.content.ropes.pulley.PhysPulleyBlockEntity;
+import yay.evy.everest.vstuff.infrastructure.config.VStuffConfig;
+import yay.evy.everest.vstuff.internal.RopeStyle;
+import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 import yay.evy.everest.vstuff.internal.utility.ShipUtils;
@@ -92,6 +97,24 @@ public class ReworkedRopeItem extends Item {
                     blockPos0, clickedPos, player, taut);
 
             player.displayClientMessage(VStuff.translate("rope.created").withStyle(ChatFormatting.GREEN), true);
+
+
+            boolean isChain =
+                    RopeStyleManager.get(
+                            RopeStyleManager.getStyle(player)
+                    ).renderStyle() == RopeStyle.RenderStyle.CHAIN;
+
+            serverLevel.playSound(
+                    null,
+                    clickedPos,
+                    isChain
+                            ? net.minecraft.sounds.SoundEvents.CHAIN_PLACE
+                            : net.minecraft.sounds.SoundEvents.LEASH_KNOT_PLACE,
+                    net.minecraft.sounds.SoundSource.PLAYERS,
+                    1.0F,
+                    1.0F
+            );
+
         } else {
             player.displayClientMessage(VStuff.translate(info.message).withStyle(ChatFormatting.RED), true);
 
