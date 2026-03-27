@@ -7,7 +7,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import org.valkyrienskies.core.internal.joints.*;
-import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.utility.*;
 
@@ -24,8 +23,6 @@ public class ReworkedRope {
     public JointValues jointValues;
     public ResourceLocation style;
     public RopeUtils.RopeType type;
-    public boolean hasRestored = false;
-    public boolean shouldRestore = true;
 
     /**
      * yes rope very cool wow
@@ -38,8 +35,6 @@ public class ReworkedRope {
         this.jointValues = values;
         this.style = style;
         this.type = type;
-
-        if (this.type == RopeUtils.RopeType.SS) this.shouldRestore = false; // used to make ship-to-ship ropes only restore on the second try
     }
 
     // todo todo todo todo for later make the rope creation use a consumer of Integer, then RopeManager gives the consumer the id
@@ -89,26 +84,13 @@ public class ReworkedRope {
         return rope;
     }
 
-    public void restoreJoint(ServerLevel level) {
-        if (this.hasRestored()) {
-            VStuff.LOGGER.info("Not creating joint for rope that has already restored joint!");
-            return;
-        }
-
-        if (!this.shouldRestore) {
-            this.shouldRestore = true;
-        } else {
-            GTPAUtils.restoreJoint(level, this);
-        }
-    }
-
     public void removeJoint(ServerLevel level) {
         if (this.type != RopeUtils.RopeType.WW) {
 
             GTPAUtils.removeJoint(level, this);
         } else {
             RopeManager.removeRopeWithPersistence(level, this.ropeId);
-            this.hasRestored = false;
+            this.jointId = null;
         }
     }
 
@@ -131,13 +113,24 @@ public class ReworkedRope {
         return this.jointValues.makeJoint(posData0.shipId(), posData0.localPos(), posData1.shipId(), posData1.localPos());
     }
 
-    public boolean hasRestored() {
-        return this.hasRestored || (this.jointId != null && this.jointId != -1);
+    public boolean hasTrackedJoint() {
+        return this.jointId != null && this.jointId != -1;
+    }
+
+    public void attachActors(ServerLevel level) {
+        posData0.attach(level, ropeId);
+        posData1.attach(level, ropeId);
+    }
+
+    public void detachActors(ServerLevel level) {
+        posData0.remove(level, ropeId);
+        posData1.remove(level, ropeId);
     }
 
     public CompoundTag toTag() {
         CompoundTag ropeTag = new CompoundTag();
 
+        ropeTag.putInt("jointId", jointId == null ? -1 : jointId);
         ropeTag.put("posData0", TagUtils.writePosData(posData0));
         ropeTag.put("posData1", TagUtils.writePosData(posData1));
         ropeTag.put("jointValues", TagUtils.writeJointValues(jointValues));
@@ -148,7 +141,7 @@ public class ReworkedRope {
     }
 
     public static ReworkedRope fromTag(CompoundTag ropeTag, int id) {
-        return new ReworkedRope(
+        ReworkedRope rope = new ReworkedRope(
             id,
             TagUtils.readPosData(ropeTag.getCompound("posData0")),
             TagUtils.readPosData(ropeTag.getCompound("posData1")),
@@ -156,5 +149,10 @@ public class ReworkedRope {
             TagUtils.readResourceLocation(ropeTag.getCompound("style")),
             RopeUtils.RopeType.valueOf(ropeTag.getString("type"))
         );
+        if (ropeTag.contains("jointId")) {
+            int savedJointId = ropeTag.getInt("jointId");
+            rope.jointId = savedJointId == -1 ? null : savedJointId;
+        }
+        return rope;
     }
 }

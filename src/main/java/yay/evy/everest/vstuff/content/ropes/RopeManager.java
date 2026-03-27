@@ -45,6 +45,10 @@ public class RopeManager {
         return activeRopes.containsKey(id);
     }
 
+    public static void ensureLoaded(ServerLevel level) {
+        RopePersistence.get(level);
+    }
+
     public static void replaceRope(Integer id, ReworkedRope rope) {
         activeRopes.put(id, rope);
     }
@@ -67,6 +71,7 @@ public class RopeManager {
     }
 
     public static void syncAllRopesToPlayer(ServerPlayer player) {
+        ensureLoaded(player.serverLevel());
         NetworkHandler.sendClearAllConstraintsToPlayer(player);
         VStuff.LOGGER.info("Syncing all ropes to player {}", player.getName().getString());
 

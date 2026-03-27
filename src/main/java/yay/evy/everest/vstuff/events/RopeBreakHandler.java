@@ -26,6 +26,7 @@ public class RopeBreakHandler {
     @SubscribeEvent
     public static void onBlockBreak(BlockEvent.BreakEvent event) {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
+        RopeManager.ensureLoaded(level);
 
         BlockPos brokenPos = event.getPos();
         List<Integer> constraintsToRemove = new ArrayList<>();

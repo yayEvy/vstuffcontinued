@@ -33,6 +33,9 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
     @Override
     public void connectRope(Integer ropeId, BlockState state, Level level, BlockPos pos) {
+        if (level instanceof ServerLevel serverLevel) {
+            RopeManager.ensureLoaded(serverLevel);
+        }
         if (ropeId == null || RopeManager.getRope(ropeId) == null) return;
 
         this.ropeId = ropeId;
