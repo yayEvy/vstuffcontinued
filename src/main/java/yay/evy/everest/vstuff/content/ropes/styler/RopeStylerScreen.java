@@ -136,6 +136,11 @@ public class RopeStylerScreen extends AbstractSimiScreen {
         int x = guiLeft;
         int y = guiTop;
 
+        if (selectedCategory == null) {
+            background.render(guiGraphics, guiLeft, guiTop);
+            return;
+        }
+
         // bg
         background.render(guiGraphics, x, y);
 
@@ -193,8 +198,8 @@ public class RopeStylerScreen extends AbstractSimiScreen {
         List<RopeStyle> styles = categoryEntry.styles;
 
         for (int i = 0; i < 6; i++) {
-            if (i < styles.size()) {
-                displayedStyles[i] = styles.get(i+offset);
+            if (i + offset < styles.size()) {
+                displayedStyles[i] = styles.get(i + offset);
                 styleButtons[i].active = true;
             } else {
                 displayedStyles[i] = null;
@@ -264,7 +269,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
         super.mouseScrolled(mouseX, mouseY, delta);
         if (!canScroll()) return false;
         if (insideCategorySelector(mouseX, mouseY)) return false;
-        if (selectedCategory.styles.size() < 6) return false;
+        if (selectedCategory == null || selectedCategory.styles.size() < 6) return false;
 
         double listSize = selectedCategory.styles.size() - 6;
         float scrollFactor = (float) (delta / listSize);
@@ -285,6 +290,8 @@ public class RopeStylerScreen extends AbstractSimiScreen {
     }
 
     private void scrollTo(float pos) {
+        if (selectedCategory == null) return;
+
         List<RopeStyle> styles = selectedCategory.styles;
         float listSize = styles.size() - 6;
         int index = (int) ((double) (pos * listSize) + 0.5);
@@ -293,7 +300,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
     }
 
     private boolean canScroll() {
-        return selectedCategory.styles.size() > 6;
+        return selectedCategory != null && selectedCategory.styles.size() > 6;
     }
 
     private boolean insideCategorySelector(double mouseX, double mouseY) {
