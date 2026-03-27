@@ -90,7 +90,8 @@ public class VStuff {
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> VStuffClient.initVStuffClient(modEventBus));
 
-        ValkyrienSkiesMod.getApi().getShipLoadEvent().on(RopePersistence::onShipLoad);
+        // todo get rid of this init and also rope persistence in general, since thank fucking god vs has joint persistence, thank you so much giga
+       // ValkyrienSkiesMod.getApi().getShipLoadEvent().on(RopePersistence::onShipLoad);
 
         LOGGER.info("{} ({}) initialized", VStuff.NAME, VStuff.MOD_ID);
     }

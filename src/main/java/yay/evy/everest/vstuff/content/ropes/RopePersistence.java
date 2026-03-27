@@ -17,6 +17,9 @@ import yay.evy.everest.vstuff.internal.utility.ShipUtils;
 
 import java.util.*;
 
+
+// todo get rid of this class lmao, see mod init
+
 public class RopePersistence extends SavedData {
     private static final String DATA_NAME = "vstuff_ropes";
 
@@ -71,6 +74,7 @@ public class RopePersistence extends SavedData {
         setDirty();
     }
 
+    /*
 
     public static void onShipLoad(ShipLoadEvent shipLoadEvent, RegisteredListener registeredListener) {
         Long loadedId = shipLoadEvent.getShip().getId();
@@ -93,4 +97,6 @@ public class RopePersistence extends SavedData {
 
     }
 
+
+     */
 }
