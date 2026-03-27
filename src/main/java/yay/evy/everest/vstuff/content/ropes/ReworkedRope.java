@@ -104,10 +104,6 @@ public class ReworkedRope {
 
     public void removeJoint(ServerLevel level) {
         if (this.type != RopeUtils.RopeType.WW) {
-            if (!this.hasRestored()) {
-                VStuff.LOGGER.warn("Cannot remove joint for rope id {} because it has not restored its joint.", this.ropeId);
-                return;
-            }
 
             GTPAUtils.removeJoint(level, this);
         } else {
