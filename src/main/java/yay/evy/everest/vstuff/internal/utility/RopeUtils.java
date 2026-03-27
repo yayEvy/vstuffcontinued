@@ -105,6 +105,7 @@ public class RopeUtils {
     }
 
     public static @Nullable Integer findTargetedLead(ServerLevel level, Player player) {
+        RopeManager.ensureLoaded(level);
         Vec3 eyePos = player.getEyePosition();
         Vec3 lookVec = player.getViewVector(1.0f);
         double maxDistance = player.getBlockReach();

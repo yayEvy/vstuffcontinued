@@ -36,7 +36,6 @@ import org.slf4j.Logger;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff.LevituffAttachment;
 import yay.evy.everest.vstuff.content.ships.reactionwheel.ReactionWheelAttachment;
-import yay.evy.everest.vstuff.content.ropes.RopePersistence;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.PhysGrabberServerAttachment;
 import yay.evy.everest.vstuff.content.ropes.thrower.RopeThrowerEntity;
 import yay.evy.everest.vstuff.content.ships.thrust.ThrusterForceAttachment;
@@ -89,9 +88,6 @@ public class VStuff {
         modEventBus.addListener(this::commonSetup);
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> VStuffClient.initVStuffClient(modEventBus));
-
-        // todo get rid of this init and also rope persistence in general, since thank fucking god vs has joint persistence, thank you so much giga
-       // ValkyrienSkiesMod.getApi().getShipLoadEvent().on(RopePersistence::onShipLoad);
 
         LOGGER.info("{} ({}) initialized", VStuff.NAME, VStuff.MOD_ID);
     }
