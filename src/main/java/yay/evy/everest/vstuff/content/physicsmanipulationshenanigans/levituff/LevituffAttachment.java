@@ -25,34 +25,30 @@ public final class LevituffAttachment implements ShipPhysicsListener {
 
     @Override
     public void physTick(@NotNull PhysShip physShip, @NotNull PhysLevel physLevel) {
-
-        if (appliersMapping.isEmpty())
-            return;
+        if (appliersMapping.isEmpty()) return;
 
         PhysShipImpl ship = (PhysShipImpl) physShip;
 
-        double shipY = ship.getTransform().getPositionInWorld().y();
-        double mass = ship.getMass();
+        double shipY   = ship.getTransform().getPositionInWorld().y();
+        double mass    = ship.getMass();
+        double gravity = 9.81;
 
-        double gravityForce = mass * 9.81;
-
-        double liftFactor = 0.0;
-
+        double rawLift = 0.0;
         for (LevituffForceApplier applier : appliersMapping.values()) {
-            liftFactor += applier.baseStrength * applier.getLiftMultiplier(shipY);
+            rawLift += applier.baseStrength * applier.getLiftMultiplier(shipY);
         }
 
-        liftFactor = liftFactor / (1.0 + liftFactor);
-
-        liftFactor *= 1.5;
-
-        double liftForce = gravityForce * liftFactor;
+        double liftFraction = Math.min(rawLift, 1.0);
 
         double verticalVelocity = ship.getVelocity().y();
+        double targetRiseSpeed  = 1.0;
 
-        double damping = -verticalVelocity * mass * 1.2;
-        double buoyancy = liftForce - gravityForce;
-        double totalForce = buoyancy + damping;
+        double speedError = targetRiseSpeed - verticalVelocity;
+        double pd = speedError * mass * 2.0;
+
+        double antigravity = mass * gravity * liftFraction;
+
+        double totalForce = antigravity + pd;
 
         ship.applyInvariantForce(new Vector3d(0, totalForce, 0));
     }

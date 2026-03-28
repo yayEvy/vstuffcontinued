@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class LevituffForceApplier {
 
-    public double baseStrength = 500;
+    public double baseStrength = 0.5;
 
     public LevituffForceApplier() {}
 
