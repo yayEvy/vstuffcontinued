@@ -193,6 +193,8 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
         calculateObstruction(getLevel(), worldPosition, getBlockState().getValue(MechanicalThrusterBlock.FACING));
         isThrustDirty = wasThrustDirty;
 
+        tooltip.add(Component.literal(" "));
+
         tooltip.add(Component.translatable("create.gui.goggles.thruster.status")
                 .append(Component.literal(": "))
                 .append(Component.literal(getGoggleStatus())
