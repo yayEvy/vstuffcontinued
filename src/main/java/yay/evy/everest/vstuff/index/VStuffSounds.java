@@ -16,6 +16,14 @@ public class VStuffSounds {
     public static final RegistryObject<SoundEvent> GRABBER_HUM = evilSoundRegister("grabber_hum");
     public static final RegistryObject<SoundEvent> ASSEMBLE = evilSoundRegister("assemble");
 
+    // levituff sounds
+    public static final RegistryObject<SoundEvent> LEVITUFF_GRIND = evilSoundRegister("levituff_grind");
+    public static final RegistryObject<SoundEvent> LEVITUFF_D = evilSoundRegister("levituff_d");
+    public static final RegistryObject<SoundEvent> LEVITUFF_F = evilSoundRegister("levituff_f");
+    public static final RegistryObject<SoundEvent> LEVITUFF_G = evilSoundRegister("levituff_g");
+    public static final RegistryObject<SoundEvent> LEVITUFF_A = evilSoundRegister("levituff_a");
+    public static final RegistryObject<SoundEvent> LEVITUFF_C = evilSoundRegister("levituff_c");
+
 
     private static RegistryObject<SoundEvent> evilSoundRegister(String name) {
         ResourceLocation id = new ResourceLocation(VStuff.MOD_ID, name);

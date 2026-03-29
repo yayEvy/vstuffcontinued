@@ -4,30 +4,45 @@
       { "name": "vstuff:rope_create", "stream": false }
     ]
   },
-
   "rope_break": {
     "sounds": [
       { "name": "vstuff:rope_break", "stream": false }
     ]
   },
-
   "rope_throw": {
     "sounds": [
       { "name": "vstuff:rope_throw", "stream": false }
     ]
   },
-
   "grabber_hum": {
     "subtitle": "subtitles.vstuff.grabber_hum",
     "sounds": [
       { "name": "vstuff:grabber_hum", "stream": true }
     ]
   },
-
   "assemble": {
     "subtitle": "subtitles.vstuff.assemble",
     "sounds": [
       { "name": "vstuff:assemble", "stream": true }
     ]
+  },
+
+  "levituff_d": {
+    "sounds": [ { "name": "vstuff:levituff_d" } ]
+  },
+  "levituff_f": {
+    "sounds": [ { "name": "vstuff:levituff_f" } ]
+  },
+  "levituff_g": {
+    "sounds": [ { "name": "vstuff:levituff_g" } ]
+  },
+  "levituff_a": {
+    "sounds": [ { "name": "vstuff:levituff_a" } ]
+  },
+  "levituff_c": {
+    "sounds": [ { "name": "vstuff:levituff_c" } ]
+  },
+  "levituff_grind": {
+    "sounds": [ { "name": "vstuff:levituff_grind", "stream": true } ]
   }
 }

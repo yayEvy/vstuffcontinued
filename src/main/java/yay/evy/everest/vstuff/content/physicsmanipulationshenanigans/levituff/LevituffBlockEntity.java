@@ -2,11 +2,13 @@ package yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
+import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff.sound.LevituffSoundPlayer;
 
 public class LevituffBlockEntity extends BlockEntity {
 
@@ -51,5 +53,21 @@ public class LevituffBlockEntity extends BlockEntity {
         }
 
         super.setRemoved();
+    }
+
+    private final LevituffSoundPlayer soundPlayer = new LevituffSoundPlayer();
+
+    public static void clientTick(Level level, BlockPos pos, BlockState state, LevituffBlockEntity be) {
+        if (level.isClientSide) {
+            int count = 1;
+            if (level instanceof ServerLevel serverLevel) {
+                LoadedServerShip ship = VSGameUtilsKt.getShipObjectManagingPos(serverLevel, be.worldPosition);
+                if (ship != null) {
+                    LevituffAttachment attachment = LevituffAttachment.get(level, pos);
+                    if (attachment != null) count = attachment.appliersMapping.size();
+                }
+            }
+            be.soundPlayer.tick(level, pos, count);
+        }
     }
 }
