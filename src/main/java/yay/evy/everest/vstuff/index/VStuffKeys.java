@@ -27,7 +27,7 @@ public enum VStuffKeys {
     VStuffKeys(String description, int defaultKey) {
         this.description = VStuff.MOD_ID + ".keyinfo." + description;
         this.key = defaultKey;
-        this.modifiable = !description.isEmpty();
+        this.modifiable = !description.isEmpty(); // what?
     }
 
     @SubscribeEvent

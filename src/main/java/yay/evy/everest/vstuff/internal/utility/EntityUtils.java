@@ -14,6 +14,20 @@ public class EntityUtils {
                 || predicate.test(player.getItemInHand(InteractionHand.OFF_HAND));
     }
 
+
+    /*
+        Note: main hand takes priority
+    */
+    public static InteractionHand holdingInHand(Player player, Predicate<ItemStack> predicate) {
+        if (predicate.test(player.getItemInHand(InteractionHand.MAIN_HAND))) {
+            return InteractionHand.MAIN_HAND;
+        } else if (predicate.test(player.getItemInHand(InteractionHand.OFF_HAND))) {
+            return InteractionHand.OFF_HAND;
+        } else {
+            return null;
+        }
+    }
+
     public static boolean isHoldingItem(Player player, Predicate<Item> predicate) {
         return isHolding(player, (stack) -> predicate.test(stack.getItem()));
     }
