@@ -2,24 +2,21 @@ package yay.evy.everest.vstuff.internal.utility;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.StringRepresentable;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.internal.world.VsiShipWorld;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.content.ropes.IRopeActor;
-import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 import yay.evy.everest.vstuff.content.ropes.RopeManager;
+import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 
 import javax.annotation.Nullable;
-import java.util.Map;
 
 public class RopeUtils {
 
@@ -41,9 +38,19 @@ public class RopeUtils {
         if (shipId != null) {
             Ship shipObject = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
             if (shipObject != null) {
-                Vector3d worldPos = new Vector3d();
-                shipObject.getTransform().getShipToWorld().transformPosition(localPos, worldPos);
-                return worldPos;
+                return shipObject.getTransform().getShipToWorld().transformPosition(localPos, new Vector3d());
+            }
+        }
+        return localPos;
+    }
+
+    public static Vector3d getWorldPos(Level level, BlockPos pos) {
+        Vector3d localPos = getLocalPos(level, pos);
+        Long shipId = ShipUtils.getLoadedShipIdAtPos(level, pos);
+        if (shipId != null) {
+            Ship shipObject = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
+            if (shipObject != null) {
+                return shipObject.getTransform().getShipToWorld().transformPosition(localPos, new Vector3d());
             }
         }
         return localPos;
@@ -105,17 +112,13 @@ public class RopeUtils {
     }
 
     public static @Nullable Integer findTargetedLead(ServerLevel level, Player player) {
-        RopeManager.ensureLoaded(level);
         Vec3 eyePos = player.getEyePosition();
         Vec3 lookVec = player.getViewVector(1.0f);
         double maxDistance = player.getBlockReach();
         double minDistance = Double.MAX_VALUE;
-        Integer closestConstraintId = null;
+        Integer foundId = null;
 
-        for (Map.Entry<Integer, ReworkedRope> entry : RopeManager.getActiveRopes().entrySet()) {
-            Integer constraintId = entry.getKey();
-
-            ReworkedRope rope = entry.getValue();
+        for (ReworkedRope rope : RopeManager.get(level).getRopeList()) {
 
             Vector3d worldPosA = convertLocalToWorld(level, rope.posData0.localPos(), rope.posData0.shipId());
             Vector3d worldPosB = convertLocalToWorld(level, rope.posData1.localPos(), rope.posData1.shipId());
@@ -123,11 +126,33 @@ public class RopeUtils {
             double distance = getDistanceToRope(eyePos, lookVec, worldPosA, worldPosB, maxDistance);
             if (distance < minDistance && distance <= 1.0) {
                 minDistance = distance;
-                closestConstraintId = constraintId;
+                foundId = rope.getRopeId();
             }
         }
 
-        return closestConstraintId;
+        return foundId;
+    }
+
+    public static void playPlaceSound(ServerLevel serverLevel, BlockPos pos, boolean chain) {
+        serverLevel.playSound(
+                null,
+                pos,
+                chain ? SoundEvents.CHAIN_PLACE : SoundEvents.WOOL_PLACE,
+                SoundSource.PLAYERS,
+                1.0f,
+                1.0f
+        );
+    }
+
+    public static void playBreakSound(ServerLevel serverLevel, BlockPos pos, boolean chain) {
+        serverLevel.playSound(
+                null,
+                pos,
+                chain ? SoundEvents.CHAIN_BREAK : SoundEvents.WOOL_BREAK,
+                SoundSource.PLAYERS,
+                1.0f,
+                1.0f
+        );
     }
 
     public static SelectType getSelectType(Level level, BlockPos pos) {
@@ -142,12 +167,6 @@ public class RopeUtils {
         PULLEY
     }
 
-    public enum RopeType {
-        WW,
-        WS,
-        SS
-    }
-
     public enum PosType {
         SHIP,
         WORLD,
@@ -156,15 +175,5 @@ public class RopeUtils {
     public enum SelectType {
         NORMAL,
         ACTOR
-    }
-
-    public static RopeType getRopeType(RopePosData posData0, RopePosData posData1) {
-        if (posData0.isWorld() && !posData1.isWorld()) {
-            return RopeType.WS;
-        } else if (posData0.isWorld()) {
-            return RopeType.WW;
-        } else {
-            return RopeType.SS;
-        }
     }
 }

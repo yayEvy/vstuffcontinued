@@ -35,7 +35,6 @@ public class VStuffBlocks  {
                     .transform(axeOrPickaxe())
                     .blockstate(BlockStateGen.directionalAxisBlockProvider())
                     //.transform(VStress.setImpact(8))
-
                     .item()
                     .transform(customItemModel())
                     .register();
@@ -48,7 +47,6 @@ public class VStuffBlocks  {
                     .transform(axeOrPickaxe())
                     .blockstate(BlockStateGen.horizontalBlockProvider(true))
                     //.transform(VStress.setImpact(4))
-
                     .item()
                     .transform(customItemModel())
                     .register();
@@ -59,7 +57,6 @@ public class VStuffBlocks  {
                     .initialProperties(AllBlocks.ZINC_BLOCK)
                     .transform(pickaxeOnly())
                     .blockstate(BlockStateGen.directionalBlockProvider(false))
-
                     .item()
                     .build()
                     .register();
@@ -69,9 +66,9 @@ public class VStuffBlocks  {
             REGISTRATE.block("reaction_wheel", ReactionWheelBlock::new)
                     .initialProperties(AllBlocks.BRASS_BLOCK)
                     .properties(BlockBehaviour.Properties::noOcclusion)
+                    .transform(pickaxeOnly())
                     .blockstate(BlockStateGen.directionalBlockProvider(true))
                     //.transform(VStress.setImpact(4))
-
                     .item()
                     .transform(customItemModel())
                     .register();
@@ -81,7 +78,6 @@ public class VStuffBlocks  {
             REGISTRATE.block("levituff", LevituffBlock::new)
                     .initialProperties(() -> Blocks.TUFF)
                     .transform(pickaxeOnly())
-
                     .simpleItem()
                     .register();
 

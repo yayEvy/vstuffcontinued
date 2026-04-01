@@ -12,7 +12,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
-import yay.evy.everest.vstuff.index.VStuffPartials;
+import yay.evy.everest.vstuff.index.VStuffPartialModels;
 
 import static yay.evy.everest.vstuff.content.ships.thrust.MechanicalThrusterBlock.FACING;
 
@@ -29,7 +29,7 @@ public class MechanicalThrusterRenderer extends ShaftRenderer<MechanicalThruster
 
         int lightInFront = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(facing));
 
-        SuperByteBuffer fan = CachedBuffers.partialFacing(VStuffPartials.THRUSTER_FAN, be.getBlockState(), facing);
+        SuperByteBuffer fan = CachedBuffers.partialFacing(VStuffPartialModels.THRUSTER_FAN, be.getBlockState(), facing);
 
         float time = AnimationTickHolder.getRenderTime(be.getLevel());
         float speed = be.getSpeed() * 5;

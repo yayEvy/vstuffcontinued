@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.createmod.catnip.gui.AbstractSimiScreen;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.internal.RopeStyle;
@@ -26,9 +27,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 import yay.evy.everest.vstuff.internal.network.packet.RopeStyleSelectPacket;
+import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
 import java.util.List;
 
+//todo basically make better idk
 public class RopeStylerScreen extends AbstractSimiScreen {
 
     public RopeStylerScreen(Player player) {
@@ -39,7 +42,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
     private final VStuffGuiTextures background = VStuffGuiTextures.ROPE_STYLER;
     // The names of bogey categories
     private final List<Component> categoryComponentList = RopeStyleCategoryManager.getSortedList().stream()
-            .map(RopeStyleCategory::getName)
+            .map(mapper -> mapper.name)
             .toList();
     // The category that is currently selected
     private RopeStyleCategory selectedCategory;
@@ -322,19 +325,13 @@ public class RopeStylerScreen extends AbstractSimiScreen {
     }
 
     private Button.OnPress bogeySelection(int index) {
-        return b -> {
-            selectedStyle = displayedStyles[index];
-        };
+        return b -> selectedStyle = displayedStyles[index];
     }
 
     private void onMenuClose() {
         if (selectedStyle == null) return;
 
-        RopeStyle style = selectedStyle;
-
-        VStuff.LOGGER.info("Setting player {} ({}) selected rope style to {}", player.getName().getString(), player.getUUID(), selectedStyle.id());
-
-        NetworkHandler.INSTANCE.sendToServer(new RopeStyleSelectPacket(style.id()));
+        NetworkHandler.selectStyle(selectedStyle.id());
 
         onClose();
     }

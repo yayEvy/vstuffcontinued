@@ -1,13 +1,14 @@
 package yay.evy.everest.vstuff.content.ropes.pulley;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import yay.evy.everest.vstuff.content.ropes.IRopeActor;
-import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 import yay.evy.everest.vstuff.content.ropes.RopeManager;
+import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 
 public class PulleyAnchorBlockEntity extends BlockEntity implements IRopeActor {
 
@@ -20,13 +21,11 @@ public class PulleyAnchorBlockEntity extends BlockEntity implements IRopeActor {
 
     @Override
     public void connectRope(Integer ropeId, BlockState state, Level level, BlockPos pos) {
-        if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-            RopeManager.ensureLoaded(serverLevel);
-        }
-        if (ropeId == null || RopeManager.getRope(ropeId) == null) return;
+        if (!(level instanceof ServerLevel serverLevel)) return;
+        if (ropeId == null || RopeManager.get(serverLevel).hasRope(ropeId)) return;
 
         this.ropeId = ropeId;
-        this.rope = RopeManager.getRope(ropeId);
+        this.rope = RopeManager.get(serverLevel).getRope(ropeId);
 
         blockConnect(state, level, pos);
 

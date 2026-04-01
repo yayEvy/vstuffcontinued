@@ -5,6 +5,7 @@ import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.valkyrienskies.core.internal.joints.VSDistanceJoint;
+import org.valkyrienskies.core.internal.joints.VSJoint;
 import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
 import org.valkyrienskies.core.internal.joints.VSJointPose;
 
@@ -15,8 +16,10 @@ public record JointValues(VSJointMaxForceTorque maxForceTorque, Float minLength,
     public static final Float DEFAULT_TOLERANCE = 0.1f;
     public static final Float DEFAULT_STIFFNESS = 1e8f;
     public static final Float DEFAULT_DAMPING = null;
-    public static JointValues withDefault(VSJointMaxForceTorque maxForceTorque, Float maxLength, Double compliance) {
-        return new JointValues(maxForceTorque, DEFAULT_MINLENGTH, maxLength, compliance, DEFAULT_TOLERANCE, DEFAULT_STIFFNESS, DEFAULT_DAMPING);
+    public static final Double DEFAULT_COMPLIANCE = VSJoint.DEFAULT_COMPLIANCE;
+
+    public static JointValues withDefault(Float maxForce, Float maxTorque, Float maxLength) {
+        return new JointValues(new VSJointMaxForceTorque(maxForce, maxTorque), DEFAULT_MINLENGTH, maxLength, DEFAULT_COMPLIANCE, DEFAULT_TOLERANCE, DEFAULT_STIFFNESS, DEFAULT_DAMPING);
     }
 
     public JointValues withChanged(@Nullable VSJointMaxForceTorque newMaxForceTorque, @Nullable Float newMinLength,

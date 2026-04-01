@@ -55,21 +55,18 @@ public class TagUtils {
         tag.putLong("shipId", posData.shipId() == null ? -1 : posData.shipId()); // use -1 to denote ground body
         tag.put("blockPos", NbtUtils.writeBlockPos(posData.blockPos()));
         tag.put("localPos", writeVector3d(posData.localPos()));
-        tag.putString("posType", posData.posType().name());
         tag.putString("selectType", posData.selectType().name());
 
         return tag;
     }
 
     public static RopePosData readPosData(CompoundTag tag) {
-        Long shipId = tag.getLong("shipId");
-        shipId = shipId == -1 ? null : shipId;
+        Long shipId = tag.getLong("shipId") == -1 ? null : tag.getLong("shipId");
         BlockPos blockPos = NbtUtils.readBlockPos(tag.getCompound("blockPos"));
         Vector3d localPos = readVector3d(tag.getCompound("localPos"));
-        RopeUtils.PosType posType = RopeUtils.PosType.valueOf(tag.getString("posType"));
         RopeUtils.SelectType selectType = RopeUtils.SelectType.valueOf(tag.getString("selectType"));
 
-        return new RopePosData(shipId, blockPos, localPos, posType, selectType);
+        return new RopePosData(shipId, blockPos, localPos, shipId == null, selectType);
     }
 
     public static CompoundTag writeResourceLocation(ResourceLocation resourceLocation) {

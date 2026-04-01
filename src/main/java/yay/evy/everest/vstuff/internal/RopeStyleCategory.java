@@ -19,9 +19,5 @@ public class RopeStyleCategory {
         this.name = name;
         this.order = order;
     }
-
-    public Component getName() {
-        return name;
-    }
 }
 

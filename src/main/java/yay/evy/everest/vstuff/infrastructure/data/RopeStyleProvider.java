@@ -27,31 +27,31 @@ public class RopeStyleProvider implements DataProvider {
         List<CompletableFuture<?>> futures = new ArrayList<>();
 
 
-        futures.add(basicRopeStyle(output, "Normal", "normal"));
-        futures.add(basicRopeStyle(output, "Chain", "chain"));
+        futures.add(basicRopeStyle(output, "Normal", false));
+        futures.add(basicRopeStyle(output, "Chain", true));
 
         woolStyles(output, futures);
         dyedStyles(output, futures);
 
-        futures.add(basicRopeStyle(output, "Pride", "normal"));
-        futures.add(basicRopeStyle(output, "Gay", "normal"));
-        futures.add(basicRopeStyle(output, "Lesbian", "normal"));
-        futures.add(basicRopeStyle(output, "Bisexual", "normal"));
-        futures.add(basicRopeStyle(output, "Transgender", "normal"));
-        futures.add(basicRopeStyle(output, "Nonbinary", "normal"));
-        futures.add(basicRopeStyle(output, "Asexual", "normal"));
+        futures.add(basicRopeStyle(output, "Pride", false));
+        futures.add(basicRopeStyle(output, "Gay", false));
+        futures.add(basicRopeStyle(output, "Lesbian", false));
+        futures.add(basicRopeStyle(output, "Bisexual", false));
+        futures.add(basicRopeStyle(output, "Transgender", false));
+        futures.add(basicRopeStyle(output, "Nonbinary", false));
+        futures.add(basicRopeStyle(output, "Asexual", false));
 
         logStyles(output, futures);
 
-        futures.add(basicRopeStyle(output, "Candycane", "normal"));
-        futures.add(basicRopeStyle(output, "Christmas Tree", "normal"));
+        futures.add(basicRopeStyle(output, "Candycane", false));
+        futures.add(basicRopeStyle(output, "Christmas Tree", false));
 
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
     }
 
-    private CompletableFuture<?> basicRopeStyle(CachedOutput output, String name, String renderType) {
+    private CompletableFuture<?> basicRopeStyle(CachedOutput output, String name, boolean chain) {
         String fileName = name.toLowerCase(Locale.ROOT).replace(" ", "_");
-        return ropeStyle(output, name, renderType, "vstuff:textures/rope/rope_" + fileName + ".png", fileName);
+        return ropeStyle(output, name, chain, "vstuff:textures/rope/rope_" + fileName + ".png", fileName);
     }
 
     private void dyedStyles(CachedOutput output, List<CompletableFuture<?>> futures) {
@@ -60,7 +60,7 @@ public class RopeStyleProvider implements DataProvider {
         futures.addAll(colors.stream()
                 .map(color -> {
                     String fileName = color.toLowerCase(Locale.ROOT).replace(" ", "_") + "_dye";
-                    return ropeStyle(output, color, "normal", "vstuff:textures/rope/rope_" + fileName + ".png", fileName);
+                    return ropeStyle(output, color, false, "vstuff:textures/rope/rope_" + fileName + ".png", fileName);
                 }).collect(Collectors.toCollection(ArrayList::new))
         );
     }
@@ -71,7 +71,7 @@ public class RopeStyleProvider implements DataProvider {
         futures.addAll(colors.stream()
                 .map(color -> {
                     String fileName = color.toLowerCase(Locale.ROOT).replace(" ", "_") + "_wool";
-                    return ropeStyle(output, color, "normal", "minecraft:textures/block/" + fileName + ".png", fileName);
+                    return ropeStyle(output, color, false, "minecraft:textures/block/" + fileName + ".png", fileName);
                 }).collect(Collectors.toCollection(ArrayList::new))
         );
     }
@@ -83,7 +83,7 @@ public class RopeStyleProvider implements DataProvider {
         futures.addAll(logs.stream()
                 .map(log -> {
                     String fileName = log.toLowerCase(Locale.ROOT).replace(" ", "_") + "_log";
-                    return ropeStyle(output, log, "normal", "minecraft:textures/block/" + fileName + ".png", fileName);
+                    return ropeStyle(output, log, false, "minecraft:textures/block/" + fileName + ".png", fileName);
                 }).collect(Collectors.toCollection(ArrayList::new))
         );
     }
@@ -93,11 +93,11 @@ public class RopeStyleProvider implements DataProvider {
         return name.toLowerCase(Locale.ROOT).replace(" ", "_");
     }
 
-    private CompletableFuture<?> ropeStyle(CachedOutput output, String name, String type, String texture, String fileName) {
+    private CompletableFuture<?> ropeStyle(CachedOutput output, String name, boolean chain, String texture, String fileName) {
 
         JsonObject json = new JsonObject();
         json.addProperty("name", name);
-        json.addProperty("render_type", type);
+        json.addProperty("chain", chain);
         json.addProperty("texture", texture);
 
         Path path = generator.getPackOutput().getOutputFolder()

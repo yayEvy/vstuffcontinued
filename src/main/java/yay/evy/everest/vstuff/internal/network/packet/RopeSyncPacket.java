@@ -150,7 +150,7 @@ public class RopeSyncPacket {
             try {
                 switch (action) {
                     case ADD:
-                        ClientRopeManager.addClientConstraint(constraintId, shipA, shipB, localPosA, localPosB, maxLength, ropeStyle);
+                        ClientRopeManager.addClientConstraint(constraintId, shipA, shipB, localPosA, localPosB, maxLength, RopeStyleManager.get(ropeStyle));
                         break;
                     case REMOVE:
                         ClientRopeManager.removeClientConstraint(constraintId);

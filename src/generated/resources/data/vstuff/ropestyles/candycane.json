@@ -1,5 +1,5 @@
 {
+  "chain": false,
   "name": "Candycane",
-  "render_type": "normal",
   "texture": "vstuff:textures/rope/rope_candycane.png"
 }

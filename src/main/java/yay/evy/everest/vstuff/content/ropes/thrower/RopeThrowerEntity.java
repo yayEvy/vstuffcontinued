@@ -86,27 +86,27 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
             return;
         }
 
-        ReworkedRope ropeResult = ReworkedRope.create(serverLevel, startShipId, secondShipId, startPos, hitPos, getOwner() instanceof Player p ? p : null, false);
-
-        if (ropeResult != null) {
-
-            if (connectionType == RopeUtils.ConnectionType.PULLEY
-                    && waitingPulley != null
-                    && serverLevel.getBlockEntity(hitPos) instanceof PulleyAnchorBlockEntity) {
-
-                waitingPulley.connectRope(ropeResult.ropeId, serverLevel.getBlockState(hitPos), serverLevel, hitPos);
-            }
-
-
-            serverLevel.playSound(
-                    null,
-                    hitPos,
-                    net.minecraft.sounds.SoundEvents.LEASH_KNOT_PLACE,
-                    SoundSource.PLAYERS,
-                    1.0F,
-                    1.0F
-            );
-        }
+//        ReworkedRope ropeResult = ReworkedRope.create(serverLevel, startShipId, secondShipId, startPos, hitPos, getOwner() instanceof Player p ? p : null, false);
+//
+//        if (ropeResult != null) {
+//
+//            if (connectionType == RopeUtils.ConnectionType.PULLEY
+//                    && waitingPulley != null
+//                    && serverLevel.getBlockEntity(hitPos) instanceof PulleyAnchorBlockEntity) {
+//
+//                waitingPulley.connectRope(ropeResult.ropeId, serverLevel.getBlockState(hitPos), serverLevel, hitPos);
+//            }
+//
+//
+//            serverLevel.playSound(
+//                    null,
+//                    hitPos,
+//                    net.minecraft.sounds.SoundEvents.LEASH_KNOT_PLACE,
+//                    SoundSource.PLAYERS,
+//                    1.0F,
+//                    1.0F
+//            );
+//        }
 
         discard();
     }

@@ -3,6 +3,7 @@ package yay.evy.everest.vstuff.content.ships.assembly;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -26,8 +27,9 @@ public class ExpendableAssemblerItem extends Item {
         Level level = context.getLevel();
         ItemStack stack = context.getItemInHand();
         BlockPos clickedPos = context.getClickedPos();
+        Player player = context.getPlayer();
 
-        if (!(level instanceof ServerLevel serverLevel) || context.getPlayer() == null) {
+        if (!(level instanceof ServerLevel serverLevel) || player == null) {
             return InteractionResult.PASS;
         }
 
@@ -43,7 +45,8 @@ public class ExpendableAssemblerItem extends Item {
             Set<BlockPos> blocksToAssemble = Set.of(clickedPos);
             ShipAssembler.assembleToShipFull(serverLevel, blocksToAssemble, 1);
 
-            context.getPlayer().getCooldowns().addCooldown(this, COOLDOWN_TICKS);
+            if (!player.isCreative())
+                context.getPlayer().getCooldowns().addCooldown(this, COOLDOWN_TICKS);
 
             stack.shrink(1);
 

@@ -29,11 +29,11 @@ public class RopeStyleReloadListener extends SimpleJsonResourceReloadListener {
 
             Component name = Component.translatable("ropestyle." + id.getNamespace() + "." + id.getPath());
 
-            RopeStyle.RenderStyle renderStyle = RopeStyle.RenderStyle.valueOf(json.get("render_type").getAsString().toUpperCase());
+            boolean chain = json.get("chain").getAsBoolean();
 
-            ResourceLocation texture = new ResourceLocation(json.get("texture").getAsString());
+            ResourceLocation texture = ResourceLocation.bySeparator(json.get("texture").getAsString(), ':');
 
-            RopeStyleManager.register(new RopeStyle(id, name, renderStyle, texture));
+            RopeStyleManager.register(new RopeStyle(id, name, chain, texture));
         }
     }
 }

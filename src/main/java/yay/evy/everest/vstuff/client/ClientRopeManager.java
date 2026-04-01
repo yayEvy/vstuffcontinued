@@ -1,22 +1,21 @@
 package yay.evy.everest.vstuff.client;
 
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import yay.evy.everest.vstuff.internal.RopeStyle;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ClientRopeManager {
     private static final Map<Integer, ClientRopeData> clientConstraints = new HashMap<>();
-    private static ClientRopeData translucentRope = null;
 
     public record ClientRopeData(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength,
-                                 ResourceLocation style) {
-            public ClientRopeData(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, ResourceLocation style) {
+                                 RopeStyle style) {
+            public ClientRopeData(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, RopeStyle style) {
                 this.ship0 = ship0;
                 this.ship1 = ship1;
                 this.localPos0 = new Vector3d(localPos0);
@@ -48,24 +47,8 @@ public class ClientRopeManager {
 
     }
 
-    public static boolean hasPreviewRope() {
-        return !(translucentRope == null);
-    }
-
-    public static void setPreviewRope(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, float maxLength, ResourceLocation style) {
-        translucentRope = new ClientRopeData(ship0, ship1, localPos0, localPos1, maxLength, style);
-    }
-
-    public static void clearPreviewRope() {
-        translucentRope = null;
-    }
-
-    public static ClientRopeData getPreviewRope() {
-        return translucentRope;
-    }
-
     public static void addClientConstraint(Integer constraintId, Long shipA, Long shipB,
-                                           Vector3d localPosA, Vector3d localPosB, double maxLength, ResourceLocation style) {
+                                           Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyle style) {
         clientConstraints.put(constraintId, new ClientRopeData(shipA, shipB, localPosA, localPosB, maxLength, style));
     }
 
@@ -81,7 +64,6 @@ public class ClientRopeManager {
 
     public static void clearAllClientConstraints() {
         clientConstraints.clear();
-        translucentRope = null;
     }
 
 }

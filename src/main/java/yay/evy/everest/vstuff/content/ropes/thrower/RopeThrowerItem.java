@@ -11,6 +11,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -98,7 +99,9 @@ public class RopeThrowerItem extends Item {
         if (player.isShiftKeyDown()) {
             if (isFoil(stack)) {
                 resetStateWithMessage(serverLevel, stack, player, "rope_reset");
-                NetworkHandler.sendOutline(pos, ClientOutlineHandler.GREEN);
+                if (player instanceof ServerPlayer serverPlayer) {
+                    NetworkHandler.sendOutlineToPlayer(serverPlayer, pos, ClientOutlineHandler.GREEN);
+                }
                 return InteractionResult.SUCCESS;
             }
             return InteractionResult.FAIL;
@@ -129,7 +132,9 @@ public class RopeThrowerItem extends Item {
         first.putString("dim", serverLevel.dimension().location().toString());
         first.putString("type", type.name());
 
-        NetworkHandler.sendOutline(pos, ClientOutlineHandler.GREEN);
+        if (player instanceof ServerPlayer serverPlayer) {
+            NetworkHandler.sendOutlineToPlayer(serverPlayer, pos, ClientOutlineHandler.GREEN);
+        }
         return InteractionResult.SUCCESS;
     }
 
@@ -147,7 +152,7 @@ public class RopeThrowerItem extends Item {
         }
 
         if (isFoil(stack)) {
-            CompoundTag tag = stack.getTag().getCompound("first");
+            CompoundTag tag = stack.getTag().getCompound("data");
 
             RopeUtils.ConnectionType type;
             try {
@@ -221,7 +226,7 @@ public class RopeThrowerItem extends Item {
 
     private void resetState(ServerLevel level, ItemStack stack) {
         if (isFoil(stack)) {
-            CompoundTag tag = stack.getTag().getCompound("first");
+            CompoundTag tag = stack.getTagElement("data");
 
             if (RopeUtils.ConnectionType.valueOf(tag.getString("type")) == RopeUtils.ConnectionType.PULLEY) {
                 PhysPulleyBlockEntity pulleyBE = (PhysPulleyBlockEntity) level.getBlockEntity(NbtUtils.readBlockPos(tag.getCompound("pos")));
@@ -253,5 +258,5 @@ public class RopeThrowerItem extends Item {
 /*
 bry what the hell
 
-wren (12/15/25)
+raven (12/15/25)
  */

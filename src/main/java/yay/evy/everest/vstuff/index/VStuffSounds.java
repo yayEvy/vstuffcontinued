@@ -26,7 +26,7 @@ public class VStuffSounds {
 
 
     private static RegistryObject<SoundEvent> evilSoundRegister(String name) {
-        ResourceLocation id = new ResourceLocation(VStuff.MOD_ID, name);
+        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(VStuff.MOD_ID, name);
 
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(id));
     }

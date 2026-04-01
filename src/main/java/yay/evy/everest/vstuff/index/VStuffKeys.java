@@ -20,53 +20,29 @@ public enum VStuffKeys {
     ROPE_MENU("rope_menu_open", GLFW.GLFW_KEY_LEFT_ALT);
 
     private KeyMapping keybind;
-    private String description;
+    private final String description;
     private int key;
-    private boolean modifiable;
 
     VStuffKeys(String description, int defaultKey) {
         this.description = VStuff.MOD_ID + ".keyinfo." + description;
         this.key = defaultKey;
-        this.modifiable = !description.isEmpty(); // what?
     }
 
     @SubscribeEvent
     public static void register(RegisterKeyMappingsEvent event) {
         for (VStuffKeys key : values()) {
             key.keybind = new KeyMapping(key.description, key.key, VStuff.NAME);
-            if (!key.modifiable)
-                continue;
 
             event.register(key.keybind);
         }
     }
 
-    public KeyMapping getKeybind() {
-        return keybind;
-    }
-
     public boolean isPressed() {
-        if (!modifiable)
-            return isKeyDown(key);
         return keybind.isDown();
-    }
-
-    public String getBoundKey() {
-        return keybind.getTranslatedKeyMessage()
-                .getString()
-                .toUpperCase();
     }
 
     public int getBoundCode() {
         return keybind.getKey()
                 .getValue();
     }
-
-    public static boolean isKeyDown(int key) {
-        return InputConstants.isKeyDown(Minecraft.getInstance()
-                .getWindow()
-                .getWindow(), key);
-    }
-
-
 }

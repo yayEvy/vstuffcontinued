@@ -21,7 +21,6 @@ public class ClientEvents {
         EntityRenderers.register(VStuffEntities.ROPE_THROWER.get(), ThrownItemRenderer::new);
     }
 
-
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase == Phase.START)

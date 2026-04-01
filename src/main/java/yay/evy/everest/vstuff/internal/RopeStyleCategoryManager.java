@@ -9,7 +9,7 @@ public class RopeStyleCategoryManager {
 
     private static final Map<ResourceLocation, RopeStyleCategory> CATEGORIES = new HashMap<>();
 
-    public static final ResourceLocation UNCATEGORIZED_ID = new ResourceLocation(VStuff.MOD_ID, "uncategorized");
+    public static final ResourceLocation UNCATEGORIZED_ID = ResourceLocation.fromNamespaceAndPath(VStuff.MOD_ID, "uncategorized");
 
     public static void clear() {
         CATEGORIES.clear();

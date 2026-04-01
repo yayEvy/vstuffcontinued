@@ -22,26 +22,28 @@ public class VStuffItems {
         REGISTRATE.setCreativeTab(VStuffCreativeModeTabs.VSTUFF_MAIN);
     }
 
-
     public static final ItemEntry<ReworkedRopeItem> ROPE =
         REGISTRATE.item("rope", ReworkedRopeItem::new)
             .properties(p -> p
-                .stacksTo(64))
+                .stacksTo(64)
+            )
             .defaultModel()
             .register();
 
     public static final ItemEntry<RopeThrowerItem> ROPE_THROWER =
         REGISTRATE.item("rope_thrower", RopeThrowerItem::new)
             .properties(p -> p
-                .stacksTo(64))
+                .stacksTo(64)
+            )
             .defaultModel()
             .register();
 
     public static final ItemEntry<RopeCutterItem> ROPE_CUTTER =
         REGISTRATE.item("rope_cutter", RopeCutterItem::new)
             .properties(p -> p
-            .stacksTo(1)
-            .durability(238))
+                .stacksTo(1)
+                .durability(238)
+            )
             .defaultModel()
             .register();
 
@@ -58,7 +60,8 @@ public class VStuffItems {
         REGISTRATE.item("expendable_assembler", ExpendableAssemblerItem::new)
             .properties(p -> p
                 .stacksTo(16)
-                .rarity(Rarity.UNCOMMON))
+                .rarity(Rarity.UNCOMMON)
+            )
             .defaultModel()
             .register();
 
@@ -66,7 +69,8 @@ public class VStuffItems {
         REGISTRATE.item("creative_rope_editor", RopeEditorItem::new)
             .properties(p -> p
                 .stacksTo(1)
-                .rarity(Rarity.RARE))
+                .rarity(Rarity.RARE)
+            )
             .defaultModel()
             .register();
 

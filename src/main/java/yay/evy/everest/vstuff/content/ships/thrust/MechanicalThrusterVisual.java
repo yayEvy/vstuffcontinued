@@ -9,7 +9,7 @@ import dev.engine_room.flywheel.lib.model.Models;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
-import yay.evy.everest.vstuff.index.VStuffPartials;
+import yay.evy.everest.vstuff.index.VStuffPartialModels;
 
 import java.util.function.Consumer;
 
@@ -25,7 +25,7 @@ public class MechanicalThrusterVisual extends ShaftVisual<MechanicalThrusterBloc
 
         facing = blockState.getValue(FACING);
 
-        fan = instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(VStuffPartials.THRUSTER_FAN))
+        fan = instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(VStuffPartialModels.THRUSTER_FAN))
                 .createInstance()
                 .rotateToFace(Direction.NORTH, facing)
                 .setup(blockEntity, facing.getAxis())

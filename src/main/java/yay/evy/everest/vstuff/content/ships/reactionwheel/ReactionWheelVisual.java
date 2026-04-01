@@ -10,7 +10,7 @@ import dev.engine_room.flywheel.lib.model.Models;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import org.jetbrains.annotations.Nullable;
-import yay.evy.everest.vstuff.index.VStuffPartials;
+import yay.evy.everest.vstuff.index.VStuffPartialModels;
 
 import java.util.function.Consumer;
 
@@ -33,7 +33,7 @@ public class ReactionWheelVisual extends KineticBlockEntityVisual<ReactionWheelB
                 .setup(blockEntity)
                 .setPosition(getVisualPosition());
 
-        core = instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(VStuffPartials.REACTION_WHEEL_CORE))
+        core = instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(VStuffPartialModels.REACTION_WHEEL_CORE))
                 .createInstance()
                 .rotateToFace(Direction.UP, direction)
                 .setup(blockEntity)

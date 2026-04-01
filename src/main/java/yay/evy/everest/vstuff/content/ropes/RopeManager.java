@@ -1,81 +1,116 @@
 package yay.evy.everest.vstuff.content.ropes;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
+public class RopeManager extends SavedData {
 
-@Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class RopeManager {
+    private static final String DATA_NAME = "vstuff_ropes";
 
-    private static final Map<Integer, ReworkedRope> activeRopes = new ConcurrentHashMap<>();
-    private static int nextId = 1;
+    private static int nextId = 0;
 
+    private final Map<Integer, ReworkedRope> ropes = new HashMap<>();
 
-    public static int getNextId() {
-        return ++nextId;
+    public static RopeManager get(ServerLevel level) {
+        DimensionDataStorage storage = level.getDataStorage();
+        RopeManager persistence = storage.computeIfAbsent(RopeManager::load, RopeManager::new, DATA_NAME);
+        persistence.attachActors(level);
+        return persistence;
     }
 
-    public static void resetId() {
-        nextId = 1;
+    public static RopeManager load(CompoundTag tag) {
+        RopeManager data = new RopeManager();
+
+        ListTag ropeList = tag.getList("ropes", Tag.TAG_COMPOUND);
+        for (Tag ropeTag : ropeList) {
+            ReworkedRope rope = RopeFactory.ropeFromTag((CompoundTag) ropeTag);
+
+            data.ropes.put(rope.ropeId, rope);
+        }
+
+        VStuff.LOGGER.info("Loaded {} ropes from saved data.", data.ropes.size());
+        return data;
     }
 
-    public static void addRopeWithPersistence(ServerLevel level, ReworkedRope rope) {
-        activeRopes.put(rope.ropeId, rope);
-
-        RopePersistence persistence = RopePersistence.get(level);
-
-        persistence.addRope(rope);
-        NetworkHandler.sendConstraintAdd(rope.ropeId, rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.style);
+    @Override
+    public @NotNull CompoundTag save(@NotNull CompoundTag tag) {
+        ListTag ropeList = new ListTag();
+        for (Map.Entry<Integer, ReworkedRope> entry : ropes.entrySet()) {
+            ropeList.add(RopeFactory.ropeToTag(entry.getValue()));
+        }
+        tag.put("ropes", ropeList);
+        return tag;
     }
 
-    public static ReworkedRope getRope(Integer id) {
-        return activeRopes.get(id);
+
+    public void addRope(ReworkedRope rope) {
+        rope.setRopeId(nextId++);
+
+        ropes.put(rope.ropeId, rope);
+
+        NetworkHandler.sendConstraintAdd(rope.ropeId, rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.style.texture());
+
+        setDirty();
     }
 
-    public static boolean hasRope(Integer id) {
-        return activeRopes.containsKey(id);
+    public void removeRope(Integer id) {
+        ropes.remove(id);
+
+        NetworkHandler.sendConstraintRemove(id);
+
+        setDirty();
     }
 
-    public static void ensureLoaded(ServerLevel level) {
-        RopePersistence.get(level);
+    public boolean hasRope(Integer id) {
+        return ropes.containsKey(id);
     }
 
-    public static void replaceRope(Integer id, ReworkedRope rope) {
-        activeRopes.put(id, rope);
+    public ReworkedRope getRope(Integer id) {
+        return ropes.get(id);
     }
 
-    public static void removeRopeWithPersistence(ServerLevel level, Integer constraintId) {
+    public List<ReworkedRope> getRopeList() {
+        return ropes.values().stream().toList();
+    }
 
-        ReworkedRope data = activeRopes.remove(constraintId);
-        if (data != null) {
+    public List<Integer> getIdList() {
+        return ropes.keySet().stream().toList();
+    }
 
-            RopePersistence persistence = RopePersistence.get(level);
-            persistence.removeRope(constraintId);
+    public void saveNow(ServerLevel level) {
+        setDirty();
 
-            for (ServerPlayer player : level.getServer().getPlayerList().getPlayers()) {
-                NetworkHandler.sendConstraintRemoveToPlayer(player, constraintId);
-            }
+        level.getDataStorage().save();
+    }
 
-            NetworkHandler.sendConstraintRemove(constraintId);
-
+    public void attachActors(ServerLevel level) {
+        for (ReworkedRope rope : ropes.values()) {
+            rope.attachActors(level);
         }
     }
 
     public static void syncAllRopesToPlayer(ServerPlayer player) {
-        ensureLoaded(player.serverLevel());
+        RopeManager manager = RopeManager.get(player.serverLevel());
         NetworkHandler.sendClearAllConstraintsToPlayer(player);
-        VStuff.LOGGER.info("Syncing all ropes to player {}", player.getName().getString());
 
-        for (Map.Entry<Integer, ReworkedRope> entry : activeRopes.entrySet()) {
+        VStuff.LOGGER.info("Syncing all ropes to player {} ({})", player.getName().getString(), player.getUUID());
+
+        for (Map.Entry<Integer, ReworkedRope> entry : manager.ropes.entrySet()) {
             ReworkedRope data = entry.getValue();
             NetworkHandler.sendConstraintAddToPlayer(
                     player,
@@ -85,28 +120,8 @@ public class RopeManager {
                     data.posData0.localPos(),
                     data.posData1.localPos(),
                     data.jointValues.maxLength(),
-                    data.style
+                    data.style.id()
             );
         }
-    }
-
-    public static Map<Integer, ReworkedRope> getActiveRopes() {
-        return new HashMap<>(activeRopes);
-    }
-
-    public static void addRopeToManager(ReworkedRope rope) {
-        if (rope == null || rope.ropeId == null) return;
-
-        activeRopes.put(rope.ropeId, rope);
-    }
-
-
-    @SubscribeEvent
-    public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer player)) return;
-
-        NetworkHandler.sendClearAllConstraintsToPlayer(player);
-
-        syncAllRopesToPlayer(player);
     }
 }

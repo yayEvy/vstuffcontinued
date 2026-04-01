@@ -1,5 +1,5 @@
 {
+  "chain": false,
   "name": "Stripped Oak",
-  "render_type": "normal",
   "texture": "minecraft:textures/block/stripped_oak_log.png"
 }

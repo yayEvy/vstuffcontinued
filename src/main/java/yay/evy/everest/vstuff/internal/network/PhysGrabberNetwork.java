@@ -17,7 +17,7 @@ public class PhysGrabberNetwork {
 
     private static final String PROTOCOL_VERSION = "1";
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(VStuff.MOD_ID, "phys_grabber"),
+            ResourceLocation.fromNamespaceAndPath(VStuff.MOD_ID, "phys_grabber"),
             () -> PROTOCOL_VERSION,
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals

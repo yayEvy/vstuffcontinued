@@ -3,6 +3,7 @@ package yay.evy.everest.vstuff.content.ropes.styler;
 import net.createmod.catnip.gui.ScreenOpener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.GameType;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import yay.evy.everest.vstuff.index.VStuffItems;
@@ -39,6 +40,8 @@ public class RopeStyleMenuHandler {
         if (!holdingLead && !holdingThrower)
             return;
 
+        InteractionHand hand = EntityUtils.holdingInHand(player, (s) -> VStuffItems.ROPE.isIn(s) || VStuffItems.ROPE_THROWER.isIn(s));
+        if (hand == null) return;
 
         ScreenOpener.open(new RopeStylerScreen(player));
     }

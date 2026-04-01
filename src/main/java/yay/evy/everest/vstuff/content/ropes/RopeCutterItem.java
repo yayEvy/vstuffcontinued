@@ -28,35 +28,21 @@ public class RopeCutterItem extends Item {
             return InteractionResultHolder.pass(itemStack);
         }
 
-        Integer targetConstraintId = RopeUtils.findTargetedLead(serverLevel, player);
-        if (targetConstraintId == null) return InteractionResultHolder.pass(itemStack);
+        Integer targetRope = RopeUtils.findTargetedLead(serverLevel, player);
+        if (targetRope == null) return InteractionResultHolder.pass(itemStack);
 
         try {
-            ReworkedRope data = RopeManager.getActiveRopes().get(targetConstraintId);
-            if (data == null) return InteractionResultHolder.pass(itemStack);
+            ReworkedRope rope = RopeFactory.removeRope(serverLevel, targetRope);
 
-            RopeStyle.RenderStyle style = RopeStyleManager.get(data.style).renderStyle();
+            boolean chain = rope.style.chain();
 
-            Component notif = style == RopeStyle.RenderStyle.CHAIN
-                    ? Component.translatable("vstuff.message.chain_break")
-                    : Component.translatable("vstuff.message.rope_break");
-            player.displayClientMessage(notif, true);
+            player.displayClientMessage(
+                    Component.translatable("vstuff.rope." + (chain ? "chain" : "rope") + "_break"),
+                    true
+            );
 
-            if (VStuffConfig.ROPE_SOUNDS.get()) {
-                var sound = (style == RopeStyle.RenderStyle.CHAIN)
-                        ? SoundEvents.CHAIN_BREAK
-                        : SoundEvents.LEASH_KNOT_BREAK;
-                serverLevel.playSound(
-                        null,
-                        player.blockPosition(),
-                        sound,
-                        SoundSource.PLAYERS,
-                        1.0F,
-                        1.0F
-                );
-            }
+            RopeUtils.playBreakSound(serverLevel, player.blockPosition(), chain);
 
-            data.removeJoint(serverLevel);
 
             if (!player.isCreative()) {
                 itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));

@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
-import yay.evy.everest.vstuff.index.VStuffPartials;
+import yay.evy.everest.vstuff.index.VStuffPartialModels;
 
 public class ReactionWheelRenderer extends KineticBlockEntityRenderer<ReactionWheelBlockEntity> {
 
@@ -31,7 +31,7 @@ public class ReactionWheelRenderer extends KineticBlockEntityRenderer<ReactionWh
         int lightBehind = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(direction));
 
         SuperByteBuffer shaftHalf = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, state, direction);
-        SuperByteBuffer coreModel = CachedBuffers.partialFacing(VStuffPartials.REACTION_WHEEL_CORE, state, direction);
+        SuperByteBuffer coreModel = CachedBuffers.partialFacing(VStuffPartialModels.REACTION_WHEEL_CORE, state, direction);
 
         standardKineticRotationTransform(shaftHalf, be, lightBehind).renderInto(ms, vb);
         standardKineticRotationTransform(coreModel, be, lightBehind).renderInto(ms, vb);

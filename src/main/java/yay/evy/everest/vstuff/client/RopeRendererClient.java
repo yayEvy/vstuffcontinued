@@ -78,31 +78,7 @@ public class RopeRendererClient {
                     );
                     renderedAny = true;
                 } catch (Exception e) {
-                    if (level.getGameTime() % 100 == 0) {
-                        VStuff.LOGGER.error("Error rendering client rope: {}", e.getMessage());
-                    }
-                }
-            }
-
-            if (ClientRopeManager.hasPreviewRope()) {
-                try {
-                    ClientRopeManager.ClientRopeData previewRope = ClientRopeManager.getPreviewRope();
-                    renderClientRope(
-                            poseStack,
-                            bufferSource,
-                            -1,
-                            previewRope,
-                            level,
-                            cameraPos,
-                            partialTick,
-                            previewRope.style()
-
-                    );
-                    renderedAny = true;
-                } catch (Exception e) {
-                    if (level.getGameTime() % 100 == 0) {
-                        VStuff.LOGGER.error("Error rendering translucent rope: {}", e.getMessage());
-                    }
+                    VStuff.LOGGER.error("Error occurred while rendering rope: {}", e.getMessage());
                 }
             }
 
@@ -117,7 +93,7 @@ public class RopeRendererClient {
 
     private static void renderClientRope(PoseStack poseStack, MultiBufferSource bufferSource,
                                          Integer constraintId, ClientRopeManager.ClientRopeData ropeData,
-                                         Level level, Vec3 cameraPos, float partialTick, ResourceLocation style) {
+                                         Level level, Vec3 cameraPos, float partialTick, RopeStyle style) {
         if (!level.isClientSide) return;
         if (!ropeData.isRenderable(level)) return;
 
@@ -137,7 +113,7 @@ public class RopeRendererClient {
 
     private static void renderRope(PoseStack poseStack, MultiBufferSource bufferSource,
                                    Vector3d startPos, Vector3d endPos, double actualRopeLength,
-                                   double maxRopeLength, Vec3 cameraPos, float partialTick, Level level, ResourceLocation style) {
+                                   double maxRopeLength, Vec3 cameraPos, float partialTick, Level level, RopeStyle style) {
 
         Vector3d startRelative = new Vector3d(startPos.x - cameraPos.x, startPos.y - cameraPos.y, startPos.z - cameraPos.z);
         Vector3d endRelative = new Vector3d(endPos.x - cameraPos.x, endPos.y - cameraPos.y, endPos.z - cameraPos.z);
@@ -171,7 +147,15 @@ public class RopeRendererClient {
 
         for (int i = 0; i <= ROPE_CURVE_SEGMENTS; i++) {
             float t = (float) i / ROPE_CURVE_SEGMENTS;
-            Vector3d point = calculateCatenaryPosition(startRelative, endRelative, t, sagAmount, windOffset, stableGameTime);
+            double x = startRelative.x + (endRelative.x - startRelative.x) * t;
+            double y = startRelative.y + (endRelative.y - startRelative.y) * t;
+            double z = startRelative.z + (endRelative.z - startRelative.z) * t;
+
+            double sagCurve = Math.sin(t * Math.PI) * sagAmount;
+            double windSway = Math.sin((stableGameTime * 0.7 + t * 2)) * windOffset * Math.max(sagAmount, 0.1) * 0.3;
+            double windSwayZ = Math.cos((stableGameTime * 0.5 + t * 1.5)) * windOffset * Math.max(sagAmount, 0.1) * 0.15;
+
+            Vector3d point = new Vector3d(x + windSway, y - sagCurve, z + windSwayZ);
             curvePoints[i] = point;
 
             mutPos.set(point.x + cameraPos.x, point.y + cameraPos.y, point.z + cameraPos.z);
@@ -203,90 +187,63 @@ public class RopeRendererClient {
         lastValidLight = lightValues[ROPE_CURVE_SEGMENTS];
         for (int i = ROPE_CURVE_SEGMENTS; i >= 0; i--) {
             if (isSolid[i]) {
-                lightValues[i] = maxLight(lightValues[i], lastValidLight);
+                int block1 = LightTexture.block(lightValues[i]);
+                int sky1 = LightTexture.sky(lightValues[i]);
+                int block2 = LightTexture.block(lastValidLight);
+                int sky2 = LightTexture.sky(lastValidLight);
+
+                lightValues[i] = LightTexture.pack(Math.max(block1, block2), Math.max(sky1, sky2));
             } else {
                 lastValidLight = lightValues[i];
             }
         }
 
-        RenderType renderType = VStuffRenderTypes.renderStyleMap.get(RopeStyleManager.get(style).renderStyle()).apply(RopeStyleManager.get(style).texture());
+        boolean chain = style.chain();
+        ResourceLocation texture = style.texture();
 
-        if (RopeStyleManager.get(style).renderStyle() == RopeStyle.RenderStyle.CHAIN) {
-            renderChainRope(poseStack, bufferSource.getBuffer(renderType), curvePoints, lightValues);
+
+        if (chain) {
+            renderChainRope(poseStack, bufferSource.getBuffer(VStuffRenderTypes.chainRenderer(texture)), curvePoints, lightValues);
         } else {
-            renderNormalRope(poseStack, bufferSource.getBuffer(renderType), curvePoints, lightValues, startRelative, endRelative);
+            renderNormalRope(poseStack, bufferSource.getBuffer(VStuffRenderTypes.ropeRenderer(texture)), curvePoints, lightValues, startRelative, endRelative);
         }
 
         poseStack.popPose();
-    }
-
-    private static int maxLight(int packed1, int packed2) {
-        int block1 = LightTexture.block(packed1);
-        int sky1 = LightTexture.sky(packed1);
-        int block2 = LightTexture.block(packed2);
-        int sky2 = LightTexture.sky(packed2);
-
-        return LightTexture.pack(Math.max(block1, block2), Math.max(sky1, sky2));
-    }
-
-    private static Vector3d right(Vector3d overall, Vector3d up) {
-        Vector3d worldUp = new Vector3d(0, 1, 0);
-
-        Vector3d right = new Vector3d();
-        if (Math.abs(overall.dot(worldUp)) > 0.9) {
-            right.set(1, 0, 0);
-        } else {
-            overall.cross(worldUp, right).normalize();
-        }
-
-        right.cross(overall, up).normalize();
-
-        return right;
     }
 
     private static void renderNormalRope(PoseStack poseStack, VertexConsumer vertexConsumer,
                                          Vector3d[] curvePoints, int[] lightValues, Vector3d start, Vector3d end) {
         Matrix4f matrix = poseStack.last().pose();
 
-        Vector3d direction = new Vector3d(end).sub(start);
-        Vector3d overallDirection = new Vector3d(direction).normalize();
+        Vector3d overallDirection = new Vector3d(end).sub(start).normalize();
         Vector3d up = new Vector3d();
 
         Vector3d right = right(overallDirection, up);
 
-        Vector3d[] topRightStrip = new Vector3d[ROPE_CURVE_SEGMENTS + 1];
-        Vector3d[] topLeftStrip = new Vector3d[ROPE_CURVE_SEGMENTS + 1];
-        Vector3d[] bottomLeftStrip = new Vector3d[ROPE_CURVE_SEGMENTS + 1];
-        Vector3d[] bottomRightStrip = new Vector3d[ROPE_CURVE_SEGMENTS + 1];
+        Vector3d[][] strips = new Vector3d[4][ROPE_CURVE_SEGMENTS + 1]; // top right, top left, bottom right, bottom left
 
-        double halfWidth = getRopeWidth() * 0.6f;
+        double halfWidth = getRopeWidth() * 0.6f; // ah yes half
         Vector3d rightScaled = new Vector3d(right).mul(halfWidth);
         Vector3d upScaled = new Vector3d(up).mul(halfWidth);
 
         for (int i = 0; i <= ROPE_CURVE_SEGMENTS; i++) {
             Vector3d center = curvePoints[i];
 
-            topRightStrip[i] = new Vector3d(center).add(rightScaled).add(upScaled);
-            topLeftStrip[i] = new Vector3d(center).sub(rightScaled).add(upScaled);
-            bottomLeftStrip[i] = new Vector3d(center).sub(rightScaled).sub(upScaled);
-            bottomRightStrip[i] = new Vector3d(center).add(rightScaled).sub(upScaled);
+            strips[0][i] = v3dAddAdd(center, rightScaled, upScaled);
+            strips[1][i] = v3dSubAdd(center, rightScaled, upScaled);
+            strips[2][i] = v3dSubAdd(center, upScaled, rightScaled);
+            strips[3][i] = v3dSubSub(center, rightScaled, upScaled);
         }
 
-        double textureScale = NORMAL_ROPE_V_SCALE;
-
-        Vector3d negUp = new Vector3d(up).mul(-1);
-        Vector3d negRight = new Vector3d(right).mul(-1);
-
-        renderRopeFaceWithGapFilling(vertexConsumer, matrix, topLeftStrip, topRightStrip, up, curvePoints, lightValues, textureScale);
-        renderRopeFaceWithGapFilling(vertexConsumer, matrix, topRightStrip, bottomRightStrip, right, curvePoints, lightValues, textureScale);
-        renderRopeFaceWithGapFilling(vertexConsumer, matrix, bottomRightStrip, bottomLeftStrip, negUp, curvePoints, lightValues, textureScale);
-        renderRopeFaceWithGapFilling(vertexConsumer, matrix, bottomLeftStrip, topLeftStrip, negRight, curvePoints, lightValues, textureScale);
-
+        renderRopeFaceWithGapFilling(vertexConsumer, matrix, strips[1], strips[0], up, curvePoints, lightValues);
+        renderRopeFaceWithGapFilling(vertexConsumer, matrix, strips[0], strips[2], right, curvePoints, lightValues);
+        renderRopeFaceWithGapFilling(vertexConsumer, matrix, strips[3], strips[1], neg(right), curvePoints, lightValues);
+        renderRopeFaceWithGapFilling(vertexConsumer, matrix, strips[2], strips[3], neg(up), curvePoints, lightValues);
     }
 
     private static void renderRopeFaceWithGapFilling(VertexConsumer vertexConsumer, Matrix4f matrix,
                                                      Vector3d[] strip1, Vector3d[] strip2, Vector3d normal,
-                                                     Vector3d[] curvePoints, int[] lightValues, double textureScale) {
+                                                     Vector3d[] curvePoints, int[] lightValues) {
         double[] cumulativeDistances = new double[ROPE_CURVE_SEGMENTS + 1];
         cumulativeDistances[0] = 0;
         for (int i = 0; i < ROPE_CURVE_SEGMENTS; i++) {
@@ -295,8 +252,8 @@ public class RopeRendererClient {
         }
 
         for (int i = 0; i < ROPE_CURVE_SEGMENTS; i++) {
-            float vStart = (float) (cumulativeDistances[i] * textureScale);
-            float vEnd = (float) (cumulativeDistances[i + 1] * textureScale);
+            float vStart = (float) (cumulativeDistances[i] * NORMAL_ROPE_V_SCALE);
+            float vEnd = (float) (cumulativeDistances[i + 1] * NORMAL_ROPE_V_SCALE);
 
             int lightStart = lightValues[i];
             int lightEnd = lightValues[i + 1];
@@ -311,13 +268,13 @@ public class RopeRendererClient {
             Vector3d center1 = new Vector3d(v1).add(v2).mul(0.5);
             Vector3d center2 = new Vector3d(v3).add(v4).mul(0.5);
 
-            addRopeVertexWithAlpha(vertexConsumer, matrix, center1, 0.5f, vStart, lightStart, normal, 128);
-            addRopeVertexWithAlpha(vertexConsumer, matrix, v2, 1.0f, vStart, lightStart, normal, 128);
-            addRopeVertexWithAlpha(vertexConsumer, matrix, center2, 0.5f, vEnd, lightEnd, normal, 128);
+            addRopeVertex(vertexConsumer, matrix, center1, 0.5f, vStart, lightStart, normal, 128);
+            addRopeVertex(vertexConsumer, matrix, v2, 1.0f, vStart, lightStart, normal, 128);
+            addRopeVertex(vertexConsumer, matrix, center2, 0.5f, vEnd, lightEnd, normal, 128);
 
-            addRopeVertexWithAlpha(vertexConsumer, matrix, v1, 0.0f, vStart, lightStart, normal, 128);
-            addRopeVertexWithAlpha(vertexConsumer, matrix, center1, 0.5f, vStart, lightStart, normal, 128);
-            addRopeVertexWithAlpha(vertexConsumer, matrix, center2, 0.5f, vEnd, lightEnd, normal, 128);
+            addRopeVertex(vertexConsumer, matrix, v1, 0.0f, vStart, lightStart, normal, 128);
+            addRopeVertex(vertexConsumer, matrix, center1, 0.5f, vStart, lightStart, normal, 128);
+            addRopeVertex(vertexConsumer, matrix, center2, 0.5f, vEnd, lightEnd, normal, 128);
         }
     }
 
@@ -348,25 +305,52 @@ public class RopeRendererClient {
             Vector3d rScaled = new Vector3d(right).mul(halfWidth);
             Vector3d uScaled = new Vector3d(up).mul(halfWidth);
 
-            Vector3d diag1 = new Vector3d(right).add(up).normalize();
-            Vector3d diag2 = new Vector3d(right).sub(up).normalize();
-
-            Vector3d startTR = new Vector3d(pStart).add(rScaled).add(uScaled);
-            Vector3d startBL = new Vector3d(pStart).sub(rScaled).sub(uScaled);
-            Vector3d endTR = new Vector3d(pEnd).add(rScaled).add(uScaled);
-            Vector3d endBL = new Vector3d(pEnd).sub(rScaled).sub(uScaled);
-
-            Vector3d startTL = new Vector3d(pStart).sub(rScaled).add(uScaled);
-            Vector3d startBR = new Vector3d(pStart).add(rScaled).sub(uScaled);
-            Vector3d endTL = new Vector3d(pEnd).sub(rScaled).add(uScaled);
-            Vector3d endBR = new Vector3d(pEnd).add(rScaled).sub(uScaled);
-
             float vStart = (float) (cumulativeDistances[i] * textureVScale);
             float vEnd = (float) (cumulativeDistances[i + 1] * textureVScale);
 
-            renderFace(vertexConsumer, matrix, startTL, startBR, endTL, endBR, vStart, vEnd, lightValues[i], lightValues[i+1], diag1);
-            renderFace(vertexConsumer, matrix, startTR, startBL, endTR, endBL, vStart, vEnd, lightValues[i], lightValues[i+1], diag2);
+            renderFace(
+                    vertexConsumer,
+                    matrix,
+                    v3dSubAdd(pStart, rScaled, uScaled),
+                    v3dSubAdd(pStart, uScaled, rScaled),
+                    v3dSubAdd(pEnd, rScaled, uScaled),
+                    v3dSubAdd(pEnd, uScaled, rScaled),
+                    vStart,
+                    vEnd,
+                    lightValues[i],
+                    lightValues[i+1],
+                    new Vector3d(right).add(up).normalize()
+            );
+            renderFace(
+                    vertexConsumer,
+                    matrix,
+                    v3dAddAdd(pStart, rScaled, uScaled),
+                    v3dSubSub(pStart, rScaled, uScaled),
+                    v3dAddAdd(pEnd, rScaled, uScaled),
+                    v3dSubSub(pEnd, rScaled, uScaled),
+                    vStart,
+                    vEnd,
+                    lightValues[i],
+                    lightValues[i+1],
+                    new Vector3d(right).sub(up).normalize()
+            );
         }
+    }
+
+    private static Vector3d neg(Vector3d vector3d) {
+        return new Vector3d(vector3d).mul(-1);
+    }
+
+    private static Vector3d v3dSubAdd(Vector3d vector3d, Vector3d sub, Vector3d add) {
+        return new Vector3d(vector3d).sub(sub).add(add);
+    }
+
+    private static Vector3d v3dAddAdd(Vector3d vector3d, Vector3d add1, Vector3d add2) {
+        return new Vector3d(vector3d).add(add1).add(add2);
+    }
+
+    private static Vector3d v3dSubSub(Vector3d vector3d, Vector3d sub1, Vector3d sub2) {
+        return new Vector3d(vector3d).sub(sub1).sub(sub2);
     }
 
     private static void renderFace(VertexConsumer consumer, Matrix4f matrix, Vector3d v1, Vector3d v2,
@@ -382,10 +366,10 @@ public class RopeRendererClient {
 
     private static void addRopeVertex(VertexConsumer consumer, Matrix4f matrix, Vector3d pos,
                                       float u, float v, int light, Vector3d normal) {
-        addRopeVertexWithAlpha(consumer, matrix, pos, u, v, light, normal, 255);
+        addRopeVertex(consumer, matrix, pos, u, v, light, normal, 255);
     }
 
-    private static void addRopeVertexWithAlpha(VertexConsumer consumer, Matrix4f matrix, Vector3d pos,
+    private static void addRopeVertex(VertexConsumer consumer, Matrix4f matrix, Vector3d pos,
                                                float u, float v, int light, Vector3d normal, int alpha) {
         float clampedU = Math.max(0.0f, Math.min(1.0f, u));
         consumer.vertex(matrix, (float) pos.x, (float) pos.y, (float) pos.z)
@@ -397,16 +381,18 @@ public class RopeRendererClient {
                 .endVertex();
     }
 
-    private static Vector3d calculateCatenaryPosition(Vector3d start, Vector3d end, float t,
-                                                      double sagAmount, float windOffset, float gameTime) {
-        double x = start.x + (end.x - start.x) * t;
-        double y = start.y + (end.y - start.y) * t;
-        double z = start.z + (end.z - start.z) * t;
+    private static Vector3d right(Vector3d overall, Vector3d up) {
+        Vector3d worldUp = new Vector3d(0, 1, 0);
 
-        double sagCurve = Math.sin(t * Math.PI) * sagAmount;
-        double windSway = Math.sin((gameTime * 0.7 + t * 2)) * windOffset * Math.max(sagAmount, 0.1) * 0.3;
-        double windSwayZ = Math.cos((gameTime * 0.5 + t * 1.5)) * windOffset * Math.max(sagAmount, 0.1) * 0.15;
+        Vector3d right = new Vector3d();
+        if (Math.abs(overall.dot(worldUp)) > 0.9) {
+            right.set(1, 0, 0);
+        } else {
+            overall.cross(worldUp, right).normalize();
+        }
 
-        return new Vector3d(x + windSway, y - sagCurve, z + windSwayZ);
+        right.cross(overall, up).normalize();
+
+        return right;
     }
 }

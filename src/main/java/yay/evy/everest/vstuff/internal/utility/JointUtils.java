@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public final class JointUtils {
     private static final double JOINT_POSITION_EPSILON = 1.0e-3;
@@ -63,15 +64,15 @@ public final class JointUtils {
     }
 
     private static boolean matchesDirectAnchors(VSJoint first, VSJoint second) {
-        return first.getShipId0() == second.getShipId0() &&
-            first.getShipId1() == second.getShipId1() &&
+        return Objects.equals(first.getShipId0(), second.getShipId0()) &&
+                Objects.equals(first.getShipId1(), second.getShipId1()) &&
             matchesPose(first.getPose0(), second.getPose0()) &&
             matchesPose(first.getPose1(), second.getPose1());
     }
 
     private static boolean matchesSwappedAnchors(VSJoint first, VSJoint second) {
-        return first.getShipId0() == second.getShipId1() &&
-            first.getShipId1() == second.getShipId0() &&
+        return Objects.equals(first.getShipId0(), second.getShipId1()) &&
+                Objects.equals(first.getShipId1(), second.getShipId0()) &&
             matchesPose(first.getPose0(), second.getPose1()) &&
             matchesPose(first.getPose1(), second.getPose0());
     }

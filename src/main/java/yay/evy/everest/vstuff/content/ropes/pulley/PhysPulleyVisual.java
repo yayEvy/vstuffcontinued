@@ -10,7 +10,7 @@ import dev.engine_room.flywheel.lib.visual.SimpleTickableVisual;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import org.jetbrains.annotations.Nullable;
-import yay.evy.everest.vstuff.index.VStuffPartials;
+import yay.evy.everest.vstuff.index.VStuffPartialModels;
 
 import java.util.function.Consumer;
 
@@ -26,7 +26,7 @@ public class PhysPulleyVisual extends ShaftVisual<PhysPulleyBlockEntity> impleme
 
         direction = blockState.getValue(HORIZONTAL_FACING).getOpposite();
 
-        coil = instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(VStuffPartials.PULLEY_COIL))
+        coil = instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(VStuffPartialModels.PULLEY_COIL))
                 .createInstance()
                 .rotateToFace(Direction.UP, rotationAxis())
                 .setup(blockEntity)

@@ -6,29 +6,28 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.network.NetworkEvent;
-import yay.evy.everest.vstuff.internal.RopeStyle;
 import yay.evy.everest.vstuff.sound.RopeSoundHandler;
 
 import java.util.function.Supplier;
 
 public class RopeSoundPacket {
     private final boolean breakSound;
-    private final RopeStyle.RenderStyle style;
+    private final boolean chain;
 
-    public RopeSoundPacket(boolean breakSound, RopeStyle.RenderStyle style) {
+    public RopeSoundPacket(boolean breakSound, boolean chain) {
         this.breakSound = breakSound;
-        this.style = style;
+        this.chain = chain;
     }
 
     public static void encode(RopeSoundPacket msg, FriendlyByteBuf buf) {
         buf.writeBoolean(msg.breakSound);
-        buf.writeEnum(msg.style);
+        buf.writeBoolean(msg.chain);
     }
 
     public static RopeSoundPacket decode(FriendlyByteBuf buf) {
         return new RopeSoundPacket(
                 buf.readBoolean(),
-                buf.readEnum(RopeStyle.RenderStyle.class)
+                buf.readBoolean()
         );
     }
 
@@ -38,12 +37,12 @@ public class RopeSoundPacket {
                 Minecraft mc = Minecraft.getInstance();
                 if (mc.player != null && mc.level != null) {
                     var sound = msg.breakSound
-                            ? (msg.style == RopeStyle.RenderStyle.CHAIN
+                            ? (msg.chain
                             ? SoundEvents.CHAIN_BREAK
-                            : SoundEvents.LEASH_KNOT_BREAK)
-                            : (msg.style == RopeStyle.RenderStyle.CHAIN
+                            : SoundEvents.WOOL_BREAK)
+                            : (msg.chain
                             ? SoundEvents.CHAIN_PLACE
-                            : SoundEvents.LEASH_KNOT_PLACE);
+                            : SoundEvents.WOOL_PLACE);
 
                     mc.level.playLocalSound(
                             mc.player.getX(),

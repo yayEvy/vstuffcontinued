@@ -1,103 +1,78 @@
 package yay.evy.everest.vstuff.content.ropes;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import org.valkyrienskies.core.internal.joints.*;
+import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.internal.RopeStyle;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.utility.*;
 
 import javax.annotation.Nullable;
-
-import static yay.evy.everest.vstuff.internal.utility.RopeUtils.getRopeType;
+import java.util.Objects;
 
 public class ReworkedRope {
 
-    public Integer ropeId;
-    public Integer jointId = null;
+    Integer ropeId;
+    Integer jointId;
     public RopePosData posData0;
     public RopePosData posData1;
     public JointValues jointValues;
-    public ResourceLocation style;
-    public RopeUtils.RopeType type;
+    public RopeStyle style;
+    public final boolean hasJoint;
 
-    /**
-     * yes rope very cool wow
-     * this is used for anything with ropes, it stores all data
-     */
-    private ReworkedRope(Integer ropeId, RopePosData posData0, RopePosData posData1, JointValues values, ResourceLocation style, RopeUtils.RopeType type) {
-        this.ropeId = ropeId;
+    protected ReworkedRope(RopePosData posData0, RopePosData posData1, JointValues values, ResourceLocation style) {
         this.posData0 = posData0;
         this.posData1 = posData1;
         this.jointValues = values;
-        this.style = style;
-        this.type = type;
+        this.style = RopeStyleManager.get(style);
+        this.hasJoint = !posData0.sameShip(posData1);
     }
 
-    // todo todo todo todo for later make the rope creation use a consumer of Integer, then RopeManager gives the consumer the id
-
-    public static ReworkedRope create(ServerLevel level, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1, Player player, boolean taut) {
-        ship0 = (ShipUtils.getGroundBodyId(level).equals(ship0)) ? null : ship0;
-        ship1 = (ShipUtils.getGroundBodyId(level).equals(ship1)) ? null : ship1;
-        RopePosData posData0tmp = RopePosData.create(level, ship0, blockPos0);
-        RopePosData posData1tmp = RopePosData.create(level, ship1, blockPos1);
-        RopePosData posData0;
-        RopePosData posData1;
-
-        System.out.println(posData0tmp);
-        System.out.println(posData1tmp);
-
-        if (posData1tmp.isWorld() && !posData0tmp.isWorld()) {
-            posData0 = posData1tmp;
-            posData1 = posData0tmp;
-        } else {
-            posData0 = posData0tmp;
-            posData1 = posData1tmp;
-        }
-
-        double length = posData0.getWorldPos(level).distance(posData1.getWorldPos(level)) + (taut ? 0.0 : 0.5);
-
-        double mass0 = ShipUtils.getMassForShip(level, ship0);
-        double mass1 = ShipUtils.getMassForShip(level, ship1);
-        double effectiveMass = Math.max(Math.min(mass0, mass1), 100.0);
-        double compliance = 1e-12 / effectiveMass * (posData0.isWorld() || posData1.isWorld() ? 0.05 : 1);
-        double massRatio = Math.max(mass0, mass1) / Math.min(mass0, mass1);
-        double maxForce = 5e13f * Math.min(massRatio, 20.0f) * (posData0.isWorld() || posData1.isWorld() ? 10f : 1f);
-
-        ResourceLocation style = RopeStyleManager.getStyle(player);
-
-        ReworkedRope rope = new ReworkedRope(RopeManager.getNextId(), posData0, posData1, JointValues.withDefault(new VSJointMaxForceTorque((float) maxForce, (float) maxForce), (float) length, compliance), style, getRopeType(posData0, posData1));
-
-        if (posData0.getShipIdSafe(level).equals(posData1.getShipIdSafe(level))) {
-            RopeManager.addRopeWithPersistence(level, rope);
-
-            if (player instanceof ServerPlayer serverPlayer) {
-                RopeManager.syncAllRopesToPlayer(serverPlayer);
-            }
-        } else {
-            GTPAUtils.addRopeJoint(level, player, rope);
-        }
-
-        return rope;
+    public Integer getRopeId() {
+        return ropeId;
     }
 
-    public void removeJoint(ServerLevel level) {
-        if (this.type != RopeUtils.RopeType.WW) {
+    public Integer getJointId() {
+        return hasTrackedJoint() ? jointId : -1;
+    }
 
-            GTPAUtils.removeJoint(level, this);
+    public ReworkedRope setRopeId(Integer to) {
+        if (ropeId != null) {
+            VStuff.LOGGER.warn("Blocking attempt to set ropeId when it has already been set.");
         } else {
-            RopeManager.removeRopeWithPersistence(level, this.ropeId);
-            this.jointId = null;
+            this.ropeId = Objects.requireNonNull(to, "Cannot set ropeId to a null value!");
         }
+
+        return this;
+    }
+
+    public ReworkedRope setJointId(Integer to) {
+        if (jointId != null) {
+            VStuff.LOGGER.warn("Blocking attempt to set jointId when it has already been set.");
+        } else if (!hasJoint) {
+            VStuff.LOGGER.warn("Cannot set jointId for a rope that does not have a joint!");
+        } else if (!(to >= 0)) {
+            VStuff.LOGGER.warn("Received invalid value for jointId: {}", to);
+        } else {
+            this.jointId = Objects.requireNonNull(to, "Cannot set jointId to a null value!");
+        }
+
+        return this;
+    }
+
+    public boolean atBlockPos(BlockPos blockPos) {
+        return this.posData0.blockPos().equals(blockPos) || this.posData1.blockPos().equals(blockPos);
+    }
+
+    public void unsafeSetJointId(Integer to) {
+        this.jointId = to;
     }
 
     public void setJointLength(ServerLevel level, Float newLength) {
         setJointValues(level, null, null, newLength, null, null, null, null);
     }
-
 
     /**
      * sets a rope's joint values. any parameters that are given null will not be changed
@@ -125,34 +100,5 @@ public class ReworkedRope {
     public void detachActors(ServerLevel level) {
         posData0.remove(level, ropeId);
         posData1.remove(level, ropeId);
-    }
-
-    public CompoundTag toTag() {
-        CompoundTag ropeTag = new CompoundTag();
-
-        ropeTag.putInt("jointId", jointId == null ? -1 : jointId);
-        ropeTag.put("posData0", TagUtils.writePosData(posData0));
-        ropeTag.put("posData1", TagUtils.writePosData(posData1));
-        ropeTag.put("jointValues", TagUtils.writeJointValues(jointValues));
-        ropeTag.put("style", TagUtils.writeResourceLocation(style));
-        ropeTag.putString("type", type.name());
-
-        return ropeTag;
-    }
-
-    public static ReworkedRope fromTag(CompoundTag ropeTag, int id) {
-        ReworkedRope rope = new ReworkedRope(
-            id,
-            TagUtils.readPosData(ropeTag.getCompound("posData0")),
-            TagUtils.readPosData(ropeTag.getCompound("posData1")),
-            TagUtils.readJointValues(ropeTag.getCompound("jointValues")),
-            TagUtils.readResourceLocation(ropeTag.getCompound("style")),
-            RopeUtils.RopeType.valueOf(ropeTag.getString("type"))
-        );
-        if (ropeTag.contains("jointId")) {
-            int savedJointId = ropeTag.getInt("jointId");
-            rope.jointId = savedJointId == -1 ? null : savedJointId;
-        }
-        return rope;
     }
 }

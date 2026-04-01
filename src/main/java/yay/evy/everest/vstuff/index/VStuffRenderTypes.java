@@ -16,7 +16,6 @@ public class VStuffRenderTypes extends RenderType {
         super(pName, pFormat, pMode, pBufferSize, pAffectsCrumbling, pSortOnUpload, pSetupState, pClearState);
     }
 
-    public static EnumMap<RopeStyle.RenderStyle, Function<ResourceLocation, RenderType>> renderStyleMap = new EnumMap<>(RopeStyle.RenderStyle.class);
 
     public static RenderType ropeRenderer(ResourceLocation texture) {
         return create("rope_renderer",
@@ -95,14 +94,6 @@ public class VStuffRenderTypes extends RenderType {
                         .setDepthTestState(LEQUAL_DEPTH_TEST)
                         .setWriteMaskState(COLOR_DEPTH_WRITE)
                         .createCompositeState(false));
-    }
-
-
-    public static void register() { // silly
-        renderStyleMap.put(RopeStyle.RenderStyle.NORMAL, Util.memoize(VStuffRenderTypes::ropeRenderer));
-        renderStyleMap.put(RopeStyle.RenderStyle.CHAIN, Util.memoize(VStuffRenderTypes::chainRenderer));
-        renderStyleMap.put(RopeStyle.RenderStyle.NORMAL_T, Util.memoize(VStuffRenderTypes::ropeRendererTranslucent));
-        renderStyleMap.put(RopeStyle.RenderStyle.CHAIN_T, Util.memoize(VStuffRenderTypes::chainRendererTranslucent));
     }
 
 }

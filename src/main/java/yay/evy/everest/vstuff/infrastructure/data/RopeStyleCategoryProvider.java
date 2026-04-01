@@ -60,7 +60,7 @@ public class RopeStyleCategoryProvider implements DataProvider {
     private CompletableFuture<?> category(CachedOutput output, int order, String name, String... styles) {
         String fileName = name.toLowerCase(Locale.ROOT).replace(" ", "_");
 
-        return category(output, new ResourceLocation(VStuff.MOD_ID, fileName), order, name, styles);
+        return category(output, VStuff.asResource(fileName), order, name, styles);
     }
     private CompletableFuture<?> category(CachedOutput output, ResourceLocation id, int order, String name, String... styles) {
         JsonObject json = new JsonObject();

@@ -29,10 +29,10 @@ public class RopeStyleCategoryReloadListener extends SimpleJsonResourceReloadLis
         RopeStyleCategoryManager.clear();
 
         RopeStyleCategory uncategorized = new RopeStyleCategory(
-                        RopeStyleCategoryManager.UNCATEGORIZED_ID,
-                        Component.translatable("ropestyle.category.vstuff.uncategorized"),
-                        Integer.MAX_VALUE
-                );
+            RopeStyleCategoryManager.UNCATEGORIZED_ID,
+            Component.translatable("ropestyle.category.vstuff.uncategorized"),
+            Integer.MAX_VALUE
+        );
 
         RopeStyleCategoryManager.register(uncategorized);
 
@@ -57,20 +57,20 @@ public class RopeStyleCategoryReloadListener extends SimpleJsonResourceReloadLis
         for (Map.Entry<ResourceLocation, JsonElement> entry : jsons.entrySet()) {
             ResourceLocation categoryId = entry.getKey();
             RopeStyleCategory category = RopeStyleCategoryManager.getSorted().stream()
-                            .filter(c -> c.id.equals(categoryId))
-                            .findFirst()
-                            .orElse(null);
+                .filter(c -> c.id.equals(categoryId))
+                .findFirst()
+                .orElse(null);
 
             if (category == null) {
                 continue;
             }
 
             JsonArray styles = entry.getValue()
-                    .getAsJsonObject()
-                    .getAsJsonArray("styles");
+                .getAsJsonObject()
+                .getAsJsonArray("styles");
 
             for (JsonElement e : styles) {
-                ResourceLocation styleId = new ResourceLocation(e.getAsString());
+                ResourceLocation styleId = ResourceLocation.bySeparator(e.getAsString(), ':');
                 RopeStyle style = RopeStyleManager.get(styleId);
 
                 if (style != null) {

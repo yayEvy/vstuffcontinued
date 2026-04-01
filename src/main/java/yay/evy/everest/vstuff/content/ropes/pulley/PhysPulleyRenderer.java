@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
-import yay.evy.everest.vstuff.index.VStuffPartials;
+import yay.evy.everest.vstuff.index.VStuffPartialModels;
 
 import static yay.evy.everest.vstuff.content.ropes.pulley.PhysPulleyBlock.HORIZONTAL_FACING;
 
@@ -24,7 +24,7 @@ public class PhysPulleyRenderer extends ShaftRenderer<PhysPulleyBlockEntity> {
         Direction direction = be.getBlockState().getValue(HORIZONTAL_FACING);
         VertexConsumer vb = buffer.getBuffer(RenderType.cutoutMipped());
 
-        SuperByteBuffer coil = CachedBuffers.partialFacing(VStuffPartials.PULLEY_COIL, be.getBlockState(), direction);
+        SuperByteBuffer coil = CachedBuffers.partialFacing(VStuffPartialModels.PULLEY_COIL, be.getBlockState(), direction);
 
         standardKineticRotationTransform(coil, be, light).renderInto(ms, vb);
     }

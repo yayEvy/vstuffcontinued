@@ -6,24 +6,23 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import yay.evy.everest.vstuff.index.VStuffEntities;
-import yay.evy.everest.vstuff.index.VStuffRenderTypes;
+import yay.evy.everest.vstuff.index.VStuffPartialModels;
 import yay.evy.everest.vstuff.infrastructure.ponder.VStuffPonders;
 
 public class VStuffClient {
 
-    public static void initVStuffClient(IEventBus modEventBus) {
-        modEventBus.addListener(VStuffClient::initialize);
+    public static void initialize(IEventBus modEventBus) {
+        modEventBus.addListener(VStuffClient::clientInit);
     }
 
-    public static void initialize(final FMLClientSetupEvent event) {
-
+    private static void clientInit(final FMLClientSetupEvent event) {
         event.enqueueWork(() -> EntityRenderers.register(
                 VStuffEntities.ROPE_THROWER.get(),
                 ThrownItemRenderer::new
         ));
 
-        PonderIndex.addPlugin(new VStuffPonders());
-        VStuffRenderTypes.register();
+        VStuffPartialModels.register();
 
+        PonderIndex.addPlugin(new VStuffPonders());
     }
 }

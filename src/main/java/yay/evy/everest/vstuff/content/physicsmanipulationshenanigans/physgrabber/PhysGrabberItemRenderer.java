@@ -19,13 +19,12 @@ import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.TransformDa
 public class PhysGrabberItemRenderer extends CustomRenderedItemModelRenderer {
 
 
-    private static final ResourceLocation EMPTY = VStuff.asTextureResource("item/energy_core/empty.png");
-    private static final ResourceLocation TINT = VStuff.asTextureResource("item/energy_core/blue_tint.png");
+    private static final ResourceLocation TINT = VStuff.asResource("textures/item/energy_core/blue_tint.png");
 
     private static final PartialModel CORE = PartialModel.of(VStuff.asResource("item/energy_core/core"));
     private static final PartialModel CORE_INNER = PartialModel.of(VStuff.asResource("item/energy_core/core_inner"));
     private static final PartialModel CORE_OUTER = PartialModel.of(VStuff.asResource("item/energy_core/core_outer"));
-    private static final Vector3f TIP_OFFSET = new Vector3f(0f, -0.55f, 0.7f); // tweak these to match your model's tip
+    private static final Vector3f TIP_OFFSET = new Vector3f(0f, -0.55f, 0.7f);
 
     @Override
     protected void render(ItemStack stack, CustomRenderedItemModel model, PartialItemModelRenderer renderer, ItemDisplayContext transformType,
@@ -41,8 +40,6 @@ public class PhysGrabberItemRenderer extends CustomRenderedItemModelRenderer {
 
         ms.popPose();
     }
-
-
 
     private void renderCore(@NotNull PoseStack ms, @NotNull PartialItemModelRenderer renderer, @NotNull TransformData innerData, @NotNull TransformData data, int light) {
         Vector3f modelOffset = new Vector3f(0.0F, -0.55F, 0.3275F);

@@ -15,8 +15,9 @@ import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.mod.api.BlockEntityPhysicsListener;
 import yay.evy.everest.vstuff.content.ropes.IRopeActor;
-import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 import yay.evy.everest.vstuff.content.ropes.RopeManager;
+import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
+import yay.evy.everest.vstuff.content.ropes.RopeFactory;
 import yay.evy.everest.vstuff.index.VStuffBlockEntities;
 
 import java.util.List;
@@ -33,13 +34,11 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
     @Override
     public void connectRope(Integer ropeId, BlockState state, Level level, BlockPos pos) {
-        if (level instanceof ServerLevel serverLevel) {
-            RopeManager.ensureLoaded(serverLevel);
-        }
-        if (ropeId == null || RopeManager.getRope(ropeId) == null) return;
+        if (!(level instanceof ServerLevel serverLevel)) return;
+        if (ropeId == null || RopeManager.get(serverLevel).hasRope(ropeId)) return;
 
         this.ropeId = ropeId;
-        this.rope = RopeManager.getRope(ropeId);
+        this.rope = RopeManager.get(serverLevel).getRope(ropeId);
 
         blockConnect(state, level, pos);
 
@@ -81,7 +80,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         }
 
 
-        if (!RopeManager.hasRope(ropeId)) {
+        if (!RopeManager.get(serverLevel).hasRope(ropeId)) {
             removeRope(ropeId, getBlockState(), serverLevel, getBlockPos());
             return;
         }
@@ -106,10 +105,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);
 
         boolean hasRope = ropeId != null;
-        if (hasRope && rope == null) {
-            rope = RopeManager.getRope(ropeId);
-            if (rope == null) return false;
-        }
 
         tooltip.add(Component.literal(" "));
 
@@ -137,23 +132,25 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     protected void write(CompoundTag tag, boolean clientPacket) {
         super.write(tag, clientPacket);
 
-        tag.putInt("rope_constraint_id", Objects.requireNonNullElse(this.ropeId, -1));
+        tag.putInt("ropeId", Objects.requireNonNullElse(this.ropeId, -1));
     }
+
     @Override
     protected void read(CompoundTag tag, boolean clientPacket) {
         super.read(tag, clientPacket);
 
-        if (tag.contains("rope_constraint_id")) {
-            this.ropeId = tag.getInt("rope_constraint_id");
+        if (tag.contains("ropeId")) {
+            this.ropeId = tag.getInt("ropeId");
             if (this.ropeId == -1) this.ropeId = null;
         }
 
         connectRope(ropeId, getBlockState(), level, getBlockPos());
     }
+
     @Override
     public @NotNull CompoundTag getUpdateTag() {
         CompoundTag tag = super.getUpdateTag();
-        if (ropeId != null) tag.putInt("rope_constraint_id", ropeId);
+        if (ropeId != null) tag.putInt("ropeId", ropeId);
         return tag;
     }
 
@@ -161,7 +158,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     public void handleUpdateTag(CompoundTag tag) {
         super.handleUpdateTag(tag);
 
-        if (tag.contains("id")) ropeId = tag.getInt("id");
+        if (tag.contains("ropeId")) ropeId = tag.getInt("ropeId");
     }
 
 
@@ -172,7 +169,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
         if (ropeId == null || rope == null) return;
 
-        rope.removeJoint(serverLevel);
+        RopeFactory.removeRope(serverLevel, ropeId);
 
         removeRope(ropeId, getBlockState(), serverLevel, getBlockPos());
     }

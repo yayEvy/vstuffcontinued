@@ -1,6 +1,5 @@
 package yay.evy.everest.vstuff.content.ropes.editor;
 
-import net.createmod.catnip.gui.ScreenOpener;
 import net.minecraft.ChatFormatting;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -25,7 +24,7 @@ public class RopeEditorItem extends Item {
 
         Integer ropeId =  RopeUtils.findTargetedLead(serverLevel, player);
 
-        if (ropeId == null || RopeManager.getRope(ropeId) == null) {
+        if (ropeId == null || RopeManager.get(serverLevel).getRope(ropeId) == null) {
             player.displayClientMessage(VStuff.translate("rope.editor_not_found").withStyle(ChatFormatting.RED), true);
             return InteractionResultHolder.success(stack);
         }

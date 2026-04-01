@@ -1,5 +1,5 @@
 {
+  "chain": false,
   "name": "White",
-  "render_type": "normal",
   "texture": "minecraft:textures/block/white_wool.png"
 }
