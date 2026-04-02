@@ -2,13 +2,8 @@ package yay.evy.everest.vstuff.index;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import net.minecraft.Util;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import yay.evy.everest.vstuff.internal.RopeStyle;
-
-import java.util.EnumMap;
-import java.util.function.Function;
 
 public class VStuffRenderTypes extends RenderType {
 

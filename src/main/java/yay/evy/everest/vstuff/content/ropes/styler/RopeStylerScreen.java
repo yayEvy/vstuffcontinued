@@ -4,12 +4,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.createmod.catnip.gui.AbstractSimiScreen;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.internal.RopeStyle;
-import yay.evy.everest.vstuff.internal.RopeStyleCategory;
 import yay.evy.everest.vstuff.internal.RopeStyleCategoryManager;
+import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import yay.evy.everest.vstuff.internal.utility.ClientTextUtils;
 import yay.evy.everest.vstuff.index.VStuffGuiTextures;
@@ -26,8 +23,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
-import yay.evy.everest.vstuff.internal.network.packet.RopeStyleSelectPacket;
-import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
 import java.util.List;
 
@@ -42,17 +37,17 @@ public class RopeStylerScreen extends AbstractSimiScreen {
     private final VStuffGuiTextures background = VStuffGuiTextures.ROPE_STYLER;
     // The names of bogey categories
     private final List<Component> categoryComponentList = RopeStyleCategoryManager.getSortedList().stream()
-            .map(mapper -> mapper.name)
+            .map(RopeStyleCategoryManager.RopeStyleCategory::name)
             .toList();
     // The category that is currently selected
-    private RopeStyleCategory selectedCategory;
+    private RopeStyleCategoryManager.RopeStyleCategory selectedCategory;
     private int categoryIndex = 0; // for the scroll input on window resize
     // The list of bogies being displayed
-    RopeStyle[] displayedStyles = new RopeStyle[6];
+    RopeStyleManager.RopeStyle[] displayedStyles = new RopeStyleManager.RopeStyle[6];
     // The list of bogey selection buttons
     RopeStyleButton[] styleButtons = new RopeStyleButton[6];
     // The bogey that is currently selected
-    RopeStyle selectedStyle;
+    RopeStyleManager.RopeStyle selectedStyle;
     // Amount scrolled, 0 = top and 1 = bottom
     private float scrollOffs;
     // True if the scrollbar is being dragged
@@ -73,7 +68,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
             addRenderableWidget(styleButtons[i] = new RopeStyleButton(x + 19, y + 41 + (i * 18), 145, 17, bogeySelection(i)));
         }
 
-        List<RopeStyleCategory> categories = RopeStyleCategoryManager.getSortedList();
+        List<RopeStyleCategoryManager.RopeStyleCategory> categories = RopeStyleCategoryManager.getSortedList();
 
         // Initial setup
         if (categories.isEmpty()) {
@@ -86,8 +81,8 @@ public class RopeStylerScreen extends AbstractSimiScreen {
 
         setupList(selectedCategory);
 
-        if (!selectedCategory.styles.isEmpty()) {
-            selectedStyle = selectedCategory.styles.get(0);
+        if (!selectedCategory.styles().isEmpty()) {
+            selectedStyle = selectedCategory.styles().get(0);
         } else {
             selectedStyle = null;
         }
@@ -107,7 +102,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
                     scrollTo(0.0F);
                     this.categoryIndex = categoryIndex;
 
-                    List<RopeStyleCategory> updatedCategories = RopeStyleCategoryManager.getSortedList();
+                    List<RopeStyleCategoryManager.RopeStyleCategory> updatedCategories = RopeStyleCategoryManager.getSortedList();
                     if (updatedCategories.isEmpty()) {
                         selectedCategory = null;
                         selectedStyle = null;
@@ -117,8 +112,8 @@ public class RopeStylerScreen extends AbstractSimiScreen {
                     selectedCategory = updatedCategories.get(categoryIndex);
                     setupList(selectedCategory);
 
-                    if (!selectedCategory.styles.isEmpty()) {
-                        selectedStyle = selectedCategory.styles.get(0);
+                    if (!selectedCategory.styles().isEmpty()) {
+                        selectedStyle = selectedCategory.styles().get(0);
                     } else {
                         selectedStyle = null;
                     }
@@ -163,7 +158,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
 
         // render names and textures
         for (int i = 0; i < 6; i++) {
-            RopeStyle style = displayedStyles[i];
+            RopeStyleManager.RopeStyle style = displayedStyles[i];
             if (style != null) {
                 // texture
                 ResourceLocation icon = style.texture();
@@ -193,12 +188,12 @@ public class RopeStylerScreen extends AbstractSimiScreen {
         ms.popPose();
     }
 
-    private void setupList(RopeStyleCategory categoryEntry) {
+    private void setupList(RopeStyleCategoryManager.RopeStyleCategory categoryEntry) {
         setupList(categoryEntry, 0);
     }
 
-    private void setupList(RopeStyleCategory categoryEntry, int offset) {
-        List<RopeStyle> styles = categoryEntry.styles;
+    private void setupList(RopeStyleCategoryManager.RopeStyleCategory categoryEntry, int offset) {
+        List<RopeStyleManager.RopeStyle> styles = categoryEntry.styles();
 
         for (int i = 0; i < 6; i++) {
             if (i + offset < styles.size()) {
@@ -272,9 +267,9 @@ public class RopeStylerScreen extends AbstractSimiScreen {
         super.mouseScrolled(mouseX, mouseY, delta);
         if (!canScroll()) return false;
         if (insideCategorySelector(mouseX, mouseY)) return false;
-        if (selectedCategory == null || selectedCategory.styles.size() < 6) return false;
+        if (selectedCategory == null || selectedCategory.styles().size() < 6) return false;
 
-        double listSize = selectedCategory.styles.size() - 6;
+        double listSize = selectedCategory.styles().size() - 6;
         float scrollFactor = (float) (delta / listSize);
 
         final float oldScrollOffs = scrollOffs;
@@ -295,7 +290,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
     private void scrollTo(float pos) {
         if (selectedCategory == null) return;
 
-        List<RopeStyle> styles = selectedCategory.styles;
+        List<RopeStyleManager.RopeStyle> styles = selectedCategory.styles();
         float listSize = styles.size() - 6;
         int index = (int) ((double) (pos * listSize) + 0.5);
 
@@ -303,7 +298,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
     }
 
     private boolean canScroll() {
-        return selectedCategory != null && selectedCategory.styles.size() > 6;
+        return selectedCategory != null && selectedCategory.styles().size() > 6;
     }
 
     private boolean insideCategorySelector(double mouseX, double mouseY) {

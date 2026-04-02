@@ -16,14 +16,15 @@ import java.util.function.BiConsumer;
 public class RopeStyleLangProvider {
 
     public static void provideLang(DataGenerator generator, BiConsumer<String, String> consumer) {
-        styleLang(generator, consumer, "ropestyles", "ropestyle");
-        styleLang(generator, consumer, "ropestyle_categories", "ropestyle.category");
+        styleLang(generator, consumer, "style", "ropestyle");
+        styleLang(generator, consumer, "category", "ropestyle.category");
     }
 
     private static void styleLang(DataGenerator generator, BiConsumer<String, String> consumer, String dir, String keyFirst) {
         Path root = generator.getPackOutput().getOutputFolder()
                 .resolve("data")
                 .resolve(VStuff.MOD_ID)
+                .resolve("ropestyle")
                 .resolve(dir);
 
         Map<String, String> langData = new HashMap<>();
@@ -42,8 +43,6 @@ public class RopeStyleLangProvider {
     private static void readFile(Path path, Map<String, String> langData, String keyFirst) {
         try (Reader reader = Files.newBufferedReader(path)) {
             JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
-
-            if (!json.has("name")) return;
 
             String id = path.getFileName().toString().replace(".json", "");
 

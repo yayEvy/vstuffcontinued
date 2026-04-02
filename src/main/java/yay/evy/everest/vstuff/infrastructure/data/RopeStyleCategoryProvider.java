@@ -62,22 +62,24 @@ public class RopeStyleCategoryProvider implements DataProvider {
 
         return category(output, VStuff.asResource(fileName), order, name, styles);
     }
+
     private CompletableFuture<?> category(CachedOutput output, ResourceLocation id, int order, String name, String... styles) {
         JsonObject json = new JsonObject();
         json.addProperty("name", name);
         json.addProperty("order", order);
 
         JsonArray styleArray = new JsonArray();
-        for (String style : styles) {
-            styleArray.add(style);
-        }
+
+        for (String style : styles) styleArray.add(style);
+
         json.add("styles", styleArray);
 
 
         Path path = generator.getPackOutput().getOutputFolder()
                 .resolve("data")
-                .resolve(id.getNamespace())
-                .resolve("ropestyle_categories")
+                .resolve(VStuff.MOD_ID)
+                .resolve("ropestyle")
+                .resolve("category")
                 .resolve(id.getPath() + ".json");
 
         return DataProvider.saveStable(output, json, path);
@@ -85,6 +87,6 @@ public class RopeStyleCategoryProvider implements DataProvider {
 
     @Override
     public String getName() {
-        return "vstuff_ropestyle_categories";
+        return "vstuff_category";
     }
 }

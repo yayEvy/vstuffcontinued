@@ -44,7 +44,7 @@ public class RopeFactory {
                 ship1,
                 blockPos0,
                 blockPos1,
-                RopeStyleManager.getOrDefaultStyle(ropeItem.getOrCreateTag()),
+                RopeStyleManager.getOrDefaultStyleId(ropeItem.getOrCreateTag()),
                 player
         ));
     }

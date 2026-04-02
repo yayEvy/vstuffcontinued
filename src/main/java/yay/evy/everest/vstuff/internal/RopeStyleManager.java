@@ -2,6 +2,7 @@ package yay.evy.everest.vstuff.internal;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -14,16 +15,13 @@ import yay.evy.everest.vstuff.internal.utility.TagUtils;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class RopeStyleManager {
 
     private static final Map<ResourceLocation, RopeStyle> STYLES = new HashMap<>();
 //    private static final HashMap<UUID, ResourceLocation> selectedStyles = new HashMap<>();
 
-    private static final String NBT_KEY = "rope_style";
-
-    public static ResourceLocation defaultId = ResourceLocation.fromNamespaceAndPath(VStuff.MOD_ID, "normal");
+    public static final ResourceLocation DEFAULT_ID = VStuff.asResource("normal");
 
     public static void clear() {
         STYLES.clear();
@@ -41,12 +39,12 @@ public class RopeStyleManager {
         return STYLES.values();
     }
 
-    public static ResourceLocation getOrDefaultStyle(CompoundTag ropeTag) {
-        if (!ropeTag.contains("style", Tag.TAG_COMPOUND)) return defaultId;
+    public static ResourceLocation getOrDefaultStyleId(CompoundTag ropeTag) {
+        if (!ropeTag.contains("style", Tag.TAG_COMPOUND)) return DEFAULT_ID;
         return TagUtils.readResourceLocation(ropeTag.getCompound("style"));
     }
 
-    public static ResourceLocation getStyle(CompoundTag ropeTag) {
+    public static ResourceLocation getStyleId(CompoundTag ropeTag) {
         return TagUtils.readResourceLocation(ropeTag.getCompound("style"));
     }
 
@@ -60,5 +58,14 @@ public class RopeStyleManager {
         if (stack.isEmpty()) return;
         CompoundTag tag = stack.getOrCreateTag();
         tag.put("style", TagUtils.writeResourceLocation(style));
+    }
+
+    public record RopeStyle(ResourceLocation id, ResourceLocation restyleGroup, Component name, RopeRenderType ropeRenderType, ResourceLocation texture) {}
+
+    public enum RopeRenderType {
+        NORMAL,
+        NORMAL_TRANSLUCENT,
+        CHAIN,
+        CHAIN_TRANSLUCENT
     }
 }

@@ -3,6 +3,7 @@ package yay.evy.everest.vstuff;
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import net.createmod.catnip.lang.LangBuilder;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -116,6 +117,10 @@ public class VStuff {
 
     public static ResourceLocation asResource(String path) {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+    }
+
+    public static ResourceLocation mcResource(String path) {
+        return ResourceLocation.fromNamespaceAndPath("minecraft", path);
     }
 
     public static MutableComponent translate(String key, Object... args) {

@@ -3,15 +3,12 @@ package yay.evy.everest.vstuff.internal.network;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import org.joml.Vector3d;
-import yay.evy.everest.vstuff.internal.RopeStyle;
 import yay.evy.everest.vstuff.internal.network.packet.RopeSyncPacket;
 import yay.evy.everest.vstuff.internal.network.packet.OutlinePacket;
-import yay.evy.everest.vstuff.internal.network.packet.RopeSoundPacket;
 import yay.evy.everest.vstuff.internal.network.packet.RopeStyleSelectPacket;
 
 public class NetworkHandler {
@@ -31,12 +28,6 @@ public class NetworkHandler {
                 .decoder(RopeSyncPacket::new)
                 .encoder(RopeSyncPacket::encode)
                 .consumerMainThread(RopeSyncPacket::handle)
-                .add();
-
-        INSTANCE.messageBuilder(RopeSoundPacket.class, packetId++)
-                .decoder(RopeSoundPacket::decode)
-                .encoder(RopeSoundPacket::encode)
-                .consumerMainThread(RopeSoundPacket::handle)
                 .add();
 
         INSTANCE.messageBuilder(RopeStyleSelectPacket.class, packetId++)

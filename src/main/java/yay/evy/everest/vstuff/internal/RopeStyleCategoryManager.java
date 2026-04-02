@@ -1,5 +1,6 @@
 package yay.evy.everest.vstuff.internal;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import yay.evy.everest.vstuff.VStuff;
 
@@ -16,22 +17,25 @@ public class RopeStyleCategoryManager {
     }
 
     public static void register(RopeStyleCategory category) {
-        CATEGORIES.put(category.id, category);
+        CATEGORIES.put(category.id(), category);
     }
 
     public static Collection<RopeStyleCategory> getSorted() {
         return CATEGORIES.values().stream()
-                .sorted(Comparator.comparingInt(c -> c.order))
+                .sorted(Comparator.comparingInt(RopeStyleCategory::order))
                 .toList();
     }
 
     public static List<RopeStyleCategory> getSortedList() {
         return CATEGORIES.values().stream()
-                .sorted(Comparator.comparingInt(c -> c.order))
+                .sorted(Comparator.comparingInt(RopeStyleCategory::order))
                 .toList();
     }
 
     public static RopeStyleCategory getUncategorized() {
         return CATEGORIES.get(UNCATEGORIZED_ID);
     }
+
+    public record RopeStyleCategory(ResourceLocation id, Component name, int order, List<RopeStyleManager.RopeStyle> styles) {}
+
 }

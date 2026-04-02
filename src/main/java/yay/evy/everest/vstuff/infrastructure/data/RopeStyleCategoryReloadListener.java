@@ -1,7 +1,6 @@
 package yay.evy.everest.vstuff.infrastructure.data;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.network.chat.Component;
@@ -9,83 +8,54 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
-import yay.evy.everest.vstuff.internal.RopeStyle;
-import yay.evy.everest.vstuff.internal.RopeStyleCategory;
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.internal.RopeStyleCategoryManager;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class RopeStyleCategoryReloadListener extends SimpleJsonResourceReloadListener {
 
     public RopeStyleCategoryReloadListener() {
-        super(new Gson(), "ropestyle_categories");
+        super(new Gson(), "ropestyle/category");
     }
 
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> jsons, ResourceManager manager, ProfilerFiller profiler) {
         RopeStyleCategoryManager.clear();
 
-        RopeStyleCategory uncategorized = new RopeStyleCategory(
-            RopeStyleCategoryManager.UNCATEGORIZED_ID,
-            Component.translatable("ropestyle.category.vstuff.uncategorized"),
-            Integer.MAX_VALUE
-        );
-
-        RopeStyleCategoryManager.register(uncategorized);
+        List<RopeStyleManager.RopeStyle> assigned = new ArrayList<>();
+        List<RopeStyleManager.RopeStyle> uncategorizedStyles = new ArrayList<>();
 
         for (Map.Entry<ResourceLocation, JsonElement> entry : jsons.entrySet()) {
             ResourceLocation id = entry.getKey();
             JsonObject json = entry.getValue().getAsJsonObject();
 
             Component name = Component.translatable("ropestyle.category." + id.getNamespace() + "." + id.getPath());
-            int order = json.has("order") ? json.get("order").getAsInt() : 0;
+            int order = json.get("order").getAsInt();
 
-            RopeStyleCategoryManager.register(new RopeStyleCategory(id, name, order));
+            List<RopeStyleManager.RopeStyle> styles = json.getAsJsonArray("styles").asList().stream().map(jsonElement -> RopeStyleManager.get(ResourceLocation.bySeparator(jsonElement.getAsString(), ':'))).toList();
+
+            assigned.addAll(styles);
+
+            RopeStyleCategoryManager.register(new RopeStyleCategoryManager.RopeStyleCategory(id, name, order, styles));
         }
 
-        assignStyles(jsons);
-    }
-
-
-
-    private void assignStyles(Map<ResourceLocation, JsonElement> jsons) {
-        Set<RopeStyle> assigned = new HashSet<>();
-
-        for (Map.Entry<ResourceLocation, JsonElement> entry : jsons.entrySet()) {
-            ResourceLocation categoryId = entry.getKey();
-            RopeStyleCategory category = RopeStyleCategoryManager.getSorted().stream()
-                .filter(c -> c.id.equals(categoryId))
-                .findFirst()
-                .orElse(null);
-
-            if (category == null) {
-                continue;
-            }
-
-            JsonArray styles = entry.getValue()
-                .getAsJsonObject()
-                .getAsJsonArray("styles");
-
-            for (JsonElement e : styles) {
-                ResourceLocation styleId = ResourceLocation.bySeparator(e.getAsString(), ':');
-                RopeStyle style = RopeStyleManager.get(styleId);
-
-                if (style != null) {
-                    category.styles.add(style);
-                    assigned.add(style);
-                }
-            }
-        }
-
-        RopeStyleCategory uncategorized = RopeStyleCategoryManager.getUncategorized();
-
-        for (RopeStyle style : RopeStyleManager.getAll()) {
+        for (RopeStyleManager.RopeStyle style : RopeStyleManager.getAll()) {
             if (!assigned.contains(style)) {
-                uncategorized.styles.add(style);
+                uncategorizedStyles.add(style);
             }
         }
+
+        RopeStyleCategoryManager.RopeStyleCategory uncategorized = new RopeStyleCategoryManager.RopeStyleCategory(
+            RopeStyleCategoryManager.UNCATEGORIZED_ID,
+            Component.translatable("ropestyle.category.vstuff.uncategorized"),
+            Integer.MAX_VALUE,
+            uncategorizedStyles
+        );
+
+        RopeStyleCategoryManager.register(uncategorized);
+
+        VStuff.LOGGER.info("Loaded {} ropestyle categories from data.", RopeStyleCategoryManager.getSortedList().size());
     }
 }

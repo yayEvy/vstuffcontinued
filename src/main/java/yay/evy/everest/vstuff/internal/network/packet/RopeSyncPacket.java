@@ -1,13 +1,11 @@
 package yay.evy.everest.vstuff.internal.network.packet;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkEvent;
 import org.joml.Vector3d;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.ClientRopeManager;
-import yay.evy.everest.vstuff.internal.RopeStyle;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
 
 import java.util.function.Supplier;
@@ -37,7 +35,7 @@ public class RopeSyncPacket {
         this.maxLength = maxLength;
 
         if (ropeStyle == null) {
-            ropeStyle = RopeStyleManager.defaultId;
+            ropeStyle = RopeStyleManager.DEFAULT_ID;
         }
         this.ropeStyle = ropeStyle;
     }
@@ -50,7 +48,7 @@ public class RopeSyncPacket {
         this.localPosA = null;
         this.localPosB = null;
         this.maxLength = 0;
-        this.ropeStyle = RopeStyleManager.defaultId;
+        this.ropeStyle = RopeStyleManager.DEFAULT_ID;
     }
 
     public RopeSyncPacket(Integer constraintId) {
@@ -61,7 +59,7 @@ public class RopeSyncPacket {
         this.localPosA = null;
         this.localPosB = null;
         this.maxLength = 0;
-        this.ropeStyle = RopeStyleManager.defaultId;
+        this.ropeStyle = RopeStyleManager.DEFAULT_ID;
     }
 
     public RopeSyncPacket(FriendlyByteBuf buf) {
@@ -87,7 +85,7 @@ public class RopeSyncPacket {
                 this.localPosA = null;
                 this.localPosB = null;
                 this.maxLength = 0;
-                this.ropeStyle = RopeStyleManager.defaultId;
+                this.ropeStyle = RopeStyleManager.DEFAULT_ID;
                 break;
             case CLEAR_ALL:
             default:
@@ -97,7 +95,7 @@ public class RopeSyncPacket {
                 this.localPosA = null;
                 this.localPosB = null;
                 this.maxLength = 0;
-                this.ropeStyle = RopeStyleManager.defaultId;
+                this.ropeStyle = RopeStyleManager.DEFAULT_ID;
                 break;
         }
     }

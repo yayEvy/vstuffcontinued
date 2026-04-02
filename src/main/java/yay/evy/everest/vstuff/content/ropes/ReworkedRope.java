@@ -5,7 +5,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import org.valkyrienskies.core.internal.joints.*;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.internal.RopeStyle;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.utility.*;
 
@@ -19,7 +18,7 @@ public class ReworkedRope {
     public RopePosData posData0;
     public RopePosData posData1;
     public JointValues jointValues;
-    public RopeStyle style;
+    public RopeStyleManager.RopeStyle style;
     public final boolean hasJoint;
 
     protected ReworkedRope(RopePosData posData0, RopePosData posData1, JointValues values, ResourceLocation style) {

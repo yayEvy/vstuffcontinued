@@ -4,7 +4,9 @@ import com.google.gson.JsonObject;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
+import net.minecraft.resources.ResourceLocation;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.internal.RopeStyleManager;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -12,6 +14,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+
+import static yay.evy.everest.vstuff.infrastructure.data.VStuffDatagen.COLORS;
+import static yay.evy.everest.vstuff.infrastructure.data.VStuffDatagen.LOGS;
+import static yay.evy.everest.vstuff.VStuff.asResource;
+import static yay.evy.everest.vstuff.VStuff.mcResource;
 
 public class RopeStyleProvider implements DataProvider {
 
@@ -23,68 +30,62 @@ public class RopeStyleProvider implements DataProvider {
 
     @Override
     public CompletableFuture<?> run(CachedOutput output) {
-
         List<CompletableFuture<?>> futures = new ArrayList<>();
 
-
-        futures.add(basicRopeStyle(output, "Normal", false));
-        futures.add(basicRopeStyle(output, "Chain", true));
+        futures.add(basicRopeStyle(output, "Normal", RopeStyleManager.RopeRenderType.NORMAL));
+        futures.add(basicRopeStyle(output, "Chain", RopeStyleManager.RopeRenderType.CHAIN));
 
         woolStyles(output, futures);
         dyedStyles(output, futures);
 
-        futures.add(basicRopeStyle(output, "Pride", false));
-        futures.add(basicRopeStyle(output, "Gay", false));
-        futures.add(basicRopeStyle(output, "Lesbian", false));
-        futures.add(basicRopeStyle(output, "Bisexual", false));
-        futures.add(basicRopeStyle(output, "Transgender", false));
-        futures.add(basicRopeStyle(output, "Nonbinary", false));
-        futures.add(basicRopeStyle(output, "Asexual", false));
+        futures.add(basicRopeStyle(output, "Pride", RopeStyleManager.RopeRenderType.NORMAL));
+        futures.add(basicRopeStyle(output, "Gay", RopeStyleManager.RopeRenderType.NORMAL));
+        futures.add(basicRopeStyle(output, "Lesbian", RopeStyleManager.RopeRenderType.NORMAL));
+        futures.add(basicRopeStyle(output, "Bisexual", RopeStyleManager.RopeRenderType.NORMAL));
+        futures.add(basicRopeStyle(output, "Transgender", RopeStyleManager.RopeRenderType.NORMAL));
+        futures.add(basicRopeStyle(output, "Nonbinary", RopeStyleManager.RopeRenderType.NORMAL));
+        futures.add(basicRopeStyle(output, "Asexual", RopeStyleManager.RopeRenderType.NORMAL));
 
         logStyles(output, futures);
 
-        futures.add(basicRopeStyle(output, "Candycane", false));
-        futures.add(basicRopeStyle(output, "Christmas Tree", false));
+        futures.add(basicRopeStyle(output, "Candycane", RopeStyleManager.RopeRenderType.NORMAL));
+        futures.add(basicRopeStyle(output, "Christmas Tree", RopeStyleManager.RopeRenderType.NORMAL));
 
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
     }
 
-    private CompletableFuture<?> basicRopeStyle(CachedOutput output, String name, boolean chain) {
+    private CompletableFuture<?> basicRopeStyle(CachedOutput output, String name, RopeStyleManager.RopeRenderType ropeRenderType) {
         String fileName = name.toLowerCase(Locale.ROOT).replace(" ", "_");
-        return ropeStyle(output, name, chain, "vstuff:textures/rope/rope_" + fileName + ".png", fileName);
+        return ropeStyle(output, name, ropeRenderType, asResource("textures/rope/rope_" + fileName + ".png"), "none", fileName);
     }
 
     private void dyedStyles(CachedOutput output, List<CompletableFuture<?>> futures) {
-        List<String> colors = List.of("Red", "Orange", "Yellow", "Lime", "Green", "Cyan",
-                "Blue", "Light Blue", "Purple", "Pink", "Magenta", "Brown", "Black", "Gray", "Light Gray", "White");
-        futures.addAll(colors.stream()
+        futures.addAll(COLORS.stream()
                 .map(color -> {
                     String fileName = color.toLowerCase(Locale.ROOT).replace(" ", "_") + "_dye";
-                    return ropeStyle(output, color, false, "vstuff:textures/rope/rope_" + fileName + ".png", fileName);
-                }).collect(Collectors.toCollection(ArrayList::new))
+                    return ropeStyle(output, color, RopeStyleManager.RopeRenderType.NORMAL, asResource("textures/rope/rope_" + fileName + ".png"), "dyes", fileName);
+                })
+                .collect(Collectors.toCollection(ArrayList::new))
         );
     }
 
     private void woolStyles(CachedOutput output, List<CompletableFuture<?>> futures) {
-        List<String> colors = List.of("Red", "Orange", "Yellow", "Lime", "Green", "Cyan",
-                "Blue", "Light Blue", "Purple", "Pink", "Magenta", "Brown", "Black", "Gray", "Light Gray", "White");
-        futures.addAll(colors.stream()
+        futures.addAll(COLORS.stream()
                 .map(color -> {
                     String fileName = color.toLowerCase(Locale.ROOT).replace(" ", "_") + "_wool";
-                    return ropeStyle(output, color, false, "minecraft:textures/block/" + fileName + ".png", fileName);
-                }).collect(Collectors.toCollection(ArrayList::new))
+                    return ropeStyle(output, color, RopeStyleManager.RopeRenderType.NORMAL, mcResource("textures/block/" + fileName + ".png"), "wools", fileName);
+                })
+                .collect(Collectors.toCollection(ArrayList::new))
         );
     }
 
     private void logStyles(CachedOutput output, List<CompletableFuture<?>> futures) {
-        List<String> logs = List.of("Oak", "Birch", "Dark Oak", "Jungle", "Acacia", "Mangrove", "Cherry",
-                "Stripped Oak", "Stripped Birch", "Stripped Dark Oak", "Stripped Jungle", "Stripped Acacia",
-                "Stripped Mangrove", "Stripped Cherry");
-        futures.addAll(logs.stream()
+        futures.addAll(LOGS.stream()
                 .map(log -> {
                     String fileName = log.toLowerCase(Locale.ROOT).replace(" ", "_") + "_log";
-                    return ropeStyle(output, log, false, "minecraft:textures/block/" + fileName + ".png", fileName);
-                }).collect(Collectors.toCollection(ArrayList::new))
+                    return ropeStyle(output, log, RopeStyleManager.RopeRenderType.NORMAL, mcResource("textures/block/" + fileName + ".png"), "logs", fileName);
+                })
+                .collect(Collectors.toCollection(ArrayList::new))
         );
     }
 
@@ -93,17 +94,19 @@ public class RopeStyleProvider implements DataProvider {
         return name.toLowerCase(Locale.ROOT).replace(" ", "_");
     }
 
-    private CompletableFuture<?> ropeStyle(CachedOutput output, String name, boolean chain, String texture, String fileName) {
+    private CompletableFuture<?> ropeStyle(CachedOutput output, String name, RopeStyleManager.RopeRenderType renderType, ResourceLocation texture, String restyleGroup, String fileName) {
 
         JsonObject json = new JsonObject();
         json.addProperty("name", name);
-        json.addProperty("chain", chain);
-        json.addProperty("texture", texture);
+        json.addProperty("render_type", renderType.name());
+        json.addProperty("texture", texture.toString());
+        json.addProperty("restyle_group", asResource(restyleGroup).toString());
 
         Path path = generator.getPackOutput().getOutputFolder()
                 .resolve("data")
                 .resolve(VStuff.MOD_ID)
-                .resolve("ropestyles")
+                .resolve("ropestyle")
+                .resolve("style")
                 .resolve(fileName + ".json");
 
         return DataProvider.saveStable(output, json, path);
@@ -111,6 +114,6 @@ public class RopeStyleProvider implements DataProvider {
 
     @Override
     public String getName() {
-        return "vstuff_ropestyles";
+        return "vstuff_styles";
     }
 }

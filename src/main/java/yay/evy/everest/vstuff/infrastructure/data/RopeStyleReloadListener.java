@@ -8,15 +8,16 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
-import yay.evy.everest.vstuff.internal.RopeStyle;
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
 
+import java.util.Locale;
 import java.util.Map;
 
 public class RopeStyleReloadListener extends SimpleJsonResourceReloadListener {
 
     public RopeStyleReloadListener() {
-        super(new Gson(), "ropestyles");
+        super(new Gson(), "ropestyle/style");
     }
 
     @Override
@@ -29,11 +30,15 @@ public class RopeStyleReloadListener extends SimpleJsonResourceReloadListener {
 
             Component name = Component.translatable("ropestyle." + id.getNamespace() + "." + id.getPath());
 
-            boolean chain = json.get("chain").getAsBoolean();
+            RopeStyleManager.RopeRenderType renderType = RopeStyleManager.RopeRenderType.valueOf(json.get("render_type").getAsString());
 
             ResourceLocation texture = ResourceLocation.bySeparator(json.get("texture").getAsString(), ':');
 
-            RopeStyleManager.register(new RopeStyle(id, name, chain, texture));
+            ResourceLocation restyleGroup = ResourceLocation.bySeparator(json.get("restyle_group").getAsString(), ':');
+
+            RopeStyleManager.register(new RopeStyleManager.RopeStyle(id, restyleGroup, name, renderType, texture));
         }
+
+        VStuff.LOGGER.info("Loaded {} rope styles from data.", RopeStyleManager.getAll().size());
     }
 }

@@ -1,8 +1,0 @@
-{
-  "name": "Basic Styles",
-  "order": 0,
-  "styles": [
-    "vstuff:normal",
-    "vstuff:chain"
-  ]
-}

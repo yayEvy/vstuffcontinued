@@ -30,6 +30,7 @@ public class ForgeEvents {
     public static void addReloadListeners(AddReloadListenerEvent event) {
         event.addListener(new RopeStyleReloadListener());
         event.addListener(new RopeStyleCategoryReloadListener());
+        //event.addListener(new RopeRestyleReloadListener()); todo i will finish this tmr
     }
 
     @SubscribeEvent

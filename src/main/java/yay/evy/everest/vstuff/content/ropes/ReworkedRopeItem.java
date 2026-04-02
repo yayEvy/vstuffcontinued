@@ -4,12 +4,9 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -19,7 +16,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.ClientOutlineHandler;
-import yay.evy.everest.vstuff.internal.RopeStyle;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
@@ -90,7 +86,7 @@ public class ReworkedRopeItem extends Item {
         if (ropeResult.valid()) {
             player.displayClientMessage(VStuff.translate("rope.created").withStyle(ChatFormatting.GREEN), true);
 
-            RopeUtils.playPlaceSound(serverLevel, clickedPos, ropeResult.rope().style.chain());
+            RopeUtils.playPlaceSound(serverLevel, clickedPos, (ropeResult.rope().style.ropeRenderType() == RopeStyleManager.RopeRenderType.CHAIN));
 
         } else {
             player.displayClientMessage(VStuff.translate(ropeResult.message()).withStyle(ChatFormatting.RED), true);

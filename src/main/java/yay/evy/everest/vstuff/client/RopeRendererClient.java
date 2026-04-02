@@ -5,7 +5,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
@@ -22,12 +21,10 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.index.VStuffRenderTypes;
 import yay.evy.everest.vstuff.infrastructure.config.VStuffConfig;
-import yay.evy.everest.vstuff.internal.RopeStyle;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class RopeRendererClient {
@@ -93,7 +90,7 @@ public class RopeRendererClient {
 
     private static void renderClientRope(PoseStack poseStack, MultiBufferSource bufferSource,
                                          Integer constraintId, ClientRopeManager.ClientRopeData ropeData,
-                                         Level level, Vec3 cameraPos, float partialTick, RopeStyle style) {
+                                         Level level, Vec3 cameraPos, float partialTick, RopeStyleManager.RopeStyle style) {
         if (!level.isClientSide) return;
         if (!ropeData.isRenderable(level)) return;
 
@@ -113,7 +110,7 @@ public class RopeRendererClient {
 
     private static void renderRope(PoseStack poseStack, MultiBufferSource bufferSource,
                                    Vector3d startPos, Vector3d endPos, double actualRopeLength,
-                                   double maxRopeLength, Vec3 cameraPos, float partialTick, Level level, RopeStyle style) {
+                                   double maxRopeLength, Vec3 cameraPos, float partialTick, Level level, RopeStyleManager.RopeStyle style) {
 
         Vector3d startRelative = new Vector3d(startPos.x - cameraPos.x, startPos.y - cameraPos.y, startPos.z - cameraPos.z);
         Vector3d endRelative = new Vector3d(endPos.x - cameraPos.x, endPos.y - cameraPos.y, endPos.z - cameraPos.z);
@@ -198,14 +195,10 @@ public class RopeRendererClient {
             }
         }
 
-        boolean chain = style.chain();
-        ResourceLocation texture = style.texture();
-
-
-        if (chain) {
-            renderChainRope(poseStack, bufferSource.getBuffer(VStuffRenderTypes.chainRenderer(texture)), curvePoints, lightValues);
+        if (style.ropeRenderType() == RopeStyleManager.RopeRenderType.CHAIN) {
+            renderChainRope(poseStack, bufferSource.getBuffer(VStuffRenderTypes.chainRenderer(style.texture())), curvePoints, lightValues);
         } else {
-            renderNormalRope(poseStack, bufferSource.getBuffer(VStuffRenderTypes.ropeRenderer(texture)), curvePoints, lightValues, startRelative, endRelative);
+            renderNormalRope(poseStack, bufferSource.getBuffer(VStuffRenderTypes.ropeRenderer(style.texture())), curvePoints, lightValues, startRelative, endRelative);
         }
 
         poseStack.popPose();
