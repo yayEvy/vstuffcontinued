@@ -1,0 +1,6 @@
+{
+  "name": "Mangrove",
+  "render_type": "NORMAL",
+  "restyle_group": "vstuff:logs",
+  "texture": "minecraft:textures/block/mangrove_log.png"
+}

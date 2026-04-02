@@ -1,0 +1,20 @@
+{
+  "name": "Log Styles",
+  "order": 4,
+  "styles": [
+    "vstuff:oak_log",
+    "vstuff:birch_log",
+    "vstuff:dark_oak_log",
+    "vstuff:jungle_log",
+    "vstuff:acacia_log",
+    "vstuff:mangrove_log",
+    "vstuff:cherry_log",
+    "vstuff:stripped_oak_log",
+    "vstuff:stripped_birch_log",
+    "vstuff:stripped_dark_oak_log",
+    "vstuff:stripped_jungle_log",
+    "vstuff:stripped_acacia_log",
+    "vstuff:stripped_mangrove_log",
+    "vstuff:stripped_cherry_log"
+  ]
+}

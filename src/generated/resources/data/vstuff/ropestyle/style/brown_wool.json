@@ -1,0 +1,6 @@
+{
+  "name": "Brown",
+  "render_type": "NORMAL",
+  "restyle_group": "vstuff:wools",
+  "texture": "minecraft:textures/block/brown_wool.png"
+}

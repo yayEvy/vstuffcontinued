@@ -72,7 +72,6 @@ public class VStuffDatagen {
     public static void gatherData(GatherDataEvent event) {
         DataGenerator generator = event.getGenerator();
 
-
         generator.addProvider(event.includeServer(), new RopeStyleProvider(generator));
         generator.addProvider(event.includeServer(), new RopeStyleCategoryProvider(generator));
         //generator.addProvider(event.includeServer(), new RopeRestylingProvider(generator)); todo i will finish this tmr

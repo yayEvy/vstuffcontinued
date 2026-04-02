@@ -1,0 +1,13 @@
+{
+  "name": "Pride Styles",
+  "order": 3,
+  "styles": [
+    "vstuff:pride",
+    "vstuff:gay",
+    "vstuff:lesbian",
+    "vstuff:bisexual",
+    "vstuff:transgender",
+    "vstuff:nonbinary",
+    "vstuff:asexual"
+  ]
+}

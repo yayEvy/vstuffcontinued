@@ -1,0 +1,6 @@
+{
+  "name": "Lime",
+  "render_type": "NORMAL",
+  "restyle_group": "vstuff:wools",
+  "texture": "minecraft:textures/block/lime_wool.png"
+}

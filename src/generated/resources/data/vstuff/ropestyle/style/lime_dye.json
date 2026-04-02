@@ -1,0 +1,6 @@
+{
+  "name": "Lime",
+  "render_type": "NORMAL",
+  "restyle_group": "vstuff:dyes",
+  "texture": "vstuff:textures/rope/rope_lime_dye.png"
+}
