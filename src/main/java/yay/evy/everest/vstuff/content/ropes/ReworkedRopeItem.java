@@ -16,7 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.ClientOutlineHandler;
-import yay.evy.everest.vstuff.internal.RopeStyleManager;
+import yay.evy.everest.vstuff.client.rope.RopeRendererTypes;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 import yay.evy.everest.vstuff.internal.utility.TagUtils;
@@ -86,7 +86,7 @@ public class ReworkedRopeItem extends Item {
         if (ropeResult.valid()) {
             player.displayClientMessage(VStuff.translate("rope.created").withStyle(ChatFormatting.GREEN), true);
 
-            RopeUtils.playPlaceSound(serverLevel, clickedPos, (ropeResult.rope().style.ropeRenderType() == RopeStyleManager.RopeRenderType.CHAIN));
+            RopeUtils.playPlaceSound(serverLevel, clickedPos, (ropeResult.rope().type.rendererTypeId().equals(RopeRendererTypes.CHAIN.getId())));
 
         } else {
             player.displayClientMessage(VStuff.translate(ropeResult.message()).withStyle(ChatFormatting.RED), true);

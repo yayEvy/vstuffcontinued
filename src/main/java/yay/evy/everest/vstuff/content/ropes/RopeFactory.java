@@ -8,7 +8,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import yay.evy.everest.vstuff.internal.RopeStyleManager;
+import yay.evy.everest.vstuff.content.ropes.type.RopeType;
 import yay.evy.everest.vstuff.internal.utility.*;
 
 public class RopeFactory {
@@ -44,12 +44,12 @@ public class RopeFactory {
                 ship1,
                 blockPos0,
                 blockPos1,
-                RopeStyleManager.getOrDefaultStyleId(ropeItem.getOrCreateTag()),
+                RopeType.getOrDefaultTypeId(ropeItem.getOrCreateTag()),
                 player
         ));
     }
 
-    public static ReworkedRope createNewRope(ServerLevel level, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1, ResourceLocation style, Player player) {
+    public static ReworkedRope createNewRope(ServerLevel level, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1, ResourceLocation type, Player player) {
         Pair<RopePosData, RopePosData> posDataPair = RopePosData.create(level, ship0, ship1, blockPos0, blockPos1);
         RopePosData posData0 = posDataPair.component1();
         RopePosData posData1 = posDataPair.component2();
@@ -61,7 +61,7 @@ public class RopeFactory {
         // double compliance = 1e-12 / Math.max(Math.min(mass0, mass1), 100.0) * (posData0.isWorld() || posData1.isWorld() ? 0.05 : 1); maybe not needed idk
         float maxForce = 5e13f * Math.min(Math.max(mass0, mass1) / Math.min(mass0, mass1), 20.0f) * (posData0.isWorld() || posData1.isWorld() ? 10f : 1f);
 
-        ReworkedRope rope = new ReworkedRope(posData0, posData1, JointValues.withDefault(maxForce, maxForce, length), style);
+        ReworkedRope rope = new ReworkedRope(posData0, posData1, JointValues.withDefault(maxForce, maxForce, length), type);
 
         if (!rope.hasJoint) {
             RopeManager.get(level).addRope(rope);
@@ -97,7 +97,7 @@ public class RopeFactory {
         ropeTag.put("posData0", TagUtils.writePosData(rope.posData0));
         ropeTag.put("posData1", TagUtils.writePosData(rope.posData1));
         ropeTag.put("jointValues", TagUtils.writeJointValues(rope.jointValues));
-        ropeTag.put("style", TagUtils.writeResourceLocation(rope.style.id()));
+        ropeTag.put("style", TagUtils.writeResourceLocation(rope.type.id()));
 
         return ropeTag;
     }

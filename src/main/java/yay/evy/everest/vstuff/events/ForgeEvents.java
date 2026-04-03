@@ -16,8 +16,8 @@ import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 import yay.evy.everest.vstuff.content.ropes.RopeFactory;
 import yay.evy.everest.vstuff.content.ropes.RopeManager;
 import yay.evy.everest.vstuff.index.VStuffItems;
-import yay.evy.everest.vstuff.infrastructure.data.RopeStyleCategoryReloadListener;
-import yay.evy.everest.vstuff.infrastructure.data.RopeStyleReloadListener;
+import yay.evy.everest.vstuff.infrastructure.data.RopeCategoryReloadListener;
+import yay.evy.everest.vstuff.infrastructure.data.RopeTypeReloadListener;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
 import java.util.HashSet;
@@ -28,8 +28,8 @@ public class ForgeEvents {
 
     @SubscribeEvent
     public static void addReloadListeners(AddReloadListenerEvent event) {
-        event.addListener(new RopeStyleReloadListener());
-        event.addListener(new RopeStyleCategoryReloadListener());
+        event.addListener(new RopeTypeReloadListener());
+        event.addListener(new RopeCategoryReloadListener());
         //event.addListener(new RopeRestyleReloadListener()); todo i will finish this tmr
     }
 

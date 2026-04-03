@@ -2112,7 +2112,7 @@ java.lang.IllegalAccessException: class io.netty.util.internal.PlatformDependent
 [01Apr2026 23:42:24.046] [modloading-worker-0/DEBUG] [com.tterrag.registrate.AbstractRegistrate/REGISTRATE.REGISTER]: Captured registration for entry weathered_iron_window_pane of type minecraft:block
 [01Apr2026 23:42:24.050] [modloading-worker-0/INFO] [yay.evy.everest.vstuff.VStuff/]: VStuff (vstuff) initialized
 [01Apr2026 23:42:24.050] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber/LOADING]: Attempting to inject @EventBusSubscriber classes into the eventbus for vstuff
-[01Apr2026 23:42:24.050] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber/LOADING]: Auto-subscribing yay.evy.everest.vstuff.client.RopeRendererClient to FORGE
+[01Apr2026 23:42:24.050] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber/LOADING]: Auto-subscribing yay.evy.everest.vstuff.client.ClientRopeManager.Renderer to FORGE
 [01Apr2026 23:42:24.052] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber/LOADING]: Auto-subscribing yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.PhysGrabberClientTick to FORGE
 [01Apr2026 23:42:24.053] [modloading-worker-0/DEBUG] [net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber/LOADING]: Auto-subscribing yay.evy.everest.vstuff.events.ClientEvents to FORGE
 [01Apr2026 23:42:24.054] [modloading-worker-0/DEBUG] [com.tterrag.registrate.AbstractRegistrate/REGISTRATE.REGISTER]: Captured registration for entry cut_granite of type minecraft:item

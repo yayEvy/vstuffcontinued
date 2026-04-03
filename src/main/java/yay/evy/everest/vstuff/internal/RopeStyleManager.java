@@ -31,9 +31,9 @@ public class RopeStyleManager {
         STYLES.put(style.id(), style);
     }
 
-    public static RopeStyle get(ResourceLocation id) {
-        return STYLES.get(id);
-    }
+//    public static RopeStyle get(ResourceLocation id) {
+//        return STYLES.get(id);
+//    }
 
     public static Collection<RopeStyle> getAll() {
         return STYLES.values();

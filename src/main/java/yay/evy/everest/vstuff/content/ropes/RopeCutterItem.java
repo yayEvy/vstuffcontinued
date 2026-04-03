@@ -8,8 +8,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import yay.evy.everest.vstuff.client.rope.RopeRendererTypes;
 import yay.evy.everest.vstuff.index.VStuffItems;
-import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
 public class RopeCutterItem extends Item {
@@ -30,7 +30,7 @@ public class RopeCutterItem extends Item {
         try {
             ReworkedRope rope = RopeFactory.removeRope(serverLevel, targetRope);
 
-            boolean chain = (rope.style.ropeRenderType() == RopeStyleManager.RopeRenderType.CHAIN);
+            boolean chain = (rope.type.rendererTypeId().equals(RopeRendererTypes.CHAIN.getId()));
 
             player.displayClientMessage(
                     Component.translatable("vstuff.rope." + (chain ? "chain" : "rope") + "_break"),

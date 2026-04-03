@@ -45,8 +45,8 @@ public class NetworkHandler {
 
 
     public static void sendConstraintAdd(Integer constraintId, Long shipA, Long shipB,
-                                         Vector3d localPosA, Vector3d localPosB, double maxLength, ResourceLocation style) {
-        RopeSyncPacket packet = new RopeSyncPacket(constraintId, shipA, shipB, localPosA, localPosB, maxLength, style);
+                                         Vector3d localPosA, Vector3d localPosB, double maxLength, ResourceLocation type) {
+        RopeSyncPacket packet = new RopeSyncPacket(constraintId, shipA, shipB, localPosA, localPosB, maxLength, type);
         INSTANCE.send(PacketDistributor.ALL.noArg(), packet);
     }
 

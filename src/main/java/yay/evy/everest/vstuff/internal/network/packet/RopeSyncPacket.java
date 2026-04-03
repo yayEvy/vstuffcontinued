@@ -6,7 +6,7 @@ import net.minecraftforge.network.NetworkEvent;
 import org.joml.Vector3d;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.ClientRopeManager;
-import yay.evy.everest.vstuff.internal.RopeStyleManager;
+import yay.evy.everest.vstuff.content.ropes.type.RopeTypeRegistry;
 
 import java.util.function.Supplier;
 
@@ -22,10 +22,9 @@ public class RopeSyncPacket {
     private final Vector3d localPosA;
     private final Vector3d localPosB;
     private final double maxLength;
-    private final ResourceLocation ropeStyle;
+    private final ResourceLocation ropeType;
 
-    public RopeSyncPacket(Integer constraintId, Long shipA, Long shipB,
-                          Vector3d localPosA, Vector3d localPosB, double maxLength, ResourceLocation ropeStyle) {
+    public RopeSyncPacket(Integer constraintId, Long shipA, Long shipB, Vector3d localPosA, Vector3d localPosB, double maxLength, ResourceLocation ropeType) {
         this.action = Action.ADD;
         this.constraintId = constraintId;
         this.shipA = shipA;
@@ -34,10 +33,10 @@ public class RopeSyncPacket {
         this.localPosB = localPosB != null ? new Vector3d(localPosB) : new Vector3d();
         this.maxLength = maxLength;
 
-        if (ropeStyle == null) {
-            ropeStyle = RopeStyleManager.DEFAULT_ID;
+        if (ropeType == null) {
+            ropeType = RopeTypeRegistry.FALLBACK_ID;
         }
-        this.ropeStyle = ropeStyle;
+        this.ropeType = ropeType;
     }
 
     public RopeSyncPacket() {
@@ -48,7 +47,7 @@ public class RopeSyncPacket {
         this.localPosA = null;
         this.localPosB = null;
         this.maxLength = 0;
-        this.ropeStyle = RopeStyleManager.DEFAULT_ID;
+        this.ropeType = RopeTypeRegistry.FALLBACK_ID;
     }
 
     public RopeSyncPacket(Integer constraintId) {
@@ -59,7 +58,7 @@ public class RopeSyncPacket {
         this.localPosA = null;
         this.localPosB = null;
         this.maxLength = 0;
-        this.ropeStyle = RopeStyleManager.DEFAULT_ID;
+        this.ropeType = RopeTypeRegistry.FALLBACK_ID;
     }
 
     public RopeSyncPacket(FriendlyByteBuf buf) {
@@ -76,7 +75,7 @@ public class RopeSyncPacket {
                 this.maxLength = buf.readDouble();
 
 
-                this.ropeStyle = buf.readResourceLocation();
+                this.ropeType = buf.readResourceLocation();
                 break;
             case REMOVE:
                 this.constraintId = buf.readInt();
@@ -85,7 +84,7 @@ public class RopeSyncPacket {
                 this.localPosA = null;
                 this.localPosB = null;
                 this.maxLength = 0;
-                this.ropeStyle = RopeStyleManager.DEFAULT_ID;
+                this.ropeType = RopeTypeRegistry.FALLBACK_ID;
                 break;
             case CLEAR_ALL:
             default:
@@ -95,7 +94,7 @@ public class RopeSyncPacket {
                 this.localPosA = null;
                 this.localPosB = null;
                 this.maxLength = 0;
-                this.ropeStyle = RopeStyleManager.DEFAULT_ID;
+                this.ropeType = RopeTypeRegistry.FALLBACK_ID;
                 break;
         }
     }
@@ -129,7 +128,7 @@ public class RopeSyncPacket {
                 buf.writeDouble(localPosB.z);
                 buf.writeDouble(maxLength);
 
-                buf.writeResourceLocation(ropeStyle);
+                buf.writeResourceLocation(ropeType);
                 break;
             case REMOVE:
                 if (constraintId == null) {
@@ -148,7 +147,7 @@ public class RopeSyncPacket {
             try {
                 switch (action) {
                     case ADD:
-                        ClientRopeManager.addClientConstraint(constraintId, shipA, shipB, localPosA, localPosB, maxLength, RopeStyleManager.get(ropeStyle));
+                        ClientRopeManager.addClientConstraint(constraintId, shipA, shipB, localPosA, localPosB, maxLength, RopeTypeRegistry.get(ropeType));
                         break;
                     case REMOVE:
                         ClientRopeManager.removeClientConstraint(constraintId);

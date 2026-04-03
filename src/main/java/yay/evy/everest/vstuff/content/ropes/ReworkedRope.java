@@ -5,7 +5,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import org.valkyrienskies.core.internal.joints.*;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.internal.RopeStyleManager;
+import yay.evy.everest.vstuff.content.ropes.type.RopeType;
+import yay.evy.everest.vstuff.content.ropes.type.RopeTypeRegistry;
 import yay.evy.everest.vstuff.internal.utility.*;
 
 import javax.annotation.Nullable;
@@ -18,14 +19,14 @@ public class ReworkedRope {
     public RopePosData posData0;
     public RopePosData posData1;
     public JointValues jointValues;
-    public RopeStyleManager.RopeStyle style;
+    public RopeType type;
     public final boolean hasJoint;
 
-    protected ReworkedRope(RopePosData posData0, RopePosData posData1, JointValues values, ResourceLocation style) {
+    protected ReworkedRope(RopePosData posData0, RopePosData posData1, JointValues values, ResourceLocation type) {
         this.posData0 = posData0;
         this.posData1 = posData1;
         this.jointValues = values;
-        this.style = RopeStyleManager.get(style);
+        this.type = RopeTypeRegistry.get(type);
         this.hasJoint = !posData0.sameShip(posData1);
     }
 

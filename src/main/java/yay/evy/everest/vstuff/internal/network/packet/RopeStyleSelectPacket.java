@@ -4,6 +4,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
+import yay.evy.everest.vstuff.content.ropes.type.RopeType;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
 
 import java.util.function.Supplier;
@@ -28,7 +29,7 @@ public class RopeStyleSelectPacket {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
             if (player != null) {
-                RopeStyleManager.setStyle(player, pkt.id);
+                RopeType.set(player, pkt.id);
             }
         });
         ctx.get().setPacketHandled(true);

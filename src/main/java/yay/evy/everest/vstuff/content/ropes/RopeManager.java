@@ -7,8 +7,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
@@ -16,7 +14,6 @@ import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 public class RopeManager extends SavedData {
 
@@ -63,7 +60,7 @@ public class RopeManager extends SavedData {
 
         ropes.put(rope.ropeId, rope);
 
-        NetworkHandler.sendConstraintAdd(rope.ropeId, rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.style.texture());
+        NetworkHandler.sendConstraintAdd(rope.ropeId, rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.type.id());
 
         setDirty();
     }
@@ -120,7 +117,7 @@ public class RopeManager extends SavedData {
                     data.posData0.localPos(),
                     data.posData1.localPos(),
                     data.jointValues.maxLength(),
-                    data.style.id()
+                    data.type.id()
             );
         }
     }

@@ -1,0 +1,13 @@
+package yay.evy.everest.vstuff.client.rope;
+
+import net.minecraft.world.level.Level;
+import org.joml.Vector3d;
+
+public record RopeRenderContext(
+        Vector3d startRelative,
+        Vector3d endRelative,
+        double maxLength,
+        double actualLength,
+        float partialTick,
+        Level level
+) {}
