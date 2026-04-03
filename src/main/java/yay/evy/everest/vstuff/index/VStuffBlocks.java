@@ -34,7 +34,7 @@ public class VStuffBlocks  {
                     .properties(BlockBehaviour.Properties::noOcclusion)
                     .transform(axeOrPickaxe())
                     .blockstate(BlockStateGen.directionalAxisBlockProvider())
-                    //.transform(VStress.setImpact(8))
+                    .transform(VStress.setImpact(8))
                     .item()
                     .transform(customItemModel())
                     .register();
@@ -46,7 +46,7 @@ public class VStuffBlocks  {
                     .properties(BlockBehaviour.Properties::noOcclusion)
                     .transform(axeOrPickaxe())
                     .blockstate(BlockStateGen.horizontalBlockProvider(true))
-                    //.transform(VStress.setImpact(4))
+                    .transform(VStress.setImpact(4))
                     .item()
                     .transform(customItemModel())
                     .register();
@@ -68,7 +68,7 @@ public class VStuffBlocks  {
                     .properties(BlockBehaviour.Properties::noOcclusion)
                     .transform(pickaxeOnly())
                     .blockstate(BlockStateGen.directionalBlockProvider(true))
-                    //.transform(VStress.setImpact(4))
+                    .transform(VStress.setImpact(4))
                     .item()
                     .transform(customItemModel())
                     .register();

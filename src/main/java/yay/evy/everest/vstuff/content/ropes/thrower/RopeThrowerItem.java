@@ -5,7 +5,6 @@ import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
 import net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior;
-import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -24,11 +23,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
-import yay.evy.everest.vstuff.client.ClientOutlineHandler;
-import yay.evy.everest.vstuff.internal.network.NetworkHandler;
+import net.minecraftforge.network.PacketDistributor;
+import yay.evy.everest.vstuff.content.ropes.packet.OutlinePacket;
 import yay.evy.everest.vstuff.content.ropes.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.index.VStuffEntities;
 import yay.evy.everest.vstuff.index.VStuffSounds;
+import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 import yay.evy.everest.vstuff.internal.utility.ShipUtils;
 
@@ -100,7 +100,8 @@ public class RopeThrowerItem extends Item {
             if (isFoil(stack)) {
                 resetStateWithMessage(serverLevel, stack, player, "rope_reset");
                 if (player instanceof ServerPlayer serverPlayer) {
-                    NetworkHandler.sendOutlineToPlayer(serverPlayer, pos, ClientOutlineHandler.GREEN);
+                    //NetworkHandler.sendOutlineToPlayer(serverPlayer, pos, ClientOutlineHandler.GREEN);
+                    VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> serverPlayer), new OutlinePacket(pos, OutlinePacket.GREEN));
                 }
                 return InteractionResult.SUCCESS;
             }
@@ -133,7 +134,7 @@ public class RopeThrowerItem extends Item {
         first.putString("type", type.name());
 
         if (player instanceof ServerPlayer serverPlayer) {
-            NetworkHandler.sendOutlineToPlayer(serverPlayer, pos, ClientOutlineHandler.GREEN);
+            VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> serverPlayer), new OutlinePacket(pos, OutlinePacket.GREEN));
         }
         return InteractionResult.SUCCESS;
     }

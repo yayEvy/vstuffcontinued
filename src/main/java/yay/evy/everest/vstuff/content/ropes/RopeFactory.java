@@ -8,8 +8,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.network.PacketDistributor;
+import yay.evy.everest.vstuff.content.ropes.packet.UpdateRopeStylePacket;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
-import yay.evy.everest.vstuff.internal.network.NetworkHandler;
+import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.internal.utility.*;
 
 public class RopeFactory {
@@ -95,7 +97,9 @@ public class RopeFactory {
 
         rope.style = newStyle;
 
-        NetworkHandler.sendRopeUpdate(ropeId, rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.style.id());
+        //NetworkHandler.sendRopeUpdate(ropeId, rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.style.id());
+
+        VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new UpdateRopeStylePacket(ropeId, rope.style.id()));
     }
 
     public static CompoundTag ropeToTag(ReworkedRope rope) {

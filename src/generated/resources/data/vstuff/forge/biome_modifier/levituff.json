@@ -1,6 +1,6 @@
 {
   "type": "forge:add_features",
   "biomes": "#minecraft:is_overworld",
-  "features": "vstuff:levituff_ore",
+  "features": "vstuff:levituff",
   "step": "underground_ores"
 }

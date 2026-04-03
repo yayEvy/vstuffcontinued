@@ -15,14 +15,14 @@ public class ClientRopeManager {
 
     public record ClientRopeData(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength,
                                  RopeStyleManager.RopeStyle style) {
-            public ClientRopeData(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, RopeStyleManager.RopeStyle style) {
-                this.ship0 = ship0;
-                this.ship1 = ship1;
-                this.localPos0 = new Vector3d(localPos0);
-                this.localPos1 = new Vector3d(localPos1);
-                this.maxLength = maxLength;
-                this.style = style;
-            }
+        public ClientRopeData(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, RopeStyleManager.RopeStyle style) {
+            this.ship0 = ship0;
+            this.ship1 = ship1;
+            this.localPos0 = new Vector3d(localPos0);
+            this.localPos1 = new Vector3d(localPos1);
+            this.maxLength = maxLength;
+            this.style = style;
+        }
 
         public boolean isRenderable(Level level) {
             if (level == null) return false;
@@ -45,6 +45,22 @@ public class ClientRopeManager {
             return true;
         }
 
+        public ClientRopeData withLength(double newLength) {
+            return new ClientRopeData(ship0, ship1, localPos0, localPos1, newLength, style);
+        }
+
+        public ClientRopeData withStyle(RopeStyleManager.RopeStyle newStyle) {
+            return new ClientRopeData(ship0, ship1, localPos0, localPos1, maxLength, newStyle);
+        }
+
+    }
+
+    public static void updateClientRopeLength(Integer ropeId, double length) {
+        clientConstraints.computeIfPresent(ropeId, (k, ropeData) -> ropeData.withLength(length));
+    }
+
+    public static void updateClientRopeStyle(Integer ropeId, RopeStyleManager.RopeStyle style) {
+        clientConstraints.computeIfPresent(ropeId, (k, ropeData) -> ropeData.withStyle(style));
     }
 
     public static void addClientConstraint(Integer constraintId, Long shipA, Long shipB,

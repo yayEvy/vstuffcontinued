@@ -1,6 +1,5 @@
-package yay.evy.everest.vstuff.internal.network;
+package yay.evy.everest.vstuff.index;
 
-import com.simibubi.create.AllPackets;
 import com.simibubi.create.foundation.networking.SimplePacketBase;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -9,8 +8,12 @@ import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.internal.network.newpackets.OutlinePacket;
-import yay.evy.everest.vstuff.internal.network.newpackets.StyleSelectPacket;
+import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.packet.GrabPacket;
+import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.packet.ReleasePacket;
+import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.packet.UpdatePacket;
+import yay.evy.everest.vstuff.content.ropes.packet.*;
+import yay.evy.everest.vstuff.content.ropes.packet.OutlinePacket;
+import yay.evy.everest.vstuff.content.ropes.packet.StyleSelectPacket;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -23,9 +26,17 @@ public enum VStuffPackets {
 
     // server -> client packets
     OUTLINE(OutlinePacket.class, OutlinePacket::new, PLAY_TO_CLIENT),
+    ROPE_ADD(AddRopePacket.class, AddRopePacket::new, PLAY_TO_CLIENT),
+    ROPE_REMOVE(RemoveRopePacket.class, RemoveRopePacket::new, PLAY_TO_CLIENT),
+    ROPE_LENGTH_UPDATE(UpdateRopeLengthPacket.class, UpdateRopeLengthPacket::new, PLAY_TO_CLIENT),
+    ROPE_STYLE_UPDATE(UpdateRopeStylePacket.class, UpdateRopeStylePacket::new, PLAY_TO_CLIENT),
+    ROPE_CLEAR_ALL(ClearAllRopesPacket.class, ClearAllRopesPacket::new, PLAY_TO_CLIENT),
 
     // client -> server packets
-    STYLE_SELECT(StyleSelectPacket.class, StyleSelectPacket::new, PLAY_TO_SERVER)
+    STYLE_SELECT(StyleSelectPacket.class, StyleSelectPacket::new, PLAY_TO_SERVER),
+    PHYS_GRABBER_GRAB(GrabPacket.class, GrabPacket::new, PLAY_TO_SERVER),
+    PHYS_GRABBER_UPDATE(UpdatePacket.class, UpdatePacket::new, PLAY_TO_SERVER),
+    PHYS_GRABBER_RELEASE(ReleasePacket.class, ReleasePacket::new, PLAY_TO_SERVER)
 
     ;
 
@@ -43,7 +54,7 @@ public enum VStuffPackets {
         packetType = new PacketType<>(type, factory, direction);
     }
 
-    public static void registerPackets() {
+    public static void register() {
         channel = NetworkRegistry.ChannelBuilder.named(CHANNEL_NAME)
                 .serverAcceptedVersions(VERSION_STR::equals)
                 .clientAcceptedVersions(VERSION_STR::equals)

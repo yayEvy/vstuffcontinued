@@ -15,10 +15,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.network.PacketDistributor;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.client.ClientOutlineHandler;
+import yay.evy.everest.vstuff.content.ropes.packet.OutlinePacket;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
-import yay.evy.everest.vstuff.internal.network.NetworkHandler;
+import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
@@ -49,7 +50,8 @@ public class ReworkedRopeItem extends Item {
             if (!IRopeActor.canAttach(state)) {
                 player.displayClientMessage(VStuff.translate("rope.actor_connected", blockName).withStyle(ChatFormatting.RED), true);
                 if (player instanceof ServerPlayer serverPlayer) {
-                    NetworkHandler.sendOutlineToPlayer(serverPlayer, clickedPos, ClientOutlineHandler.RED);
+                    //NetworkHandler.sendOutlineToPlayer(serverPlayer, clickedPos, ClientOutlineHandler.RED);
+                    VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> serverPlayer), new OutlinePacket(clickedPos, OutlinePacket.RED));
                 }
                 return InteractionResult.SUCCESS;
             }
@@ -62,7 +64,8 @@ public class ReworkedRopeItem extends Item {
             tag.putString("dim", level.dimension().location().toString());
 
             if (player instanceof ServerPlayer serverPlayer) {
-                NetworkHandler.sendOutlineToPlayer(serverPlayer, clickedPos, ClientOutlineHandler.GREEN);
+                //NetworkHandler.sendOutlineToPlayer(serverPlayer, clickedPos, ClientOutlineHandler.GREEN);
+                VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> serverPlayer), new OutlinePacket(clickedPos, OutlinePacket.GREEN));
             }
 
             return InteractionResult.SUCCESS;

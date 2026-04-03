@@ -5,9 +5,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.createmod.catnip.gui.AbstractSimiScreen;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
+import yay.evy.everest.vstuff.content.ropes.packet.StyleSelectPacket;
 import yay.evy.everest.vstuff.internal.RopeStyleCategoryManager;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
-import yay.evy.everest.vstuff.internal.network.NetworkHandler;
+import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.internal.utility.ClientTextUtils;
 import yay.evy.everest.vstuff.index.VStuffGuiTextures;
 
@@ -312,7 +313,9 @@ public class RopeStylerScreen extends AbstractSimiScreen {
     private void onMenuClose() {
         if (selectedStyle == null) return;
 
-        NetworkHandler.selectStyle(selectedStyle.id());
+        //NetworkHandler.selectStyle(selectedStyle.id());
+
+        VStuffPackets.channel().sendToServer(new StyleSelectPacket(selectedStyle.id()));
 
         onClose();
     }

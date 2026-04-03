@@ -7,16 +7,17 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.internal.network.NetworkHandler;
+import yay.evy.everest.vstuff.content.ropes.packet.AddRopePacket;
+import yay.evy.everest.vstuff.content.ropes.packet.ClearAllRopesPacket;
+import yay.evy.everest.vstuff.content.ropes.packet.RemoveRopePacket;
+import yay.evy.everest.vstuff.index.VStuffPackets;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 public class RopeManager extends SavedData {
 
@@ -63,15 +64,17 @@ public class RopeManager extends SavedData {
 
         ropes.put(rope.ropeId, rope);
 
-        NetworkHandler.sendConstraintAdd(rope.ropeId, rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.style.id());
+        //NetworkHandler.sendConstraintAdd(rope.ropeId, rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.style.id());
 
+        VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new AddRopePacket(rope));
         setDirty();
     }
 
     public void removeRope(Integer id) {
         ropes.remove(id);
 
-        NetworkHandler.sendConstraintRemove(id);
+        //NetworkHandler.sendConstraintRemove(id);
+        VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new RemoveRopePacket(id));
 
         setDirty();
     }
@@ -106,22 +109,23 @@ public class RopeManager extends SavedData {
 
     public static void syncAllRopesToPlayer(ServerPlayer player) {
         RopeManager manager = RopeManager.get(player.serverLevel());
-        NetworkHandler.sendClearAllConstraintsToPlayer(player);
+        //NetworkHandler.sendClearAllConstraintsToPlayer(player);
+        VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new ClearAllRopesPacket());
 
         VStuff.LOGGER.info("Syncing all ropes to player {} ({})", player.getName().getString(), player.getUUID());
 
-        for (Map.Entry<Integer, ReworkedRope> entry : manager.ropes.entrySet()) {
-            ReworkedRope data = entry.getValue();
-            NetworkHandler.sendConstraintAddToPlayer(
-                    player,
-                    entry.getKey(),
-                    data.posData0.shipId(),
-                    data.posData1.shipId(),
-                    data.posData0.localPos(),
-                    data.posData1.localPos(),
-                    data.jointValues.maxLength(),
-                    data.style.id()
-            );
+        for (ReworkedRope rope : manager.getRopeList()) {
+            VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new AddRopePacket(rope));
+//            NetworkHandler.sendConstraintAddToPlayer(
+//                    player,
+//                    entry.getKey(),
+//                    data.posData0.shipId(),
+//                    data.posData1.shipId(),
+//                    data.posData0.localPos(),
+//                    data.posData1.localPos(),
+//                    data.jointValues.maxLength(),
+//                    data.style.id()
+//            );
         }
     }
 }

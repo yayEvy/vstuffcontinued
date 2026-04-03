@@ -1,9 +1,8 @@
-package yay.evy.everest.vstuff.internal.network.newpackets;
+package yay.evy.everest.vstuff.content.ropes.packet;
 
 import com.simibubi.create.foundation.networking.SimplePacketBase;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
 
