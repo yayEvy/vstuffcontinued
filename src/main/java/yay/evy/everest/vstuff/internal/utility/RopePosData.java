@@ -38,6 +38,7 @@ public record RopePosData(@Nullable Long shipId, BlockPos blockPos, Vector3d loc
     }
 
     public void attach(ServerLevel level, Integer ropeId) {
+        System.out.println("attaching for " + ropeId);
         if (selectType == RopeUtils.SelectType.ACTOR) {
             IRopeActor actor = (IRopeActor) level.getBlockEntity(blockPos);
             if (actor == null) return;

@@ -29,9 +29,7 @@ public class RopeManager extends SavedData {
 
     public static RopeManager get(ServerLevel level) {
         DimensionDataStorage storage = level.getDataStorage();
-        RopeManager persistence = storage.computeIfAbsent(RopeManager::load, RopeManager::new, DATA_NAME);
-        persistence.attachActors(level);
-        return persistence;
+        return storage.computeIfAbsent(RopeManager::load, RopeManager::new, DATA_NAME);
     }
 
     public static RopeManager load(CompoundTag tag) {
@@ -64,16 +62,14 @@ public class RopeManager extends SavedData {
 
         ropes.put(rope.ropeId, rope);
 
-        //NetworkHandler.sendConstraintAdd(rope.ropeId, rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.style.id());
-
         VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new AddRopePacket(rope));
+
         setDirty();
     }
 
     public void removeRope(Integer id) {
         ropes.remove(id);
 
-        //NetworkHandler.sendConstraintRemove(id);
         VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new RemoveRopePacket(id));
 
         setDirty();

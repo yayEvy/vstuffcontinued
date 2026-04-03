@@ -53,7 +53,6 @@ public class RopeFactory {
     }
 
     public static ReworkedRope createNewRope(ServerLevel level, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1, ResourceLocation style, Player player) {
-        System.out.println(style);
         Pair<RopePosData, RopePosData> posDataPair = RopePosData.create(level, ship0, ship1, blockPos0, blockPos1);
         RopePosData posData0 = posDataPair.component1();
         RopePosData posData1 = posDataPair.component2();
@@ -69,6 +68,8 @@ public class RopeFactory {
 
         if (!rope.hasJoint) {
             RopeManager.get(level).addRope(rope);
+            System.out.println("attach actors");
+            rope.attachActors(level);
 
             if (player instanceof ServerPlayer serverPlayer) {
                 RopeManager.syncAllRopesToPlayer(serverPlayer);

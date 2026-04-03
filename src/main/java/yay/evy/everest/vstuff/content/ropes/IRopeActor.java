@@ -16,10 +16,12 @@ public interface IRopeActor {
     BlockState getActorBlockState();
 
     default void blockConnect(BlockState state, Level level, BlockPos pos) {
+        System.out.println("block connect");
         level.sendBlockUpdated(pos, state, state.setValue(CONNECTED, true), 3);
     }
 
     default void blockRemove(BlockState state, Level level, BlockPos pos) {
+        System.out.println("block remove");
         level.sendBlockUpdated(pos, state, state.setValue(CONNECTED, false), 3);
     }
 
