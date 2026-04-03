@@ -42,8 +42,8 @@ public class AddRopePacket extends SimplePacketBase {
         long tempId1 = buffer.readLong();
         this.ship0 = tempId0 == -1 ? null : tempId0;
         this.ship1 = tempId1 == -1 ? null : tempId1;
-        this.localPos0 = buffer.readVector3f().get(new Vector3d());
-        this.localPos1 = buffer.readVector3f().get(new Vector3d());
+        this.localPos0 = readVector3d(buffer);
+        this.localPos1 = readVector3d(buffer);
         this.maxLength = buffer.readDouble();
         this.styleId = buffer.readResourceLocation();
     }
@@ -53,8 +53,8 @@ public class AddRopePacket extends SimplePacketBase {
         buffer.writeInt(ropeId);
         buffer.writeLong(ship0 == null ? -1 : ship0);
         buffer.writeLong(ship1 == null ? -1 : ship1);
-        buffer.writeVector3f(localPos0.get(new Vector3f()));
-        buffer.writeVector3f(localPos1.get(new Vector3f()));
+        writeVector3d(buffer, localPos0);
+        writeVector3d(buffer, localPos1);
         buffer.writeDouble(maxLength);
         buffer.writeResourceLocation(styleId);
     }
@@ -63,5 +63,15 @@ public class AddRopePacket extends SimplePacketBase {
     public boolean handle(NetworkEvent.Context context) {
         context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientRopeManager.addClientConstraint(ropeId, ship0, ship1, localPos0, localPos1, maxLength, RopeStyleManager.get(styleId))));
         return true;
+    }
+
+    private static Vector3d readVector3d(FriendlyByteBuf buf) {
+        return new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
+    }
+
+    private static void writeVector3d(FriendlyByteBuf buf, Vector3d vector3d) {
+        buf.writeDouble(vector3d.x);
+        buf.writeDouble(vector3d.y);
+        buf.writeDouble(vector3d.z);
     }
 }
