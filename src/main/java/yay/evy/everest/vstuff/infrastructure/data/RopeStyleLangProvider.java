@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.stream.Stream;
 
 public class RopeStyleLangProvider {
 
@@ -29,8 +30,8 @@ public class RopeStyleLangProvider {
 
         Map<String, String> langData = new HashMap<>();
 
-        try {
-            Files.walk(root)
+        try (Stream<Path> pathStream = Files.walk(root)) {
+            pathStream
                     .filter(path -> path.toString().endsWith(".json"))
                     .forEach(path -> readFile(path, langData, keyFirst));
         } catch (IOException e) {
@@ -49,6 +50,7 @@ public class RopeStyleLangProvider {
             String key = keyFirst + "." + VStuff.MOD_ID + "." + id;
 
             String name = json.get("name").getAsString();
+            System.out.println(name);
 
             langData.put(key, name);
 

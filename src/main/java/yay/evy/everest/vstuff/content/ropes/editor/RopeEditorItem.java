@@ -9,6 +9,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 import yay.evy.everest.vstuff.content.ropes.RopeManager;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
@@ -22,14 +23,14 @@ public class RopeEditorItem extends Item {
         ItemStack stack = player.getItemInHand(usedHand);
         if (!(level instanceof ServerLevel serverLevel)) return InteractionResultHolder.pass(stack);
 
-        Integer ropeId =  RopeUtils.findTargetedLead(serverLevel, player);
+        ReworkedRope rope = RopeUtils.findTargetedLead(serverLevel, player);
 
-        if (ropeId == null || RopeManager.get(serverLevel).getRope(ropeId) == null) {
+        if (rope == null) {
             player.displayClientMessage(VStuff.translate("rope.editor_not_found").withStyle(ChatFormatting.RED), true);
             return InteractionResultHolder.success(stack);
         }
 
-        ///ScreenOpener.open(new RopeEditorScreen(RopeManager.getRope(ropeId)));
+        //ScreenOpener.open(new RopeEditorScreen(RopeManager.getRope(ropeId)));
 
         return InteractionResultHolder.success(stack);
     }

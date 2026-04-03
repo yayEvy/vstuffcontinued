@@ -11,54 +11,45 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Math;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
-import yay.evy.everest.vstuff.infrastructure.config.VStuffConfig;
 import com.simibubi.create.content.kinetics.fan.IAirCurrentSource;
 import com.simibubi.create.content.kinetics.fan.AirCurrent;
+import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
 import static com.simibubi.create.content.kinetics.motor.CreativeMotorBlockEntity.MAX_SPEED;
-@SuppressWarnings({"deprecation", "unchecked"})
+
 public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements IAirCurrentSource {
 
-    // hey vsauce air current here
-    @Nullable
+   @Nullable
     private AirCurrent airCurrent;
 
     public static final int BASE_MAX_THRUST = 100_000;
-    // Constants
+
     protected static final int OBSTRUCTION_LENGTH = 10;
     protected static final int TICKS_PER_ENTITY_CHECK = 5;
-    private static final float PARTICLE_VELOCITY = 4;
-    private static final double NOZZLE_OFFSET_FROM_CENTER = 0.9;
-    private static final double SHIP_VELOCITY_INHERITANCE = 0.5;
 
-    // Common State
     protected ThrusterData thrusterData;
     protected int emptyBlocks;
-    protected boolean isThrustDirty = false;
 
-    // Ticking
+
     private int currentTick = 0;
-    private int clientTick = 0;
-    private float particleSpawnAccumulator = 0.0f;
 
     public MechanicalThrusterBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
         thrusterData = new ThrusterData();
     }
 
-
-    @SuppressWarnings("null")
     @Override
     public void initialize() {
         super.initialize();
+        if (level == null) return;
         if (!level.isClientSide) {
             calculateObstruction(level, worldPosition, getBlockState().getValue(MechanicalThrusterBlock.FACING));
         }
@@ -69,6 +60,8 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
         if (this.isRemoved()) {
             return;
         }
+
+        if (level == null) return;
 
         if (level.getBlockState(worldPosition).getBlock() != this.getBlockState().getBlock()) {
             this.setRemoved();
@@ -81,60 +74,38 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
 
         currentTick++;
 
-        int tick_rate = VStuffConfig.THRUSTER_TICKS_PER_UPDATE.get();
-
         int previousEmptyBlocks = emptyBlocks;
         calculateObstruction(level, worldPosition, currentBlockState.getValue(MechanicalThrusterBlock.FACING));
         if (previousEmptyBlocks != emptyBlocks) {
-            isThrustDirty = true;
             setChanged();
             level.sendBlockUpdated(worldPosition, currentBlockState, currentBlockState, Block.UPDATE_CLIENTS);
         }
 
-
-        if (isThrustDirty || currentTick % tick_rate == 0) {
-            updateThrust(currentBlockState);
-        }
+        updateThrust(currentBlockState);
     }
 
     public void updateThrust(BlockState currentBlockState) {
         float speed = getSpeed();
         if (speed == 0) {
             thrusterData.setThrust(0);
-            isThrustDirty = false;
             return;
         }
 
         float obstructionEffect = calculateObstructionEffect(); // 0..1
         float powerPercentage = Math.min(Math.abs(speed) / MAX_SPEED, 1f); // scale rotation to 0..1
 
-        float thrustMultiplier = VStuffConfig.THRUSTER_THRUST_MULTIPLIER.get().floatValue(); // user-configurable
+        float thrustMultiplier = VStuffConfigs.server().thrustMultiplier.getF();
 
         float softPower = (float) java.lang.Math.pow(powerPercentage, 1.2);
 
         float thrust = BASE_MAX_THRUST * thrustMultiplier * softPower * obstructionEffect;
 
         thrusterData.setThrust(thrust);
-        isThrustDirty = false;
     }
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         super.addBehaviours(behaviours);
-    }
-
-    protected boolean isWorking() {
-        return getRpm() != 0;
-    }
-
-    public float getRpm() {
-        if (level != null) {
-            BlockEntity be = level.getBlockEntity(worldPosition);
-            if (be instanceof KineticBlockEntity kineticBE) {
-                return kineticBE.getSpeed();
-            }
-        }
-        return 0;
     }
 
     protected String getGoggleStatus() {
@@ -152,36 +123,19 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
         return thrusterData;
     }
 
-    public int getEmptyBlocks() {
-        return emptyBlocks;
-    }
-
-    public void dirtyThrust() {
-        isThrustDirty = true;
-    }
-
-
     protected void addSpecificGoggleInfo(List<Component> tooltip, boolean isPlayerSneaking) {}
 
     protected float calculateObstructionEffect() {
         return (float) emptyBlocks / (float) OBSTRUCTION_LENGTH;
     }
 
-    protected float getSpeedScalar() {
-        return Math.abs(getSpeed() / 256);
-    }
 
+    @SuppressWarnings("deprecation")
     public void calculateObstruction(Level level, BlockPos pos, Direction forwardDirection){
-        //Starting from the block behind and iterate OBSTRUCTION_LENGTH blocks in that direction
-        //Can't really use level.clip as we explicitly want to check for obstruction only in ship space
-        int oldEmptyBlocks = this.emptyBlocks;
         for (emptyBlocks = 0; emptyBlocks < OBSTRUCTION_LENGTH; emptyBlocks++){
             BlockPos checkPos = pos.relative(forwardDirection, emptyBlocks + 1);
             BlockState state = level.getBlockState(checkPos);
             if (!(state.isAir() || !state.isSolid())) break;
-        }
-        if (oldEmptyBlocks != this.emptyBlocks) {
-            isThrustDirty = true;
         }
     }
 
@@ -189,16 +143,14 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);
 
-        boolean wasThrustDirty = isThrustDirty;
         calculateObstruction(getLevel(), worldPosition, getBlockState().getValue(MechanicalThrusterBlock.FACING));
-        isThrustDirty = wasThrustDirty;
 
         tooltip.add(Component.literal(" "));
 
         tooltip.add(Component.translatable("create.gui.goggles.thruster.status")
                 .append(Component.literal(": "))
                 .append(Component.literal(getGoggleStatus())
-                        .withStyle(ChatFormatting.AQUA)));
+                .withStyle(ChatFormatting.AQUA)));
 
         float efficiency = 100;
         ChatFormatting tooltipColor = ChatFormatting.GREEN;
@@ -209,8 +161,7 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
         tooltip.add(Component.translatable("create.gui.goggles.thruster.efficiency")
                 .append(Component.literal(" "))
                 .append(Component.literal(String.format("%.1f%%", efficiency))
-                        .withStyle(tooltipColor)));
-
+                .withStyle(tooltipColor)));
 
 
         addSpecificGoggleInfo(tooltip, isPlayerSneaking);
@@ -233,8 +184,6 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
         emptyBlocks = compound.getInt("emptyBlocks");
         currentTick = compound.getInt("currentTick");
         thrusterData.setThrust(compound.getFloat("thrust"));
-        isThrustDirty = true;
-
     }
 
     @Override
@@ -243,17 +192,13 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
 
         if (level instanceof ServerLevel serverLevel) {
             MinecraftServer server = serverLevel.getServer();
-
             server.execute(() -> {
 
-                if (!server.isSameThread())
-                    return;
-
+                if (!server.isSameThread()) return;
 
                 recalcThruster();
 
-                ThrusterForceAttachment attachment =
-                        ThrusterForceAttachment.get(serverLevel, worldPosition);
+                ThrusterForceAttachment attachment = ThrusterForceAttachment.get(serverLevel, worldPosition);
 
                 if (attachment != null) {
                     ThrusterData data = getThrusterData();
@@ -268,7 +213,6 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
 
     private void recalcThruster() {
         calculateObstruction(level, worldPosition, getBlockState().getValue(MechanicalThrusterBlock.FACING));
-        isThrustDirty = true;
         updateThrust(getBlockState());
         setChanged();
     }
@@ -298,7 +242,7 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
     @Override
     public float getMaxDistance() {
         float speed = Math.abs(getSpeed());
-        return Math.min(VStuffConfig.THRUSTER_MAX_AIR_PUSH_DISTANCE.get(), speed / 16.0f);
+        return Math.min(VStuffConfigs.server().thrusterMaxPushDistance.getF(), speed / 16.0f);
     }
 
     @Override
@@ -312,12 +256,12 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
     }
 
     @Override
-    public BlockPos getAirCurrentPos() {
+    public @NotNull BlockPos getAirCurrentPos() {
         return worldPosition;
     }
 
     @Override
-    public Direction getAirflowOriginSide() {
+    public @NotNull Direction getAirflowOriginSide() {
         return getBlockState().getValue(MechanicalThrusterBlock.FACING);
     }
 

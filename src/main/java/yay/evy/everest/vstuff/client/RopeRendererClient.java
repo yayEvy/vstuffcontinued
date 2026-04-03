@@ -20,7 +20,7 @@ import org.joml.Vector3d;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.index.VStuffRenderTypes;
-import yay.evy.everest.vstuff.infrastructure.config.VStuffConfig;
+import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
@@ -28,10 +28,6 @@ import java.util.Map;
 
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class RopeRendererClient {
-
-    private static float getRopeWidth() {
-        return VStuffConfig.ROPE_THICKNESS.get().floatValue();
-    }
 
     private static final int ROPE_CURVE_SEGMENTS = 32;
     private static final float ROPE_SAG_FACTOR = 1.02f;
@@ -215,7 +211,7 @@ public class RopeRendererClient {
 
         Vector3d[][] strips = new Vector3d[4][ROPE_CURVE_SEGMENTS + 1]; // top right, top left, bottom right, bottom left
 
-        double halfWidth = getRopeWidth() * 0.6f; // ah yes half
+        double halfWidth = VStuffConfigs.client().ropeThickness.getF() * 0.6f; // ah yes half
         Vector3d rightScaled = new Vector3d(right).mul(halfWidth);
         Vector3d upScaled = new Vector3d(up).mul(halfWidth);
 
@@ -283,7 +279,7 @@ public class RopeRendererClient {
             cumulativeDistances[i + 1] = totalLen;
         }
 
-        double halfWidth = getRopeWidth() * 1.5;
+        double halfWidth = VStuffConfigs.client().ropeThickness.getF() * 1.5; //ts is not half width
         double linkLengthInBlocks = 1.0;
         double textureVScale = 1.2 / linkLengthInBlocks;
 

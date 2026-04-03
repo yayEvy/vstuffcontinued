@@ -14,6 +14,8 @@ import yay.evy.everest.vstuff.internal.RopeStyleManager;
 
 import java.util.*;
 
+import static yay.evy.everest.vstuff.infrastructure.data.DatagenUtils.parseLoc;
+
 public class RopeStyleCategoryReloadListener extends SimpleJsonResourceReloadListener {
 
     public RopeStyleCategoryReloadListener() {
@@ -34,7 +36,7 @@ public class RopeStyleCategoryReloadListener extends SimpleJsonResourceReloadLis
             Component name = Component.translatable("ropestyle.category." + id.getNamespace() + "." + id.getPath());
             int order = json.get("order").getAsInt();
 
-            List<RopeStyleManager.RopeStyle> styles = json.getAsJsonArray("styles").asList().stream().map(jsonElement -> RopeStyleManager.get(ResourceLocation.bySeparator(jsonElement.getAsString(), ':'))).toList();
+            List<RopeStyleManager.RopeStyle> styles = json.getAsJsonArray("styles").asList().stream().map(jsonElement -> RopeStyleManager.get(parseLoc(jsonElement))).toList();
 
             assigned.addAll(styles);
 
@@ -56,6 +58,6 @@ public class RopeStyleCategoryReloadListener extends SimpleJsonResourceReloadLis
 
         RopeStyleCategoryManager.register(uncategorized);
 
-        VStuff.LOGGER.info("Loaded {} ropestyle categories from data.", RopeStyleCategoryManager.getSortedList().size());
+        VStuff.LOGGER.info("Loaded {} style categories from data.", RopeStyleCategoryManager.getSortedList().size());
     }
 }

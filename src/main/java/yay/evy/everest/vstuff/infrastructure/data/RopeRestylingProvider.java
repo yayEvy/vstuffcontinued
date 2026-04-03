@@ -2,11 +2,14 @@ package yay.evy.everest.vstuff.infrastructure.data;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.simibubi.create.AllBlocks;
+import com.simibubi.create.AllItems;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.ForgeRegistries;
 import yay.evy.everest.vstuff.VStuff;
 
@@ -14,7 +17,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-import static yay.evy.everest.vstuff.infrastructure.data.VStuffDatagen.*;
+import static yay.evy.everest.vstuff.infrastructure.data.DatagenUtils.*;
 
 public class RopeRestylingProvider implements DataProvider {
 
@@ -28,8 +31,18 @@ public class RopeRestylingProvider implements DataProvider {
     public CompletableFuture<?> run(CachedOutput output) {
         List<CompletableFuture<?>> futures = new ArrayList<>();
 
-        futures.add(restylingSingle(output, "dyes", dyes, zipToMap(dyes.stream().map(VStuff::asResource).toList(), DYE_ITEMS)));
-        futures.add(restyling(output, "wools", wools, zipToMap(wools.stream().map(VStuff::asResource).toList(), zipToList(DYE_ITEMS, WOOL_ITEMS))));
+        futures.add(restylingSingle(output, "dyes", zipToMap(dyes.stream().map(VStuff::asResource).toList(), DYE_ITEMS)));
+        futures.add(restyling(output, "wools", zipToMap(wools.stream().map(VStuff::asResource).toList(), zipToList(DYE_ITEMS, WOOL_ITEMS))));
+        futures.add(restylingSingle(output, "logs", zipToMap(logs.stream().map(VStuff::asResource).toList(), LOG_ITEMS)));
+        futures.add(restyling(output, "casings",
+            Map.ofEntries(
+                restyleEntry("andesite_casing", AllBlocks.ANDESITE_CASING.asItem(), AllItems.ANDESITE_ALLOY.asItem()),
+                restyleEntry("copper_casing", AllBlocks.COPPER_CASING.asItem(), Items.COPPER_INGOT),
+                restyleEntry("brass_casing", AllBlocks.BRASS_CASING.asItem(), AllItems.BRASS_INGOT.asItem()),
+                restyleEntry("train_casing", AllBlocks.RAILWAY_CASING.asItem(), AllItems.STURDY_SHEET.asItem()),
+                restyleEntry("industrial_iron", AllBlocks.INDUSTRIAL_IRON_BLOCK.asItem(), Items.IRON_INGOT)
+            )
+        ));
 
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
     }
@@ -61,20 +74,12 @@ public class RopeRestylingProvider implements DataProvider {
         return list;
     }
 
-    private CompletableFuture<?> restylingSingle(CachedOutput output, String filename, List<String> forStyles, Map<ResourceLocation, Item> styleToItemMap) {
-        return restyling(output, filename, forStyles, zipToMap(styleToItemMap.keySet(), styleToItemMap.values().stream().map(List::of).toList()));
+    private CompletableFuture<?> restylingSingle(CachedOutput output, String filename,  Map<ResourceLocation, Item> styleToItemMap) {
+        return restyling(output, filename, zipToMap(styleToItemMap.keySet(), styleToItemMap.values().stream().map(List::of).toList()));
     }
 
-    private CompletableFuture<?> restyling(CachedOutput output, String fileName, List<String> forStyles, Map<ResourceLocation, List<Item>> styleToItemMap) {
+    private CompletableFuture<?> restyling(CachedOutput output, String fileName, Map<ResourceLocation, List<Item>> styleToItemMap) {
         JsonObject json = new JsonObject();
-
-        JsonArray forStylesArray = new JsonArray();
-
-        for (String style : forStyles) forStylesArray.add(VStuff.asResource(style).toString());
-
-        json.add("forStyles", forStylesArray);
-
-        JsonObject restyles = new JsonObject();
 
         for (Map.Entry<ResourceLocation, List<Item>> styleToItemEntry : styleToItemMap.entrySet()) {
             JsonArray itemArray = new JsonArray();
@@ -83,10 +88,8 @@ public class RopeRestylingProvider implements DataProvider {
                 itemArray.add(getItemLocation(item).toString());
             }
 
-            restyles.add(styleToItemEntry.getKey().toString(), itemArray);
+            json.add(styleToItemEntry.getKey().toString(), itemArray);
         }
-
-        json.add("restyles", restyles);
 
         Path path = generator.getPackOutput().getOutputFolder()
                 .resolve("data")
@@ -106,4 +109,61 @@ public class RopeRestylingProvider implements DataProvider {
     public String getName() {
         return "vstuff_restyle";
     }
+
+    static final List<Item> DYE_ITEMS = List.of(
+            Items.RED_DYE,
+            Items.ORANGE_DYE,
+            Items.YELLOW_DYE,
+            Items.LIME_DYE,
+            Items.GREEN_DYE,
+            Items.CYAN_DYE,
+            Items.BLUE_DYE,
+            Items.LIGHT_BLUE_DYE,
+            Items.PURPLE_DYE,
+            Items.PINK_DYE,
+            Items.MAGENTA_DYE,
+            Items.BROWN_DYE,
+            Items.BLACK_DYE,
+            Items.GRAY_DYE,
+            Items.LIGHT_GRAY_DYE,
+            Items.WHITE_DYE
+    );
+
+    static final List<Item> WOOL_ITEMS = List.of(
+            Items.RED_WOOL,
+            Items.ORANGE_WOOL,
+            Items.YELLOW_WOOL,
+            Items.LIME_WOOL,
+            Items.GREEN_WOOL,
+            Items.CYAN_WOOL,
+            Items.BLUE_WOOL,
+            Items.LIGHT_BLUE_WOOL,
+            Items.PURPLE_WOOL,
+            Items.PINK_WOOL,
+            Items.MAGENTA_WOOL,
+            Items.BROWN_WOOL,
+            Items.BLACK_WOOL,
+            Items.GRAY_WOOL,
+            Items.LIGHT_GRAY_WOOL,
+            Items.WHITE_WOOL
+    );
+
+    static final List<Item> LOG_ITEMS = List.of(
+            Items.OAK_LOG,
+            Items.BIRCH_LOG,
+            Items.SPRUCE_LOG,
+            Items.DARK_OAK_LOG,
+            Items.JUNGLE_LOG,
+            Items.ACACIA_LOG,
+            Items.MANGROVE_LOG,
+            Items.CHERRY_LOG,
+            Items.STRIPPED_OAK_LOG,
+            Items.STRIPPED_BIRCH_LOG,
+            Items.STRIPPED_SPRUCE_LOG,
+            Items.STRIPPED_DARK_OAK_LOG,
+            Items.STRIPPED_JUNGLE_LOG,
+            Items.STRIPPED_ACACIA_LOG,
+            Items.STRIPPED_MANGROVE_LOG,
+            Items.STRIPPED_CHERRY_LOG
+    );
 }

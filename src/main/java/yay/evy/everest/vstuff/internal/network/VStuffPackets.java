@@ -9,12 +9,23 @@ import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.internal.network.newpackets.OutlinePacket;
+import yay.evy.everest.vstuff.internal.network.newpackets.StyleSelectPacket;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT;
+import static net.minecraftforge.network.NetworkDirection.PLAY_TO_SERVER;
+
 public enum VStuffPackets {
+
+    // server -> client packets
+    OUTLINE(OutlinePacket.class, OutlinePacket::new, PLAY_TO_CLIENT),
+
+    // client -> server packets
+    STYLE_SELECT(StyleSelectPacket.class, StyleSelectPacket::new, PLAY_TO_SERVER)
 
     ;
 
@@ -38,6 +49,10 @@ public enum VStuffPackets {
                 .clientAcceptedVersions(VERSION_STR::equals)
                 .networkProtocolVersion(() -> VERSION_STR)
                 .simpleChannel();
+
+        for (VStuffPackets packet : values()) {
+            packet.packetType.register();
+        }
     }
 
     private static class PacketType<T extends SimplePacketBase> {

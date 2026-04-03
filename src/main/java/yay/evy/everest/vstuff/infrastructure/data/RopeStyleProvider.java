@@ -15,10 +15,9 @@ import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import static yay.evy.everest.vstuff.infrastructure.data.VStuffDatagen.COLORS;
-import static yay.evy.everest.vstuff.infrastructure.data.VStuffDatagen.LOGS;
 import static yay.evy.everest.vstuff.VStuff.asResource;
 import static yay.evy.everest.vstuff.VStuff.mcResource;
+import static yay.evy.everest.vstuff.infrastructure.data.DatagenUtils.*;
 
 public class RopeStyleProvider implements DataProvider {
 
@@ -48,6 +47,12 @@ public class RopeStyleProvider implements DataProvider {
 
         logStyles(output, futures);
 
+//        futures.add(basicRopeStyle(output, "Andesite Casing", RopeStyleManager.RopeRenderType.NORMAL, "casings"));
+//        futures.add(basicRopeStyle(output, "Copper Casing", RopeStyleManager.RopeRenderType.NORMAL, "casings"));
+//        futures.add(basicRopeStyle(output, "Brass Casing", RopeStyleManager.RopeRenderType.NORMAL, "casings"));
+//        futures.add(basicRopeStyle(output, "Train Casing", RopeStyleManager.RopeRenderType.NORMAL, "casings"));
+//        futures.add(basicRopeStyle(output, "Industrial Iron", RopeStyleManager.RopeRenderType.NORMAL, "casings"));
+
         futures.add(basicRopeStyle(output, "Candycane", RopeStyleManager.RopeRenderType.NORMAL));
         futures.add(basicRopeStyle(output, "Christmas Tree", RopeStyleManager.RopeRenderType.NORMAL));
 
@@ -57,6 +62,11 @@ public class RopeStyleProvider implements DataProvider {
     private CompletableFuture<?> basicRopeStyle(CachedOutput output, String name, RopeStyleManager.RopeRenderType ropeRenderType) {
         String fileName = name.toLowerCase(Locale.ROOT).replace(" ", "_");
         return ropeStyle(output, name, ropeRenderType, asResource("textures/rope/rope_" + fileName + ".png"), "none", fileName);
+    }
+
+    private CompletableFuture<?> basicRopeStyle(CachedOutput output, String name, RopeStyleManager.RopeRenderType ropeRenderType, String restyleGroup) {
+        String fileName = name.toLowerCase(Locale.ROOT).replace(" ", "_");
+        return ropeStyle(output, name, ropeRenderType, asResource("textures/rope/rope_" + fileName + ".png"), restyleGroup, fileName);
     }
 
     private void dyedStyles(CachedOutput output, List<CompletableFuture<?>> futures) {
@@ -70,9 +80,9 @@ public class RopeStyleProvider implements DataProvider {
     }
 
     private void woolStyles(CachedOutput output, List<CompletableFuture<?>> futures) {
-        futures.addAll(COLORS.stream()
+        futures.addAll(WOOLS.stream()
                 .map(color -> {
-                    String fileName = color.toLowerCase(Locale.ROOT).replace(" ", "_") + "_wool";
+                    String fileName = color.toLowerCase(Locale.ROOT).replace(" ", "_");
                     return ropeStyle(output, color, RopeStyleManager.RopeRenderType.NORMAL, mcResource("textures/block/" + fileName + ".png"), "wools", fileName);
                 })
                 .collect(Collectors.toCollection(ArrayList::new))

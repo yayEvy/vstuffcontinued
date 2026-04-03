@@ -11,8 +11,9 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
 
-import java.util.Locale;
 import java.util.Map;
+
+import static yay.evy.everest.vstuff.infrastructure.data.DatagenUtils.parseLoc;
 
 public class RopeStyleReloadListener extends SimpleJsonResourceReloadListener {
 
@@ -32,9 +33,9 @@ public class RopeStyleReloadListener extends SimpleJsonResourceReloadListener {
 
             RopeStyleManager.RopeRenderType renderType = RopeStyleManager.RopeRenderType.valueOf(json.get("render_type").getAsString());
 
-            ResourceLocation texture = ResourceLocation.bySeparator(json.get("texture").getAsString(), ':');
+            ResourceLocation texture = parseLoc(json.get("texture"));
 
-            ResourceLocation restyleGroup = ResourceLocation.bySeparator(json.get("restyle_group").getAsString(), ':');
+            ResourceLocation restyleGroup = parseLoc(json.get("restyle_group"));
 
             RopeStyleManager.register(new RopeStyleManager.RopeStyle(id, restyleGroup, name, renderType, texture));
         }

@@ -9,6 +9,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
+import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import yay.evy.everest.vstuff.internal.utility.*;
 
 public class RopeFactory {
@@ -50,6 +51,7 @@ public class RopeFactory {
     }
 
     public static ReworkedRope createNewRope(ServerLevel level, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1, ResourceLocation style, Player player) {
+        System.out.println(style);
         Pair<RopePosData, RopePosData> posDataPair = RopePosData.create(level, ship0, ship1, blockPos0, blockPos1);
         RopePosData posData0 = posDataPair.component1();
         RopePosData posData1 = posDataPair.component2();
@@ -76,7 +78,7 @@ public class RopeFactory {
         return rope;
     }
 
-    public static ReworkedRope removeRope(ServerLevel serverLevel, Integer ropeId) {
+    public static void removeRope(ServerLevel serverLevel, Integer ropeId) {
         RopeManager manager = RopeManager.get(serverLevel);
         ReworkedRope removed = manager.getRope(ropeId);
 
@@ -85,8 +87,15 @@ public class RopeFactory {
         } else {
             manager.removeRope(ropeId);
         }
+    }
 
-        return removed;
+    public static void restyleRope(ServerLevel serverLevel, Integer ropeId, RopeStyleManager.RopeStyle newStyle) {
+        ReworkedRope rope = RopeManager.get(serverLevel).getRope(ropeId);
+        if (rope == null) return;
+
+        rope.style = newStyle;
+
+        NetworkHandler.sendRopeUpdate(ropeId, rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.style.id());
     }
 
     public static CompoundTag ropeToTag(ReworkedRope rope) {

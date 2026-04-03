@@ -24,7 +24,7 @@ import yay.evy.everest.vstuff.content.ships.reactionwheel.ReactionWheelAttachmen
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.PhysGrabberServerAttachment;
 import yay.evy.everest.vstuff.content.ships.thrust.ThrusterForceAttachment;
 import yay.evy.everest.vstuff.index.*;
-import yay.evy.everest.vstuff.infrastructure.config.VStuffConfig;
+import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import yay.evy.everest.vstuff.internal.network.PhysGrabberNetwork;
 import org.valkyrienskies.core.api.VsBeta;
@@ -41,8 +41,8 @@ public class VStuff {
     public VStuff() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, VStuffConfig.SERVER_CONFIG);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, VStuffConfig.CLIENT_CONFIG);
+        //ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, VStuffConfig.SERVER_CONFIG);
+        ///ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, VStuffConfig.CLIENT_CONFIG);
 
         VStuffCreativeModeTabs.register(modEventBus);
 
@@ -57,7 +57,7 @@ public class VStuff {
         VStuffBlockEntities.register();
         //VStuffPackets.registerPackets();
         // todo fix these / make sure they work
-        //VStuffConfigs.register(ModLoadingContext.get());
+        VStuffConfigs.register(ModLoadingContext.get());
 
         MinecraftForge.EVENT_BUS.register(this);
         NetworkHandler.registerPackets();

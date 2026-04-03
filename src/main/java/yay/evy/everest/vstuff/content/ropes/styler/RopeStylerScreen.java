@@ -26,33 +26,34 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
-//todo basically make better idk
 public class RopeStylerScreen extends AbstractSimiScreen {
 
     public RopeStylerScreen(Player player) {
         this.player = player;
     }
+
     Player player;
 
     private final VStuffGuiTextures background = VStuffGuiTextures.ROPE_STYLER;
-    // The names of bogey categories
+
     private final List<Component> categoryComponentList = RopeStyleCategoryManager.getSortedList().stream()
             .map(RopeStyleCategoryManager.RopeStyleCategory::name)
             .toList();
-    // The category that is currently selected
+
     private RopeStyleCategoryManager.RopeStyleCategory selectedCategory;
-    private int categoryIndex = 0; // for the scroll input on window resize
-    // The list of bogies being displayed
+
+    private int categoryIndex = 0;
+
     RopeStyleManager.RopeStyle[] displayedStyles = new RopeStyleManager.RopeStyle[6];
-    // The list of bogey selection buttons
+
     RopeStyleButton[] styleButtons = new RopeStyleButton[6];
-    // The bogey that is currently selected
+
     RopeStyleManager.RopeStyle selectedStyle;
-    // Amount scrolled, 0 = top and 1 = bottom
+
     private float scrollOffs;
-    // True if the scrollbar is being dragged
+
     private boolean scrolling;
-    private int ticksOpen;
+
     private boolean soundPlayed;
 
     @Override
@@ -70,7 +71,6 @@ public class RopeStylerScreen extends AbstractSimiScreen {
 
         List<RopeStyleCategoryManager.RopeStyleCategory> categories = RopeStyleCategoryManager.getSortedList();
 
-        // Initial setup
         if (categories.isEmpty()) {
             selectedCategory = null;
             selectedStyle = null;
@@ -87,11 +87,9 @@ public class RopeStylerScreen extends AbstractSimiScreen {
             selectedStyle = null;
         }
 
-        // Scrolling Initial setup
         scrollOffs = 0;
         scrollTo(0);
 
-        // category select
         Label categoryLabel = new Label(x + 14, y + 25, Component.empty()).withShadow();
         ScrollInput categoryScrollInput = new SelectionScrollInput(x + 9, y + 20, 150, 18)
                 .forOptions(categoryComponentList)
@@ -139,46 +137,35 @@ public class RopeStylerScreen extends AbstractSimiScreen {
             return;
         }
 
-        // bg
         background.render(guiGraphics, x, y);
 
-        // header
         MutableComponent header = Component.translatable("vstuff.gui.rope_menu.title");
         int halfWidth = background.width / 2;
         int halfHeaderWidth = font.width(header) / 2;
         guiGraphics.drawString(font, header, x + halfWidth - halfHeaderWidth, y + 4, 0x582424, false);
 
 
-
-        // Render scroll bar
-        // Formula is barPos = startLoc + (endLoc - startLoc) * scrollOffs
         int scrollBarPos = (int) (41 + (134 - 41) * scrollOffs);
         VStuffGuiTextures barTexture = canScroll() ? VStuffGuiTextures.ROPE_SCROLL : VStuffGuiTextures.ROPE_SCROLL_DISABLED;
         barTexture.render(guiGraphics, x + 11, y + scrollBarPos);
 
-        // render names and textures
         for (int i = 0; i < 6; i++) {
             RopeStyleManager.RopeStyle style = displayedStyles[i];
             if (style != null) {
-                // texture
                 ResourceLocation icon = style.texture();
                 if (icon != null)
                     renderIcon(guiGraphics, ms, icon, x + 20, y + 42 + (i * 18));
 
-                // name
-                Component bogeyName = ClientTextUtils.getComponentWithWidthCutoff(style.name(), 114);
-                // button has already been added in init, now just draw text
-                guiGraphics.drawString(font, bogeyName, x + 40, y + 46 + (i * 18), 0xFFFFFF);
+                Component styleName = ClientTextUtils.getComponentWithWidthCutoff(style.name(), 114);
+                guiGraphics.drawString(font, styleName, x + 40, y + 46 + (i * 18), 0xFFFFFF);
             }
         }
 
-        // show name of selected
         if (selectedStyle != null) {
             Component displayName = selectedStyle.name();
             Component shortenedName = ClientTextUtils.getComponentWithWidthCutoff(displayName, 126);
             guiGraphics.drawString(font, shortenedName, x + 15, y + 165, 0xFFFFFF);
 
-           // ms.popPose();
         }
     }
 
@@ -208,7 +195,6 @@ public class RopeStylerScreen extends AbstractSimiScreen {
 
     @Override
     public void tick() {
-        ticksOpen++;
         soundPlayed = false;
         super.tick();
     }

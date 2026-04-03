@@ -39,9 +39,18 @@ public class RopeStyleManager {
         return STYLES.values();
     }
 
+    public static RopeStyle getDefault() {
+        return STYLES.get(DEFAULT_ID);
+    }
+
     public static ResourceLocation getOrDefaultStyleId(CompoundTag ropeTag) {
         if (!ropeTag.contains("style", Tag.TAG_COMPOUND)) return DEFAULT_ID;
         return TagUtils.readResourceLocation(ropeTag.getCompound("style"));
+    }
+
+    public static RopeStyle getOrDefaultStyle(ItemStack stack) {
+        if (!stack.hasTag()) return getDefault();
+        return get(getOrDefaultStyleId(stack.getOrCreateTag()));
     }
 
     public static ResourceLocation getStyleId(CompoundTag ropeTag) {
@@ -49,6 +58,7 @@ public class RopeStyleManager {
     }
 
     public static void setStyle(Player player, ResourceLocation style) {
+        if (player == null) return;
         InteractionHand hand = EntityUtils.holdingInHand(player, (s) -> VStuffItems.ROPE.isIn(s) || VStuffItems.ROPE_THROWER.isIn(s));
         if (hand == null) return;
         setStyle(player.getItemInHand(hand), style);

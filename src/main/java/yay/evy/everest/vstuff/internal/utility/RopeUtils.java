@@ -13,6 +13,7 @@ import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.content.ropes.IRopeActor;
+import yay.evy.everest.vstuff.content.ropes.ReworkedRopeItem;
 import yay.evy.everest.vstuff.content.ropes.RopeManager;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 
@@ -111,12 +112,12 @@ public class RopeUtils {
         return minDistanceToRope;
     }
 
-    public static @Nullable Integer findTargetedLead(ServerLevel level, Player player) {
+    public static @Nullable ReworkedRope findTargetedLead(ServerLevel level, Player player) {
         Vec3 eyePos = player.getEyePosition();
         Vec3 lookVec = player.getViewVector(1.0f);
         double maxDistance = player.getBlockReach();
         double minDistance = Double.MAX_VALUE;
-        Integer foundId = null;
+        ReworkedRope foundRope = null;
 
         for (ReworkedRope rope : RopeManager.get(level).getRopeList()) {
 
@@ -126,11 +127,11 @@ public class RopeUtils {
             double distance = getDistanceToRope(eyePos, lookVec, worldPosA, worldPosB, maxDistance);
             if (distance < minDistance && distance <= 1.0) {
                 minDistance = distance;
-                foundId = rope.getRopeId();
+                foundRope = rope;
             }
         }
 
-        return foundId;
+        return foundRope;
     }
 
     public static void playPlaceSound(ServerLevel serverLevel, BlockPos pos, boolean chain) {
