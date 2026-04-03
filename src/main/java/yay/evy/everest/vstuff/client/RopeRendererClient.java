@@ -24,6 +24,7 @@ import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Mod.EventBusSubscriber(modid = "vstuff", bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
@@ -34,6 +35,9 @@ public class RopeRendererClient {
     private static final float NORMAL_ROPE_V_SCALE = 2.5f;
     private static final float CHAIN_ROPE_V_SCALE = 0.5f;
     private static final float WIND_STRENGTH = 0.02f;
+
+    private static final Map<Integer, Vector3d> previousRightVectors = new HashMap<>();
+    private static final float ORIENTATION_SMOOTH_FACTOR = 0.15f; // lower is smoother ye0yepeyepe
 
     private static final BlockPos.MutableBlockPos sharedMutablePos = new BlockPos.MutableBlockPos();
 
@@ -100,13 +104,13 @@ public class RopeRendererClient {
         if (VSGameUtilsKt.isBlockInShipyard(level, endPos.x, endPos.y, endPos.z)) return;
 
         renderRope(poseStack, bufferSource, startPos, endPos,
-                    actualRopeLength, maxRopeLength, cameraPos, partialTick, level, style);
+                actualRopeLength, maxRopeLength, cameraPos, partialTick, level, style, constraintId);
 
     }
 
     private static void renderRope(PoseStack poseStack, MultiBufferSource bufferSource,
                                    Vector3d startPos, Vector3d endPos, double actualRopeLength,
-                                   double maxRopeLength, Vec3 cameraPos, float partialTick, Level level, RopeStyleManager.RopeStyle style) {
+                                   double maxRopeLength, Vec3 cameraPos, float partialTick, Level level, RopeStyleManager.RopeStyle style, int constraintId) {
 
         Vector3d startRelative = new Vector3d(startPos.x - cameraPos.x, startPos.y - cameraPos.y, startPos.z - cameraPos.z);
         Vector3d endRelative = new Vector3d(endPos.x - cameraPos.x, endPos.y - cameraPos.y, endPos.z - cameraPos.z);
@@ -194,20 +198,29 @@ public class RopeRendererClient {
         if (style.ropeRenderType() == RopeStyleManager.RopeRenderType.CHAIN) {
             renderChainRope(poseStack, bufferSource.getBuffer(VStuffRenderTypes.chainRenderer(style.texture())), curvePoints, lightValues);
         } else {
-            renderNormalRope(poseStack, bufferSource.getBuffer(VStuffRenderTypes.ropeRenderer(style.texture())), curvePoints, lightValues, startRelative, endRelative);
+            renderNormalRope(poseStack, bufferSource.getBuffer(VStuffRenderTypes.ropeRenderer(style.texture())), curvePoints, lightValues, startRelative, endRelative, constraintId);
         }
 
         poseStack.popPose();
     }
 
     private static void renderNormalRope(PoseStack poseStack, VertexConsumer vertexConsumer,
-                                         Vector3d[] curvePoints, int[] lightValues, Vector3d start, Vector3d end) {
+                                         Vector3d[] curvePoints, int[] lightValues, Vector3d start, Vector3d end,
+                                         int constraintId) {
         Matrix4f matrix = poseStack.last().pose();
 
         Vector3d overallDirection = new Vector3d(end).sub(start).normalize();
         Vector3d up = new Vector3d();
-
         Vector3d right = right(overallDirection, up);
+
+        Vector3d prevRight = previousRightVectors.get(constraintId);
+        if (prevRight != null) {
+            if (prevRight.dot(right) < 0) right.mul(-1);
+            right.lerp(prevRight, 1.0f - ORIENTATION_SMOOTH_FACTOR).normalize();
+            up = new Vector3d();
+            right.cross(overallDirection, up).normalize();
+        }
+        previousRightVectors.put(constraintId, new Vector3d(right));
 
         Vector3d[][] strips = new Vector3d[4][ROPE_CURVE_SEGMENTS + 1]; // top right, top left, bottom right, bottom left
 
