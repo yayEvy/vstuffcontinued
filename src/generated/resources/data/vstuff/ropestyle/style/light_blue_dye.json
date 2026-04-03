@@ -1,0 +1,6 @@
+{
+  "name": "Light Blue",
+  "render_type": "NORMAL",
+  "restyle_group": "vstuff:dyes",
+  "texture": "vstuff:textures/rope/rope_light_blue_dye.png"
+}

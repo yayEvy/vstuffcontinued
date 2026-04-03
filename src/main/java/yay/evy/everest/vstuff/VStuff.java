@@ -4,12 +4,17 @@ import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -24,10 +29,12 @@ import yay.evy.everest.vstuff.content.ships.reactionwheel.ReactionWheelAttachmen
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.PhysGrabberServerAttachment;
 import yay.evy.everest.vstuff.content.ships.thrust.ThrusterForceAttachment;
 import yay.evy.everest.vstuff.index.*;
-import yay.evy.everest.vstuff.infrastructure.config.VStuffConfig;
+import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import yay.evy.everest.vstuff.internal.network.PhysGrabberNetwork;
 import org.valkyrienskies.core.api.VsBeta;
+
+import java.util.concurrent.CompletableFuture;
 
 @Mod(VStuff.MOD_ID)
 public class VStuff {
@@ -41,8 +48,8 @@ public class VStuff {
     public VStuff() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, VStuffConfig.SERVER_CONFIG);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, VStuffConfig.CLIENT_CONFIG);
+        //ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, VStuffConfig.SERVER_CONFIG);
+        ///ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, VStuffConfig.CLIENT_CONFIG);
 
         VStuffCreativeModeTabs.register(modEventBus);
 
@@ -57,7 +64,7 @@ public class VStuff {
         VStuffBlockEntities.register();
         //VStuffPackets.registerPackets();
         // todo fix these / make sure they work
-        //VStuffConfigs.register(ModLoadingContext.get());
+        VStuffConfigs.register(ModLoadingContext.get());
 
         MinecraftForge.EVENT_BUS.register(this);
         NetworkHandler.registerPackets();
@@ -126,5 +133,15 @@ public class VStuff {
     public static MutableComponent translate(String key, Object... args) {
         Object[] args1 = LangBuilder.resolveBuilders(args);
         return Component.translatable(VStuff.MOD_ID + "." + key, args1);
+    }
+
+    @SubscribeEvent
+    public static void onGatherData(GatherDataEvent event) {
+        DataGenerator gen = event.getGenerator();
+        PackOutput output = gen.getPackOutput();
+        CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
+
+        gen.addProvider(event.includeServer(),
+                new VStuffWorldGenProvider(output, lookupProvider));
     }
 }

@@ -1,0 +1,50 @@
+{
+  "vstuff:acacia_log": [
+    "minecraft:acacia_log"
+  ],
+  "vstuff:birch_log": [
+    "minecraft:birch_log"
+  ],
+  "vstuff:cherry_log": [
+    "minecraft:cherry_log"
+  ],
+  "vstuff:dark_oak_log": [
+    "minecraft:dark_oak_log"
+  ],
+  "vstuff:jungle_log": [
+    "minecraft:jungle_log"
+  ],
+  "vstuff:mangrove_log": [
+    "minecraft:mangrove_log"
+  ],
+  "vstuff:oak_log": [
+    "minecraft:oak_log"
+  ],
+  "vstuff:spruce_log": [
+    "minecraft:spruce_log"
+  ],
+  "vstuff:stripped_acacia_log": [
+    "minecraft:stripped_acacia_log"
+  ],
+  "vstuff:stripped_birch_log": [
+    "minecraft:stripped_birch_log"
+  ],
+  "vstuff:stripped_cherry_log": [
+    "minecraft:stripped_cherry_log"
+  ],
+  "vstuff:stripped_dark_oak_log": [
+    "minecraft:stripped_dark_oak_log"
+  ],
+  "vstuff:stripped_jungle_log": [
+    "minecraft:stripped_jungle_log"
+  ],
+  "vstuff:stripped_mangrove_log": [
+    "minecraft:stripped_mangrove_log"
+  ],
+  "vstuff:stripped_oak_log": [
+    "minecraft:stripped_oak_log"
+  ],
+  "vstuff:stripped_spruce_log": [
+    "minecraft:stripped_spruce_log"
+  ]
+}

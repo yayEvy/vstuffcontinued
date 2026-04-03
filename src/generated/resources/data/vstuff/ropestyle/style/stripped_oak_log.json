@@ -1,0 +1,6 @@
+{
+  "name": "Stripped Oak",
+  "render_type": "NORMAL",
+  "restyle_group": "vstuff:logs",
+  "texture": "minecraft:textures/block/stripped_oak_log.png"
+}

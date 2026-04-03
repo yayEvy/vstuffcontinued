@@ -26,8 +26,11 @@ public class VServer extends ConfigBase {
     public final ConfigFloat pulleySpeed = f(0.5f, 0.1f, 64, "pulleySpeed", "[in Blocks per second per RPM]", Comments.pulleySpeed);
 
     public final ConfigGroup physGrabber = group(1, "physGrabber", Comments.physGrabber);
+    public final ConfigFloat physGrabberMaxMass = f(500000, 0, "physGrabberMaxMass", Comments.physGrabberMaxMass);
 
     public final ConfigGroup reactionWheel = group(1, "reactionWheel", Comments.reactionWheel);
+    public final ConfigFloat reactionWheelMaxSpeed = f(256, 1, 256, "reactionWheelMaxSpeed", Comments.inRpm, Comments.reactionWheelMaxSpeed);
+    public final ConfigFloat reactionWheelMaxTorque = f(50000, 0, 100000, "reactionWheelMaxTorque", Comments.reactionWheelMaxTorque);
 
     @Override
     public @NotNull String getName() {
@@ -36,6 +39,7 @@ public class VServer extends ConfigBase {
 
     private static class Comments {
         static String inBlocks = "[in Blocks]";
+        static String inRpm = "[in RPM]";
         static String server = "VStuff server config, most values are here.";
         static String stress = "Stress impacts of VStuff's blocks";
 
@@ -52,7 +56,10 @@ public class VServer extends ConfigBase {
         static String pulleySpeed = "How fast the pulley retracts/extends";
 
         static String physGrabber = "Values for the Phys Grabber";
+        static String physGrabberMaxMass = "The maximum weight the Phys Grabber can grab. Set to 0 to make the grabber ignore mass.";
 
         static String reactionWheel = "Values for the Reaction Wheel";
+        static String reactionWheelMaxSpeed = "Maximum RPM the Reaction Wheel scales torque against";
+        static String reactionWheelMaxTorque = "Maximum torque applied by Reaction Wheel at max RPM";
     }
 }

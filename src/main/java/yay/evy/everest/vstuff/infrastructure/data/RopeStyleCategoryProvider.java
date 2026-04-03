@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
+import static yay.evy.everest.vstuff.infrastructure.data.DatagenUtils.*;
+
 public class RopeStyleCategoryProvider implements DataProvider {
 
     private final DataGenerator generator;
@@ -27,34 +29,24 @@ public class RopeStyleCategoryProvider implements DataProvider {
         List<CompletableFuture<?>> futures = new ArrayList<>();
 
         futures.add(category(output, 0, "Basic Styles", "vstuff:normal", "vstuff:chain"));
-        futures.add(category(output, 1, "Wool Styles", colors("wool")));
-        futures.add(category(output, 2, "Dyed Styles", colors("dye")));
-        futures.add(category(output, 3, "Pride Styles", "vstuff:pride", "vstuff:gay",
-                "vstuff:lesbian", "vstuff:bisexual", "vstuff:transgender", "vstuff:nonbinary", "vstuff:asexual"));
-        futures.add(category(output, 4, "Log Styles", logs()));
-        futures.add(category(output, 5, "Merry VStuffmas", "vstuff:christmas_tree", "vstuff:candycane"));
+
+        futures.add(category(output, 1, "Wool Styles", wools));
+
+        futures.add(category(output, 2, "Dyed Styles", dyes));
+
+        futures.add(category(output, 3, "Pride Styles", resourceArray("pride", "gay", "lesbian", "bisexual", "transgender", "nonbinary", "asexual")));
+
+        futures.add(category(output, 4, "Log Styles", logs));
+
+        //futures.add(category(output, 5, "Casing Styles", resourceArray("andesite_casing", "brass_casing", "copper_casing", "train_casing", "industrial_iron")));
+
+        futures.add(category(output, 6, "Merry VStuffmas", "vstuff:christmas_tree", "vstuff:candycane"));
 
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
     }
 
-    private String[] colors(String suffix) {
-        List<String> colors = List.of("Red", "Orange", "Yellow", "Lime", "Green", "Cyan",
-                "Blue", "Light Blue", "Purple", "Pink", "Magenta", "Brown", "Black", "Gray", "Light Gray", "White");
-        return colors.stream().map(color -> {
-            String path = color.toLowerCase(Locale.ROOT).replace(" ", "_");
-            return "vstuff:" + path + "_" + suffix;
-        }).toArray(String[]::new);
-    }
-
-    private String[] logs() {
-        List<String> logs = List.of("Oak", "Birch", "Dark Oak", "Jungle", "Acacia", "Mangrove", "Cherry",
-                "Stripped Oak", "Stripped Birch", "Stripped Dark Oak", "Stripped Jungle", "Stripped Acacia",
-                "Stripped Mangrove", "Stripped Cherry");
-
-        return logs.stream().map(log -> {
-            String path = log.toLowerCase(Locale.ROOT).replace(" ", "_");
-            return "vstuff:" + path + "_log";
-        }).toArray(String[]::new);
+    private CompletableFuture<?> category(CachedOutput output, int order, String name, List<String> styles) {
+        return category(output, order, name, resourceArray(styles.toArray(String[]::new)));
     }
 
     private CompletableFuture<?> category(CachedOutput output, int order, String name, String... styles) {

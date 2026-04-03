@@ -43,6 +43,10 @@ public class NetworkHandler {
                 .add();
     }
 
+    public static void sendRopeUpdate(Integer ropeId, Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, ResourceLocation style) {
+        sendConstraintRemove(ropeId);
+        sendConstraintAdd(ropeId, ship0, ship1, localPos0, localPos1, maxLength, style);
+    }
 
     public static void sendConstraintAdd(Integer constraintId, Long shipA, Long shipB,
                                          Vector3d localPosA, Vector3d localPosB, double maxLength, ResourceLocation type) {

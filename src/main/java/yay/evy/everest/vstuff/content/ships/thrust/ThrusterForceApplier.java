@@ -8,22 +8,16 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import net.minecraft.core.BlockPos;
-import yay.evy.everest.vstuff.infrastructure.config.VStuffConfig;
+import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
 
 
 public class ThrusterForceApplier {
     ThrusterData data;
 
-    public ThrusterForceApplier() {
-
-    }
-
     public ThrusterForceApplier(ThrusterData data){
         this.data = data;
     }
 
-    //Cached vectors to reduce allocations on physics thread
-    private Vector3d relativePos = new Vector3d();
     private final Vector3d worldForceDirection = new Vector3d();
     private final Vector3d worldForce = new Vector3d();
     private final Vector3d parallelForce = new Vector3d();
@@ -38,18 +32,17 @@ public class ThrusterForceApplier {
         float thrust = data.getThrust();
         if (thrust == 0) return;
 
-        final int maxSpeed = VStuffConfig.THRUSTER_MAX_SPEED.get();
+        final int maxSpeed = VStuffConfigs.server().thrusterMaxSpeed.get();
         final ShipTransform transform = ship.getTransform();
         final Vector3dc shipCenterOfMass = transform.getPositionInShip();
 
-        relativePos = VectorConversionsMCKt.toJOMLD(pos)
+        Vector3d relativePos = VectorConversionsMCKt.toJOMLD(pos)
                 .add(0.5, 0.5, 0.5)
                 .sub(shipCenterOfMass);
 
-        // Get thruster direction, fallback to +Z if invalid
         Vector3d thrusterDir = new Vector3d(data.getDirection());
         if (thrusterDir.lengthSquared() < 1e-6) {
-            thrusterDir.set(0, 0, 1); // default forward
+            thrusterDir.set(0, 0, 1);
         }
 
         transform.getShipToWorld().transformDirection(thrusterDir, worldForceDirection);
@@ -85,10 +78,10 @@ public class ThrusterForceApplier {
 
         var pipeline = VSGameUtilsKt.getVsPipeline(currentServer);
         double physTps = pipeline.computePhysTps();
-        if (physTps <= 0) return; // Sometimes physics runs backwards and this results in timeline splitting, we try to avoid that with this line
+        if (physTps <= 0) return;
         double deltaTime = 1.0 / physTps;
         double mass = ship.getMass();
-        if (mass <= 0) return; //Same with tps but in case of negative mass we can accidentally create alcubierre bubble
+        if (mass <= 0) return;
 
         forceToScale.mul(deltaTime / mass, scaledForce_temp1);
         linearVelocity.add(scaledForce_temp1, scaledForce_temp2);

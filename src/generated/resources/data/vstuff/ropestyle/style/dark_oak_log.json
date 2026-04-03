@@ -1,0 +1,6 @@
+{
+  "name": "Dark Oak",
+  "render_type": "NORMAL",
+  "restyle_group": "vstuff:logs",
+  "texture": "minecraft:textures/block/dark_oak_log.png"
+}

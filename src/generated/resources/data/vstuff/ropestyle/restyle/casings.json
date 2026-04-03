@@ -1,0 +1,22 @@
+{
+  "vstuff:andesite_casing": [
+    "create:andesite_casing",
+    "create:andesite_alloy"
+  ],
+  "vstuff:brass_casing": [
+    "create:brass_casing",
+    "create:brass_ingot"
+  ],
+  "vstuff:copper_casing": [
+    "create:copper_casing",
+    "minecraft:copper_ingot"
+  ],
+  "vstuff:industrial_iron": [
+    "create:industrial_iron_block",
+    "minecraft:iron_ingot"
+  ],
+  "vstuff:train_casing": [
+    "create:railway_casing",
+    "create:sturdy_sheet"
+  ]
+}

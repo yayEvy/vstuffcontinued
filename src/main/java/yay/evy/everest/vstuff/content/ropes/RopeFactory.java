@@ -8,6 +8,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import yay.evy.everest.vstuff.internal.RopeStyleManager;
+import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import yay.evy.everest.vstuff.content.ropes.type.RopeType;
 import yay.evy.everest.vstuff.internal.utility.*;
 
@@ -76,7 +78,7 @@ public class RopeFactory {
         return rope;
     }
 
-    public static ReworkedRope removeRope(ServerLevel serverLevel, Integer ropeId) {
+    public static void removeRope(ServerLevel serverLevel, Integer ropeId) {
         RopeManager manager = RopeManager.get(serverLevel);
         ReworkedRope removed = manager.getRope(ropeId);
 
@@ -85,8 +87,15 @@ public class RopeFactory {
         } else {
             manager.removeRope(ropeId);
         }
+    }
 
-        return removed;
+    public static void restyleRope(ServerLevel serverLevel, Integer ropeId, RopeStyleManager.RopeStyle newStyle) {
+        ReworkedRope rope = RopeManager.get(serverLevel).getRope(ropeId);
+        if (rope == null) return;
+
+        rope.style = newStyle;
+
+        NetworkHandler.sendRopeUpdate(ropeId, rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.style.id());
     }
 
     public static CompoundTag ropeToTag(ReworkedRope rope) {
@@ -97,7 +106,7 @@ public class RopeFactory {
         ropeTag.put("posData0", TagUtils.writePosData(rope.posData0));
         ropeTag.put("posData1", TagUtils.writePosData(rope.posData1));
         ropeTag.put("jointValues", TagUtils.writeJointValues(rope.jointValues));
-        ropeTag.put("style", TagUtils.writeResourceLocation(rope.type.id()));
+        ropeTag.put("type", TagUtils.writeResourceLocation(rope.type.id()));
 
         return ropeTag;
     }

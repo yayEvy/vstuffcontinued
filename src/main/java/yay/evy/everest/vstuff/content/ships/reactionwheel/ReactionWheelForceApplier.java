@@ -6,7 +6,7 @@ import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 
 
 import net.minecraft.core.BlockPos;
-import yay.evy.everest.vstuff.infrastructure.config.VStuffConfig;
+import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
 
 @JsonAutoDetect(
         fieldVisibility = JsonAutoDetect.Visibility.ANY
@@ -32,8 +32,8 @@ public class ReactionWheelForceApplier {
 
     private void applyDirectTorque(PhysShipImpl ship) {
 
-        double maxSpeed = VStuffConfig.REACTION_WHEEL_MAX_SPEED.get();
-        double torqueStrength = VStuffConfig.REACTION_WHEEL_TORQUE_STRENGTH.get();
+        double maxSpeed = VStuffConfigs.server().reactionWheelMaxSpeed.get();
+        double torqueStrength = VStuffConfigs.server().reactionWheelMaxTorque.get();
 
         if (maxSpeed <= 0) return;
 

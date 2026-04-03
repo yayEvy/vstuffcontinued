@@ -1,0 +1,6 @@
+{
+  "name": "Red Wool",
+  "render_type": "NORMAL",
+  "restyle_group": "vstuff:wools",
+  "texture": "minecraft:textures/block/red_wool.png"
+}

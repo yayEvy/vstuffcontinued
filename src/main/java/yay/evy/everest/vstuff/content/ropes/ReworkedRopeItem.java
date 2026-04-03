@@ -4,6 +4,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -83,6 +84,7 @@ public class ReworkedRopeItem extends Item {
 
         RopeFactory.RopeResult ropeResult = RopeFactory.tryCreateNewRope(serverLevel, heldItem, firstClickedPos, clickedPos, player);
 
+
         if (ropeResult.valid()) {
             player.displayClientMessage(VStuff.translate("rope.created").withStyle(ChatFormatting.GREEN), true);
 
@@ -101,6 +103,14 @@ public class ReworkedRopeItem extends Item {
         resetTag(heldItem);
 
         return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    public Component getName(ItemStack stack) {
+        return Component.translatable(this.getDescriptionId(stack))
+                .append(" (")
+                .append(RopeStyleManager.getOrDefaultStyle(stack).name())
+                .append(")");
     }
 
     @Override

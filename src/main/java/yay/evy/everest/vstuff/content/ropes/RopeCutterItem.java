@@ -24,11 +24,11 @@ public class RopeCutterItem extends Item {
             return InteractionResultHolder.pass(itemStack);
         }
 
-        Integer targetRope = RopeUtils.findTargetedLead(serverLevel, player);
-        if (targetRope == null) return InteractionResultHolder.pass(itemStack);
+        ReworkedRope rope = RopeUtils.findTargetedLead(serverLevel, player);
+        if (rope == null) return InteractionResultHolder.pass(itemStack);
 
         try {
-            ReworkedRope rope = RopeFactory.removeRope(serverLevel, targetRope);
+            RopeFactory.removeRope(serverLevel, rope.ropeId);
 
             boolean chain = (rope.type.rendererTypeId().equals(RopeRendererTypes.CHAIN.getId()));
 
