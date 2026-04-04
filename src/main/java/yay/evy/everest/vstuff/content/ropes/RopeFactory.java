@@ -11,8 +11,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.PacketDistributor;
 import yay.evy.everest.vstuff.content.ropes.packet.UpdateRopeStylePacket;
 import yay.evy.everest.vstuff.index.VStuffPackets;
-import yay.evy.everest.vstuff.content.ropes.type.RopeTypeManager;
-import yay.evy.everest.vstuff.content.ropes.type.RopeType;
+import yay.evy.everest.vstuff.internal.RopeTypeManager;
+import yay.evy.everest.vstuff.internal.RopeType;
 import yay.evy.everest.vstuff.internal.utility.*;
 
 public class RopeFactory {
@@ -90,6 +90,7 @@ public class RopeFactory {
             GTPAUtils.removeJoint(serverLevel, removed);
         } else {
             manager.removeRope(ropeId);
+            removed.detachActors(serverLevel);
         }
     }
 
@@ -122,7 +123,7 @@ public class RopeFactory {
                 TagUtils.readPosData(ropeTag.getCompound("posData0")),
                 TagUtils.readPosData(ropeTag.getCompound("posData1")),
                 TagUtils.readJointValues(ropeTag.getCompound("jointValues")),
-                TagUtils.readResourceLocation(ropeTag.getCompound("style"))
+                TagUtils.readResourceLocation(ropeTag.getCompound("type"))
         ).setRopeId(ropeTag.getInt("ropeId"));
 
         if (ropeTag.getInt("jointId") != -1) {

@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.infrastructure.data;
+package yay.evy.everest.vstuff.infrastructure.data.listener;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -9,9 +9,9 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.client.rope.RopeRendererTypes;
-import yay.evy.everest.vstuff.content.ropes.type.RopeType;
-import yay.evy.everest.vstuff.content.ropes.type.RopeTypeManager;
+import yay.evy.everest.vstuff.client.RopeRendererTypes;
+import yay.evy.everest.vstuff.internal.RopeType;
+import yay.evy.everest.vstuff.internal.RopeTypeManager;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
@@ -33,7 +33,7 @@ public class RopeTypeReloadListener extends SimpleJsonResourceReloadListener {
             ResourceLocation id = entry.getKey();
             JsonObject json = entry.getValue().getAsJsonObject();
 
-            Component name = Component.translatable(json.get("name").getAsString());
+            Component name = Component.translatable("ropetype." + id.getNamespace() + "." + id.getPath());
             ResourceLocation category = parseLoc(json.get("category"));
             ResourceLocation renderer = parseLoc(json.get("renderer"));
             ResourceLocation restyleGroup = parseLoc(json.get("restyle_group"));

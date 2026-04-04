@@ -1,7 +1,7 @@
 {
   "category": "vstuff:pride_styles",
-  "name": "ropetype.vstuff.nonbinary",
-  "renderer": "vstuff:normal",
+  "name": "Nonbinary",
+  "renderer": "vstuff:none",
   "renderer_params": {
     "texture": "vstuff:textures/rope/rope_nonbinary.png"
   },

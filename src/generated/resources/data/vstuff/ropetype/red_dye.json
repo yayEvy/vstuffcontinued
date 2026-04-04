@@ -1,6 +1,6 @@
 {
   "category": "vstuff:dyed_styles",
-  "name": "ropetype.vstuff.red_dye",
+  "name": "Red",
   "renderer": "vstuff:solid_colour",
   "renderer_params": {
     "color": "#FF6961"

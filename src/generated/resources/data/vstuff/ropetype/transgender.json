@@ -1,9 +1,0 @@
-{
-  "category": "vstuff:pride_styles",
-  "name": "ropetype.vstuff.transgender",
-  "renderer": "vstuff:normal",
-  "renderer_params": {
-    "texture": "vstuff:textures/rope/rope_transgender.png"
-  },
-  "restyle_group": "vstuff:none"
-}

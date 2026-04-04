@@ -1,6 +1,6 @@
 {
   "category": "vstuff:dyed_styles",
-  "name": "ropetype.vstuff.blue_dye",
+  "name": "Blue",
   "renderer": "vstuff:solid_colour",
   "renderer_params": {
     "color": "#3C44AA"

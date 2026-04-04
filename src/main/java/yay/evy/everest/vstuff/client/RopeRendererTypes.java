@@ -1,13 +1,15 @@
-package yay.evy.everest.vstuff.client.rope;
+package yay.evy.everest.vstuff.client;
 
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.client.rope.renderers.ChainRopeRenderer;
-import yay.evy.everest.vstuff.client.rope.renderers.SolidColourRopeRenderer;
-import yay.evy.everest.vstuff.client.rope.renderers.NormalRopeRenderer;
+import yay.evy.everest.vstuff.client.renderers.ChainRopeRenderer;
+import yay.evy.everest.vstuff.client.renderers.SolidColourRopeRenderer;
+import yay.evy.everest.vstuff.client.renderers.NormalRopeRenderer;
+import yay.evy.everest.vstuff.internal.rendering.IRopeRenderer;
+import yay.evy.everest.vstuff.internal.rendering.RopeRendererType;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -52,9 +54,7 @@ public final class RopeRendererTypes {
                 return null;
             }
 
-            IRopeRenderer renderer = type.create(params);
-            RENDERER_CACHE.put(location, renderer);
-            return renderer;
+            return type.create(params);
         });
     }
 

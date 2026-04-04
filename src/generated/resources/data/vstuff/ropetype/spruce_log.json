@@ -1,6 +1,6 @@
 {
   "category": "vstuff:log_styles",
-  "name": "ropetype.vstuff.spruce_log",
+  "name": "Spruce",
   "renderer": "vstuff:normal",
   "renderer_params": {
     "texture": "minecraft:textures/block/spruce_log.png"

@@ -8,7 +8,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import yay.evy.everest.vstuff.client.rope.RopeRendererTypes;
+import yay.evy.everest.vstuff.client.RopeRendererTypes;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
@@ -23,6 +23,7 @@ public class RopeCutterItem extends Item {
         if (!(level instanceof ServerLevel serverLevel)) {
             return InteractionResultHolder.pass(itemStack);
         }
+
 
         ReworkedRope rope = RopeUtils.findTargetedLead(serverLevel, player);
         if (rope == null) return InteractionResultHolder.pass(itemStack);

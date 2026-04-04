@@ -11,10 +11,10 @@ import java.util.Map;
 
 public class DatagenUtils {
 
-    static final List<String> COLORS = List.of("Red", "Orange", "Yellow", "Lime", "Green", "Cyan",
+    public static final List<String> COLORS = List.of("Red", "Orange", "Yellow", "Lime", "Green", "Cyan",
             "Blue", "Light Blue", "Purple", "Pink", "Magenta", "Brown", "Black", "Gray", "Light Gray", "White");
 
-    static final Map<String, String> DYE_COLORS = Map.ofEntries(
+    public static final Map<String, String> DYE_COLORS = Map.ofEntries(
             Map.entry("red",        "#FF6961"),
             Map.entry("orange",     "#FF9F33"),
             Map.entry("yellow",     "#FFFF00"),
@@ -33,25 +33,25 @@ public class DatagenUtils {
             Map.entry("white",      "#F9FFFE")
     );
 
-    static final List<String> LOGS = List.of("Oak", "Birch", "Spruce", "Dark Oak", "Jungle", "Acacia", "Mangrove", "Cherry",
+    public static final List<String> LOGS = List.of("Oak", "Birch", "Spruce", "Dark Oak", "Jungle", "Acacia", "Mangrove", "Cherry",
             "Stripped Oak", "Stripped Birch", "Stripped Spruce", "Stripped Dark Oak", "Stripped Jungle", "Stripped Acacia",
             "Stripped Mangrove", "Stripped Cherry");
 
-    static final List<String> WOOLS = COLORS.stream().map(color -> color + " Wool").toList();
+    public static final List<String> WOOLS = COLORS.stream().map(color -> color + " Wool").toList();
 
-    static final List<String> dyes = toIds(COLORS, "_dye");
-    static final List<String> wools = toIds(COLORS, "_wool");
-    static final List<String> logs = toIds(LOGS, "_log");
+    public static final List<String> dyes = toIds(COLORS, "_dye");
+    public static final List<String> wools = toIds(COLORS, "_wool");
+    public static final List<String> logs = toIds(LOGS, "_log");
 
-    static String[] resourceArray(String... paths) {
+    public static String[] resourceArray(String... paths) {
         return Arrays.stream(paths).map(path -> VStuff.asResource(path).toString()).toArray(String[]::new);
     }
 
-    static List<String> toIds(List<String> names, String append) {
+    public static List<String> toIds(List<String> names, String append) {
         return names.stream().map(name -> name.toLowerCase(Locale.ROOT).replace(" ", "_") + append).toList();
     }
 
-    static ResourceLocation parseLoc(JsonElement jsonElement) {
+    public static ResourceLocation parseLoc(JsonElement jsonElement) {
         return ResourceLocation.bySeparator(jsonElement.getAsString(), ':');
     }
 }

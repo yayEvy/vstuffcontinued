@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.client.rope;
+package yay.evy.everest.vstuff.internal.rendering;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;

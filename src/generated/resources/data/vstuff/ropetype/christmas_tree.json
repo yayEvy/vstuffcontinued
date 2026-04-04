@@ -1,6 +1,6 @@
 {
   "category": "vstuff:merry_vstuffmas",
-  "name": "ropetype.vstuff.christmas_tree",
+  "name": "Christmas Tree",
   "renderer": "vstuff:normal",
   "renderer_params": {
     "texture": "vstuff:textures/rope/rope_christmas_tree.png"

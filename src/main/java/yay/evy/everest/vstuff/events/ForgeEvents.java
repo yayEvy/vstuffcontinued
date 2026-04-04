@@ -21,11 +21,11 @@ import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 import yay.evy.everest.vstuff.content.ropes.RopeFactory;
 import yay.evy.everest.vstuff.content.ropes.RopeManager;
-import yay.evy.everest.vstuff.content.ropes.type.RopeType;
+import yay.evy.everest.vstuff.internal.RopeType;
 import yay.evy.everest.vstuff.index.VStuffItems;
-import yay.evy.everest.vstuff.infrastructure.data.RopeCategoryReloadListener;
-import yay.evy.everest.vstuff.infrastructure.data.RopeRestyleReloadListener;
-import yay.evy.everest.vstuff.infrastructure.data.RopeTypeReloadListener;
+import yay.evy.everest.vstuff.infrastructure.data.listener.RopeCategoryReloadListener;
+import yay.evy.everest.vstuff.infrastructure.data.listener.RopeRestyleReloadListener;
+import yay.evy.everest.vstuff.infrastructure.data.listener.RopeTypeReloadListener;
 import yay.evy.everest.vstuff.internal.RopeRestyleManager;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
@@ -95,11 +95,18 @@ public class ForgeEvents {
                 event.setCancellationResult(InteractionResult.SUCCESS);
             }
         } else if ((event.getLevel() instanceof ServerLevel level)) {
+            if (event.getItemStack().is(VStuffItems.ROPE_CUTTER.get())) {
+                return;
+            }
             ItemStack itemStack = event.getItemStack();
             Player player = event.getEntity();
 
             ReworkedRope rope = RopeUtils.findTargetedLead(level, player);
             if (rope == null) return;
+
+            if (!RopeRestyleManager.canRetyle(rope.type, itemStack.getItem())) {
+                return;
+            }
 
             RopeType newType = RopeRestyleManager.retype(rope.type, itemStack.getItem());
             if (!newType.equals(rope.type)) {

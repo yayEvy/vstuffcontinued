@@ -1,6 +1,6 @@
 {
   "category": "vstuff:basic_styles",
-  "name": "ropetype.vstuff.chain",
+  "name": "Chain",
   "renderer": "vstuff:chain",
   "renderer_params": {
     "texture": "vstuff:textures/rope/rope_chain.png"

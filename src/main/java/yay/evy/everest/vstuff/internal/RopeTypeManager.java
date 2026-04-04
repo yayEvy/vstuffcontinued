@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.ropes.type;
+package yay.evy.everest.vstuff.internal;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -66,9 +66,12 @@ public final class RopeTypeManager {
         }
         // all extras are dumped here
         List<RopeType> uncategorized = grouped.entrySet().stream().sorted().map(Map.Entry::getValue).flatMap(Collection::stream).toList();
+
         if (!uncategorized.isEmpty())
             result.add(new RopeCategory(uncategorizedId,
-                    Component.translatable("ropecategory.vstuff.uncategorized"),Integer.MIN_VALUE, uncategorized));
-        return result;
+                    Component.translatable("ropecategory.vstuff.uncategorized"), Integer.MAX_VALUE, uncategorized));
+
+
+        return result.stream().sorted(Comparator.comparingInt(RopeCategory::order)).toList();
     }
 }

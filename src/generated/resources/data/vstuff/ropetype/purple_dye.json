@@ -1,6 +1,6 @@
 {
   "category": "vstuff:dyed_styles",
-  "name": "ropetype.vstuff.purple_dye",
+  "name": "Purple",
   "renderer": "vstuff:solid_colour",
   "renderer_params": {
     "color": "#8932B8"

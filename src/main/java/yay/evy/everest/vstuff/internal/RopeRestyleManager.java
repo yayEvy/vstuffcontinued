@@ -4,8 +4,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.ForgeRegistries;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.ropes.type.RopeType;
-import yay.evy.everest.vstuff.content.ropes.type.RopeTypeManager;
 
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +40,10 @@ public class RopeRestyleManager {
         if (group.canRestyle(item))
             return group.getTypeForItem(item);
         return fromType;
+    }
+
+    public static boolean canRetyle(RopeType fromType, Item item) {
+        return get(fromType.restyleGroup()).canRestyle(item);
     }
 
     public record RopeRestyle(ResourceLocation id, Map<ResourceLocation, ResourceLocation> itemLocToTypeIdMap) {

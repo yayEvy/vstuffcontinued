@@ -18,8 +18,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.client.rope.RopeRendererTypes;
-import yay.evy.everest.vstuff.content.ropes.type.RopeType;
+import yay.evy.everest.vstuff.client.RopeRendererTypes;
+import yay.evy.everest.vstuff.internal.RopeType;
 import yay.evy.everest.vstuff.content.ropes.packet.OutlinePacket;
 import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
@@ -125,14 +125,14 @@ public class ReworkedRopeItem extends Item {
 
     private void resetTag(ItemStack stack) {
         ResourceLocation lastStyle = null;
-        if (stack.getTag().contains("style")) {
-            lastStyle = TagUtils.readResourceLocation(stack.getTagElement("style"));
+        if (stack.getTag().contains("type")) {
+            lastStyle = TagUtils.readResourceLocation(stack.getTagElement("type"));
         }
 
         stack.setTag(null);
 
         if (lastStyle != null) {
-            stack.getOrCreateTag().put("style", TagUtils.writeResourceLocation(lastStyle));
+            stack.getOrCreateTag().put("type", TagUtils.writeResourceLocation(lastStyle));
         }
         // clears tag then puts the style back if there was one
     }

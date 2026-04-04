@@ -1,6 +1,6 @@
 {
   "category": "vstuff:log_styles",
-  "name": "ropetype.vstuff.stripped_acacia_log",
+  "name": "Stripped Acacia",
   "renderer": "vstuff:normal",
   "renderer_params": {
     "texture": "minecraft:textures/block/stripped_acacia_log.png"

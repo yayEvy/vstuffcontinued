@@ -1,6 +1,6 @@
 {
   "category": "vstuff:log_styles",
-  "name": "ropetype.vstuff.birch_log",
+  "name": "Birch",
   "renderer": "vstuff:normal",
   "renderer_params": {
     "texture": "minecraft:textures/block/birch_log.png"

@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.client.rope;
+package yay.evy.everest.vstuff.internal.rendering;
 
 import com.google.gson.JsonObject;
 import net.minecraft.client.gui.GuiGraphics;

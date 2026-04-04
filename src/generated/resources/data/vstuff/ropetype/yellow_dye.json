@@ -1,6 +1,6 @@
 {
   "category": "vstuff:dyed_styles",
-  "name": "ropetype.vstuff.yellow_dye",
+  "name": "Yellow",
   "renderer": "vstuff:solid_colour",
   "renderer_params": {
     "color": "#FFFF00"
