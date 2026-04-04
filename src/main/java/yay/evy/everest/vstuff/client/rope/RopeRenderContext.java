@@ -11,5 +11,7 @@ public record RopeRenderContext(
         double maxLength,
         double actualLength,
         float partialTick,
-        Level level
+        Level level,
+        net.minecraft.core.BlockPos startBlockPos,
+        net.minecraft.core.BlockPos endBlockPos
 ) {}
