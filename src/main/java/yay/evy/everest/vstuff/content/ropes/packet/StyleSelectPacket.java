@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.internal.network.newpackets;
+package yay.evy.everest.vstuff.content.ropes.packet;
 
 import com.simibubi.create.foundation.networking.SimplePacketBase;
 import net.minecraft.network.FriendlyByteBuf;

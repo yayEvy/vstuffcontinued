@@ -8,6 +8,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.network.PacketDistributor;
+import yay.evy.everest.vstuff.content.ropes.packet.UpdateRopeStylePacket;
+import yay.evy.everest.vstuff.internal.RopeStyleManager;
+import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.content.ropes.type.RopeTypeRegistry;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import yay.evy.everest.vstuff.content.ropes.type.RopeType;
@@ -67,6 +71,8 @@ public class RopeFactory {
 
         if (!rope.hasJoint) {
             RopeManager.get(level).addRope(rope);
+            System.out.println("attach actors");
+            rope.attachActors(level);
 
             if (player instanceof ServerPlayer serverPlayer) {
                 RopeManager.syncAllRopesToPlayer(serverPlayer);
@@ -95,13 +101,9 @@ public class RopeFactory {
 
         rope.type = RopeTypeRegistry.get(newTypeId);
 
-        NetworkHandler.sendRopeUpdate(
-                ropeId,
-                rope.posData0.shipId(), rope.posData1.shipId(),
-                rope.posData0.localPos(), rope.posData1.localPos(),
-                rope.jointValues.maxLength(),
-                newTypeId
-        );
+        //NetworkHandler.sendRopeUpdate(ropeId, rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.style.id());
+
+        VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new UpdateRopeStylePacket(ropeId, rope.type.id()));
     }
 
     public static CompoundTag ropeToTag(ReworkedRope rope) {

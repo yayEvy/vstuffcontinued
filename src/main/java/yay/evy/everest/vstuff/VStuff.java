@@ -3,38 +3,30 @@ package yay.evy.everest.vstuff;
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import net.createmod.catnip.lang.LangBuilder;
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
+import org.valkyrienskies.core.api.ships.ShipPhysicsListener;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff.LevituffAttachment;
-import yay.evy.everest.vstuff.content.ropes.RopeManager;
 import yay.evy.everest.vstuff.content.ships.reactionwheel.ReactionWheelAttachment;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.PhysGrabberServerAttachment;
 import yay.evy.everest.vstuff.content.ships.thrust.ThrusterForceAttachment;
 import yay.evy.everest.vstuff.index.*;
 import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
-import yay.evy.everest.vstuff.internal.network.NetworkHandler;
-import yay.evy.everest.vstuff.internal.network.PhysGrabberNetwork;
 import org.valkyrienskies.core.api.VsBeta;
+import yay.evy.everest.vstuff.index.VStuffPackets;
+import yay.evy.everest.vstuff.infrastructure.data.VStuffDatagen;
 
-import java.util.concurrent.CompletableFuture;
 
 @Mod(VStuff.MOD_ID)
 public class VStuff {
@@ -42,14 +34,10 @@ public class VStuff {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String NAME = "VStuff";
 
-    private static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MOD_ID);
+    private static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MOD_ID); //todo implement tooltip modifier factory like create's
 
-    @SuppressWarnings("removal") // sybau
-    public VStuff() {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-
-        //ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, VStuffConfig.SERVER_CONFIG);
-        ///ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, VStuffConfig.CLIENT_CONFIG);
+    public VStuff(FMLJavaModLoadingContext modLoadingContext) {
+        IEventBus modEventBus = modLoadingContext.getModEventBus();
 
         VStuffCreativeModeTabs.register(modEventBus);
 
@@ -62,15 +50,13 @@ public class VStuff {
         VStuffItems.register();
         VStuffEntities.register(modEventBus);
         VStuffBlockEntities.register();
-        //VStuffPackets.registerPackets();
-        // todo fix these / make sure they work
-        VStuffConfigs.register(ModLoadingContext.get());
+        VStuffPackets.register();
+        VStuffConfigs.register(modLoadingContext);
 
         MinecraftForge.EVENT_BUS.register(this);
-        NetworkHandler.registerPackets();
-        PhysGrabberNetwork.register();
 
         modEventBus.addListener(this::commonSetup);
+        modEventBus.addListener(VStuffDatagen::gatherData);
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> VStuffClient.initialize(modEventBus));
 
@@ -83,39 +69,18 @@ public class VStuff {
     }
 
     public static void registerAttachments() {
-        LOGGER.info("Registering {} attachments...", VStuff.MOD_ID);
+        registerAttachment(ThrusterForceAttachment.class);
+        registerAttachment(PhysGrabberServerAttachment.class);
+        registerAttachment(ReactionWheelAttachment.class);
+        System.out.println("vstuff more like vs tuff");
+        registerAttachment(LevituffAttachment.class);
+    }
 
-        // thruster attachment ! yippee
-        ValkyrienSkiesMod.getApi().registerAttachment(
-                ThrusterForceAttachment.class, builder -> {
-                    builder.build();
-                    return null;
-                }
-        );
-
-        // phys grabber aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-        ValkyrienSkiesMod.getApi().registerAttachment(
-                PhysGrabberServerAttachment.class, builder -> {
-                    builder.build();
-                    return null;
-                }
-        );
-
-        // robbing john propulsion :3dsmile:
-        ValkyrienSkiesMod.getApi().registerAttachment(
-                ReactionWheelAttachment.class, builder -> {
-                    builder.build();
-                    return null;
-                }
-        );
-
-        System.out.println("vstuff more like vs tuff :3dsmile:");
-        ValkyrienSkiesMod.getApi().registerAttachment(
-                LevituffAttachment.class, builder -> {
-                    builder.build();
-                    return null;
-                }
-        );
+    private static <A extends ShipPhysicsListener> void registerAttachment(Class<A> attachment) {
+        ValkyrienSkiesMod.getApi().registerAttachment(attachment, attachmentBuilder -> {
+            attachmentBuilder.build();
+            return null;
+        });
     }
 
     public static CreateRegistrate registrate() {
@@ -133,15 +98,5 @@ public class VStuff {
     public static MutableComponent translate(String key, Object... args) {
         Object[] args1 = LangBuilder.resolveBuilders(args);
         return Component.translatable(VStuff.MOD_ID + "." + key, args1);
-    }
-
-    @SubscribeEvent
-    public static void onGatherData(GatherDataEvent event) {
-        DataGenerator gen = event.getGenerator();
-        PackOutput output = gen.getPackOutput();
-        CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
-
-        gen.addProvider(event.includeServer(),
-                new VStuffWorldGenProvider(output, lookupProvider));
     }
 }

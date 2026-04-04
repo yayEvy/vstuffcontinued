@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.internal.network.newpackets;
+package yay.evy.everest.vstuff.content.ropes.packet;
 
 import com.simibubi.create.foundation.networking.SimplePacketBase;
 import net.createmod.catnip.outliner.Outline;
@@ -54,4 +54,7 @@ public class OutlinePacket extends SimplePacketBase {
             params.colored(color).lineWidth(1 / 16f);
         }
     }
+
+    public static final int RED = 0xFF6961;
+    public static final int GREEN = 0x77DD77;
 }

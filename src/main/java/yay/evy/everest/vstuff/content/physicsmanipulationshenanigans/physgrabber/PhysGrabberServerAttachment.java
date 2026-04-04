@@ -52,17 +52,19 @@ public final class PhysGrabberServerAttachment implements ShipPhysicsListener {
         ship.applyInvariantForce(force);
     }
 
-    public void setTarget(Vector3d newTarget) {
+    public PhysGrabberServerAttachment target(Vector3d newTarget) {
         this.targetPos.set(newTarget);
         this.active = true;
+        return this;
     }
 
     public void release() {
         this.active = false;
     }
 
-    public void setCreative(boolean creative) {
+    public PhysGrabberServerAttachment creative(boolean creative) {
         this.isCreative = creative;
+        return this;
     }
 
 

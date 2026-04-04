@@ -1,9 +1,9 @@
 {
-  "feature": "vstuff:levituff_ore",
+  "feature": "vstuff:levituff",
   "placement": [
     {
-      "type": "minecraft:count",
-      "count": 8
+      "type": "minecraft:rarity_filter",
+      "chance": 18
     },
     {
       "type": "minecraft:in_square"
@@ -12,11 +12,11 @@
       "type": "minecraft:height_range",
       "height": {
         "type": "minecraft:uniform",
-        "min_inclusive": {
-          "absolute": -64
-        },
         "max_inclusive": {
-          "absolute": 32
+          "absolute": 30
+        },
+        "min_inclusive": {
+          "absolute": -50
         }
       }
     },

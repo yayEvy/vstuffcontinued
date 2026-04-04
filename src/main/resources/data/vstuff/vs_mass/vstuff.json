@@ -11,7 +11,7 @@
   },
   {
     "block": "vstuff:pulley_anchor",
-    "mass": 10.0,
+    "mass": 100.0,
     "friction": 0.2
   },
   {
@@ -21,7 +21,7 @@
   },
   {
     "block": "vstuff:levituff",
-    "mass": 100.0,
+    "mass": 300.0,
     "friction": 0.6
   }
 ]

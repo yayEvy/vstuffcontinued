@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.createmod.catnip.gui.AbstractSimiScreen;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
+import yay.evy.everest.vstuff.content.ropes.packet.StyleSelectPacket;
 import yay.evy.everest.vstuff.client.rope.RopeRendererType;
 import yay.evy.everest.vstuff.client.rope.RopeRendererTypes;
 import yay.evy.everest.vstuff.content.ropes.type.RopeCategory;
@@ -12,7 +13,7 @@ import yay.evy.everest.vstuff.content.ropes.type.RopeType;
 import yay.evy.everest.vstuff.content.ropes.type.RopeTypeRegistry;
 import yay.evy.everest.vstuff.internal.RopeStyleCategoryManager;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
-import yay.evy.everest.vstuff.internal.network.NetworkHandler;
+import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.internal.utility.ClientTextUtils;
 import yay.evy.everest.vstuff.index.VStuffGuiTextures;
 
@@ -62,7 +63,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
         setWindowSize(background.width, background.height);
         super.init();
         clearWidgets();
-        
+
         List<RopeCategory> categories = RopeTypeRegistry.buildSortedCategories();
         List<Component> categoryComponentList = categories.stream().map(RopeCategory::name).toList();
 
@@ -317,7 +318,9 @@ public class RopeStylerScreen extends AbstractSimiScreen {
     private void onMenuClose() {
         if (selectedType == null) return;
 
-        NetworkHandler.selectType(selectedType.id());
+        //NetworkHandler.selectStyle(selectedStyle.id());
+
+        VStuffPackets.channel().sendToServer(new StyleSelectPacket(selectedType.id()));
 
         onClose();
     }

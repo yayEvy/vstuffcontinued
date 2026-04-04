@@ -22,7 +22,7 @@ public class PulleyAnchorBlockEntity extends BlockEntity implements IRopeActor {
     @Override
     public void connectRope(Integer ropeId, BlockState state, Level level, BlockPos pos) {
         if (!(level instanceof ServerLevel serverLevel)) return;
-        if (ropeId == null || RopeManager.get(serverLevel).hasRope(ropeId)) return;
+        if (ropeId == null || !RopeManager.get(serverLevel).hasRope(ropeId)) return;
 
         this.ropeId = ropeId;
         this.rope = RopeManager.get(serverLevel).getRope(ropeId);

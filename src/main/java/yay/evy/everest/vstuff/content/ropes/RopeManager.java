@@ -8,8 +8,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.content.ropes.packet.AddRopePacket;
+import yay.evy.everest.vstuff.content.ropes.packet.ClearAllRopesPacket;
+import yay.evy.everest.vstuff.content.ropes.packet.RemoveRopePacket;
+import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.content.ropes.type.RopeTypeRegistry;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 
@@ -27,9 +32,7 @@ public class RopeManager extends SavedData {
 
     public static RopeManager get(ServerLevel level) {
         DimensionDataStorage storage = level.getDataStorage();
-        RopeManager persistence = storage.computeIfAbsent(RopeManager::load, RopeManager::new, DATA_NAME);
-        persistence.attachActors(level);
-        return persistence;
+        return storage.computeIfAbsent(RopeManager::load, RopeManager::new, DATA_NAME);
     }
 
     public static RopeManager load(CompoundTag tag) {
@@ -62,7 +65,7 @@ public class RopeManager extends SavedData {
 
         ropes.put(rope.ropeId, rope);
 
-        NetworkHandler.sendConstraintAdd(rope.ropeId, rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.type.id());
+        VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new AddRopePacket(rope));
 
         setDirty();
     }
@@ -70,7 +73,7 @@ public class RopeManager extends SavedData {
     public void removeRope(Integer id) {
         ropes.remove(id);
 
-        NetworkHandler.sendConstraintRemove(id);
+        VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new RemoveRopePacket(id));
 
         setDirty();
     }
@@ -105,22 +108,23 @@ public class RopeManager extends SavedData {
 
     public static void syncAllRopesToPlayer(ServerPlayer player) {
         RopeManager manager = RopeManager.get(player.serverLevel());
-        NetworkHandler.sendClearAllConstraintsToPlayer(player);
+        //NetworkHandler.sendClearAllConstraintsToPlayer(player);
+        VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new ClearAllRopesPacket());
 
         VStuff.LOGGER.info("Syncing all ropes to player {} ({})", player.getName().getString(), player.getUUID());
 
-        for (Map.Entry<Integer, ReworkedRope> entry : manager.ropes.entrySet()) {
-            ReworkedRope data = entry.getValue();
-            NetworkHandler.sendConstraintAddToPlayer(
-                    player,
-                    entry.getKey(),
-                    data.posData0.shipId(),
-                    data.posData1.shipId(),
-                    data.posData0.localPos(),
-                    data.posData1.localPos(),
-                    data.jointValues.maxLength(),
-                    data.type.id()
-            );
+        for (ReworkedRope rope : manager.getRopeList()) {
+            VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new AddRopePacket(rope));
+//            NetworkHandler.sendConstraintAddToPlayer(
+//                    player,
+//                    entry.getKey(),
+//                    data.posData0.shipId(),
+//                    data.posData1.shipId(),
+//                    data.posData0.localPos(),
+//                    data.posData1.localPos(),
+//                    data.jointValues.maxLength(),
+//                    data.style.id()
+//            );
         }
     }
 }

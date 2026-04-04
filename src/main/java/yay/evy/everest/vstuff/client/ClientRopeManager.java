@@ -58,6 +58,22 @@ public class ClientRopeManager {
             return true;
         }
 
+        public ClientRopeData withLength(double newLength) {
+            return new ClientRopeData(ship0, ship1, localPos0, localPos1, newLength, style);
+        }
+
+        public ClientRopeData withStyle(RopeType newType) {
+            return new ClientRopeData(ship0, ship1, localPos0, localPos1, maxLength, newType);
+        }
+
+    }
+
+    public static void updateClientRopeLength(Integer ropeId, double length) {
+        clientConstraints.computeIfPresent(ropeId, (k, ropeData) -> ropeData.withLength(length));
+    }
+
+    public static void updateClientRopeStyle(Integer ropeId, RopeType type) {
+        clientConstraints.computeIfPresent(ropeId, (k, ropeData) -> ropeData.withStyle(type));
     }
 
     public static void addClientConstraint(Integer constraintId, Long shipA, Long shipB,

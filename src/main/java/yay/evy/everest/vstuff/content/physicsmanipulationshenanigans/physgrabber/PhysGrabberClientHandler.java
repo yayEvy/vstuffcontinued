@@ -10,8 +10,11 @@ import net.minecraft.world.phys.Vec3;
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
-import yay.evy.everest.vstuff.internal.network.PhysGrabberNetwork;
-import yay.evy.everest.vstuff.index.VStuffSounds;
+import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.packet.GrabPacket;
+import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.packet.ReleasePacket;
+import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.packet.UpdatePacket;
+    import yay.evy.everest.vstuff.index.VStuffSounds;
+import yay.evy.everest.vstuff.index.VStuffPackets;
 
 
 public class PhysGrabberClientHandler {
@@ -35,7 +38,8 @@ public class PhysGrabberClientHandler {
 
             if (ship != null) {
                 Vec3 target = player.getEyePosition(1.0F).add(player.getLookAngle().scale(5.0));
-                PhysGrabberNetwork.sendGrab(ship.getId(), target, player.isCreative());
+                //PhysGrabberNetwork.sendGrab(ship.getId(), target, player.isCreative());
+                VStuffPackets.channel().sendToServer(new GrabPacket(ship.getId(), target, player.isCreative()));
                 grabbedShip = ship;
 
                 if (mc.level != null) {
@@ -46,7 +50,8 @@ public class PhysGrabberClientHandler {
             }
             return false;
         } else {
-            PhysGrabberNetwork.sendRelease(grabbedShip.getId());
+            //PhysGrabberNetwork.sendRelease(grabbedShip.getId());
+            VStuffPackets.channel().sendToServer(new ReleasePacket(grabbedShip.getId()));
             grabbedShip = null;
 
             if (humSound instanceof GrabberHum hum) {
@@ -59,7 +64,8 @@ public class PhysGrabberClientHandler {
 
     public static void forceRelease(Minecraft mc, Player player) {
         if (grabbedShip != null) {
-            PhysGrabberNetwork.sendRelease(grabbedShip.getId());
+            //PhysGrabberNetwork.sendRelease(grabbedShip.getId());
+            VStuffPackets.channel().sendToServer(new ReleasePacket(grabbedShip.getId()));
             grabbedShip = null;
 
             if (humSound instanceof GrabberHum hum) {
@@ -80,7 +86,8 @@ public class PhysGrabberClientHandler {
         Vec3 lookDir = player.getLookAngle();
         Vec3 target = eyePos.add(lookDir.scale(5.0)).add(0, 0.5, 0);
         boolean creative = player.isCreative();
-        PhysGrabberNetwork.sendUpdate(grabbedShip.getId(), target, creative);
+        //PhysGrabberNetwork.sendUpdate(grabbedShip.getId(), target, creative);
+        VStuffPackets.channel().sendToServer(new UpdatePacket(grabbedShip.getId(), target, creative));
 
     }
 
