@@ -1,0 +1,9 @@
+{
+  "category": "vstuff:wool_styles",
+  "name": "ropetype.vstuff.green_wool",
+  "renderer": "vstuff:normal",
+  "renderer_params": {
+    "texture": "minecraft:textures/block/green_wool.png"
+  },
+  "restyle_group": "vstuff:wools"
+}

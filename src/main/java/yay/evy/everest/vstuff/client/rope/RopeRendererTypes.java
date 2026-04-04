@@ -6,8 +6,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.rope.renderers.ChainRopeRenderer;
-import yay.evy.everest.vstuff.client.rope.renderers.TexturedRopeRenderer;
-import yay.evy.everest.vstuff.index.VStuffRenderTypes;
+import yay.evy.everest.vstuff.client.rope.renderers.SolidColourRopeRenderer;
+import yay.evy.everest.vstuff.client.rope.renderers.NormalRopeRenderer;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -23,10 +23,14 @@ public final class RopeRendererTypes {
 
     public static RopeRendererType register(RopeRendererType type) {
         if (REGISTRY.containsKey(type.getId())) {
-            VStuff.LOGGER.warn("RopeRendererType '{}' is being registered twice — overwriting.", type.getId());
+            VStuff.LOGGER.warn("RopeRendererType '{}' is being registered twice, overwriting.", type.getId());
         }
         REGISTRY.put(type.getId(), type);
         return type;
+    }
+
+    public static RopeRendererType get(ResourceLocation id) {
+        return REGISTRY.get(id);
     }
 
     /**
@@ -62,13 +66,13 @@ public final class RopeRendererTypes {
      * ze normal tube renderer.
      * Required params: { "texture": "vstuff:textures/rope/rope_normal.png" }
      */
-    public static final RopeRendererType TEXTURED = register(new RopeRendererType(
-            VStuff.asResource("textured"),
+    public static final RopeRendererType NORMAL = register(new RopeRendererType(
+            VStuff.asResource("normal"),
             (params) -> {
                 ResourceLocation texture = ResourceLocation.tryParse(
                         params.get("texture").getAsString()
                 );
-                return new TexturedRopeRenderer(texture);
+                return new NormalRopeRenderer(texture);
             }
     ));
 
@@ -91,13 +95,18 @@ public final class RopeRendererTypes {
      * Required params: { "color": "#FF6961" }
      * colour is ARGB hex, # is optional, alpha defaults to FF if omitted.
      */
-//    public static final RopeRendererType SOLID_COLOUR = register(new RopeRendererType(
-//            VStuff.asResource("solid_colour"),
-//            params -> {
-//                int argb = parseColour(params.get("color").getAsString());
-//                return new SolidColourRopeRenderer(argb);
-//            }
-//    ));
+    public static final RopeRendererType SOLID_COLOUR = register(new RopeRendererType(
+            VStuff.asResource("solid_colour"),
+            params -> {
+                int argb = parseColour(params.get("color").getAsString());
+                return new SolidColourRopeRenderer(argb);
+            },
+            (guiGraphics, params) -> {
+                int argb = parseColour(params.get("color").getAsString());
+                // draw a filled 16x16 swatch — alpha always fully opaque in the GUI
+                guiGraphics.fill(0, 0, 16, 16, argb | 0xFF000000);
+            }
+    ));
 
     /**
      * Parse a hex colour string.

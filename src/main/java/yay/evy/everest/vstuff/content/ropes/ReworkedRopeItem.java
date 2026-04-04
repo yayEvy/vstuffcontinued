@@ -15,9 +15,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.ClientOutlineHandler;
 import yay.evy.everest.vstuff.client.rope.RopeRendererTypes;
+import yay.evy.everest.vstuff.content.ropes.type.RopeType;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 import yay.evy.everest.vstuff.internal.utility.TagUtils;
@@ -106,10 +108,10 @@ public class ReworkedRopeItem extends Item {
     }
 
     @Override
-    public Component getName(ItemStack stack) {
+    public @NotNull Component getName(@NotNull ItemStack stack) {
         return Component.translatable(this.getDescriptionId(stack))
                 .append(" (")
-                .append(RopeStyleManager.getOrDefaultStyle(stack).name())
+                .append(RopeType.getOrDefault(stack.getOrCreateTag()).name())
                 .append(")");
     }
 

@@ -1,0 +1,9 @@
+{
+  "category": "vstuff:wool_styles",
+  "name": "ropetype.vstuff.white_wool",
+  "renderer": "vstuff:normal",
+  "renderer_params": {
+    "texture": "minecraft:textures/block/white_wool.png"
+  },
+  "restyle_group": "vstuff:wools"
+}

@@ -34,7 +34,7 @@ public class RopeRestyleReloadListener extends SimpleJsonResourceReloadListener 
             ResourceLocation id = entry.getKey();
             JsonObject json = entry.getValue().getAsJsonObject();
 
-            HashMap<ResourceLocation, ResourceLocation> itemLocToStyleIdMap = new HashMap<>();
+            HashMap<ResourceLocation, ResourceLocation> itemLocToTypeIdMap = new HashMap<>();
 
             for (Map.Entry<String, JsonElement> restyleEntry : json.entrySet()) {
                 JsonArray items = restyleEntry.getValue().getAsJsonArray();
@@ -42,11 +42,11 @@ public class RopeRestyleReloadListener extends SimpleJsonResourceReloadListener 
                 ResourceLocation styleId = ResourceLocation.bySeparator(restyleEntry.getKey(), ':');
 
                 for (JsonElement item : items) {
-                    itemLocToStyleIdMap.put(parseLoc(item), styleId);
+                    itemLocToTypeIdMap.put(parseLoc(item), styleId);
                 }
             }
 
-            RopeRestyleManager.register(new RopeRestyleManager.RopeRestyle(id, itemLocToStyleIdMap));
+            RopeRestyleManager.register(new RopeRestyleManager.RopeRestyle(id, itemLocToTypeIdMap));
         }
 
         VStuff.LOGGER.info("Loaded {} restyles from data.", RopeRestyleManager.getAll().size());

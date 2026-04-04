@@ -1,6 +1,0 @@
-{
-  "name": "Cherry",
-  "render_type": "NORMAL",
-  "restyle_group": "vstuff:logs",
-  "texture": "minecraft:textures/block/cherry_log.png"
-}

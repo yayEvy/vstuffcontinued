@@ -5,6 +5,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.createmod.catnip.gui.AbstractSimiScreen;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
+import yay.evy.everest.vstuff.client.rope.RopeRendererType;
+import yay.evy.everest.vstuff.client.rope.RopeRendererTypes;
+import yay.evy.everest.vstuff.content.ropes.type.RopeCategory;
+import yay.evy.everest.vstuff.content.ropes.type.RopeType;
+import yay.evy.everest.vstuff.content.ropes.type.RopeTypeRegistry;
 import yay.evy.everest.vstuff.internal.RopeStyleCategoryManager;
 import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.network.NetworkHandler;
@@ -36,19 +41,15 @@ public class RopeStylerScreen extends AbstractSimiScreen {
 
     private final VStuffGuiTextures background = VStuffGuiTextures.ROPE_STYLER;
 
-    private final List<Component> categoryComponentList = RopeStyleCategoryManager.getSortedList().stream()
-            .map(RopeStyleCategoryManager.RopeStyleCategory::name)
-            .toList();
-
-    private RopeStyleCategoryManager.RopeStyleCategory selectedCategory;
+    private RopeCategory selectedCategory;
 
     private int categoryIndex = 0;
 
-    RopeStyleManager.RopeStyle[] displayedStyles = new RopeStyleManager.RopeStyle[6];
+    RopeType[] displayedTypes = new RopeType[6];
 
-    RopeStyleButton[] styleButtons = new RopeStyleButton[6];
+    RopeTypeButton[] styleButtons = new RopeTypeButton[6];
 
-    RopeStyleManager.RopeStyle selectedStyle;
+    RopeType selectedType;
 
     private float scrollOffs;
 
@@ -61,19 +62,20 @@ public class RopeStylerScreen extends AbstractSimiScreen {
         setWindowSize(background.width, background.height);
         super.init();
         clearWidgets();
+        
+        List<RopeCategory> categories = RopeTypeRegistry.buildSortedCategories();
+        List<Component> categoryComponentList = categories.stream().map(RopeCategory::name).toList();
 
         int x = guiLeft;
         int y = guiTop;
 
         for (int i = 0; i < 6; i++) {
-            addRenderableWidget(styleButtons[i] = new RopeStyleButton(x + 19, y + 41 + (i * 18), 145, 17, bogeySelection(i)));
+            addRenderableWidget(styleButtons[i] = new RopeTypeButton(x + 19, y + 41 + (i * 18), 145, 17, bogeySelection(i)));
         }
-
-        List<RopeStyleCategoryManager.RopeStyleCategory> categories = RopeStyleCategoryManager.getSortedList();
 
         if (categories.isEmpty()) {
             selectedCategory = null;
-            selectedStyle = null;
+            selectedType = null;
             return;
         }
 
@@ -81,10 +83,10 @@ public class RopeStylerScreen extends AbstractSimiScreen {
 
         setupList(selectedCategory);
 
-        if (!selectedCategory.styles().isEmpty()) {
-            selectedStyle = selectedCategory.styles().get(0);
+        if (!selectedCategory.types().isEmpty()) {
+            selectedType = selectedCategory.types().get(0);
         } else {
-            selectedStyle = null;
+            selectedType = null;
         }
 
         scrollOffs = 0;
@@ -100,20 +102,19 @@ public class RopeStylerScreen extends AbstractSimiScreen {
                     scrollTo(0.0F);
                     this.categoryIndex = categoryIndex;
 
-                    List<RopeStyleCategoryManager.RopeStyleCategory> updatedCategories = RopeStyleCategoryManager.getSortedList();
-                    if (updatedCategories.isEmpty()) {
+                    if (categories.isEmpty()) {
                         selectedCategory = null;
-                        selectedStyle = null;
+                        selectedType = null;
                         return;
                     }
 
-                    selectedCategory = updatedCategories.get(categoryIndex);
+                    selectedCategory = categories.get(categoryIndex);
                     setupList(selectedCategory);
 
-                    if (!selectedCategory.styles().isEmpty()) {
-                        selectedStyle = selectedCategory.styles().get(0);
+                    if (!selectedCategory.types().isEmpty()) {
+                        selectedType = selectedCategory.types().get(0);
                     } else {
-                        selectedStyle = null;
+                        selectedType = null;
                     }
                 });
 
@@ -150,44 +151,48 @@ public class RopeStylerScreen extends AbstractSimiScreen {
         barTexture.render(guiGraphics, x + 11, y + scrollBarPos);
 
         for (int i = 0; i < 6; i++) {
-            RopeStyleManager.RopeStyle style = displayedStyles[i];
+            RopeType style = displayedTypes[i];
             if (style != null) {
-                ResourceLocation icon = style.texture();
-                if (icon != null)
-                    renderIcon(guiGraphics, ms, icon, x + 20, y + 42 + (i * 18));
-
+                    renderIcon(guiGraphics, ms, style, x + 20, y + 42 + (i * 18));
                 Component styleName = ClientTextUtils.getComponentWithWidthCutoff(style.name(), 114);
                 guiGraphics.drawString(font, styleName, x + 40, y + 46 + (i * 18), 0xFFFFFF);
             }
         }
 
-        if (selectedStyle != null) {
-            Component displayName = selectedStyle.name();
+        if (selectedType != null) {
+            Component displayName = selectedType.name();
             Component shortenedName = ClientTextUtils.getComponentWithWidthCutoff(displayName, 126);
             guiGraphics.drawString(font, shortenedName, x + 15, y + 165, 0xFFFFFF);
 
         }
     }
 
-    private void renderIcon(GuiGraphics guiGraphics, PoseStack ms, ResourceLocation icon, int x, int y) {
+    private void renderIcon(GuiGraphics guiGraphics, PoseStack ms, RopeType type, int x, int y) {
+        RopeRendererType rendererType = RopeRendererTypes.get(type.rendererTypeId());
+        if (rendererType == null) return;
+
         ms.pushPose();
-        guiGraphics.blit(icon, x, y, 0, 0, 0, 16, 16, 16, 16);
+
+        ms.translate(x, y, 0);
+
+        rendererType.renderPreview(guiGraphics, type.rendererParams());
+
         ms.popPose();
     }
 
-    private void setupList(RopeStyleCategoryManager.RopeStyleCategory categoryEntry) {
+    private void setupList(RopeCategory categoryEntry) {
         setupList(categoryEntry, 0);
     }
 
-    private void setupList(RopeStyleCategoryManager.RopeStyleCategory categoryEntry, int offset) {
-        List<RopeStyleManager.RopeStyle> styles = categoryEntry.styles();
+    private void setupList(RopeCategory categoryEntry, int offset) {
+        List<RopeType> styles = categoryEntry.types();
 
         for (int i = 0; i < 6; i++) {
             if (i + offset < styles.size()) {
-                displayedStyles[i] = styles.get(i + offset);
+                displayedTypes[i] = styles.get(i + offset);
                 styleButtons[i].active = true;
             } else {
-                displayedStyles[i] = null;
+                displayedTypes[i] = null;
                 styleButtons[i].active = false;
             }
         }
@@ -202,7 +207,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-            if (selectedStyle == null)
+            if (selectedType == null)
                 onClose();
             else
                 onMenuClose();
@@ -253,9 +258,9 @@ public class RopeStylerScreen extends AbstractSimiScreen {
         super.mouseScrolled(mouseX, mouseY, delta);
         if (!canScroll()) return false;
         if (insideCategorySelector(mouseX, mouseY)) return false;
-        if (selectedCategory == null || selectedCategory.styles().size() < 6) return false;
+        if (selectedCategory == null || selectedCategory.types().size() < 6) return false;
 
-        double listSize = selectedCategory.styles().size() - 6;
+        double listSize = selectedCategory.types().size() - 6;
         float scrollFactor = (float) (delta / listSize);
 
         final float oldScrollOffs = scrollOffs;
@@ -276,7 +281,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
     private void scrollTo(float pos) {
         if (selectedCategory == null) return;
 
-        List<RopeStyleManager.RopeStyle> styles = selectedCategory.styles();
+        List<RopeType> styles = selectedCategory.types();
         float listSize = styles.size() - 6;
         int index = (int) ((double) (pos * listSize) + 0.5);
 
@@ -284,7 +289,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
     }
 
     private boolean canScroll() {
-        return selectedCategory != null && selectedCategory.styles().size() > 6;
+        return selectedCategory != null && selectedCategory.types().size() > 6;
     }
 
     private boolean insideCategorySelector(double mouseX, double mouseY) {
@@ -306,20 +311,20 @@ public class RopeStylerScreen extends AbstractSimiScreen {
     }
 
     private Button.OnPress bogeySelection(int index) {
-        return b -> selectedStyle = displayedStyles[index];
+        return b -> selectedType = displayedTypes[index];
     }
 
     private void onMenuClose() {
-        if (selectedStyle == null) return;
+        if (selectedType == null) return;
 
-        NetworkHandler.selectStyle(selectedStyle.id());
+        NetworkHandler.selectType(selectedType.id());
 
         onClose();
     }
 
-    public static class RopeStyleButton extends Button {
+    public static class RopeTypeButton extends Button {
 
-        public RopeStyleButton(int x, int y, int width, int height, OnPress onPress) {
+        public RopeTypeButton(int x, int y, int width, int height, OnPress onPress) {
             super(x, y, width, height, Component.empty(), onPress, Button.DEFAULT_NARRATION);
         }
 

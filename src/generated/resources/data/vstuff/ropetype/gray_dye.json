@@ -1,0 +1,9 @@
+{
+  "category": "vstuff:dyed_styles",
+  "name": "ropetype.vstuff.gray_dye",
+  "renderer": "vstuff:solid_colour",
+  "renderer_params": {
+    "color": "#474F52"
+  },
+  "restyle_group": "vstuff:dyes"
+}

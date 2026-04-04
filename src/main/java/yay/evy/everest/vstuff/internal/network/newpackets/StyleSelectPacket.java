@@ -3,9 +3,8 @@ package yay.evy.everest.vstuff.internal.network.newpackets;
 import com.simibubi.create.foundation.networking.SimplePacketBase;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
-import yay.evy.everest.vstuff.internal.RopeStyleManager;
+import yay.evy.everest.vstuff.content.ropes.type.RopeType;
 
 public class StyleSelectPacket extends SimplePacketBase {
 
@@ -26,7 +25,7 @@ public class StyleSelectPacket extends SimplePacketBase {
 
     @Override
     public boolean handle(NetworkEvent.Context context) {
-        context.enqueueWork(() -> RopeStyleManager.setStyle(context.getSender(), this.id));
+        context.enqueueWork(() -> RopeType.set(context.getSender(), this.id));
         return true;
     }
 }

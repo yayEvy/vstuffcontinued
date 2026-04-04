@@ -1,0 +1,9 @@
+{
+  "category": "vstuff:dyed_styles",
+  "name": "ropetype.vstuff.yellow_dye",
+  "renderer": "vstuff:solid_colour",
+  "renderer_params": {
+    "color": "#FFFF00"
+  },
+  "restyle_group": "vstuff:dyes"
+}

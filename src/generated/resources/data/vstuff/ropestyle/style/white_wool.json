@@ -1,6 +1,0 @@
-{
-  "name": "White Wool",
-  "render_type": "NORMAL",
-  "restyle_group": "vstuff:wools",
-  "texture": "minecraft:textures/block/white_wool.png"
-}

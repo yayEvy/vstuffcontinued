@@ -1,0 +1,9 @@
+{
+  "category": "vstuff:dyed_styles",
+  "name": "ropetype.vstuff.cyan_dye",
+  "renderer": "vstuff:solid_colour",
+  "renderer_params": {
+    "color": "#169C9C"
+  },
+  "restyle_group": "vstuff:dyes"
+}

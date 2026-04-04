@@ -1,0 +1,9 @@
+{
+  "category": "vstuff:log_styles",
+  "name": "ropetype.vstuff.oak_log",
+  "renderer": "vstuff:normal",
+  "renderer_params": {
+    "texture": "minecraft:textures/block/oak_log.png"
+  },
+  "restyle_group": "vstuff:logs"
+}

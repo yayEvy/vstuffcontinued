@@ -12,6 +12,7 @@ import yay.evy.everest.vstuff.content.ropes.type.RopeCategory;
 import yay.evy.everest.vstuff.content.ropes.type.RopeTypeRegistry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 import java.util.Map;
 
 public class RopeCategoryReloadListener extends SimpleJsonResourceReloadListener {
@@ -34,7 +35,7 @@ public class RopeCategoryReloadListener extends SimpleJsonResourceReloadListener
                             id,
                             name,
                             order,
-                            null
+                            List.of()
                     )
             );
         }

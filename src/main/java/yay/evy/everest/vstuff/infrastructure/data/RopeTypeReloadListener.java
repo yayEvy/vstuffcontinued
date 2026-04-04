@@ -12,10 +12,11 @@ import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.rope.RopeRendererTypes;
 import yay.evy.everest.vstuff.content.ropes.type.RopeType;
 import yay.evy.everest.vstuff.content.ropes.type.RopeTypeRegistry;
-import yay.evy.everest.vstuff.internal.RopeStyleManager;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
+
+import static yay.evy.everest.vstuff.infrastructure.data.DatagenUtils.parseLoc;
 
 public class RopeTypeReloadListener extends SimpleJsonResourceReloadListener {
     public RopeTypeReloadListener() {
@@ -33,14 +34,16 @@ public class RopeTypeReloadListener extends SimpleJsonResourceReloadListener {
             JsonObject json = entry.getValue().getAsJsonObject();
 
             Component name = Component.translatable(json.get("name").getAsString());
-            ResourceLocation category = ResourceLocation.tryParse(json.get("category").getAsString());
-            ResourceLocation renderer = ResourceLocation.tryParse(json.get("renderer").getAsString());
+            ResourceLocation category = parseLoc(json.get("category"));
+            ResourceLocation renderer = parseLoc(json.get("renderer"));
+            ResourceLocation restyleGroup = parseLoc(json.get("restyle_group"));
             JsonObject rendererParams = json.getAsJsonObject("renderer_params");
 
             RopeTypeRegistry.registerType(new RopeType(
                     id,
                     name,
                     category,
+                    restyleGroup,
                     renderer,
                     rendererParams
             ));

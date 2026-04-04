@@ -1,0 +1,9 @@
+{
+  "category": "vstuff:wool_styles",
+  "name": "ropetype.vstuff.pink_wool",
+  "renderer": "vstuff:normal",
+  "renderer_params": {
+    "texture": "minecraft:textures/block/pink_wool.png"
+  },
+  "restyle_group": "vstuff:wools"
+}

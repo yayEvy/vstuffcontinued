@@ -9,7 +9,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 import org.joml.Vector3d;
 import yay.evy.everest.vstuff.internal.network.packet.RopeSyncPacket;
 import yay.evy.everest.vstuff.internal.network.packet.OutlinePacket;
-import yay.evy.everest.vstuff.internal.network.packet.RopeStyleSelectPacket;
+import yay.evy.everest.vstuff.internal.network.packet.RopeTypeSelectPacket;
 
 public class NetworkHandler {
 
@@ -30,10 +30,10 @@ public class NetworkHandler {
                 .consumerMainThread(RopeSyncPacket::handle)
                 .add();
 
-        INSTANCE.messageBuilder(RopeStyleSelectPacket.class, packetId++)
-                .decoder(RopeStyleSelectPacket::decode)
-                .encoder(RopeStyleSelectPacket::encode)
-                .consumerMainThread(RopeStyleSelectPacket::handle)
+        INSTANCE.messageBuilder(RopeTypeSelectPacket.class, packetId++)
+                .decoder(RopeTypeSelectPacket::decode)
+                .encoder(RopeTypeSelectPacket::encode)
+                .consumerMainThread(RopeTypeSelectPacket::handle)
                 .add();
 
         INSTANCE.messageBuilder(OutlinePacket.class, packetId++)
@@ -43,9 +43,9 @@ public class NetworkHandler {
                 .add();
     }
 
-    public static void sendRopeUpdate(Integer ropeId, Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, ResourceLocation style) {
+    public static void sendRopeUpdate(Integer ropeId, Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, ResourceLocation type) {
         sendConstraintRemove(ropeId);
-        sendConstraintAdd(ropeId, ship0, ship1, localPos0, localPos1, maxLength, style);
+        sendConstraintAdd(ropeId, ship0, ship1, localPos0, localPos1, maxLength, type);
     }
 
     public static void sendConstraintAdd(Integer constraintId, Long shipA, Long shipB,
@@ -86,8 +86,8 @@ public class NetworkHandler {
         INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);
     }
 
-    public static void selectStyle(ResourceLocation style) {
-        INSTANCE.sendToServer(new RopeStyleSelectPacket(style));
+    public static void selectType(ResourceLocation style) {
+        INSTANCE.sendToServer(new RopeTypeSelectPacket(style));
     }
 
 }

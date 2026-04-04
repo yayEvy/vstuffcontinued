@@ -4,6 +4,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.ForgeRegistries;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.content.ropes.type.RopeType;
+import yay.evy.everest.vstuff.content.ropes.type.RopeTypeRegistry;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,28 +37,28 @@ public class RopeRestyleManager {
         return RESTYLES.values().stream().toList();
     }
 
-    public static RopeStyleManager.RopeStyle restyle(RopeStyleManager.RopeStyle fromStyle, Item item) {
-        RopeRestyle group = get(fromStyle.restyleGroup());
+    public static RopeType retype(RopeType fromType, Item item) {
+        RopeRestyle group = get(fromType.restyleGroup());
         if (group.canRestyle(item))
-            return group.getStyleForItem(item);
-        return fromStyle;
+            return group.getTypeForItem(item);
+        return fromType;
     }
 
-    public record RopeRestyle(ResourceLocation id, Map<ResourceLocation, ResourceLocation> itemLocToStyleIdMap) {
+    public record RopeRestyle(ResourceLocation id, Map<ResourceLocation, ResourceLocation> itemLocToTypeIdMap) {
         public boolean canRestyle(Item item) {
             return canRestyle(getItemLocation(item));
         }
 
         public boolean canRestyle(ResourceLocation itemLoc) {
-            return itemLocToStyleIdMap.containsKey(itemLoc);
+            return itemLocToTypeIdMap.containsKey(itemLoc);
         }
 
-        public RopeStyleManager.RopeStyle getStyleForItem(Item item) {
-            return getStyleForItemLoc(getItemLocation(item));
+        public RopeType getTypeForItem(Item item) {
+            return getTypeForItemLoc(getItemLocation(item));
         }
 
-        public RopeStyleManager.RopeStyle getStyleForItemLoc(ResourceLocation item) {
-            return RopeStyleManager.get(itemLocToStyleIdMap.get(item));
+        public RopeType getTypeForItemLoc(ResourceLocation item) {
+            return RopeTypeRegistry.get(itemLocToTypeIdMap.get(item));
         }
     }
 

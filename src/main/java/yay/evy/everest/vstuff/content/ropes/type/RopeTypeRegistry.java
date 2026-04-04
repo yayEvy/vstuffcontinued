@@ -59,14 +59,16 @@ public final class RopeTypeRegistry {
         List<RopeCategory> result = new ArrayList<>();
         for (RopeCategory cat : CATEGORIES.values()) {
             List<RopeType> types = grouped.getOrDefault(cat.id(), List.of());
-            if (!types.isEmpty())
+            if (!types.isEmpty()) {
                 result.add(new RopeCategory(cat.id(), cat.name(), cat.order(), types));
+                grouped.remove(cat.id());
+            }
         }
-        List<RopeType> uncategorized = grouped.getOrDefault(uncategorizedId, List.of());
+        // all extras are dumped here
+        List<RopeType> uncategorized = grouped.entrySet().stream().sorted().map(Map.Entry::getValue).flatMap(Collection::stream).toList();
         if (!uncategorized.isEmpty())
             result.add(new RopeCategory(uncategorizedId,
-                    Component.translatable("ropecategory.vstuff.uncategorized"),
-                    Integer.MAX_VALUE, uncategorized));
+                    Component.translatable("ropecategory.vstuff.uncategorized"),Integer.MIN_VALUE, uncategorized));
         return result;
     }
 }

@@ -1,0 +1,9 @@
+{
+  "category": "vstuff:dyed_styles",
+  "name": "ropetype.vstuff.magenta_dye",
+  "renderer": "vstuff:solid_colour",
+  "renderer_params": {
+    "color": "#C74EBD"
+  },
+  "restyle_group": "vstuff:dyes"
+}

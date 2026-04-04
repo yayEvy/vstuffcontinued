@@ -1,0 +1,9 @@
+{
+  "category": "vstuff:dyed_styles",
+  "name": "ropetype.vstuff.brown_dye",
+  "renderer": "vstuff:solid_colour",
+  "renderer_params": {
+    "color": "#835432"
+  },
+  "restyle_group": "vstuff:dyes"
+}

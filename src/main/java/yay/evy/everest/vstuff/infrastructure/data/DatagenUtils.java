@@ -7,11 +7,31 @@ import yay.evy.everest.vstuff.VStuff;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class DatagenUtils {
 
     static final List<String> COLORS = List.of("Red", "Orange", "Yellow", "Lime", "Green", "Cyan",
             "Blue", "Light Blue", "Purple", "Pink", "Magenta", "Brown", "Black", "Gray", "Light Gray", "White");
+
+    static final Map<String, String> DYE_COLORS = Map.ofEntries(
+            Map.entry("red",        "#FF6961"),
+            Map.entry("orange",     "#FF9F33"),
+            Map.entry("yellow",     "#FFFF00"),
+            Map.entry("lime",       "#7FFF00"),
+            Map.entry("green",      "#3D7B3F"),
+            Map.entry("cyan",       "#169C9C"),
+            Map.entry("blue",       "#3C44AA"),
+            Map.entry("light_blue", "#3ABEC7"),
+            Map.entry("purple",     "#8932B8"),
+            Map.entry("pink",       "#F38BAA"),
+            Map.entry("magenta",    "#C74EBD"),
+            Map.entry("brown",      "#835432"),
+            Map.entry("black",      "#1D1D21"),
+            Map.entry("gray",       "#474F52"),
+            Map.entry("light_gray", "#9D9D97"),
+            Map.entry("white",      "#F9FFFE")
+    );
 
     static final List<String> LOGS = List.of("Oak", "Birch", "Spruce", "Dark Oak", "Jungle", "Acacia", "Mangrove", "Cherry",
             "Stripped Oak", "Stripped Birch", "Stripped Spruce", "Stripped Dark Oak", "Stripped Jungle", "Stripped Acacia",

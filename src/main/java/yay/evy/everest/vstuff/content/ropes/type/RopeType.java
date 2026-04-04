@@ -12,17 +12,21 @@ import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.internal.utility.EntityUtils;
 import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
-// content/ropes/RopeType.java
 public record RopeType(
         ResourceLocation id,
         Component name,
         ResourceLocation category,
+        ResourceLocation restyleGroup,
         ResourceLocation rendererTypeId,
-        JsonObject rendererParams      // parsed client-side
+        JsonObject rendererParams      // parsed by the renderer on client
 ) {
     public static ResourceLocation getOrDefaultTypeId(CompoundTag ropeTag) {
         if (!ropeTag.contains("type", Tag.TAG_COMPOUND)) return RopeTypeRegistry.FALLBACK_ID;
         return TagUtils.readResourceLocation(ropeTag.getCompound("type"));
+    }
+
+    public static RopeType getOrDefault(CompoundTag tag) {
+        return RopeTypeRegistry.get(getOrDefaultTypeId(tag));
     }
 
     public static void set(Player player, ResourceLocation type) {

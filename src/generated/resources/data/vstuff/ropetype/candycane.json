@@ -1,0 +1,9 @@
+{
+  "category": "vstuff:merry_vstuffmas",
+  "name": "ropetype.vstuff.candycane",
+  "renderer": "vstuff:normal",
+  "renderer_params": {
+    "texture": "vstuff:textures/rope/rope_candycane.png"
+  },
+  "restyle_group": "vstuff:none"
+}

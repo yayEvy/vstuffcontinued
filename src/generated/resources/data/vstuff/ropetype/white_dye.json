@@ -1,0 +1,9 @@
+{
+  "category": "vstuff:dyed_styles",
+  "name": "ropetype.vstuff.white_dye",
+  "renderer": "vstuff:solid_colour",
+  "renderer_params": {
+    "color": "#F9FFFE"
+  },
+  "restyle_group": "vstuff:dyes"
+}

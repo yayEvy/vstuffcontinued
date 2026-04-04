@@ -1,6 +1,0 @@
-{
-  "name": "Jungle",
-  "render_type": "NORMAL",
-  "restyle_group": "vstuff:logs",
-  "texture": "minecraft:textures/block/jungle_log.png"
-}

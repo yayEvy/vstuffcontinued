@@ -27,12 +27,11 @@ public class VStuffConfiguredFeatures {
 
     public static final ResourceKey<ConfiguredFeature<?, ?>> LEVITUFF_ORE =
             ResourceKey.create(Registries.CONFIGURED_FEATURE,
-                    new ResourceLocation(VStuff.MOD_ID, "levituff_ore"));
+                    ResourceLocation.fromNamespaceAndPath(VStuff.MOD_ID, "levituff_ore"));
 
 
     public static final TagKey<Block> TUFF_REPLACEABLES =
-            TagKey.create(Registries.BLOCK, new ResourceLocation("minecraft", "tuff_replaceables"));
-
+            TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("minecraft", "tuff_replaceables"));
     public static void bootstrap(BootstapContext<ConfiguredFeature<?, ?>> context) {
         RuleTest replaceableTuff = new BlockMatchTest(Blocks.TUFF);
 

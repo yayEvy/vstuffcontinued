@@ -20,8 +20,8 @@ public class VStuffDatagen {
     public static void gatherData(GatherDataEvent event) {
         DataGenerator generator = event.getGenerator();
 
-        generator.addProvider(event.includeServer(), new RopeStyleProvider(generator));
-        generator.addProvider(event.includeServer(), new RopeStyleCategoryProvider(generator));
+        generator.addProvider(event.includeServer(), new RopeTypeProvider(generator));
+        generator.addProvider(event.includeServer(), new RopeCategoryProvider(generator));
         generator.addProvider(event.includeServer(), new RopeRestylingProvider(generator));
 
         gatherAllLang(generator);
@@ -32,7 +32,6 @@ public class VStuffDatagen {
             BiConsumer<String, String> langConsumer = registrateLangProvider::add;
 
             provideDefaultLang("default", langConsumer);
-            RopeStyleLangProvider.provideLang(generator, langConsumer);
         });
     }
 

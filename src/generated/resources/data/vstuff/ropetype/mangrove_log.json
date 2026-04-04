@@ -1,0 +1,9 @@
+{
+  "category": "vstuff:log_styles",
+  "name": "ropetype.vstuff.mangrove_log",
+  "renderer": "vstuff:normal",
+  "renderer_params": {
+    "texture": "minecraft:textures/block/mangrove_log.png"
+  },
+  "restyle_group": "vstuff:logs"
+}

@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -16,12 +17,12 @@ import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 import yay.evy.everest.vstuff.content.ropes.RopeFactory;
 import yay.evy.everest.vstuff.content.ropes.RopeManager;
+import yay.evy.everest.vstuff.content.ropes.type.RopeType;
 import yay.evy.everest.vstuff.index.VStuffItems;
+import yay.evy.everest.vstuff.infrastructure.data.RopeCategoryReloadListener;
 import yay.evy.everest.vstuff.infrastructure.data.RopeRestyleReloadListener;
-import yay.evy.everest.vstuff.infrastructure.data.RopeStyleCategoryReloadListener;
-import yay.evy.everest.vstuff.infrastructure.data.RopeStyleReloadListener;
+import yay.evy.everest.vstuff.infrastructure.data.RopeTypeReloadListener;
 import yay.evy.everest.vstuff.internal.RopeRestyleManager;
-import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
 import java.util.HashSet;
@@ -32,8 +33,8 @@ public class ForgeEvents {
 
     @SubscribeEvent
     public static void addReloadListeners(AddReloadListenerEvent event) {
-        event.addListener(new RopeStyleReloadListener());
-        event.addListener(new RopeStyleCategoryReloadListener());
+        event.addListener(new RopeTypeReloadListener());
+        event.addListener(new RopeCategoryReloadListener());
         event.addListener(new RopeRestyleReloadListener());
     }
 
@@ -91,8 +92,9 @@ public class ForgeEvents {
         ReworkedRope rope = RopeUtils.findTargetedLead(level, player);
         if (rope == null) return;
 
-        RopeStyleManager.RopeStyle newStyle = RopeRestyleManager.restyle(rope.style, itemStack.getItem());
-
-        RopeFactory.restyleRope(level, rope.getRopeId(), newStyle);
+        RopeType newType = RopeRestyleManager.retype(rope.type, itemStack.getItem());
+        if (!newType.equals(rope.type)) {
+            RopeFactory.retypeRope(level, rope.getRopeId(), newType.id());
+        }
     }
 }

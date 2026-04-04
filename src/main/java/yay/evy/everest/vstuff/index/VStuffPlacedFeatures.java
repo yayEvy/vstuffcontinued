@@ -18,7 +18,7 @@ public class VStuffPlacedFeatures {
 
     public static final ResourceKey<PlacedFeature> LEVITUFF_ORE =
             ResourceKey.create(Registries.PLACED_FEATURE,
-                    new ResourceLocation(VStuff.MOD_ID, "levituff_ore"));
+                    ResourceLocation.fromNamespaceAndPath(VStuff.MOD_ID, "levituff_ore"));
 
     public static void bootstrap(BootstapContext<PlacedFeature> context) {
         HolderGetter<ConfiguredFeature<?, ?>> configured =
