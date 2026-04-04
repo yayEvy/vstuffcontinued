@@ -1,5 +1,6 @@
 package yay.evy.everest.vstuff.internal.utility;
 
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -12,6 +13,7 @@ import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import yay.evy.everest.vstuff.client.ClientRopeManager;
 import yay.evy.everest.vstuff.content.ropes.IRopeActor;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRopeItem;
 import yay.evy.everest.vstuff.content.ropes.RopeManager;
@@ -123,6 +125,27 @@ public class RopeUtils {
 
             Vector3d worldPosA = convertLocalToWorld(level, rope.posData0.localPos(), rope.posData0.shipId());
             Vector3d worldPosB = convertLocalToWorld(level, rope.posData1.localPos(), rope.posData1.shipId());
+
+            double distance = getDistanceToRope(eyePos, lookVec, worldPosA, worldPosB, maxDistance);
+            if (distance < minDistance && distance <= 1.0) {
+                minDistance = distance;
+                foundRope = rope;
+            }
+        }
+
+        return foundRope;
+    }
+
+    public static @Nullable ClientRopeManager.ClientRopeData findTargetedLeadClient(ClientLevel level, Player player) {
+        Vec3 eyePos = player.getEyePosition();
+        Vec3 lookVec = player.getViewVector(1.0f);
+        double maxDistance = player.getBlockReach();
+        double minDistance = Double.MAX_VALUE;
+        ClientRopeManager.ClientRopeData foundRope = null;
+
+        for (ClientRopeManager.ClientRopeData rope : ClientRopeManager.getClientConstraints().values()) {
+            Vector3d worldPosA = convertLocalToWorld(level, rope.localPos0(), rope.ship0());
+            Vector3d worldPosB = convertLocalToWorld(level, rope.localPos1(), rope.ship1());
 
             double distance = getDistanceToRope(eyePos, lookVec, worldPosA, worldPosB, maxDistance);
             if (distance < minDistance && distance <= 1.0) {

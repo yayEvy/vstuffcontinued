@@ -1,15 +1,19 @@
 package yay.evy.everest.vstuff.events;
 
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3d;
@@ -73,28 +77,36 @@ public class ForgeEvents {
         RopeManager.syncAllRopesToPlayer(player);
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onPlayerRightClickItem(PlayerInteractEvent.RightClickItem event) {
+        if (event.getItemStack().getItem() instanceof BlockItem) return;
         handleRightClickEvent(event);
     }
 
-//    @SubscribeEvent
-//    public static void onPlayerRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
-//        handleRightClickEvent(event);
-//    }
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onPlayerRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+        handleRightClickEvent(event);
+    }
 
     private static void handleRightClickEvent(PlayerInteractEvent event) {
-        if (!(event.getLevel() instanceof ServerLevel level)) return;
+        if ((event.getLevel() instanceof ClientLevel level)) {
+            if (RopeUtils.findTargetedLeadClient(level, event.getEntity()) != null) {
+                event.setCanceled(true);
+                event.setCancellationResult(InteractionResult.SUCCESS);
+            }
+        } else if ((event.getLevel() instanceof ServerLevel level)) {
+            ItemStack itemStack = event.getItemStack();
+            Player player = event.getEntity();
 
-        ItemStack itemStack = event.getItemStack();
-        Player player = event.getEntity();
+            ReworkedRope rope = RopeUtils.findTargetedLead(level, player);
+            if (rope == null) return;
 
-        ReworkedRope rope = RopeUtils.findTargetedLead(level, player);
-        if (rope == null) return;
-
-        RopeType newType = RopeRestyleManager.retype(rope.type, itemStack.getItem());
-        if (!newType.equals(rope.type)) {
-            RopeFactory.retypeRope(level, rope.getRopeId(), newType.id());
+            RopeType newType = RopeRestyleManager.retype(rope.type, itemStack.getItem());
+            if (!newType.equals(rope.type)) {
+                RopeFactory.retypeRope(level, rope.getRopeId(), newType.id());
+                event.setCanceled(true);
+                event.setCancellationResult(InteractionResult.SUCCESS);
+            }
         }
     }
 }
