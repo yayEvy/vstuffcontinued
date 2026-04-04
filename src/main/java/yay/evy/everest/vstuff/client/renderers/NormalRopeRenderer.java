@@ -10,6 +10,7 @@ import org.joml.Vector3d;
 import yay.evy.everest.vstuff.internal.rendering.IRopeRenderer;
 import yay.evy.everest.vstuff.internal.rendering.RopeRenderContext;
 import yay.evy.everest.vstuff.index.VStuffRenderTypes;
+import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
 
 import static yay.evy.everest.vstuff.internal.utility.RopeRenderUtils.*;
 
@@ -23,7 +24,8 @@ public class NormalRopeRenderer implements IRopeRenderer {
 
     @Override
     public void render(RopeRenderContext ctx, PoseStack pose, MultiBufferSource bufferSource, Vector3d[] curve, int[] light) {
-        renderNormalRope(pose, bufferSource.getBuffer(this.getRenderType()), curve, light, ctx.startRelative(), ctx.endRelative(), ctx.prevStartRelative(), ctx.prevEndRelative());
+        renderNormalRope(pose, bufferSource.getBuffer(this.getRenderType()), curve, light,
+                ctx.startRelative(), ctx.endRelative(), ctx.prevStartRelative(), ctx.prevEndRelative());
     }
 
     @Override
@@ -32,7 +34,8 @@ public class NormalRopeRenderer implements IRopeRenderer {
     }
 
     private void renderNormalRope(PoseStack poseStack, VertexConsumer vertexConsumer,
-                                         Vector3d[] curvePoints, int[] lightValues, Vector3d start, Vector3d end, Vector3d prevStart, Vector3d prevEnd) {
+                                  Vector3d[] curvePoints, int[] lightValues, Vector3d start, Vector3d end,
+                                  Vector3d prevStart, Vector3d prevEnd) {
         Matrix4f matrix = poseStack.last().pose();
 
         Vector3d overallDirection = new Vector3d(end).sub(start).normalize();
@@ -70,6 +73,15 @@ public class NormalRopeRenderer implements IRopeRenderer {
         renderRopeFaceWithGapFilling(vertexConsumer, matrix, strips[0], strips[2], right, curvePoints, lightValues);
         renderRopeFaceWithGapFilling(vertexConsumer, matrix, strips[3], strips[1], neg(right), curvePoints, lightValues);
         renderRopeFaceWithGapFilling(vertexConsumer, matrix, strips[2], strips[3], neg(up), curvePoints, lightValues);
+
+        // todo make it work better with 99% of blocks, "im just gonna make rope knots a config thats off by default until we find a better way to implement it for like 99% of blocks, but ill keep it in cause it does look sweet..."
+        // so for now it's a config, being off by default
+        if (VStuffConfigs.client().ropeKnots.get()) {
+            int startLight = lightValues[0];
+            int endLight   = lightValues[ROPE_CURVE_SEGMENTS];
+            RopeKnotRenderer.renderKnot(vertexConsumer, matrix, curvePoints[0], startLight);
+            RopeKnotRenderer.renderKnot(vertexConsumer, matrix, curvePoints[ROPE_CURVE_SEGMENTS], endLight);
+        }
     }
 
     private static void renderRopeFaceWithGapFilling(VertexConsumer vertexConsumer, Matrix4f matrix,

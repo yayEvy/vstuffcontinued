@@ -184,7 +184,10 @@ public class ClientRopeManager {
             Pair<Vector3d,Vector3d> prevStartRelativeAndEndRelative = previousStartRelativeAndEndRelativeVectors.computeIfAbsent(ropeId, (id) -> new Pair<>(startRelative, endRelative));
 
             RopeRenderContext ctx = new RopeRenderContext(
-                    startRelative, endRelative,prevStartRelativeAndEndRelative.getFirst(),prevStartRelativeAndEndRelative.getSecond(), maxLength, actualLength, partialTick, level
+                    startRelative, endRelative, prevStartRelativeAndEndRelative.getFirst(), prevStartRelativeAndEndRelative.getSecond(),
+                    maxLength, actualLength, partialTick, level,
+                    new net.minecraft.core.BlockPos((int) Math.floor(startPos.x), (int) Math.floor(startPos.y), (int) Math.floor(startPos.z)),
+                    new net.minecraft.core.BlockPos((int) Math.floor(endPos.x),   (int) Math.floor(endPos.y),   (int) Math.floor(endPos.z))
             );
 
             previousStartRelativeAndEndRelativeVectors.put(ropeId, new Pair<>(startRelative, endRelative));
