@@ -3,7 +3,6 @@ package yay.evy.everest.vstuff.content.ropes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -15,8 +14,6 @@ import yay.evy.everest.vstuff.content.ropes.packet.AddRopePacket;
 import yay.evy.everest.vstuff.content.ropes.packet.ClearAllRopesPacket;
 import yay.evy.everest.vstuff.content.ropes.packet.RemoveRopePacket;
 import yay.evy.everest.vstuff.index.VStuffPackets;
-import yay.evy.everest.vstuff.content.ropes.type.RopeTypeRegistry;
-import yay.evy.everest.vstuff.internal.network.NetworkHandler;
 
 import java.util.HashMap;
 import java.util.List;

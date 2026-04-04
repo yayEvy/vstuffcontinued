@@ -7,8 +7,6 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.client.rope.RopeRendererTypes;
-import yay.evy.everest.vstuff.internal.RopeStyleManager;
 
 import java.nio.file.Path;
 import java.util.ArrayList;

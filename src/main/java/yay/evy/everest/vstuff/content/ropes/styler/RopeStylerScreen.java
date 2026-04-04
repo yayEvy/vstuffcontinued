@@ -10,9 +10,7 @@ import yay.evy.everest.vstuff.client.rope.RopeRendererType;
 import yay.evy.everest.vstuff.client.rope.RopeRendererTypes;
 import yay.evy.everest.vstuff.content.ropes.type.RopeCategory;
 import yay.evy.everest.vstuff.content.ropes.type.RopeType;
-import yay.evy.everest.vstuff.content.ropes.type.RopeTypeRegistry;
-import yay.evy.everest.vstuff.internal.RopeStyleCategoryManager;
-import yay.evy.everest.vstuff.internal.RopeStyleManager;
+import yay.evy.everest.vstuff.content.ropes.type.RopeTypeManager;
 import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.internal.utility.ClientTextUtils;
 import yay.evy.everest.vstuff.index.VStuffGuiTextures;
@@ -26,7 +24,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 
@@ -64,7 +61,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
         super.init();
         clearWidgets();
 
-        List<RopeCategory> categories = RopeTypeRegistry.buildSortedCategories();
+        List<RopeCategory> categories = RopeTypeManager.buildSortedCategories();
         List<Component> categoryComponentList = categories.stream().map(RopeCategory::name).toList();
 
         int x = guiLeft;

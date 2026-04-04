@@ -11,7 +11,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.rope.RopeRendererTypes;
 import yay.evy.everest.vstuff.content.ropes.type.RopeType;
-import yay.evy.everest.vstuff.content.ropes.type.RopeTypeRegistry;
+import yay.evy.everest.vstuff.content.ropes.type.RopeTypeManager;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
@@ -26,7 +26,7 @@ public class RopeTypeReloadListener extends SimpleJsonResourceReloadListener {
     @Override
     @ParametersAreNonnullByDefault
     protected void apply(Map<ResourceLocation, JsonElement> jsons, ResourceManager manager, ProfilerFiller profiler) {
-        RopeTypeRegistry.clearAll(); // clear categories too cuz that runs after this one
+        RopeTypeManager.clearAll(); // clear categories too cuz that runs after this one
         RopeRendererTypes.clearCache();
 
         for (Map.Entry<ResourceLocation, JsonElement> entry : jsons.entrySet()) {
@@ -39,7 +39,7 @@ public class RopeTypeReloadListener extends SimpleJsonResourceReloadListener {
             ResourceLocation restyleGroup = parseLoc(json.get("restyle_group"));
             JsonObject rendererParams = json.getAsJsonObject("renderer_params");
 
-            RopeTypeRegistry.registerType(new RopeType(
+            RopeTypeManager.registerType(new RopeType(
                     id,
                     name,
                     category,
@@ -48,6 +48,6 @@ public class RopeTypeReloadListener extends SimpleJsonResourceReloadListener {
                     rendererParams
             ));
         }
-        VStuff.LOGGER.info("Loaded {} rope types from data.", RopeTypeRegistry.typeCount());
+        VStuff.LOGGER.info("Loaded {} rope types from data.", RopeTypeManager.typeCount());
     }
 }

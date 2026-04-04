@@ -5,7 +5,7 @@ import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.ForgeRegistries;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.ropes.type.RopeType;
-import yay.evy.everest.vstuff.content.ropes.type.RopeTypeRegistry;
+import yay.evy.everest.vstuff.content.ropes.type.RopeTypeManager;
 
 import java.util.HashMap;
 import java.util.List;
@@ -58,7 +58,7 @@ public class RopeRestyleManager {
         }
 
         public RopeType getTypeForItemLoc(ResourceLocation item) {
-            return RopeTypeRegistry.get(itemLocToTypeIdMap.get(item));
+            return RopeTypeManager.get(itemLocToTypeIdMap.get(item));
         }
     }
 

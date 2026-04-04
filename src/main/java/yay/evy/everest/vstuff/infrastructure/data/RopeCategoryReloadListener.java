@@ -9,7 +9,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import yay.evy.everest.vstuff.content.ropes.type.RopeCategory;
-import yay.evy.everest.vstuff.content.ropes.type.RopeTypeRegistry;
+import yay.evy.everest.vstuff.content.ropes.type.RopeTypeManager;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
@@ -30,7 +30,7 @@ public class RopeCategoryReloadListener extends SimpleJsonResourceReloadListener
             Component name = Component.translatable(json.get("name").getAsString());
             int order = json.get("order").getAsInt();
 
-            RopeTypeRegistry.registerCategory(
+            RopeTypeManager.registerCategory(
                     new RopeCategory(
                             id,
                             name,

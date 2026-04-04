@@ -7,32 +7,32 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 import yay.evy.everest.vstuff.client.ClientRopeManager;
-import yay.evy.everest.vstuff.internal.RopeStyleManager;
+import yay.evy.everest.vstuff.content.ropes.type.RopeTypeManager;
 
 public class UpdateRopeStylePacket extends SimplePacketBase {
 
     private Integer ropeId;
-    private ResourceLocation newStyle;
+    private ResourceLocation newType;
 
-    public UpdateRopeStylePacket(Integer ropeId, ResourceLocation newStyle) {
+    public UpdateRopeStylePacket(Integer ropeId, ResourceLocation newType) {
         this.ropeId = ropeId;
-        this.newStyle = newStyle;
+        this.newType = newType;
     }
 
     public UpdateRopeStylePacket(FriendlyByteBuf buffer) {
         this.ropeId = buffer.readInt();
-        this.newStyle = buffer.readResourceLocation();
+        this.newType = buffer.readResourceLocation();
     }
 
     @Override
     public void write(FriendlyByteBuf buffer) {
         buffer.writeInt(ropeId);
-        buffer.writeResourceLocation(newStyle);
+        buffer.writeResourceLocation(newType);
     }
 
     @Override
     public boolean handle(NetworkEvent.Context context) {
-        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientRopeManager.updateClientRopeStyle(ropeId, RopeStyleManager.get(newStyle))));
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientRopeManager.updateClientRopeStyle(ropeId, RopeTypeManager.get(newType))));
         return true;
     }
 }

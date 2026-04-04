@@ -36,17 +36,26 @@ public class SolidColourRopeRenderer implements IRopeRenderer {
     public void render(RopeRenderContext ctx, PoseStack pose, MultiBufferSource bufferSource,
                        Vector3d[] curve, int[] light) {
         VertexConsumer consumer = bufferSource.getBuffer(getRenderType());
-        renderColouredRope(pose, consumer, curve, light, ctx.startRelative(), ctx.endRelative());
+        renderColouredRope(pose, consumer, curve, light, ctx.startRelative(), ctx.endRelative(), ctx.prevStartRelative(), ctx.prevEndRelative());
     }
 
-    private void renderColouredRope(PoseStack poseStack, VertexConsumer vertexConsumer,
-                                    Vector3d[] curvePoints, int[] lightValues,
-                                    Vector3d start, Vector3d end) {
+    private void renderColouredRope(PoseStack poseStack, VertexConsumer vertexConsumer, Vector3d[] curvePoints, int[] lightValues, Vector3d start, Vector3d end, Vector3d prevStart, Vector3d prevEnd) {
         Matrix4f matrix = poseStack.last().pose();
 
         Vector3d overallDirection = new Vector3d(end).sub(start).normalize();
         Vector3d up = new Vector3d();
         Vector3d right = right(overallDirection, up);
+
+        Vector3d prevOverallDirection = new Vector3d(prevEnd).sub(prevStart).normalize();
+        Vector3d prevUp = new Vector3d();
+        Vector3d prevRight = right(prevOverallDirection, prevUp);
+
+
+        if (prevRight.dot(right) < 0) right.mul(-1);
+        right.lerp(prevRight, 1.0f - ORIENTATION_SMOOTH_FACTOR).normalize();
+        up = new Vector3d();
+        right.cross(overallDirection, up).normalize();
+
 
         Vector3d[][] strips = new Vector3d[4][ROPE_CURVE_SEGMENTS + 1];
 
@@ -86,7 +95,6 @@ public class SolidColourRopeRenderer implements IRopeRenderer {
 
             renderFace(consumer, matrix, v1, v2, v3, v4, vStart, vEnd, ls, le, normal);
 
-            // Gap-filling triangles — same as TexturedRopeRenderer but semi-transparent
             Vector3d c1 = new Vector3d(v1).add(v2).mul(0.5);
             Vector3d c2 = new Vector3d(v3).add(v4).mul(0.5);
 

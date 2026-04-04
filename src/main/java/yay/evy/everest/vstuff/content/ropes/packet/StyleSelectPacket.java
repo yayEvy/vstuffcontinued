@@ -8,7 +8,7 @@ import yay.evy.everest.vstuff.content.ropes.type.RopeType;
 
 public class StyleSelectPacket extends SimplePacketBase {
 
-    private ResourceLocation id;
+    private final ResourceLocation id;
 
     public StyleSelectPacket(ResourceLocation id) {
         this.id = id;

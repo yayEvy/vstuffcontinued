@@ -6,7 +6,7 @@ import net.minecraft.server.level.ServerLevel;
 import org.valkyrienskies.core.internal.joints.*;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.ropes.type.RopeType;
-import yay.evy.everest.vstuff.content.ropes.type.RopeTypeRegistry;
+import yay.evy.everest.vstuff.content.ropes.type.RopeTypeManager;
 import yay.evy.everest.vstuff.internal.utility.*;
 
 import javax.annotation.Nullable;
@@ -26,7 +26,7 @@ public class ReworkedRope {
         this.posData0 = posData0;
         this.posData1 = posData1;
         this.jointValues = values;
-        this.type = RopeTypeRegistry.get(type);
+        this.type = RopeTypeManager.get(type);
         this.hasJoint = !posData0.sameShip(posData1);
     }
 

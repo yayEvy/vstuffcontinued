@@ -21,12 +21,12 @@ public record RopeType(
         JsonObject rendererParams      // parsed by the renderer on client
 ) {
     public static ResourceLocation getOrDefaultTypeId(CompoundTag ropeTag) {
-        if (!ropeTag.contains("type", Tag.TAG_COMPOUND)) return RopeTypeRegistry.FALLBACK_ID;
+        if (!ropeTag.contains("type", Tag.TAG_COMPOUND)) return RopeTypeManager.FALLBACK_ID;
         return TagUtils.readResourceLocation(ropeTag.getCompound("type"));
     }
 
     public static RopeType getOrDefault(CompoundTag tag) {
-        return RopeTypeRegistry.get(getOrDefaultTypeId(tag));
+        return RopeTypeManager.get(getOrDefaultTypeId(tag));
     }
 
     public static void set(Player player, ResourceLocation type) {

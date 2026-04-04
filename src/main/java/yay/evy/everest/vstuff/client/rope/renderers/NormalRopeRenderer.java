@@ -7,7 +7,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
-import org.joml.Vector3dc;
 import yay.evy.everest.vstuff.client.rope.IRopeRenderer;
 import yay.evy.everest.vstuff.client.rope.RopeRenderContext;
 import yay.evy.everest.vstuff.index.VStuffRenderTypes;
@@ -17,8 +16,6 @@ import static yay.evy.everest.vstuff.internal.utility.RopeRenderUtils.*;
 public class NormalRopeRenderer implements IRopeRenderer {
 
     private final ResourceLocation texture;
-    private static final float ORIENTATION_SMOOTH_FACTOR = 0.15f;
-    private Vector3dc prevRight;
 
     public NormalRopeRenderer(ResourceLocation texture){
         this.texture = texture;
@@ -26,7 +23,7 @@ public class NormalRopeRenderer implements IRopeRenderer {
 
     @Override
     public void render(RopeRenderContext ctx, PoseStack pose, MultiBufferSource bufferSource, Vector3d[] curve, int[] light) {
-        renderNormalRope(pose, bufferSource.getBuffer(this.getRenderType()), curve, light, ctx.startRelative(), ctx.endRelative());
+        renderNormalRope(pose, bufferSource.getBuffer(this.getRenderType()), curve, light, ctx.startRelative(), ctx.endRelative(), ctx.prevStartRelative(), ctx.prevEndRelative());
     }
 
     @Override
@@ -35,23 +32,24 @@ public class NormalRopeRenderer implements IRopeRenderer {
     }
 
     private void renderNormalRope(PoseStack poseStack, VertexConsumer vertexConsumer,
-                                         Vector3d[] curvePoints, int[] lightValues, Vector3d start, Vector3d end) {
+                                         Vector3d[] curvePoints, int[] lightValues, Vector3d start, Vector3d end, Vector3d prevStart, Vector3d prevEnd) {
         Matrix4f matrix = poseStack.last().pose();
 
         Vector3d overallDirection = new Vector3d(end).sub(start).normalize();
         Vector3d up = new Vector3d();
-
         Vector3d right = right(overallDirection, up);
 
+        Vector3d prevOverallDirection = new Vector3d(prevEnd).sub(prevStart).normalize();
+        Vector3d prevUp = new Vector3d();
+        Vector3d prevRight = right(prevOverallDirection, prevUp);
 
-        if (prevRight != null) {
-            if (prevRight.dot(right) < 0) right.mul(-1);
-            right.lerp(prevRight, 1.0f - ORIENTATION_SMOOTH_FACTOR).normalize();
-            up = new Vector3d();
-            right.cross(overallDirection, up).normalize();
-        }
 
-        prevRight = right;
+
+        if (prevRight.dot(right) < 0) right.mul(-1);
+        right.lerp(prevRight, 1.0f - ORIENTATION_SMOOTH_FACTOR).normalize();
+        up = new Vector3d();
+        right.cross(overallDirection, up).normalize();
+
 
         Vector3d[][] strips = new Vector3d[4][ROPE_CURVE_SEGMENTS + 1]; // top right, top left, bottom right, bottom left
 

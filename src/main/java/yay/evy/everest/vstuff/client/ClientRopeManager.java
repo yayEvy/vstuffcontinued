@@ -1,6 +1,8 @@
 package yay.evy.everest.vstuff.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.resources.ResourceLocation;
@@ -19,7 +21,7 @@ import yay.evy.everest.vstuff.client.rope.IRopeRenderer;
 import yay.evy.everest.vstuff.client.rope.RopeRenderContext;
 import yay.evy.everest.vstuff.client.rope.RopeRendererTypes;
 import yay.evy.everest.vstuff.content.ropes.type.RopeType;
-import yay.evy.everest.vstuff.content.ropes.type.RopeTypeRegistry;
+import yay.evy.everest.vstuff.content.ropes.type.RopeTypeManager;
 import yay.evy.everest.vstuff.internal.utility.RopeRenderUtils;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
@@ -28,6 +30,7 @@ import java.util.Map;
 
 public class ClientRopeManager {
     private static final Map<Integer, ClientRopeData> clientConstraints = new HashMap<>();
+    private static final Map<Integer, Pair<Vector3d,Vector3d>> previousStartRelativeAndEndRelativeVectors = new HashMap<>();
 
     public record ClientRopeData(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, RopeType type) {
 
@@ -59,7 +62,7 @@ public class ClientRopeManager {
         }
 
         public ClientRopeData withLength(double newLength) {
-            return new ClientRopeData(ship0, ship1, localPos0, localPos1, newLength, style);
+            return new ClientRopeData(ship0, ship1, localPos0, localPos1, newLength, type);
         }
 
         public ClientRopeData withStyle(RopeType newType) {
@@ -118,7 +121,7 @@ public class ClientRopeManager {
                     try {
                         boolean rendered = renderClientRope(
                                 poseStack, bufferSource, entry.getValue(),
-                                level, cameraPos, partialTick
+                                level, cameraPos, partialTick, entry.getKey()
                         );
                         if (rendered) renderedAny = true;
                     } catch (Exception e) {
@@ -137,7 +140,7 @@ public class ClientRopeManager {
 
         private static boolean renderClientRope(PoseStack poseStack, MultiBufferSource bufferSource,
                                                 ClientRopeData ropeData,
-                                                Level level, Vec3 cameraPos, float partialTick) {
+                                                Level level, Vec3 cameraPos, float partialTick, int ropeId) {
             if (!level.isClientSide) return false;
             if (!ropeData.canRender(level)) return false;
 
@@ -160,7 +163,7 @@ public class ClientRopeManager {
             if (startRelative.distance(endRelative) < 0.1) return false;
 
             ResourceLocation ropeTypeId = ropeData.type().id();
-            RopeType ropeType = RopeTypeRegistry.get(ropeTypeId);
+            RopeType ropeType = RopeTypeManager.get(ropeTypeId);
             if (ropeType == null) return false;
 
             IRopeRenderer renderer = RopeRendererTypes.getOrCreate(
@@ -178,9 +181,13 @@ public class ClientRopeManager {
             Vector3d[] curve  = RopeRenderUtils.computeCurve(startRelative, endRelative, sagAmount, windOffset, stableGameTime);
             int[] light  = RopeRenderUtils.computeLighting(curve, level, cameraPos);
 
+            Pair<Vector3d,Vector3d> prevStartRelativeAndEndRelative = previousStartRelativeAndEndRelativeVectors.computeIfAbsent(ropeId, (id) -> new Pair<>(startRelative, endRelative));
+
             RopeRenderContext ctx = new RopeRenderContext(
-                    startRelative, endRelative, maxLength, actualLength, partialTick, level
+                    startRelative, endRelative,prevStartRelativeAndEndRelative.getFirst(),prevStartRelativeAndEndRelative.getSecond(), maxLength, actualLength, partialTick, level
             );
+
+            previousStartRelativeAndEndRelativeVectors.put(ropeId, new Pair<>(startRelative, endRelative));
 
             poseStack.pushPose();
             renderer.render(ctx, poseStack, bufferSource, curve, light);

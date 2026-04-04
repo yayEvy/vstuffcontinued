@@ -10,10 +10,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.PacketDistributor;
 import yay.evy.everest.vstuff.content.ropes.packet.UpdateRopeStylePacket;
-import yay.evy.everest.vstuff.internal.RopeStyleManager;
 import yay.evy.everest.vstuff.index.VStuffPackets;
-import yay.evy.everest.vstuff.content.ropes.type.RopeTypeRegistry;
-import yay.evy.everest.vstuff.internal.network.NetworkHandler;
+import yay.evy.everest.vstuff.content.ropes.type.RopeTypeManager;
 import yay.evy.everest.vstuff.content.ropes.type.RopeType;
 import yay.evy.everest.vstuff.internal.utility.*;
 
@@ -99,7 +97,7 @@ public class RopeFactory {
         ReworkedRope rope = RopeManager.get(serverLevel).getRope(ropeId);
         if (rope == null) return;
 
-        rope.type = RopeTypeRegistry.get(newTypeId);
+        rope.type = RopeTypeManager.get(newTypeId);
 
         //NetworkHandler.sendRopeUpdate(ropeId, rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.style.id());
 

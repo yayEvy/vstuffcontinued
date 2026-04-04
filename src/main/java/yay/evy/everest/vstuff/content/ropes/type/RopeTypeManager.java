@@ -6,13 +6,13 @@ import yay.evy.everest.vstuff.VStuff;
 
 import java.util.*;
 
-public final class RopeTypeRegistry {
+public final class RopeTypeManager {
     private static final Map<ResourceLocation, RopeType> TYPES = new LinkedHashMap<>();
     private static final Map<ResourceLocation, RopeCategory> CATEGORIES = new LinkedHashMap<>();
 
     public static final ResourceLocation FALLBACK_ID = VStuff.asResource("normal");
 
-    private RopeTypeRegistry() {}
+    private RopeTypeManager() {}
 
     public static void registerType(RopeType type) {
         TYPES.put(type.id(), type);

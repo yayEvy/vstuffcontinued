@@ -7,10 +7,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 import org.joml.Vector3d;
-import org.joml.Vector3f;
 import yay.evy.everest.vstuff.client.ClientRopeManager;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
-import yay.evy.everest.vstuff.internal.RopeStyleManager;
+import yay.evy.everest.vstuff.content.ropes.type.RopeTypeManager;
 
 public class AddRopePacket extends SimplePacketBase {
 
@@ -20,20 +19,20 @@ public class AddRopePacket extends SimplePacketBase {
     private Vector3d localPos0;
     private Vector3d localPos1;
     private double maxLength;
-    private ResourceLocation styleId;
+    private ResourceLocation typeId;
 
     public AddRopePacket(ReworkedRope rope) {
-        this(rope.getRopeId(), rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.style.id());
+        this(rope.getRopeId(), rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.type.id());
     }
 
-    public AddRopePacket(Integer ropeId, Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, ResourceLocation styleId) {
+    public AddRopePacket(Integer ropeId, Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, ResourceLocation typeId) {
         this.ropeId = ropeId;
         this.ship0 = ship0;
         this.ship1 = ship1;
         this.localPos0 = localPos0;
         this.localPos1 = localPos1;
         this.maxLength = maxLength;
-        this.styleId = styleId;
+        this.typeId = typeId;
     }
 
     public AddRopePacket(FriendlyByteBuf buffer) {
@@ -45,7 +44,7 @@ public class AddRopePacket extends SimplePacketBase {
         this.localPos0 = readVector3d(buffer);
         this.localPos1 = readVector3d(buffer);
         this.maxLength = buffer.readDouble();
-        this.styleId = buffer.readResourceLocation();
+        this.typeId = buffer.readResourceLocation();
     }
 
     @Override
@@ -56,12 +55,12 @@ public class AddRopePacket extends SimplePacketBase {
         writeVector3d(buffer, localPos0);
         writeVector3d(buffer, localPos1);
         buffer.writeDouble(maxLength);
-        buffer.writeResourceLocation(styleId);
+        buffer.writeResourceLocation(typeId);
     }
 
     @Override
     public boolean handle(NetworkEvent.Context context) {
-        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientRopeManager.addClientConstraint(ropeId, ship0, ship1, localPos0, localPos1, maxLength, RopeStyleManager.get(styleId))));
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientRopeManager.addClientConstraint(ropeId, ship0, ship1, localPos0, localPos1, maxLength, RopeTypeManager.get(typeId))));
         return true;
     }
 

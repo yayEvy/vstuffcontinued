@@ -16,6 +16,7 @@ public final class RopeRenderUtils {
     public static final float  CHAIN_ROPE_V_SCALE   = 0.5f;
     public static final float  ROPE_SAG_FACTOR      = 1.02f;
     public static final float  WIND_STRENGTH        = 0.02f;
+    public static final float ORIENTATION_SMOOTH_FACTOR = 0.15f; // lower is smoother ye0yepeyepe
 
     private static final BlockPos.MutableBlockPos SHARED_MUTABLE_POS = new BlockPos.MutableBlockPos();
 
