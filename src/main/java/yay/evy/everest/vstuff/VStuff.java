@@ -8,6 +8,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -55,8 +56,8 @@ public class VStuff {
 
         MinecraftForge.EVENT_BUS.register(this);
 
-        modEventBus.addListener(this::commonSetup);
-        modEventBus.addListener(VStuffDatagen::gatherData);
+        modEventBus.addListener(VStuff::commonSetup);
+        modEventBus.addListener(EventPriority.LOWEST, VStuffDatagen::gatherData);
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> VStuffClient.initialize(modEventBus));
 
@@ -64,7 +65,7 @@ public class VStuff {
     }
 
     @VsBeta
-    private void commonSetup(final FMLCommonSetupEvent event) {
+    private static void commonSetup(final FMLCommonSetupEvent event) {
         event.enqueueWork(VStuff::registerAttachments);
     }
 

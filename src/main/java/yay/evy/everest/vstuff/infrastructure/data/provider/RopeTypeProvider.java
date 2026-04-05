@@ -39,7 +39,7 @@ public class RopeTypeProvider implements DataProvider {
 
         futures.addAll(dyeTypes(output));
 
-        futures.addAll(ropeTypes(output, List.of("Pride", "Gay", "Lesbian", "Bisexual", "Trangender", "Nonbinary", "Asexual"), "pride_styles", "none"));
+        futures.addAll(ropeTypes(output, List.of("Pride", "Gay", "Lesbian", "Bisexual", "Transgender", "Nonbinary", "Asexual"), "pride_styles", "none", "normal"));
 
         futures.addAll(logTypes(output));
 
@@ -71,9 +71,9 @@ public class RopeTypeProvider implements DataProvider {
         }).toList();
     }
 
-    private List<? extends CompletableFuture<?>> ropeTypes(CachedOutput output, List<String> names, String category, String restyleGroup) {
+    private List<? extends CompletableFuture<?>> ropeTypes(CachedOutput output, List<String> names, String category, String restyleGroup, String renderer) {
         List<CompletableFuture<?>> types = new ArrayList<>();
-        names.forEach(name -> types.add(ropeType(output, name, category, restyleGroup, restyleGroup)));
+        names.forEach(name -> types.add(ropeType(output, name, category, restyleGroup, renderer)));
         return types;
     }
 

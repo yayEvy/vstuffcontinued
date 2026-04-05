@@ -1,9 +1,0 @@
-{
-  "category": "vstuff:pride_styles",
-  "name": "Trangender",
-  "renderer": "vstuff:none",
-  "renderer_params": {
-    "texture": "vstuff:textures/rope/rope_trangender.png"
-  },
-  "restyle_group": "vstuff:none"
-}

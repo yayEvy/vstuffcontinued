@@ -1,9 +1,9 @@
 {
   "category": "vstuff:pride_styles",
-  "name": "Gay",
+  "name": "Transgender",
   "renderer": "vstuff:normal",
   "renderer_params": {
-    "texture": "vstuff:textures/rope/rope_gay.png"
+    "texture": "vstuff:textures/rope/rope_transgender.png"
   },
   "restyle_group": "vstuff:none"
 }

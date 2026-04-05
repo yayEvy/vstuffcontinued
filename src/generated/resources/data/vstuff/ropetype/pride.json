@@ -1,7 +1,7 @@
 {
   "category": "vstuff:pride_styles",
   "name": "Pride",
-  "renderer": "vstuff:none",
+  "renderer": "vstuff:normal",
   "renderer_params": {
     "texture": "vstuff:textures/rope/rope_pride.png"
   },
