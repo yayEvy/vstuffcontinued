@@ -5,6 +5,7 @@ import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.ForgeRegistries;
 import yay.evy.everest.vstuff.VStuff;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,8 +43,19 @@ public class RopeRestyleManager {
         return fromType;
     }
 
-    public static boolean canRetyle(RopeType fromType, Item item) {
-        return get(fromType.restyleGroup()).canRestyle(item);
+    public static boolean canRetype(RopeType fromType, Item item) {
+        RopeRestyle group = get(fromType.restyleGroup()); // if the group can restyle from that item, and that the new style is a different style
+        return group.canRestyle(item) && !(group.getTypeForItem(item).id().equals(fromType.id()));
+    }
+
+    public static boolean isValidRetyping(Item item) {
+        return validRetypingItems().contains(getItemLocation(item));
+    }
+
+    public static List<ResourceLocation> validRetypingItems() {
+        List<ResourceLocation> validItems = new ArrayList<>();
+        RESTYLES.values().forEach(ropeRestyle -> validItems.addAll(ropeRestyle.itemLocToTypeIdMap.keySet()));
+        return validItems;
     }
 
     public record RopeRestyle(ResourceLocation id, Map<ResourceLocation, ResourceLocation> itemLocToTypeIdMap) {

@@ -13,6 +13,7 @@ import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -31,6 +32,8 @@ import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import static yay.evy.everest.vstuff.internal.utility.RopeUtils.findTargetedLeadClient;
 
 @Mod.EventBusSubscriber(modid = VStuff.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ForgeEvents {
@@ -78,41 +81,34 @@ public class ForgeEvents {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public static void onPlayerRightClickItem(PlayerInteractEvent.RightClickItem event) {
-        if (event.getItemStack().getItem() instanceof BlockItem) return;
+    public static void onPlayerRightClickItem(PlayerInteractEvent.RightClickItem event) { // fired when right-clicking air
         handleRightClickEvent(event);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public static void onPlayerRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+    public static void onPlayerRightClickBlock(PlayerInteractEvent.RightClickBlock event) { // fired when right-clicking a block
         handleRightClickEvent(event);
     }
 
     private static void handleRightClickEvent(PlayerInteractEvent event) {
-        if ((event.getLevel() instanceof ClientLevel level)) {
-            if (RopeUtils.findTargetedLeadClient(level, event.getEntity()) != null) {
-                event.setCanceled(true);
-                event.setCancellationResult(InteractionResult.SUCCESS);
-            }
-        } else if ((event.getLevel() instanceof ServerLevel level)) {
-            if (event.getItemStack().is(VStuffItems.ROPE_CUTTER.get())) {
-                return;
-            }
-            ItemStack itemStack = event.getItemStack();
-            Player player = event.getEntity();
+        ItemStack itemStack = event.getItemStack();
+        if (RopeRestyleManager.isValidRetyping(itemStack.getItem())) {
+            if ((event.getLevel() instanceof ClientLevel level)) {
+                if (findTargetedLeadClient(level, event.getEntity()) != null) {
+                    event.setCanceled(true);
+                    event.setCancellationResult(InteractionResult.SUCCESS);
+                }
+            } else if ((event.getLevel() instanceof ServerLevel level)) {
+                Player player = event.getEntity();
+                ReworkedRope rope = RopeUtils.findRope(level, player);
+                if (rope == null) return;
 
-            ReworkedRope rope = RopeUtils.findTargetedLead(level, player);
-            if (rope == null) return;
-
-            if (!RopeRestyleManager.canRetyle(rope.type, itemStack.getItem())) {
-                return;
-            }
-
-            RopeType newType = RopeRestyleManager.retype(rope.type, itemStack.getItem());
-            if (!newType.equals(rope.type)) {
-                RopeFactory.retypeRope(level, rope.getRopeId(), newType.id());
-                event.setCanceled(true);
-                event.setCancellationResult(InteractionResult.SUCCESS);
+                if (RopeRestyleManager.canRetype(rope.type, itemStack.getItem())) {
+                    RopeType newType = RopeRestyleManager.retype(rope.type, itemStack.getItem());
+                    RopeFactory.retypeRope(level, rope.getRopeId(), newType.id());
+                    event.setCanceled(true);
+                    event.setCancellationResult(InteractionResult.SUCCESS);
+                }
             }
         }
     }

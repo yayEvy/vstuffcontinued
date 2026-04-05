@@ -25,7 +25,7 @@ public class RopeCutterItem extends Item {
         }
 
 
-        ReworkedRope rope = RopeUtils.findTargetedLead(serverLevel, player);
+        ReworkedRope rope = RopeUtils.findRope(serverLevel, player);
         if (rope == null) return InteractionResultHolder.pass(itemStack);
 
         try {

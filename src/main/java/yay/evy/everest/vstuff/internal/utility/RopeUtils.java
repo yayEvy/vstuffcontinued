@@ -114,7 +114,7 @@ public class RopeUtils {
         return minDistanceToRope;
     }
 
-    public static @Nullable ReworkedRope findTargetedLead(ServerLevel level, Player player) {
+    public static @Nullable ReworkedRope findRope(ServerLevel level, Player player) {
         Vec3 eyePos = player.getEyePosition();
         Vec3 lookVec = player.getViewVector(1.0f);
         double maxDistance = player.getBlockReach();
