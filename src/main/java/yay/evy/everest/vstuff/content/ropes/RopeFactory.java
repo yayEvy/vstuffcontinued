@@ -15,7 +15,7 @@ import yay.evy.everest.vstuff.internal.RopeTypeManager;
 import yay.evy.everest.vstuff.internal.RopeType;
 import yay.evy.everest.vstuff.internal.utility.*;
 
-public class RopeFactory {
+public class  RopeFactory {
 
     public record RopeResult(ReworkedRope rope, boolean valid, String message) {
         public static RopeResult withMessage(String message) {

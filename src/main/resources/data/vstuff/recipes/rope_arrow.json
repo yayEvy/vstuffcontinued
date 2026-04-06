@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "LLL",
+    "LIL",
+    "LLL"
+  ],
+  "key": {
+    "L": {
+      "item": "vstuff:rope"
+    },
+    "I": {
+      "item": "minecraft:arrow"
+    }
+  },
+  "result": {
+    "item": "vstuff:rope_arrow",
+    "count": 8
+  }
+}

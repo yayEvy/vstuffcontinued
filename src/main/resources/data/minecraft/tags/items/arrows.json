@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "vstuff:rope_arrow",
+    {
+      "id": "#minecraft:arrows", "required": false
+    }
+  ]
+}

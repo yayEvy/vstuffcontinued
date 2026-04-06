@@ -30,7 +30,7 @@
   "vstuff.message.chain_created": "Successfully created chain!",
   "vstuff.message.interdimensional_fail": "Cannot create rope across dimensions!",
   "vstuff.message.nonfullblock_fail": "Cannot create rope connected to a non-full block!",
-  "vstuff.rope.first": "First position selected.",
+  "vstuff.message.rope.first": "First position selected.",
   "vstuff.message.rope_break": "Rope broken!",
   "vstuff.message.chain_break": "Chain broken!",
   "vstuff.message.rope_thrower_not_set": "No block selected!",
@@ -75,6 +75,6 @@
 
   "vstuff.message.grabber_limit": "Ship is too heavy!",
 
-  "subtitles.vstuff.assemble": "Assembler Assembles Tragically"
+  "subtitles.vstuff.assemble": "Assembler Assembles Whimsically"
 
 }
