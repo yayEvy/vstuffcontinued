@@ -1,6 +1,6 @@
 {
   "category": "vstuff:dyed_styles",
-  "name": "ropetype.vstuff.green_dye",
+  "name": "Green",
   "renderer": "vstuff:solid_colour",
   "renderer_params": {
     "color": "#3D7B3F"

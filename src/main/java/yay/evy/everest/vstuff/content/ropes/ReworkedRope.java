@@ -5,8 +5,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import org.valkyrienskies.core.internal.joints.*;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.ropes.type.RopeType;
-import yay.evy.everest.vstuff.content.ropes.type.RopeTypeManager;
+import yay.evy.everest.vstuff.internal.RopeType;
+import yay.evy.everest.vstuff.internal.RopeTypeManager;
 import yay.evy.everest.vstuff.internal.utility.*;
 
 import javax.annotation.Nullable;

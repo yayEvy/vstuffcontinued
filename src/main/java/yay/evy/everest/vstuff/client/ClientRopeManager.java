@@ -17,11 +17,10 @@ import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.client.rope.IRopeRenderer;
-import yay.evy.everest.vstuff.client.rope.RopeRenderContext;
-import yay.evy.everest.vstuff.client.rope.RopeRendererTypes;
-import yay.evy.everest.vstuff.content.ropes.type.RopeType;
-import yay.evy.everest.vstuff.content.ropes.type.RopeTypeManager;
+import yay.evy.everest.vstuff.internal.rendering.IRopeRenderer;
+import yay.evy.everest.vstuff.internal.rendering.RopeRenderContext;
+import yay.evy.everest.vstuff.internal.RopeType;
+import yay.evy.everest.vstuff.internal.RopeTypeManager;
 import yay.evy.everest.vstuff.internal.utility.RopeRenderUtils;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
@@ -137,7 +136,8 @@ public class ClientRopeManager {
                         );
                         if (rendered) renderedAny = true;
                     } catch (Exception e) {
-                        VStuff.LOGGER.error("Error rendering rope {}: {}", entry.getKey(), e.getMessage());
+                        VStuff.LOGGER.error("Error occurred rendering rope {}: {}: {}", entry.getKey(), e.getClass(), e.getMessage());
+                        e.printStackTrace();
                     }
                 }
 

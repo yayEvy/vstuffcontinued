@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.infrastructure.data;
+package yay.evy.everest.vstuff.infrastructure.data.provider;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -94,8 +94,7 @@ public class RopeRestylingProvider implements DataProvider {
         Path path = generator.getPackOutput().getOutputFolder()
                 .resolve("data")
                 .resolve(VStuff.MOD_ID)
-                .resolve("ropestyle")
-                .resolve("restyle")
+                .resolve("roperestyle")
                 .resolve(fileName + ".json");
 
         return DataProvider.saveStable(output, json, path);

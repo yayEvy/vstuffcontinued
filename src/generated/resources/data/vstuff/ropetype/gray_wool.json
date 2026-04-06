@@ -1,6 +1,6 @@
 {
   "category": "vstuff:wool_styles",
-  "name": "ropetype.vstuff.gray_wool",
+  "name": "Gray Wool",
   "renderer": "vstuff:normal",
   "renderer_params": {
     "texture": "minecraft:textures/block/gray_wool.png"

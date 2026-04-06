@@ -1,6 +1,6 @@
 {
   "category": "vstuff:dyed_styles",
-  "name": "ropetype.vstuff.light_gray_dye",
+  "name": "Light Gray",
   "renderer": "vstuff:solid_colour",
   "renderer_params": {
     "color": "#9D9D97"

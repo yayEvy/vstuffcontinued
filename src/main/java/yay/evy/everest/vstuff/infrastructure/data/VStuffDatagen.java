@@ -8,9 +8,11 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.infrastructure.data.provider.RopeCategoryProvider;
+import yay.evy.everest.vstuff.infrastructure.data.provider.RopeLangProvider;
+import yay.evy.everest.vstuff.infrastructure.data.provider.RopeRestylingProvider;
+import yay.evy.everest.vstuff.infrastructure.data.provider.RopeTypeProvider;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -36,6 +38,7 @@ public class VStuffDatagen {
             BiConsumer<String, String> langConsumer = registrateLangProvider::add;
 
             provideDefaultLang("default", langConsumer);
+            RopeLangProvider.provideLang(generator, langConsumer);
         });
     }
 

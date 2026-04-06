@@ -170,8 +170,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         if (ropeId == null || rope == null) return;
 
         RopeFactory.removeRope(serverLevel, ropeId);
-
-        removeRope(ropeId, getBlockState(), serverLevel, getBlockPos());
     }
 
 

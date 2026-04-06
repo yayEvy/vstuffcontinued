@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.ropes.type;
+package yay.evy.everest.vstuff.internal;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;

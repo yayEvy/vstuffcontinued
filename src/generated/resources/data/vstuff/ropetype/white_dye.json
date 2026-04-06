@@ -1,6 +1,6 @@
 {
   "category": "vstuff:dyed_styles",
-  "name": "ropetype.vstuff.white_dye",
+  "name": "White",
   "renderer": "vstuff:solid_colour",
   "renderer_params": {
     "color": "#F9FFFE"

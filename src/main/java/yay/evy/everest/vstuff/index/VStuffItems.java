@@ -11,6 +11,7 @@ import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.ropes.PhysRopeItem;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRopeItem;
 import yay.evy.everest.vstuff.content.ropes.RopeCutterItem;
+import yay.evy.everest.vstuff.content.ropes.arrow.RopeArrowItem;
 import yay.evy.everest.vstuff.content.ships.assembly.ExpendableAssemblerItem;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.PhysGrabberItem;
 import yay.evy.everest.vstuff.content.ropes.editor.RopeEditorItem;
@@ -50,6 +51,14 @@ public class VStuffItems {
             )
             .defaultModel()
             .register();
+
+        public static final ItemEntry<RopeArrowItem> ROPE_ARROW =
+            REGISTRATE.item("rope_arrow", RopeArrowItem::new)
+                    .properties(p -> p
+                            .stacksTo(64)
+                    )
+                    .defaultModel()
+                    .register();
 
     public static final ItemEntry<RopeCutterItem> ROPE_CUTTER =
         REGISTRATE.item("rope_cutter", RopeCutterItem::new)

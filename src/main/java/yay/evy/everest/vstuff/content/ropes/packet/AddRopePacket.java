@@ -9,7 +9,7 @@ import net.minecraftforge.network.NetworkEvent;
 import org.joml.Vector3d;
 import yay.evy.everest.vstuff.client.ClientRopeManager;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
-import yay.evy.everest.vstuff.content.ropes.type.RopeTypeManager;
+import yay.evy.everest.vstuff.internal.RopeTypeManager;
 
 public class AddRopePacket extends SimplePacketBase {
 

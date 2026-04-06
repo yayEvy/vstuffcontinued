@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.infrastructure.data;
+package yay.evy.everest.vstuff.infrastructure.data.listener;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -19,7 +19,7 @@ import static yay.evy.everest.vstuff.infrastructure.data.DatagenUtils.parseLoc;
 public class RopeRestyleReloadListener extends SimpleJsonResourceReloadListener {
 
     public RopeRestyleReloadListener() {
-        super(new Gson(), "ropestyle/restyle");
+        super(new Gson(), "roperestyle");
     }
 
     @Override

@@ -1,6 +1,6 @@
 {
   "category": "vstuff:pride_styles",
-  "name": "ropetype.vstuff.asexual",
+  "name": "Asexual",
   "renderer": "vstuff:normal",
   "renderer_params": {
     "texture": "vstuff:textures/rope/rope_asexual.png"

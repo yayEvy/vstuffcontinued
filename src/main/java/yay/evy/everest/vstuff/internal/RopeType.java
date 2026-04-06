@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.ropes.type;
+package yay.evy.everest.vstuff.internal;
 
 import com.google.gson.JsonObject;
 import net.minecraft.nbt.CompoundTag;

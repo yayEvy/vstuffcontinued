@@ -1,6 +1,6 @@
 {
   "category": "vstuff:log_styles",
-  "name": "ropetype.vstuff.jungle_log",
+  "name": "Jungle",
   "renderer": "vstuff:normal",
   "renderer_params": {
     "texture": "minecraft:textures/block/jungle_log.png"

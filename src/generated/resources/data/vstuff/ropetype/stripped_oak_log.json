@@ -1,6 +1,6 @@
 {
   "category": "vstuff:log_styles",
-  "name": "ropetype.vstuff.stripped_oak_log",
+  "name": "Stripped Oak",
   "renderer": "vstuff:normal",
   "renderer_params": {
     "texture": "minecraft:textures/block/stripped_oak_log.png"

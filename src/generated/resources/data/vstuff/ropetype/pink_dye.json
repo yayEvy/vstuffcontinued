@@ -1,6 +1,6 @@
 {
   "category": "vstuff:dyed_styles",
-  "name": "ropetype.vstuff.pink_dye",
+  "name": "Pink",
   "renderer": "vstuff:solid_colour",
   "renderer_params": {
     "color": "#F38BAA"

@@ -1,6 +1,6 @@
 {
   "category": "vstuff:pride_styles",
-  "name": "ropetype.vstuff.lesbian",
+  "name": "Lesbian",
   "renderer": "vstuff:normal",
   "renderer_params": {
     "texture": "vstuff:textures/rope/rope_lesbian.png"

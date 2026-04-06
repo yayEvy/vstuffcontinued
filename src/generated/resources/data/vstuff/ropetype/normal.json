@@ -1,6 +1,6 @@
 {
   "category": "vstuff:basic_styles",
-  "name": "ropetype.vstuff.normal",
+  "name": "Normal",
   "renderer": "vstuff:normal",
   "renderer_params": {
     "texture": "vstuff:textures/rope/rope_normal.png"

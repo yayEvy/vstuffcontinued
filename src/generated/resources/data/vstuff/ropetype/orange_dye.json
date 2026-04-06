@@ -1,6 +1,6 @@
 {
   "category": "vstuff:dyed_styles",
-  "name": "ropetype.vstuff.orange_dye",
+  "name": "Orange",
   "renderer": "vstuff:solid_colour",
   "renderer_params": {
     "color": "#FF9F33"

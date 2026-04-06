@@ -4,7 +4,7 @@ issueTrackerURL = "${issue_tracker}"
 license = "${mod_license}"
 
 [[mods]]
-modId = "${mod_id}"
+modId = "vstuff"
 version = "${mod_version}"
 displayName = "${mod_name}"
 displayURL = "${homepage}"
@@ -12,28 +12,28 @@ authors = "${mod_authors}"
 description = '''${mod_description}'''
 logoFile = "icon.png"
 
-[[dependencies.${mod_id}]]
+[[dependencies.vstuff]]
     modId = "forge"
     mandatory = true
     versionRange = "${forge_version_range}"
     ordering = "NONE"
     side = "BOTH"
 
-[[dependencies.${mod_id}]]
+[[dependencies.vstuff]]
     modId="minecraft"
     mandatory=true
     versionRange="[${minecraft_version},)"
     ordering="NONE"
     side="BOTH"
 
-[[dependencies.${mod_id}]]
+[[dependencies.vstuff]]
     modId="valkyrienskies"
     mandatory=true
     versionRange="[${vs2_min_version},)"
     ordering="AFTER"
     side="BOTH"
 
-[[dependencies.${mod_id}]]
+[[dependencies.vstuff]]
     modId="create"
     mandatory=true
     versionRange="[${create_major_version},)"

@@ -1,6 +1,6 @@
 {
   "category": "vstuff:dyed_styles",
-  "name": "ropetype.vstuff.light_blue_dye",
+  "name": "Light Blue",
   "renderer": "vstuff:solid_colour",
   "renderer_params": {
     "color": "#3ABEC7"

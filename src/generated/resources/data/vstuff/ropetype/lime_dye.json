@@ -1,6 +1,6 @@
 {
   "category": "vstuff:dyed_styles",
-  "name": "ropetype.vstuff.lime_dye",
+  "name": "Lime",
   "renderer": "vstuff:solid_colour",
   "renderer_params": {
     "color": "#7FFF00"

@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.infrastructure.data;
+package yay.evy.everest.vstuff.infrastructure.data.listener;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -8,8 +8,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
-import yay.evy.everest.vstuff.content.ropes.type.RopeCategory;
-import yay.evy.everest.vstuff.content.ropes.type.RopeTypeManager;
+import yay.evy.everest.vstuff.internal.RopeCategory;
+import yay.evy.everest.vstuff.internal.RopeType;
+import yay.evy.everest.vstuff.internal.RopeTypeManager;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
@@ -27,7 +28,7 @@ public class RopeCategoryReloadListener extends SimpleJsonResourceReloadListener
             ResourceLocation id = entry.getKey();
             JsonObject json = entry.getValue().getAsJsonObject();
 
-            Component name = Component.translatable(json.get("name").getAsString());
+            Component name = Component.translatable("ropecategory." + id.getNamespace() + "." + id.getPath());
             int order = json.get("order").getAsInt();
 
             RopeTypeManager.registerCategory(

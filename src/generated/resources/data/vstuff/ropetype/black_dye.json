@@ -1,6 +1,6 @@
 {
   "category": "vstuff:dyed_styles",
-  "name": "ropetype.vstuff.black_dye",
+  "name": "Black",
   "renderer": "vstuff:solid_colour",
   "renderer_params": {
     "color": "#1D1D21"

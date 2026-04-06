@@ -1,6 +1,6 @@
 {
   "category": "vstuff:log_styles",
-  "name": "ropetype.vstuff.acacia_log",
+  "name": "Acacia",
   "renderer": "vstuff:normal",
   "renderer_params": {
     "texture": "minecraft:textures/block/acacia_log.png"

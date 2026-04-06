@@ -1,6 +1,6 @@
 {
   "category": "vstuff:log_styles",
-  "name": "ropetype.vstuff.dark_oak_log",
+  "name": "Dark Oak",
   "renderer": "vstuff:normal",
   "renderer_params": {
     "texture": "minecraft:textures/block/dark_oak_log.png"

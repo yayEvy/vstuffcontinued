@@ -23,7 +23,7 @@ public class RopeEditorItem extends Item {
         ItemStack stack = player.getItemInHand(usedHand);
         if (!(level instanceof ServerLevel serverLevel)) return InteractionResultHolder.pass(stack);
 
-        ReworkedRope rope = RopeUtils.findTargetedLead(serverLevel, player);
+        ReworkedRope rope = RopeUtils.findRope(serverLevel, player);
 
         if (rope == null) {
             player.displayClientMessage(VStuff.translate("rope.editor_not_found").withStyle(ChatFormatting.RED), true);

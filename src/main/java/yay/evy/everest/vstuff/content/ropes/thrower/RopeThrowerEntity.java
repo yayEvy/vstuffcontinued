@@ -86,7 +86,7 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
             return;
         }
 
-//        ReworkedRope ropeResult = ReworkedRope.create(serverLevel, startShipId, secondShipId, startPos, hitPos, getOwner() instanceof Player p ? p : null, false);
+//       ReworkedRope ropeResult = ReworkedRope.create(serverLevel, startShipId, secondShipId, startPos, hitPos, getOwner() instanceof Player p ? p : null, false);
 //
 //        if (ropeResult != null) {
 //

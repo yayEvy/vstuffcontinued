@@ -1,6 +1,6 @@
 {
   "category": "vstuff:log_styles",
-  "name": "ropetype.vstuff.stripped_jungle_log",
+  "name": "Stripped Jungle",
   "renderer": "vstuff:normal",
   "renderer_params": {
     "texture": "minecraft:textures/block/stripped_jungle_log.png"

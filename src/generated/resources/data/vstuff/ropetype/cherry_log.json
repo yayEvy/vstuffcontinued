@@ -1,6 +1,6 @@
 {
   "category": "vstuff:log_styles",
-  "name": "ropetype.vstuff.cherry_log",
+  "name": "Cherry",
   "renderer": "vstuff:normal",
   "renderer_params": {
     "texture": "minecraft:textures/block/cherry_log.png"

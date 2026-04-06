@@ -1,6 +1,6 @@
 {
   "category": "vstuff:wool_styles",
-  "name": "ropetype.vstuff.light_blue_wool",
+  "name": "Light Blue Wool",
   "renderer": "vstuff:normal",
   "renderer_params": {
     "texture": "minecraft:textures/block/light_blue_wool.png"

@@ -1,6 +1,6 @@
 {
   "category": "vstuff:pride_styles",
-  "name": "ropetype.vstuff.bisexual",
+  "name": "Bisexual",
   "renderer": "vstuff:normal",
   "renderer_params": {
     "texture": "vstuff:textures/rope/rope_bisexual.png"

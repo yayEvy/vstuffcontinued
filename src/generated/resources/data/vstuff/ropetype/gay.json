@@ -1,6 +1,6 @@
 {
   "category": "vstuff:pride_styles",
-  "name": "ropetype.vstuff.gay",
+  "name": "Gay",
   "renderer": "vstuff:normal",
   "renderer_params": {
     "texture": "vstuff:textures/rope/rope_gay.png"
