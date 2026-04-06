@@ -78,7 +78,7 @@ public class VStuffCreativeModeTabs {
                 return false;
             }));
             items.addAll(collectItems(VSTUFF_MAIN, (item) -> {
-                return false;
+                return item == VStuffItems.PHYS_ROPE.get();
             }));
 
             outputAll(output, items);

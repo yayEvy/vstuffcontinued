@@ -3,6 +3,8 @@ package yay.evy.everest.vstuff.index;
 import com.simibubi.create.foundation.data.AssetLookup;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.ItemEntry;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import yay.evy.everest.vstuff.VStuff;
@@ -38,6 +40,7 @@ public class VStuffItems {
                     )
                     .defaultModel()
                     .register();
+
 
 
     public static final ItemEntry<RopeThrowerItem> ROPE_THROWER =

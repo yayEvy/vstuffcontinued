@@ -152,13 +152,6 @@ public class ForgeEvents {
     public static void onWorldSave(LevelEvent.Save event) {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
         if (!level.equals(level.getServer().overworld())) return;
-
-        PhysRopeManager manager = PhysRopeManager.get(level);
-        for (PhysRopeConstraint c : manager.getPhysRopes().values()) {
-            if (c.hasSegments()) {
-                c.clearJointIds(level);
-                c.restoreJoints(level, c.getSegments(), c.getSegmentLength());
-            }
-        }
+        PhysRopeManager.get(level).setDirty();
     }
 }

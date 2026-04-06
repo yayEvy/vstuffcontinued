@@ -247,15 +247,16 @@ public class ClientRopeManager {
 
         if (prev != null && prev.size() == positions.size() && lastTime != null) {
             double dt = (now - lastTime) / 1000.0;
-            if (dt > 0) {
+            double clampedDt = Math.min(dt, 0.1);
+            if (clampedDt > 0) {
                 List<Vector3d> velocities = new ArrayList<>(positions.size());
                 for (int i = 0; i < positions.size(); i++) {
                     Vector3d a = prev.get(i);
                     Vector3d b = positions.get(i);
                     velocities.add(new Vector3d(
-                            (b.x - a.x) / dt,
-                            (b.y - a.y) / dt,
-                            (b.z - a.z) / dt
+                            (b.x - a.x) / clampedDt,
+                            (b.y - a.y) / clampedDt,
+                            (b.z - a.z) / clampedDt
                     ));
                 }
                 physRopeSegmentVelocities.put(ropeId, velocities);
@@ -279,7 +280,8 @@ public class ClientRopeManager {
 
         long now = System.currentTimeMillis();
         double timeSinceUpdate = lastTime != null ? (now - lastTime) / 1000.0 : 0;
-        double extrapolation = Math.min(timeSinceUpdate, 0.1);
+
+        if (timeSinceUpdate > 0.1) return current;
 
         if (velocities == null || velocities.size() != current.size()) return current;
 
@@ -287,12 +289,11 @@ public class ClientRopeManager {
         for (int i = 0; i < current.size(); i++) {
             Vector3d base = new Vector3d(current.get(i));
             Vector3d vel = velocities.get(i);
-            base.add(vel.x * extrapolation, vel.y * extrapolation, vel.z * extrapolation);
+            base.add(vel.x * timeSinceUpdate, vel.y * timeSinceUpdate, vel.z * timeSinceUpdate);
             result.add(base);
         }
         return result;
     }
-
     public static void clearNormalRopeConstraints() {
         clientConstraints.keySet().removeIf(id -> id < PHYS_ROPE_ID_START);
     }
