@@ -18,7 +18,7 @@ public class ClearAllRopesPacket extends SimplePacketBase {
 
     @Override
     public boolean handle(NetworkEvent.Context context) {
-        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ClientRopeManager::clearAllClientConstraints));
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ClientRopeManager::clearNormalRopeConstraints));
         return true;
     }
 }

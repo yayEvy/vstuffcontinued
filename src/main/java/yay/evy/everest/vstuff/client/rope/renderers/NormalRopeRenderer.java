@@ -46,29 +46,47 @@ public class NormalRopeRenderer implements IRopeRenderer {
         Vector3d prevUp = new Vector3d();
         Vector3d prevRight = right(prevOverallDirection, prevUp);
 
-
-
         if (prevRight.dot(right) < 0) right.mul(-1);
         right.lerp(prevRight, 1.0f - ORIENTATION_SMOOTH_FACTOR).normalize();
         up = new Vector3d();
         right.cross(overallDirection, up).normalize();
 
+        Vector3d[] tangents = new Vector3d[ROPE_CURVE_SEGMENTS + 1];
+        for (int i = 0; i <= ROPE_CURVE_SEGMENTS; i++) {
+            if (i == 0) {
+                tangents[i] = new Vector3d(curvePoints[1]).sub(curvePoints[0]).normalize();
+            } else if (i == ROPE_CURVE_SEGMENTS) {
+                tangents[i] = new Vector3d(curvePoints[ROPE_CURVE_SEGMENTS]).sub(curvePoints[ROPE_CURVE_SEGMENTS - 1]).normalize();
+            } else {
+                tangents[i] = new Vector3d(curvePoints[i + 1]).sub(curvePoints[i - 1]).normalize();
+            }
+        }
 
-        Vector3d[][] strips = new Vector3d[4][ROPE_CURVE_SEGMENTS + 1]; // top right, top left, bottom right, bottom left
 
-        double halfWidth = getRopeWidth() * 0.6f; // ah yes half
-        Vector3d rightScaled = new Vector3d(right).mul(halfWidth);
-        Vector3d upScaled = new Vector3d(up).mul(halfWidth);
+        Vector3d[][] strips = new Vector3d[4][ROPE_CURVE_SEGMENTS + 1]; // tdfsfsdsfgdsfgfde rsAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+        double halfWidth = getRopeWidth() * 0.6f;
+
+        Vector3d refRight = new Vector3d(right);
 
         for (int i = 0; i <= ROPE_CURVE_SEGMENTS; i++) {
-            Vector3d center = curvePoints[i];
+            Vector3d tangent = tangents[i];
+            Vector3d segUp = new Vector3d();
+            Vector3d segRight = right(tangent, segUp);
 
+            if (segRight.dot(refRight) < 0) segRight.mul(-1);
+            refRight = new Vector3d(segRight);
+            segRight.cross(tangent, segUp).normalize();
+
+            Vector3d rightScaled = new Vector3d(segRight).mul(halfWidth);
+            Vector3d upScaled = new Vector3d(segUp).mul(halfWidth);
+
+            Vector3d center = curvePoints[i];
             strips[0][i] = v3dAddAdd(center, rightScaled, upScaled);
             strips[1][i] = v3dSubAdd(center, rightScaled, upScaled);
             strips[2][i] = v3dSubAdd(center, upScaled, rightScaled);
             strips[3][i] = v3dSubSub(center, rightScaled, upScaled);
         }
-
         renderRopeFaceWithGapFilling(vertexConsumer, matrix, strips[1], strips[0], up, curvePoints, lightValues);
         renderRopeFaceWithGapFilling(vertexConsumer, matrix, strips[0], strips[2], right, curvePoints, lightValues);
         renderRopeFaceWithGapFilling(vertexConsumer, matrix, strips[3], strips[1], neg(right), curvePoints, lightValues);

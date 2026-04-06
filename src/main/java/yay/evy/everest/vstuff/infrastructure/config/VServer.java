@@ -17,6 +17,10 @@ public class VServer extends ConfigBase {
     public final ConfigFloat ropeMaxLength = f(32, 8, 256, "ropeMaxLength", Comments.inBlocks, Comments.ropeMaxLength);
     public final ConfigBool ropeSounds = b(true, "ropeSounds", Comments.ropeSounds);
 
+    public final ConfigInt physRopeSegments = i(8, 2, 64, "physRopeSegments", Comments.physRopeSegments);
+    public final ConfigFloat physRopeCapsuleRadius = f(0.1f, 0.01f, 1.0f, "physRopeCapsuleRadius", Comments.inBlocks, Comments.physRopeCapsuleRadius);
+    public final ConfigFloat physRopeMassPerSegment = f(10.0f, 0.1f, 10000.0f, "physRopeMassPerSegment", Comments.physRopeMassPerSegment);
+
     public final ConfigGroup thruster = group(1, "thruster", Comments.thruster);
     public final ConfigFloat thrustMultiplier = f(1, 0, "thrusterMultiplier", Comments.thrusterMultiplier);
     public final ConfigInt thrusterMaxSpeed = i(10, 0, "thrusterMaxSpeed", "[in Blocks per second]", Comments.thrusterMaxSpeed);
@@ -46,6 +50,10 @@ public class VServer extends ConfigBase {
         static String ropes = "Values for ropes";
         static String ropeMaxLength = "The maximum length of a rope";
         static String ropeSounds = "Whether ropes make sounds when created";
+
+        static String physRopeSegments = "Number of physics segments in a phys rope";
+        static String physRopeCapsuleRadius = "Radius of each phys rope capsule collider";
+        static String physRopeMassPerSegment = "Mass of each phys rope segment";
 
         static String thruster = "Values for the Mechanical Thruster";
         static String thrusterMultiplier = "The multiplier for the amount of thrust produced";

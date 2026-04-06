@@ -31,6 +31,7 @@ public enum VStuffPackets {
     ROPE_LENGTH_UPDATE(UpdateRopeLengthPacket.class, UpdateRopeLengthPacket::new, PLAY_TO_CLIENT),
     ROPE_STYLE_UPDATE(UpdateRopeStylePacket.class, UpdateRopeStylePacket::new, PLAY_TO_CLIENT),
     ROPE_CLEAR_ALL(ClearAllRopesPacket.class, ClearAllRopesPacket::new, PLAY_TO_CLIENT),
+    PHYS_ROPE_SEGMENTS(PhysRopeSegmentsPacket.class, PhysRopeSegmentsPacket::new, PLAY_TO_CLIENT),
 
     // client -> server packets
     STYLE_SELECT(StyleSelectPacket.class, StyleSelectPacket::new, PLAY_TO_SERVER),
@@ -45,7 +46,7 @@ public enum VStuffPackets {
     }
 
     public static final ResourceLocation CHANNEL_NAME = VStuff.asResource("main");
-    public static final String VERSION_STR = "2";
+    public static final String VERSION_STR = "3";
     private static SimpleChannel channel;
 
     private PacketType<?> packetType;
