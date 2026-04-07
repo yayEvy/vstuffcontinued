@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 public class RopeLangProvider {
 
     public static void provideLang(DataGenerator generator, BiConsumer<String, String> consumer) {
-        provideLang(generator, consumer, "ropetype", "ropetype");
+        provideLang(generator, consumer, "ropestyle", "ropestyle");
         provideLang(generator, consumer, "ropecategory", "ropecategory");
     }
 

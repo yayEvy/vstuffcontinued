@@ -12,7 +12,7 @@ import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.infrastructure.data.provider.RopeCategoryProvider;
 import yay.evy.everest.vstuff.infrastructure.data.provider.RopeLangProvider;
 import yay.evy.everest.vstuff.infrastructure.data.provider.RopeRestylingProvider;
-import yay.evy.everest.vstuff.infrastructure.data.provider.RopeTypeProvider;
+import yay.evy.everest.vstuff.infrastructure.data.provider.RopeStyleProvider;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -25,12 +25,12 @@ public class VStuffDatagen {
         PackOutput output = generator.getPackOutput();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 
-        generator.addProvider(event.includeServer(), new RopeTypeProvider(generator));
+        generator.addProvider(event.includeServer(), new RopeStyleProvider(generator));
         generator.addProvider(event.includeServer(), new RopeCategoryProvider(generator));
         generator.addProvider(event.includeServer(), new RopeRestylingProvider(generator));
         generator.addProvider(event.includeServer(), new VStuffWorldGenProvider(output, lookupProvider));
 
-        gatherAllLang(generator);
+        //gatherAllLang(generator);
     }
 
     private static void gatherAllLang(DataGenerator generator) {

@@ -11,9 +11,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -23,11 +21,9 @@ import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 import yay.evy.everest.vstuff.content.ropes.RopeFactory;
 import yay.evy.everest.vstuff.index.VStuffItems;
-import yay.evy.everest.vstuff.index.VStuffPackets;
-import yay.evy.everest.vstuff.internal.RopeType;
+import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 
 public class RopeArrowEntity extends AbstractArrow {
 
@@ -76,7 +72,7 @@ public class RopeArrowEntity extends AbstractArrow {
             Long secondShipId = getShipIdAtPos(serverLevel, secondPos);
 
             RopeFactory.createNewRope(serverLevel,firstShipId,secondShipId,firstPos,secondPos,
-                    RopeType.getOrDefaultTypeId(itemStack.getOrCreateTag()), player);
+                    RopeStyle.getOrDefaultStyleId(itemStack.getOrCreateTag()), player);
 
             System.out.println("FIRST: " + firstPos);
             System.out.println("SECOND: " + secondPos);

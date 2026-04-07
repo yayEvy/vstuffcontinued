@@ -8,7 +8,8 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.internal.RopeRestyleManager;
+import yay.evy.everest.vstuff.internal.styling.RopeRestyleManager;
+import yay.evy.everest.vstuff.internal.styling.data.RopeRestyle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +62,7 @@ public class RopeRestyleReloadListener extends SimpleJsonResourceReloadListener 
 
                 ResourceLocation result = parseLoc(json.get("result"));
 
-                RopeRestyleManager.register(new RopeRestyleManager.RopeRestyle(inputItems, fromCategory, fromTypes, result));
+                RopeRestyleManager.register(new RopeRestyle(inputItems, fromCategory, fromTypes, result));
             } catch (Exception e) {
                 VStuff.LOGGER.error("Failed to load restyle '{}': {}", id, e.getMessage());
             }

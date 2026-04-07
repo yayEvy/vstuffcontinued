@@ -11,8 +11,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.PacketDistributor;
 import yay.evy.everest.vstuff.content.ropes.packet.UpdateRopeStylePacket;
 import yay.evy.everest.vstuff.index.VStuffPackets;
-import yay.evy.everest.vstuff.internal.RopeTypeManager;
-import yay.evy.everest.vstuff.internal.RopeType;
+import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
+import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 import yay.evy.everest.vstuff.internal.utility.*;
 
 public class  RopeFactory {
@@ -48,12 +48,12 @@ public class  RopeFactory {
                 ship1,
                 blockPos0,
                 blockPos1,
-                RopeType.getOrDefaultTypeId(ropeItem.getOrCreateTag()),
+                RopeStyle.getOrDefaultStyleId(ropeItem.getOrCreateTag()),
                 player
         ));
     }
 
-    public static ReworkedRope createNewRope(ServerLevel level, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1, ResourceLocation type, Player player) {
+    public static ReworkedRope createNewRope(ServerLevel level, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1, ResourceLocation style, Player player) {
         Pair<RopePosData, RopePosData> posDataPair = RopePosData.create(level, ship0, ship1, blockPos0, blockPos1);
         RopePosData posData0 = posDataPair.component1();
         RopePosData posData1 = posDataPair.component2();
@@ -65,7 +65,7 @@ public class  RopeFactory {
         // double compliance = 1e-12 / Math.max(Math.min(mass0, mass1), 100.0) * (posData0.isWorld() || posData1.isWorld() ? 0.05 : 1); maybe not needed idk
         float maxForce = 5e13f * Math.min(Math.max(mass0, mass1) / Math.min(mass0, mass1), 20.0f) * (posData0.isWorld() || posData1.isWorld() ? 10f : 1f);
 
-        ReworkedRope rope = new ReworkedRope(posData0, posData1, JointValues.withDefault(maxForce, maxForce, length), type);
+        ReworkedRope rope = new ReworkedRope(posData0, posData1, JointValues.withDefault(maxForce, maxForce, length), style);
 
         if (!rope.hasJoint) {
             RopeManager.get(level).addRope(rope);
@@ -98,11 +98,11 @@ public class  RopeFactory {
         ReworkedRope rope = RopeManager.get(serverLevel).getRope(ropeId);
         if (rope == null) return;
 
-        rope.type = RopeTypeManager.get(newTypeId);
+        rope.style = RopeStyleManager.get(newTypeId);
 
         //NetworkHandler.sendRopeUpdate(ropeId, rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.style.id());
 
-        VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new UpdateRopeStylePacket(ropeId, rope.type.id()));
+        VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new UpdateRopeStylePacket(ropeId, rope.style.id()));
     }
 
     public static CompoundTag ropeToTag(ReworkedRope rope) {
@@ -113,7 +113,7 @@ public class  RopeFactory {
         ropeTag.put("posData0", TagUtils.writePosData(rope.posData0));
         ropeTag.put("posData1", TagUtils.writePosData(rope.posData1));
         ropeTag.put("jointValues", TagUtils.writeJointValues(rope.jointValues));
-        ropeTag.put("type", TagUtils.writeResourceLocation(rope.type.id()));
+        ropeTag.put("style", TagUtils.writeResourceLocation(rope.style.id()));
 
         return ropeTag;
     }
@@ -123,7 +123,7 @@ public class  RopeFactory {
                 TagUtils.readPosData(ropeTag.getCompound("posData0")),
                 TagUtils.readPosData(ropeTag.getCompound("posData1")),
                 TagUtils.readJointValues(ropeTag.getCompound("jointValues")),
-                TagUtils.readResourceLocation(ropeTag.getCompound("type"))
+                TagUtils.readResourceLocation(ropeTag.getCompound("style"))
         ).setRopeId(ropeTag.getInt("ropeId"));
 
         if (ropeTag.getInt("jointId") != -1) {

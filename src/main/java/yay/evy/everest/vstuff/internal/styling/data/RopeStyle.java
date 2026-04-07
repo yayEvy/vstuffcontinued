@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.internal;
+package yay.evy.everest.vstuff.internal.styling.data;
 
 import com.google.gson.JsonObject;
 import net.minecraft.nbt.CompoundTag;
@@ -9,34 +9,35 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import yay.evy.everest.vstuff.index.VStuffItems;
+import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.utility.EntityUtils;
 import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
-public record RopeType(
+public record RopeStyle(
         ResourceLocation id,
         Component name,
         ResourceLocation category,
         ResourceLocation rendererTypeId,
         JsonObject rendererParams      // parsed by the renderer on client
 ) {
-    public static ResourceLocation getOrDefaultTypeId(CompoundTag ropeTag) {
-        if (!ropeTag.contains("type", Tag.TAG_COMPOUND)) return RopeTypeManager.FALLBACK_ID;
-        return TagUtils.readResourceLocation(ropeTag.getCompound("type"));
+    public static ResourceLocation getOrDefaultStyleId(CompoundTag ropeTag) {
+        if (!ropeTag.contains("style", Tag.TAG_COMPOUND)) return RopeStyleManager.FALLBACK_ID;
+        return TagUtils.readResourceLocation(ropeTag.getCompound("style"));
     }
 
-    public static RopeType getOrDefault(CompoundTag tag) {
-        return RopeTypeManager.get(getOrDefaultTypeId(tag));
+    public static RopeStyle getOrDefault(CompoundTag tag) {
+        return RopeStyleManager.get(getOrDefaultStyleId(tag));
     }
 
-    public static void set(Player player, ResourceLocation type) {
+    public static void set(Player player, ResourceLocation style) {
         InteractionHand hand = EntityUtils.holdingInHand(player, (s) -> VStuffItems.ROPE.isIn(s) || VStuffItems.ROPE_THROWER.isIn(s));
         if (hand == null) return;
-        set(player.getItemInHand(hand), type);
+        set(player.getItemInHand(hand), style);
     }
 
-    public static void set(ItemStack stack, ResourceLocation type) {
+    public static void set(ItemStack stack, ResourceLocation style) {
         if (stack.isEmpty()) return;
         CompoundTag tag = stack.getOrCreateTag();
-        tag.put("type", TagUtils.writeResourceLocation(type));
+        tag.put("style", TagUtils.writeResourceLocation(style));
     }
 }

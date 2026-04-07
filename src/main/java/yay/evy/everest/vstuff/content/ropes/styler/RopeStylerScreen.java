@@ -8,9 +8,9 @@ import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.content.ropes.packet.StyleSelectPacket;
 import yay.evy.everest.vstuff.internal.rendering.RopeRendererType;
 import yay.evy.everest.vstuff.client.RopeRendererTypes;
-import yay.evy.everest.vstuff.internal.RopeCategory;
-import yay.evy.everest.vstuff.internal.RopeType;
-import yay.evy.everest.vstuff.internal.RopeTypeManager;
+import yay.evy.everest.vstuff.internal.styling.data.RopeCategory;
+import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
+import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
 import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.internal.utility.ClientTextUtils;
 import yay.evy.everest.vstuff.index.VStuffGuiTextures;
@@ -43,11 +43,11 @@ public class RopeStylerScreen extends AbstractSimiScreen {
 
     private int categoryIndex = 0;
 
-    RopeType[] displayedTypes = new RopeType[6];
+    RopeStyle[] displayedTypes = new RopeStyle[6];
 
     RopeTypeButton[] styleButtons = new RopeTypeButton[6];
 
-    RopeType selectedType;
+    RopeStyle selectedType;
 
     private float scrollOffs;
 
@@ -61,7 +61,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
         super.init();
         clearWidgets();
 
-        List<RopeCategory> categories = RopeTypeManager.buildSortedCategories();
+        List<RopeCategory> categories = RopeStyleManager.buildSortedCategories();
         List<Component> categoryComponentList = categories.stream().map(RopeCategory::name).toList();
 
         int x = guiLeft;
@@ -149,7 +149,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
         barTexture.render(guiGraphics, x + 11, y + scrollBarPos);
 
         for (int i = 0; i < 6; i++) {
-            RopeType style = displayedTypes[i];
+            RopeStyle style = displayedTypes[i];
             if (style != null) {
                     renderIcon(guiGraphics, ms, style, x + 20, y + 42 + (i * 18));
                 Component styleName = ClientTextUtils.getComponentWithWidthCutoff(style.name(), 114);
@@ -165,7 +165,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
         }
     }
 
-    private void renderIcon(GuiGraphics guiGraphics, PoseStack ms, RopeType type, int x, int y) {
+    private void renderIcon(GuiGraphics guiGraphics, PoseStack ms, RopeStyle type, int x, int y) {
         RopeRendererType rendererType = RopeRendererTypes.get(type.rendererTypeId());
         if (rendererType == null) return;
 
@@ -183,7 +183,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
     }
 
     private void setupList(RopeCategory categoryEntry, int offset) {
-        List<RopeType> styles = categoryEntry.types();
+        List<RopeStyle> styles = categoryEntry.types();
 
         for (int i = 0; i < 6; i++) {
             if (i + offset < styles.size()) {
@@ -279,7 +279,7 @@ public class RopeStylerScreen extends AbstractSimiScreen {
     private void scrollTo(float pos) {
         if (selectedCategory == null) return;
 
-        List<RopeType> styles = selectedCategory.types();
+        List<RopeStyle> styles = selectedCategory.types();
         float listSize = styles.size() - 6;
         int index = (int) ((double) (pos * listSize) + 0.5);
 

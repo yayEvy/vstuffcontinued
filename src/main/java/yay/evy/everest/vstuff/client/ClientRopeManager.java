@@ -19,8 +19,8 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.internal.rendering.IRopeRenderer;
 import yay.evy.everest.vstuff.internal.rendering.RopeRenderContext;
-import yay.evy.everest.vstuff.internal.RopeType;
-import yay.evy.everest.vstuff.internal.RopeTypeManager;
+import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
+import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.utility.RopeRenderUtils;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
@@ -31,15 +31,15 @@ public class ClientRopeManager {
     private static final Map<Integer, ClientRopeData> clientConstraints = new HashMap<>();
     private static final Map<Integer, Pair<Vector3d,Vector3d>> previousStartRelativeAndEndRelativeVectors = new HashMap<>();
 
-    public record ClientRopeData(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, RopeType type) {
+    public record ClientRopeData(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, RopeStyle style) {
 
-            public ClientRopeData(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, RopeType type) {
+            public ClientRopeData(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, RopeStyle style) {
                 this.ship0 = ship0;
                 this.ship1 = ship1;
                 this.localPos0 = new Vector3d(localPos0);
                 this.localPos1 = new Vector3d(localPos1);
                 this.maxLength = maxLength;
-                this.type = type;
+                this.style = style;
             }
 
         public boolean canRender(Level level) {
@@ -61,11 +61,11 @@ public class ClientRopeManager {
         }
 
         public ClientRopeData withLength(double newLength) {
-            return new ClientRopeData(ship0, ship1, localPos0, localPos1, newLength, type);
+            return new ClientRopeData(ship0, ship1, localPos0, localPos1, newLength, style);
         }
 
-        public ClientRopeData withStyle(RopeType newType) {
-            return new ClientRopeData(ship0, ship1, localPos0, localPos1, maxLength, newType);
+        public ClientRopeData withStyle(RopeStyle newStyle) {
+            return new ClientRopeData(ship0, ship1, localPos0, localPos1, maxLength, newStyle);
         }
 
     }
@@ -74,13 +74,13 @@ public class ClientRopeManager {
         clientConstraints.computeIfPresent(ropeId, (k, ropeData) -> ropeData.withLength(length));
     }
 
-    public static void updateClientRopeStyle(Integer ropeId, RopeType type) {
-        clientConstraints.computeIfPresent(ropeId, (k, ropeData) -> ropeData.withStyle(type));
+    public static void updateClientRopeStyle(Integer ropeId, RopeStyle style) {
+        clientConstraints.computeIfPresent(ropeId, (k, ropeData) -> ropeData.withStyle(style));
     }
 
     public static void addClientConstraint(Integer constraintId, Long shipA, Long shipB,
-                                           Vector3d localPosA, Vector3d localPosB, double maxLength, RopeType type) {
-        clientConstraints.put(constraintId, new ClientRopeData(shipA, shipB, localPosA, localPosB, maxLength, type));
+                                           Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyle style) {
+        clientConstraints.put(constraintId, new ClientRopeData(shipA, shipB, localPosA, localPosB, maxLength, style));
     }
 
     public static void removeClientConstraint(Integer constraintId) {
@@ -162,8 +162,8 @@ public class ClientRopeManager {
 
             if (startRelative.distance(endRelative) < 0.1) return false;
 
-            ResourceLocation ropeTypeId = ropeData.type().id();
-            RopeType ropeType = RopeTypeManager.get(ropeTypeId);
+            ResourceLocation ropeTypeId = ropeData.style().id();
+            RopeStyle ropeType = RopeStyleManager.get(ropeTypeId);
             if (ropeType == null) return false;
 
             IRopeRenderer renderer = RopeRendererTypes.getOrCreate(

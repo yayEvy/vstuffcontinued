@@ -4,7 +4,7 @@ import com.simibubi.create.foundation.networking.SimplePacketBase;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkEvent;
-import yay.evy.everest.vstuff.internal.RopeType;
+import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 
 public class StyleSelectPacket extends SimplePacketBase {
 
@@ -25,7 +25,7 @@ public class StyleSelectPacket extends SimplePacketBase {
 
     @Override
     public boolean handle(NetworkEvent.Context context) {
-        context.enqueueWork(() -> RopeType.set(context.getSender(), this.id));
+        context.enqueueWork(() -> RopeStyle.set(context.getSender(), this.id));
         return true;
     }
 }
