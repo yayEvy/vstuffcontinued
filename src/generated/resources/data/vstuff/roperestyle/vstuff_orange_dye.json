@@ -1,0 +1,7 @@
+{
+  "from_category": "vstuff:dyed_styles",
+  "input": [
+    "minecraft:orange_dye"
+  ],
+  "result": "vstuff:orange_dye"
+}

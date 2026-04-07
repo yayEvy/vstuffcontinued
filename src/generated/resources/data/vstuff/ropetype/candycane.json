@@ -4,6 +4,5 @@
   "renderer": "vstuff:normal",
   "renderer_params": {
     "texture": "vstuff:textures/rope/rope_candycane.png"
-  },
-  "restyle_group": "vstuff:none"
+  }
 }

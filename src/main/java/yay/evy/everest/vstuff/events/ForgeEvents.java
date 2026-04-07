@@ -81,12 +81,12 @@ public class ForgeEvents {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public static void onPlayerRightClickItem(PlayerInteractEvent.RightClickItem event) { // fired when right-clicking air
+    public static void onPlayerRightClickItem(PlayerInteractEvent.RightClickItem event) { // fired when right-clicking air // i see
         handleRightClickEvent(event);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public static void onPlayerRightClickBlock(PlayerInteractEvent.RightClickBlock event) { // fired when right-clicking a block
+    public static void onPlayerRightClickBlock(PlayerInteractEvent.RightClickBlock event) { // fired when right-clicking a block // oh ok
         handleRightClickEvent(event);
     }
 

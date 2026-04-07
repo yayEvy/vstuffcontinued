@@ -36,14 +36,12 @@ public class RopeTypeReloadListener extends SimpleJsonResourceReloadListener {
             Component name = Component.translatable("ropetype." + id.getNamespace() + "." + id.getPath());
             ResourceLocation category = parseLoc(json.get("category"));
             ResourceLocation renderer = parseLoc(json.get("renderer"));
-            ResourceLocation restyleGroup = parseLoc(json.get("restyle_group"));
             JsonObject rendererParams = json.getAsJsonObject("renderer_params");
 
             RopeTypeManager.registerType(new RopeType(
                     id,
                     name,
                     category,
-                    restyleGroup,
                     renderer,
                     rendererParams
             ));

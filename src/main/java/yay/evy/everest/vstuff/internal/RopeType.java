@@ -16,7 +16,6 @@ public record RopeType(
         ResourceLocation id,
         Component name,
         ResourceLocation category,
-        ResourceLocation restyleGroup,
         ResourceLocation rendererTypeId,
         JsonObject rendererParams      // parsed by the renderer on client
 ) {

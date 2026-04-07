@@ -1,0 +1,7 @@
+{
+  "from_category": "vstuff:log_styles",
+  "input": [
+    "minecraft:stripped_cherry_log"
+  ],
+  "result": "vstuff:stripped_cherry_log"
+}

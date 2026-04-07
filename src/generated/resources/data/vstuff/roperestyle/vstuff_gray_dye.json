@@ -1,0 +1,7 @@
+{
+  "from_category": "vstuff:dyed_styles",
+  "input": [
+    "minecraft:gray_dye"
+  ],
+  "result": "vstuff:gray_dye"
+}

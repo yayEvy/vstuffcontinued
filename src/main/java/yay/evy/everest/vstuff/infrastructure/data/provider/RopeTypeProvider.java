@@ -86,7 +86,6 @@ public class RopeTypeProvider implements DataProvider {
         JsonObject json = new JsonObject();
         json.addProperty("name", name);
         json.addProperty("category", asResource(category).toString());
-        json.addProperty("restyle_group", asResource(restyleGroup).toString());
         json.addProperty("renderer", asResource(renderer).toString());
         json.add("renderer_params", rendererParams);
 

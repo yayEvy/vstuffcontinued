@@ -1,0 +1,7 @@
+{
+  "from_category": "vstuff:log_styles",
+  "input": [
+    "minecraft:spruce_log"
+  ],
+  "result": "vstuff:spruce_log"
+}

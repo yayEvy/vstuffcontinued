@@ -1,0 +1,7 @@
+{
+  "from_category": "vstuff:log_styles",
+  "input": [
+    "minecraft:jungle_log"
+  ],
+  "result": "vstuff:jungle_log"
+}

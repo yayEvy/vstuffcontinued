@@ -47,6 +47,10 @@ public class DatagenUtils {
         return Arrays.stream(paths).map(path -> VStuff.asResource(path).toString()).toArray(String[]::new);
     }
 
+    public static List<ResourceLocation> resourceList(List<String> paths) {
+        return paths.stream().map(VStuff::asResource).toList();
+    }
+
     public static List<String> toIds(List<String> names, String append) {
         return names.stream().map(name -> name.toLowerCase(Locale.ROOT).replace(" ", "_") + append).toList();
     }

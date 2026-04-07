@@ -4,6 +4,5 @@
   "renderer": "vstuff:chain",
   "renderer_params": {
     "texture": "vstuff:textures/rope/rope_chain.png"
-  },
-  "restyle_group": "vstuff:none"
+  }
 }

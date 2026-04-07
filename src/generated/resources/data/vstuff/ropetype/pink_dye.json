@@ -4,6 +4,5 @@
   "renderer": "vstuff:solid_colour",
   "renderer_params": {
     "color": "#F38BAA"
-  },
-  "restyle_group": "vstuff:dyes"
+  }
 }

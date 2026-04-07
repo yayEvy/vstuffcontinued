@@ -1,0 +1,8 @@
+{
+  "from_category": "vstuff:wool_styles",
+  "input": [
+    "minecraft:lime_wool",
+    "minecraft:lime_dye"
+  ],
+  "result": "vstuff:lime_wool"
+}

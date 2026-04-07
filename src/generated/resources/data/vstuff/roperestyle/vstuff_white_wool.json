@@ -1,0 +1,8 @@
+{
+  "from_category": "vstuff:wool_styles",
+  "input": [
+    "minecraft:white_wool",
+    "minecraft:white_dye"
+  ],
+  "result": "vstuff:white_wool"
+}

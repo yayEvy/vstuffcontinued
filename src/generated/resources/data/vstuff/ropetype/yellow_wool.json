@@ -4,6 +4,5 @@
   "renderer": "vstuff:normal",
   "renderer_params": {
     "texture": "minecraft:textures/block/yellow_wool.png"
-  },
-  "restyle_group": "vstuff:wools"
+  }
 }

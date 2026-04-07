@@ -1,0 +1,7 @@
+{
+  "from_category": "vstuff:log_styles",
+  "input": [
+    "minecraft:dark_oak_log"
+  ],
+  "result": "vstuff:dark_oak_log"
+}

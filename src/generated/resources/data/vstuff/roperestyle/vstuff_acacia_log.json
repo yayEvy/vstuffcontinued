@@ -1,0 +1,7 @@
+{
+  "from_category": "vstuff:log_styles",
+  "input": [
+    "minecraft:acacia_log"
+  ],
+  "result": "vstuff:acacia_log"
+}

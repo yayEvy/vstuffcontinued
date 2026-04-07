@@ -12,10 +12,13 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.ForgeRegistries;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.internal.RopeCategory;
+import yay.evy.everest.vstuff.internal.RopeType;
 
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 import static yay.evy.everest.vstuff.infrastructure.data.DatagenUtils.*;
 
@@ -31,24 +34,35 @@ public class RopeRestylingProvider implements DataProvider {
     public CompletableFuture<?> run(CachedOutput output) {
         List<CompletableFuture<?>> futures = new ArrayList<>();
 
-        futures.add(restylingSingle(output, "dyes", zipToMap(dyes.stream().map(VStuff::asResource).toList(), DYE_ITEMS)));
-        futures.add(restyling(output, "wools", zipToMap(wools.stream().map(VStuff::asResource).toList(), zipToList(DYE_ITEMS, WOOL_ITEMS))));
-        futures.add(restylingSingle(output, "logs", zipToMap(logs.stream().map(VStuff::asResource).toList(), LOG_ITEMS)));
-        futures.add(restyling(output, "casings",
-            Map.ofEntries(
-                restyleEntry("andesite_casing", AllBlocks.ANDESITE_CASING.asItem(), AllItems.ANDESITE_ALLOY.asItem()),
-                restyleEntry("copper_casing", AllBlocks.COPPER_CASING.asItem(), Items.COPPER_INGOT),
-                restyleEntry("brass_casing", AllBlocks.BRASS_CASING.asItem(), AllItems.BRASS_INGOT.asItem()),
-                restyleEntry("train_casing", AllBlocks.RAILWAY_CASING.asItem(), AllItems.STURDY_SHEET.asItem()),
-                restyleEntry("industrial_iron", AllBlocks.INDUSTRIAL_IRON_BLOCK.asItem(), Items.IRON_INGOT)
-            )
-        ));
+        futures.addAll(woolRestyles(output));
+
+        futures.addAll(logRestyles(output));
+
+        futures.addAll(dyeRestyles(output));
 
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
     }
 
     private static Map.Entry<ResourceLocation, List<Item>> restyleEntry(String loc, Item... items) {
         return Map.entry(VStuff.asResource(loc), Arrays.stream(items).toList());
+    }
+
+    private List<? extends CompletableFuture<?>> woolRestyles(CachedOutput output) {
+        return zipToMap(zipToList(WOOL_ITEMS, DYE_ITEMS), resourceList(wools)).entrySet().stream().map((entry) ->
+                        restyling(output, entry.getKey(), "vstuff:wool_styles", null, entry.getValue().toString()))
+                .toList();
+    }
+
+    private List<? extends CompletableFuture<?>> logRestyles(CachedOutput output) {
+        return zipToMap(LOG_ITEMS, resourceList(logs)).entrySet().stream().map((entry) ->
+                        restyling(output, List.of(entry.getKey()), "vstuff:log_styles", null, entry.getValue().toString()))
+                .toList();
+    }
+
+    private List<? extends CompletableFuture<?>> dyeRestyles(CachedOutput output) {
+        return zipToMap(DYE_ITEMS, resourceList(dyes)).entrySet().stream().map((entry) ->
+                        restyling(output, List.of(entry.getKey()), "vstuff:dyed_styles", null, entry.getValue().toString()))
+                .toList();
     }
 
     public static <K, V> Map<K, V> zipToMap(Collection<K> keys, Collection<V> values) {
@@ -74,28 +88,36 @@ public class RopeRestylingProvider implements DataProvider {
         return list;
     }
 
-    private CompletableFuture<?> restylingSingle(CachedOutput output, String filename,  Map<ResourceLocation, Item> styleToItemMap) {
-        return restyling(output, filename, zipToMap(styleToItemMap.keySet(), styleToItemMap.values().stream().map(List::of).toList()));
-    }
+//    private CompletableFuture<?> restylingSingle(CachedOutput output, String filename,  Map<ResourceLocation, Item> styleToItemMap) {
+//        return restyling(output, filename, zipToMap(styleToItemMap.keySet(), styleToItemMap.values().stream().map(List::of).toList()));
+//    }
 
-    private CompletableFuture<?> restyling(CachedOutput output, String fileName, Map<ResourceLocation, List<Item>> styleToItemMap) {
+    private CompletableFuture<?> restyling(CachedOutput output, List<Item> inputs, String fromCategory, List<String> fromTypes, String result) {
         JsonObject json = new JsonObject();
 
-        for (Map.Entry<ResourceLocation, List<Item>> styleToItemEntry : styleToItemMap.entrySet()) {
-            JsonArray itemArray = new JsonArray();
+        JsonArray inputsArray = new JsonArray();
 
-            for (Item item : styleToItemEntry.getValue()) {
-                itemArray.add(getItemLocation(item).toString());
-            }
-
-            json.add(styleToItemEntry.getKey().toString(), itemArray);
+        for (Item item : inputs) {
+            inputsArray.add(getItemLocation(item).toString());
         }
+
+        json.add("input", inputsArray);
+
+        if (fromCategory != null) json.addProperty("from_category", fromCategory);
+
+        if (fromTypes != null) {
+            JsonArray typesArray = new JsonArray();
+            for (String type : fromTypes)  typesArray.add(type);
+            json.add("from_types", typesArray);
+        }
+
+        json.addProperty("result", result);
 
         Path path = generator.getPackOutput().getOutputFolder()
                 .resolve("data")
                 .resolve(VStuff.MOD_ID)
                 .resolve("roperestyle")
-                .resolve(fileName + ".json");
+                .resolve(result.replace(":", "_") + ".json");
 
         return DataProvider.saveStable(output, json, path);
     }

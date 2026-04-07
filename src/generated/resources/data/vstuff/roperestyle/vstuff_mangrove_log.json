@@ -1,0 +1,7 @@
+{
+  "from_category": "vstuff:log_styles",
+  "input": [
+    "minecraft:mangrove_log"
+  ],
+  "result": "vstuff:mangrove_log"
+}
