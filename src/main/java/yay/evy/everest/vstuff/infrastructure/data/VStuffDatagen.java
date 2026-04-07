@@ -29,8 +29,7 @@ public class VStuffDatagen {
         generator.addProvider(event.includeServer(), new RopeCategoryProvider(generator));
         generator.addProvider(event.includeServer(), new RopeRestylingProvider(generator));
         generator.addProvider(event.includeServer(), new VStuffWorldGenProvider(output, lookupProvider));
-
-        //gatherAllLang(generator);
+        gatherAllLang(generator);
     }
 
     private static void gatherAllLang(DataGenerator generator) {
