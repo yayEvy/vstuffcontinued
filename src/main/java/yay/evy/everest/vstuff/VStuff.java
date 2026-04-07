@@ -3,12 +3,16 @@ package yay.evy.everest.vstuff;
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import net.createmod.catnip.lang.LangBuilder;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -18,6 +22,7 @@ import org.slf4j.Logger;
 import org.valkyrienskies.core.api.ships.ShipPhysicsListener;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff.LevituffAttachment;
+import yay.evy.everest.vstuff.content.ropes.arrow.RopeArrowRenderer;
 import yay.evy.everest.vstuff.content.ships.reactionwheel.ReactionWheelAttachment;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.PhysGrabberServerAttachment;
 import yay.evy.everest.vstuff.content.ships.thrust.ThrusterForceAttachment;
@@ -49,22 +54,32 @@ public class VStuff {
         VStuffBlocks.register();
         VStuffItems.register();
         VStuffEntities.register(modEventBus);
+        modEventBus.addListener(this::onRegisterRenderers);
+
+
         VStuffBlockEntities.register();
         VStuffPackets.register();
         VStuffConfigs.register(modLoadingContext);
 
         MinecraftForge.EVENT_BUS.register(this);
 
-        modEventBus.addListener(this::commonSetup);
-        modEventBus.addListener(VStuffDatagen::gatherData);
+        modEventBus.addListener(VStuff::commonSetup);
+        modEventBus.addListener(EventPriority.LOWEST, VStuffDatagen::gatherData);
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> VStuffClient.initialize(modEventBus));
+
+
+
 
         LOGGER.info("{} ({}) initialized", VStuff.NAME, VStuff.MOD_ID);
     }
 
+    private void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        EntityRenderers.register(VStuffEntities.ROPE_ARROW.get(), RopeArrowRenderer::new);
+    }
+
     @VsBeta
-    private void commonSetup(final FMLCommonSetupEvent event) {
+    private static void commonSetup(final FMLCommonSetupEvent event) {
         event.enqueueWork(VStuff::registerAttachments);
     }
 
@@ -82,6 +97,8 @@ public class VStuff {
             return null;
         });
     }
+
+
 
     public static CreateRegistrate registrate() {
         return REGISTRATE;
