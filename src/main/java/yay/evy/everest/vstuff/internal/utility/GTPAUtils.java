@@ -7,6 +7,7 @@ import org.valkyrienskies.core.internal.joints.VSDistanceJoint;
 import org.valkyrienskies.core.internal.joints.VSJoint;
 import org.valkyrienskies.core.internal.joints.VSJointAndId;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
 import yay.evy.everest.vstuff.VStuff;
@@ -33,7 +34,7 @@ public class GTPAUtils {
             return;
         }
 
-        gtpa.addJoint(distanceJoint, 0, (jointId) -> {
+        gtpa.addJoint(distanceJoint, 0, (jointId) -> VSGameUtilsKt.executeOrSchedule(level, () -> {
             if (jointId == -1) {
                 VStuff.LOGGER.warn("Failed to create rope joint, returning.");
                 return;
@@ -49,7 +50,7 @@ public class GTPAUtils {
             if (player instanceof ServerPlayer serverPlayer) {
                 RopeManager.syncAllRopesToPlayer(serverPlayer);
             }
-        });
+        }));
     }
 
     public static void editJoint(ServerLevel level, ReworkedRope rope) {
