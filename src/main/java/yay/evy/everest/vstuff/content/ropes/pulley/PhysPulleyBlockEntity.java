@@ -73,8 +73,10 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
     @Override
     public void physTick(@Nullable PhysShip physShip, @NotNull PhysLevel physLevel) {
+        System.out.println("phys tick");
         assert level != null;
-        VSGameUtilsKt.executeOrSchedule(level, this::tickPulley);
+        this.tickPulley();
+//        VSGameUtilsKt.executeOrSchedule(level, this::tickPulley);
     }
 
     private void tickPulley() {
