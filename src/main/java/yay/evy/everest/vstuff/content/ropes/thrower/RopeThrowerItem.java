@@ -100,7 +100,7 @@ public class RopeThrowerItem extends Item {
 
         if (player.isShiftKeyDown()) {
             if (isFoil(stack)) {
-                resetStateWithMessage(serverLevel, stack, player, "rope_reset");
+                resetStateWithMessage(serverLevel, stack, player, "message.rope.reset");
                 if (player instanceof ServerPlayer serverPlayer) {
                     //NetworkHandler.sendOutlineToPlayer(serverPlayer, pos, ClientOutlineHandler.GREEN);
                     VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> serverPlayer), new OutlinePacket(pos, OutlinePacket.GREEN));
@@ -119,9 +119,9 @@ public class RopeThrowerItem extends Item {
 //            }
 
             type = RopeUtils.ConnectionType.PULLEY;
-            sendRopeMessage(player, "pulley_first");
+            sendRopeMessage(player, "pulley.first");
         } else {
-            sendRopeMessage(player, "rope_first");
+            sendRopeMessage(player, "rope.first");
         }
 
         Long shipId = ShipUtils.getShipIdAtPos(serverLevel, pos);
@@ -129,7 +129,7 @@ public class RopeThrowerItem extends Item {
             shipId = ShipUtils.getGroundBodyId(serverLevel);
         }
 
-        CompoundTag first = stack.getOrCreateTagElement("first");
+        CompoundTag first = stack.getOrCreateTagElement("data");
         first.put("pos", NbtUtils.writeBlockPos(pos));
         first.putLong("shipId", shipId);
         first.putString("dim", serverLevel.dimension().location().toString());
@@ -155,7 +155,7 @@ public class RopeThrowerItem extends Item {
         }
 
         if (isFoil(stack)) {
-            CompoundTag tag = stack.getTag().getCompound("data");
+            CompoundTag tag = stack.getOrCreateTag().getCompound("data");
 
             RopeUtils.ConnectionType type;
             try {
@@ -243,7 +243,7 @@ public class RopeThrowerItem extends Item {
 
     @Override
     public boolean isFoil(ItemStack stack) {
-        return stack.hasTag() && stack.getTag().contains("first");
+        return stack.hasTag() && stack.getTag().contains("data");
     }
 }
 

@@ -32,7 +32,7 @@ public class RopeCutterItem extends Item {
             boolean chain = (rope.style.rendererTypeId().equals(RopeRendererTypes.CHAIN.getId()));
             RopeFactory.removeRope(serverLevel, rope.ropeId);
             player.displayClientMessage(
-                    Component.translatable("vstuff.rope." + (chain ? "chain" : "rope") + "_break"),
+                    Component.translatable("vstuff.message." + (chain ? "chain" : "rope") + "_break"),
                     true
             );
 

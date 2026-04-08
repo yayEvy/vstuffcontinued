@@ -52,12 +52,35 @@ public class RopeArrowItem extends ArrowItem {
 
     @Override
     public InteractionResult useOn(UseOnContext ctext) {
-    if( ctext.getPlayer() instanceof ServerPlayer serverPlayer){
+        if (ctext.getPlayer() instanceof ServerPlayer serverPlayer) {
 
-            clickedPos = ctext.getClickedPos();
-            VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> serverPlayer), new OutlinePacket(clickedPos, OutlinePacket.GREEN));
+            ItemStack stack = ctext.getItemInHand();
+
+            if (serverPlayer.isShiftKeyDown()) {
+                if (isFoil(stack)) {
+                    resetStateWithMessage((ServerLevel) ctext.getLevel(), stack, serverPlayer, "rope_reset");
+                    VStuffPackets.channel().send(
+                            PacketDistributor.PLAYER.with(() -> serverPlayer),
+                            new OutlinePacket(ctext.getClickedPos(), OutlinePacket.RED)
+                    );
+                    return InteractionResult.SUCCESS;
+                }
+                return InteractionResult.FAIL;
+            }
+
+            BlockPos pos = ctext.getClickedPos();
+
+            CompoundTag tag = stack.getOrCreateTagElement("data");
+            tag.put("pos", NbtUtils.writeBlockPos(pos));
+            tag.putString("dim", ctext.getLevel().dimension().location().toString());
+
+            VStuffPackets.channel().send(
+                    PacketDistributor.PLAYER.with(() -> serverPlayer),
+                    new OutlinePacket(pos, OutlinePacket.GREEN)
+            );
+
             sendRopeMessage(ctext.getPlayer(), "rope_first");
-            return InteractionResult.PASS;
+            return InteractionResult.SUCCESS;
         }
         return InteractionResult.FAIL;
     }
@@ -86,20 +109,34 @@ public class RopeArrowItem extends ArrowItem {
 
 
     private void resetState(ServerLevel level, ItemStack stack) {
-        if (isFoil(stack)) {
-            CompoundTag tag = stack.getTagElement("data");
+        if (!isFoil(stack)) return;
 
-            if (RopeUtils.ConnectionType.valueOf(tag.getString("type")) == RopeUtils.ConnectionType.PULLEY) {
-                PhysPulleyBlockEntity pulleyBE = (PhysPulleyBlockEntity) level.getBlockEntity(NbtUtils.readBlockPos(tag.getCompound("pos")));
+        CompoundTag tag = stack.getTagElement("data");
+        if (tag != null) {
+
+            if (tag.contains("type")) {
+                try {
+                    RopeUtils.ConnectionType type =
+                            RopeUtils.ConnectionType.valueOf(tag.getString("type"));
+
+                    if (type == RopeUtils.ConnectionType.PULLEY && tag.contains("pos")) {
+                        BlockPos pos = NbtUtils.readBlockPos(tag.getCompound("pos"));
+                        if (level.getBlockEntity(pos) instanceof PhysPulleyBlockEntity pulleyBE) {
+                            // ion know
+                        }
+                    }
+
+                } catch (IllegalArgumentException ignored) {
+                }
             }
-
-            stack.setTag(null);
         }
+
+        stack.setTag(null);
     }
 
     @Override
     public boolean isFoil(ItemStack stack) {
-        return stack.hasTag() && stack.getTag().contains("first");
+        return stack.hasTag() && stack.getTag().contains("data");
     }
 
 }

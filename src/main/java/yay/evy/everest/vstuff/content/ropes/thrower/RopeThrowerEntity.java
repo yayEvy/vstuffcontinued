@@ -15,9 +15,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
+import yay.evy.everest.vstuff.content.ropes.RopeFactory;
 import yay.evy.everest.vstuff.content.ropes.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.content.ropes.pulley.PulleyAnchorBlockEntity;
 import yay.evy.everest.vstuff.index.VStuffItems;
+import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
 import static yay.evy.everest.vstuff.internal.utility.ShipUtils.getShipIdAtPos;
@@ -58,7 +60,6 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
 
     @Override
     protected void onHitBlock(BlockHitResult result) {
-       // System.out.println("on hit");
         if (!(level() instanceof ServerLevel serverLevel)) {
             return;
         }
@@ -71,7 +72,9 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
         BlockPos hitPos = result.getBlockPos().immutable();
         Long secondShipId = getShipIdAtPos(serverLevel, hitPos);
 
-        if (connectionType == RopeUtils.ConnectionType.PULLEY && !(serverLevel.getBlockEntity(hitPos) instanceof PulleyAnchorBlockEntity)) {
+        if (connectionType == RopeUtils.ConnectionType.PULLEY &&
+                !(serverLevel.getBlockEntity(hitPos) instanceof PulleyAnchorBlockEntity)) {
+
             ItemStack ropeDrop = new ItemStack(VStuffItems.ROPE.get());
             ItemEntity itemEntity = new ItemEntity(
                     serverLevel,
@@ -86,27 +89,39 @@ public class RopeThrowerEntity extends ThrowableItemProjectile {
             return;
         }
 
-//       ReworkedRope ropeResult = ReworkedRope.create(serverLevel, startShipId, secondShipId, startPos, hitPos, getOwner() instanceof Player p ? p : null, false);
-//
-//        if (ropeResult != null) {
-//
-//            if (connectionType == RopeUtils.ConnectionType.PULLEY
-//                    && waitingPulley != null
-//                    && serverLevel.getBlockEntity(hitPos) instanceof PulleyAnchorBlockEntity) {
-//
-//                waitingPulley.connectRope(ropeResult.ropeId, serverLevel.getBlockState(hitPos), serverLevel, hitPos);
-//            }
-//
-//
-//            serverLevel.playSound(
-//                    null,
-//                    hitPos,
-//                    net.minecraft.sounds.SoundEvents.LEASH_KNOT_PLACE,
-//                    SoundSource.PLAYERS,
-//                    1.0F,
-//                    1.0F
-//            );
-//        }
+        ReworkedRope ropeResult = RopeFactory.createNewRope(
+                serverLevel,
+                startShipId,
+                secondShipId,
+                startPos,
+                hitPos,
+                RopeStyle.getOrDefaultStyleId(getItem().getOrCreateTag()),
+                getOwner() instanceof Player p ? p : null
+        );
+
+        if (ropeResult != null) {
+
+            if (connectionType == RopeUtils.ConnectionType.PULLEY
+                    && waitingPulley != null
+                    && serverLevel.getBlockEntity(hitPos) instanceof PulleyAnchorBlockEntity) {
+
+                waitingPulley.connectRope(
+                        ropeResult.getRopeId(),
+                        serverLevel.getBlockState(hitPos),
+                        serverLevel,
+                        hitPos
+                );
+            }
+
+            serverLevel.playSound(
+                    null,
+                    hitPos,
+                    net.minecraft.sounds.SoundEvents.LEASH_KNOT_PLACE,
+                    SoundSource.PLAYERS,
+                    1.0F,
+                    1.0F
+            );
+        }
 
         discard();
     }

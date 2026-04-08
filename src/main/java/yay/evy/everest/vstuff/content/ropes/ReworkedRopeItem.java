@@ -58,7 +58,7 @@ public class ReworkedRopeItem extends Item {
                 return InteractionResult.SUCCESS;
             }
 
-            player.displayClientMessage(VStuff.translate("rope.first", blockName), true);
+            player.displayClientMessage(VStuff.translate("message.rope.first", blockName), true);
 
             CompoundTag tag = heldItem.getOrCreateTagElement("data");
 
