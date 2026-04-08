@@ -3,6 +3,7 @@
   "name": "Chain",
   "renderer": "vstuff:chain",
   "renderer_params": {
+    "scale": 1.0,
     "texture": "vstuff:textures/rope/rope_chain.png"
   }
 }

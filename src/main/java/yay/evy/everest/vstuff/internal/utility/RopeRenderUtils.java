@@ -129,12 +129,21 @@ public final class RopeRenderUtils {
                                   float vStart, float vEnd,
                                   int lightStart, int lightEnd,
                                   Vector3d normal) {
-        addRopeVertex(consumer, matrix, v1, 0.0f, vStart, lightStart, normal);
-        addRopeVertex(consumer, matrix, v2, 1.0f, vStart, lightStart, normal);
-        addRopeVertex(consumer, matrix, v3, 0.0f, vEnd,   lightEnd,   normal);
-        addRopeVertex(consumer, matrix, v2, 1.0f, vStart, lightStart, normal);
-        addRopeVertex(consumer, matrix, v4, 1.0f, vEnd,   lightEnd,   normal);
-        addRopeVertex(consumer, matrix, v3, 0.0f, vEnd,   lightEnd,   normal);
+        renderFace(consumer, matrix, v1, v2, v3, v4, vStart, vEnd, lightStart, lightEnd, normal, 1.0f);
+    }
+
+    public static void renderFace(VertexConsumer consumer, Matrix4f matrix,
+                                  Vector3d v1, Vector3d v2, Vector3d v3, Vector3d v4,
+                                  float vStart, float vEnd,
+                                  int lightStart, int lightEnd,
+                                  Vector3d normal, float uMax) {
+        float uOffset = (1.0f - uMax) / 2.0f;
+        addRopeVertex(consumer, matrix, v1, uOffset, vStart, lightStart, normal);
+        addRopeVertex(consumer, matrix, v2, uOffset + uMax, vStart, lightStart, normal);
+        addRopeVertex(consumer, matrix, v3, uOffset, vEnd,   lightEnd,   normal);
+        addRopeVertex(consumer, matrix, v2, uOffset + uMax, vStart, lightStart, normal);
+        addRopeVertex(consumer, matrix, v4, uOffset + uMax, vEnd,   lightEnd,   normal);
+        addRopeVertex(consumer, matrix, v3, uOffset, vEnd,   lightEnd,   normal);
     }
 
     public static void addRopeVertex(VertexConsumer consumer, Matrix4f matrix,

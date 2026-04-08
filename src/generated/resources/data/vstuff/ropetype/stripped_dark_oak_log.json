@@ -3,6 +3,7 @@
   "name": "Stripped Dark Oak",
   "renderer": "vstuff:normal",
   "renderer_params": {
+    "scale": 0.5,
     "texture": "minecraft:textures/block/stripped_dark_oak_log.png"
   }
 }

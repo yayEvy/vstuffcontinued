@@ -3,6 +3,7 @@
   "name": "Oak",
   "renderer": "vstuff:normal",
   "renderer_params": {
+    "scale": 0.5,
     "texture": "minecraft:textures/block/oak_log.png"
   }
 }

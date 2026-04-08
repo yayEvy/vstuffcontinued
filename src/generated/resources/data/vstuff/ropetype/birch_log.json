@@ -3,6 +3,7 @@
   "name": "Birch",
   "renderer": "vstuff:normal",
   "renderer_params": {
+    "scale": 0.5,
     "texture": "minecraft:textures/block/birch_log.png"
   }
 }

@@ -17,9 +17,12 @@ import static yay.evy.everest.vstuff.internal.utility.RopeRenderUtils.*;
 public class NormalRopeRenderer implements IRopeRenderer {
 
     private final ResourceLocation texture;
+    private final float uMax;
 
-    public NormalRopeRenderer(ResourceLocation texture){
+
+    public NormalRopeRenderer(ResourceLocation texture, float uMax){
         this.texture = texture;
+        this.uMax = uMax;
     }
 
     @Override
@@ -84,9 +87,11 @@ public class NormalRopeRenderer implements IRopeRenderer {
         }
     }
 
-    private static void renderRopeFaceWithGapFilling(VertexConsumer vertexConsumer, Matrix4f matrix,
+    private void renderRopeFaceWithGapFilling(VertexConsumer vertexConsumer, Matrix4f matrix,
                                                      Vector3d[] strip1, Vector3d[] strip2, Vector3d normal,
                                                      Vector3d[] curvePoints, int[] lightValues) {
+        float uOffset = (1.0f - uMax) / 2.0f;
+
         double[] cumulativeDistances = new double[ROPE_CURVE_SEGMENTS + 1];
         cumulativeDistances[0] = 0;
         for (int i = 0; i < ROPE_CURVE_SEGMENTS; i++) {
@@ -106,18 +111,18 @@ public class NormalRopeRenderer implements IRopeRenderer {
             Vector3d v3 = strip1[i + 1];
             Vector3d v4 = strip2[i + 1];
 
-            renderFace(vertexConsumer, matrix, v1, v2, v3, v4, vStart, vEnd, lightStart, lightEnd, normal);
+            renderFace(vertexConsumer, matrix, v1, v2, v3, v4, vStart, vEnd, lightStart, lightEnd, normal, this.uMax);
 
             Vector3d center1 = new Vector3d(v1).add(v2).mul(0.5);
             Vector3d center2 = new Vector3d(v3).add(v4).mul(0.5);
 
-            addRopeVertex(vertexConsumer, matrix, center1, 0.5f, vStart, lightStart, normal, 128);
-            addRopeVertex(vertexConsumer, matrix, v2, 1.0f, vStart, lightStart, normal, 128);
-            addRopeVertex(vertexConsumer, matrix, center2, 0.5f, vEnd, lightEnd, normal, 128);
+            addRopeVertex(vertexConsumer, matrix, center1, uOffset + this.uMax * 0.5f, vStart, lightStart, normal, 128);
+            addRopeVertex(vertexConsumer, matrix, v2, uOffset + this.uMax, vStart, lightStart, normal, 128);
+            addRopeVertex(vertexConsumer, matrix, center2, uOffset + this.uMax * 0.5f, vEnd, lightEnd, normal, 128);
 
-            addRopeVertex(vertexConsumer, matrix, v1, 0.0f, vStart, lightStart, normal, 128);
-            addRopeVertex(vertexConsumer, matrix, center1, 0.5f, vStart, lightStart, normal, 128);
-            addRopeVertex(vertexConsumer, matrix, center2, 0.5f, vEnd, lightEnd, normal, 128);
+            addRopeVertex(vertexConsumer, matrix, v1, uOffset, vStart, lightStart, normal, 128);
+            addRopeVertex(vertexConsumer, matrix, center1, uOffset + this.uMax * 0.5f, vStart, lightStart, normal, 128);
+            addRopeVertex(vertexConsumer, matrix, center2, uOffset + this.uMax * 0.5f, vEnd, lightEnd, normal, 128);
         }
     }
 }

@@ -72,7 +72,8 @@ public final class RopeRendererTypes {
                 ResourceLocation texture = ResourceLocation.tryParse(
                         params.get("texture").getAsString()
                 );
-                return new NormalRopeRenderer(texture);
+                float uMax = params.has("scale") ? params.get("scale").getAsFloat() : 1.0f;
+                return new NormalRopeRenderer(texture, uMax);
             }
     ));
 

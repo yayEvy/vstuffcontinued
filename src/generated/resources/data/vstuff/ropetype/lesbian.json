@@ -3,6 +3,7 @@
   "name": "Lesbian",
   "renderer": "vstuff:normal",
   "renderer_params": {
+    "scale": 1.0,
     "texture": "vstuff:textures/rope/rope_lesbian.png"
   }
 }

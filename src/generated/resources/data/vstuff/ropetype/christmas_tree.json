@@ -3,6 +3,7 @@
   "name": "Christmas Tree",
   "renderer": "vstuff:normal",
   "renderer_params": {
+    "scale": 1.0,
     "texture": "vstuff:textures/rope/rope_christmas_tree.png"
   }
 }

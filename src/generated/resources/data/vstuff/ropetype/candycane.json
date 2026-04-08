@@ -3,6 +3,7 @@
   "name": "Candycane",
   "renderer": "vstuff:normal",
   "renderer_params": {
+    "scale": 1.0,
     "texture": "vstuff:textures/rope/rope_candycane.png"
   }
 }

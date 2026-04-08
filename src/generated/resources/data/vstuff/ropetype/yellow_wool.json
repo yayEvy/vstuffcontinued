@@ -3,6 +3,7 @@
   "name": "Yellow Wool",
   "renderer": "vstuff:normal",
   "renderer_params": {
+    "scale": 0.5,
     "texture": "minecraft:textures/block/yellow_wool.png"
   }
 }

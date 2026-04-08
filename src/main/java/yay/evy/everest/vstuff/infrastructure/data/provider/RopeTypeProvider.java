@@ -9,6 +9,7 @@ import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.VStuff;
 
+import javax.json.Json;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +53,7 @@ public class RopeTypeProvider implements DataProvider {
     private List<? extends CompletableFuture<?>> woolTypes(CachedOutput output) {
         return WOOLS.stream().map(wool -> {
             String fileName = wool.toLowerCase(Locale.ROOT).replace(" ", "_");
-            return ropeType(output, fileName, wool, "wool_styles", "wools", "normal", textureParams(mcResource("textures/block/" + fileName + ".png")));
+            return ropeType(output, fileName, wool, "wool_styles", "wools", "normal", halfSizeTextureParams(mcResource("textures/block/" + fileName + ".png")));
         }).toList();
     }
 
@@ -67,7 +68,7 @@ public class RopeTypeProvider implements DataProvider {
     private List<? extends CompletableFuture<?>> logTypes(CachedOutput output) {
         return LOGS.stream().map(log -> {
             String fileName = log.toLowerCase(Locale.ROOT).replace(" ", "_") + "_log";
-            return ropeType(output, fileName, log, "log_styles", "logs", "normal", textureParams(mcResource("textures/block/" + fileName + ".png")));
+            return ropeType(output, fileName, log, "log_styles", "logs", "normal", halfSizeTextureParams(mcResource("textures/block/" + fileName + ".png")));
         }).toList();
     }
 
@@ -99,9 +100,18 @@ public class RopeTypeProvider implements DataProvider {
     }
 
     private JsonObject textureParams(ResourceLocation texture) {
+        return textureParams(texture, 1.0f);
+    }
+
+    private JsonObject textureParams(ResourceLocation texture, float scale) {
         JsonObject p = new JsonObject();
         p.addProperty("texture", texture.toString());
+        p.addProperty("scale", scale);
         return p;
+    }
+
+    private JsonObject halfSizeTextureParams(ResourceLocation texture) {
+        return textureParams(texture, 0.5f);
     }
 
     private JsonObject colorParams(String hex) {

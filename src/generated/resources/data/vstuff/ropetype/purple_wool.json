@@ -3,6 +3,7 @@
   "name": "Purple Wool",
   "renderer": "vstuff:normal",
   "renderer_params": {
+    "scale": 0.5,
     "texture": "minecraft:textures/block/purple_wool.png"
   }
 }
