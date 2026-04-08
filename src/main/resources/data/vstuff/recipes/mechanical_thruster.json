@@ -1,14 +1,15 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "CCC",
-    "ERE",
-    "CCC"
+    "CFC",
+    "CAC",
+    "CIC"
   ],
   "key": {
-    "E": { "item": "create:electron_tube" },
-    "R": { "item": "create:precision_mechanism" },
-    "C": { "item": "create:brass_casing" }
+    "C": { "item": "minecraft:chain" },
+    "F": { "item": "create:propeller" },
+    "I": { "item": "create:industrial_iron_block" },
+    "A": { "item": "create:andesite_casing" }
   },
   "result": {
     "item": "vstuff:mechanical_thruster",

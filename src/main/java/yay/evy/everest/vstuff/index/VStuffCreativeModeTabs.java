@@ -78,7 +78,8 @@ public class VStuffCreativeModeTabs {
                 return false;
             }));
             items.addAll(collectItems(VSTUFF_MAIN, (item) -> {
-                return false;
+                return item == VStuffItems.ROPE_THROWER.get()
+                        || item == VStuffItems.CREATIVE_ROPE_EDITOR.get();
             }));
 
             outputAll(output, items);
