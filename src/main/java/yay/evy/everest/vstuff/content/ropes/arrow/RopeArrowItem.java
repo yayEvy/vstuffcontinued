@@ -68,15 +68,15 @@ public class RopeArrowItem extends ArrowItem {
                 return InteractionResult.FAIL;
             }
 
-            BlockPos pos = ctext.getClickedPos();
+            clickedPos = ctext.getClickedPos();
 
             CompoundTag tag = stack.getOrCreateTagElement("data");
-            tag.put("pos", NbtUtils.writeBlockPos(pos));
+            tag.put("pos", NbtUtils.writeBlockPos(clickedPos));
             tag.putString("dim", ctext.getLevel().dimension().location().toString());
 
             VStuffPackets.channel().send(
                     PacketDistributor.PLAYER.with(() -> serverPlayer),
-                    new OutlinePacket(pos, OutlinePacket.GREEN)
+                    new OutlinePacket(clickedPos, OutlinePacket.GREEN)
             );
 
             sendRopeMessage(ctext.getPlayer(), "rope_first");

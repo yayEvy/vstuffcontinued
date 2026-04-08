@@ -74,17 +74,19 @@ public class RopeArrowEntity extends AbstractArrow {
             RopeFactory.createNewRope(serverLevel,firstShipId,secondShipId,firstPos,secondPos,
                     RopeStyle.getOrDefaultStyleId(itemStack.getOrCreateTag()), player);
 
-            System.out.println("FIRST: " + firstPos);
-            System.out.println("SECOND: " + secondPos);
-        }
 
+
+
+          //  System.out.println("FIRST: " + firstPos);
+        //    System.out.println("SECOND: " + secondPos);
+        }
+        }
         if(RopeArrowItem.getClickedPos() == null){
-            sendRopeMessage(player, "no_first_pos");
-        }
-        }
+                sendRopeMessage(player, "no_first_pos");
+            }
         }
 
-        discard();
+       // discard();
 
     }
 
