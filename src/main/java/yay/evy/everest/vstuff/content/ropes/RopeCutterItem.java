@@ -29,7 +29,7 @@ public class RopeCutterItem extends Item {
         if (rope == null) return InteractionResultHolder.pass(itemStack);
 
         try {
-            boolean chain = (rope.type.rendererTypeId().equals(RopeRendererTypes.CHAIN.getId()));
+            boolean chain = (rope.style.rendererTypeId().equals(RopeRendererTypes.CHAIN.getId()));
             RopeFactory.removeRope(serverLevel, rope.ropeId);
             player.displayClientMessage(
                     Component.translatable("vstuff.rope." + (chain ? "chain" : "rope") + "_break"),

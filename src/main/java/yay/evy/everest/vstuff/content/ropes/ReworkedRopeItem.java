@@ -19,7 +19,7 @@ import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.RopeRendererTypes;
-import yay.evy.everest.vstuff.internal.RopeType;
+import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 import yay.evy.everest.vstuff.content.ropes.packet.OutlinePacket;
 import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
@@ -93,7 +93,7 @@ public class ReworkedRopeItem extends Item {
         if (ropeResult.valid()) {
             player.displayClientMessage(VStuff.translate("rope.created").withStyle(ChatFormatting.GREEN), true);
 
-            RopeUtils.playPlaceSound(serverLevel, clickedPos, (ropeResult.rope().type.rendererTypeId().equals(RopeRendererTypes.CHAIN.getId())));
+            RopeUtils.playPlaceSound(serverLevel, clickedPos, (ropeResult.rope().style.rendererTypeId().equals(RopeRendererTypes.CHAIN.getId())));
 
         } else {
             player.displayClientMessage(VStuff.translate(ropeResult.message()).withStyle(ChatFormatting.RED), true);
@@ -114,7 +114,7 @@ public class ReworkedRopeItem extends Item {
     public @NotNull Component getName(@NotNull ItemStack stack) {
         return Component.translatable(this.getDescriptionId(stack))
                 .append(" (")
-                .append(RopeType.getOrDefault(stack.getOrCreateTag()).name())
+                .append(RopeStyle.getOrDefault(stack.getOrCreateTag()).name())
                 .append(")");
     }
 
@@ -125,14 +125,14 @@ public class ReworkedRopeItem extends Item {
 
     private void resetTag(ItemStack stack) {
         ResourceLocation lastStyle = null;
-        if (stack.getTag().contains("type")) {
-            lastStyle = TagUtils.readResourceLocation(stack.getTagElement("type"));
+        if (stack.getTag().contains("style")) {
+            lastStyle = TagUtils.readResourceLocation(stack.getTagElement("style"));
         }
 
         stack.setTag(null);
 
         if (lastStyle != null) {
-            stack.getOrCreateTag().put("type", TagUtils.writeResourceLocation(lastStyle));
+            stack.getOrCreateTag().put("style", TagUtils.writeResourceLocation(lastStyle));
         }
         // clears tag then puts the style back if there was one
     }

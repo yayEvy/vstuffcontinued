@@ -9,7 +9,7 @@ import net.minecraftforge.network.NetworkEvent;
 import org.joml.Vector3d;
 import yay.evy.everest.vstuff.client.ClientRopeManager;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
-import yay.evy.everest.vstuff.internal.RopeTypeManager;
+import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
 
 public class AddRopePacket extends SimplePacketBase {
 
@@ -22,7 +22,7 @@ public class AddRopePacket extends SimplePacketBase {
     private ResourceLocation typeId;
 
     public AddRopePacket(ReworkedRope rope) {
-        this(rope.getRopeId(), rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.type.id());
+        this(rope.getRopeId(), rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.style.id());
     }
 
     public AddRopePacket(Integer ropeId, Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, ResourceLocation typeId) {
@@ -60,7 +60,7 @@ public class AddRopePacket extends SimplePacketBase {
 
     @Override
     public boolean handle(NetworkEvent.Context context) {
-        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientRopeManager.addClientConstraint(ropeId, ship0, ship1, localPos0, localPos1, maxLength, RopeTypeManager.get(typeId))));
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientRopeManager.addClientConstraint(ropeId, ship0, ship1, localPos0, localPos1, maxLength, RopeStyleManager.get(typeId))));
         return true;
     }
 

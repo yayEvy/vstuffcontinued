@@ -1,50 +1,52 @@
-package yay.evy.everest.vstuff.internal;
+package yay.evy.everest.vstuff.internal.styling;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.internal.styling.data.RopeCategory;
+import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 
 import java.util.*;
 
-public final class RopeTypeManager {
-    private static final Map<ResourceLocation, RopeType> TYPES = new LinkedHashMap<>();
+public final class RopeStyleManager {
+    private static final Map<ResourceLocation, RopeStyle> STYLES = new LinkedHashMap<>();
     private static final Map<ResourceLocation, RopeCategory> CATEGORIES = new LinkedHashMap<>();
 
     public static final ResourceLocation FALLBACK_ID = VStuff.asResource("normal");
 
-    private RopeTypeManager() {}
+    private RopeStyleManager() {}
 
-    public static void registerType(RopeType type) {
-        TYPES.put(type.id(), type);
+    public static void registerStyle(RopeStyle type) {
+        STYLES.put(type.id(), type);
     }
 
     public static void registerCategory(RopeCategory category) {
         CATEGORIES.put(category.id(), category);
     }
 
-    public static RopeType get(ResourceLocation id) {
-        RopeType t = TYPES.get(id);
+    public static RopeStyle get(ResourceLocation id) {
+        RopeStyle t = STYLES.get(id);
         if (t == null) {
             VStuff.LOGGER.warn("Unknown rope type '{}', falling back to '{}'", id, FALLBACK_ID);
-            return TYPES.get(FALLBACK_ID);
+            return STYLES.get(FALLBACK_ID);
         }
         return t;
     }
 
-    public static Collection<RopeType> getAllTypes() { return TYPES.values(); }
+    public static Collection<RopeStyle> getAllStyles() { return STYLES.values(); }
 
     public static Collection<RopeCategory> getAllCategories() { return CATEGORIES.values(); }
 
-    public static int typeCount() { return TYPES.size(); }
+    public static int styleCount() { return STYLES.size(); }
 
     public static void clearAll() {
-        TYPES.clear();
+        STYLES.clear();
         CATEGORIES.clear();
     }
 
     // group types by le category field.
     public static List<RopeCategory> buildSortedCategories() {
-        Map<ResourceLocation, List<RopeType>> grouped = new LinkedHashMap<>();
+        Map<ResourceLocation, List<RopeStyle>> grouped = new LinkedHashMap<>();
         for (RopeCategory cat : CATEGORIES.values()) {
             grouped.put(cat.id(), new ArrayList<>());
         }
@@ -52,26 +54,22 @@ public final class RopeTypeManager {
         ResourceLocation uncategorizedId = VStuff.asResource("uncategorized");
         grouped.putIfAbsent(uncategorizedId, new ArrayList<>());
 
-        for (RopeType type : TYPES.values()) {
-            grouped.computeIfAbsent(type.category(), k -> new ArrayList<>()).add(type);
+        for (RopeStyle style : STYLES.values()) {
+            grouped.computeIfAbsent(style.category(), k -> new ArrayList<>()).add(style);
         }
 
         List<RopeCategory> result = new ArrayList<>();
         for (RopeCategory cat : CATEGORIES.values()) {
-            List<RopeType> types = grouped.getOrDefault(cat.id(), List.of());
+            List<RopeStyle> types = grouped.getOrDefault(cat.id(), List.of());
             if (!types.isEmpty()) {
                 result.add(new RopeCategory(cat.id(), cat.name(), cat.order(), types));
                 grouped.remove(cat.id());
             }
         }
         // all extras are dumped here
-        List<RopeType> uncategorized = grouped.entrySet().stream().sorted().map(Map.Entry::getValue).flatMap(Collection::stream).toList();
+        List<RopeStyle> uncategorized = grouped.entrySet().stream().sorted().map(Map.Entry::getValue).flatMap(Collection::stream).toList();
+        result.add(new RopeCategory(uncategorizedId, Component.translatable("ropecategory.vstuff.uncategorized"), Integer.MAX_VALUE, uncategorized));
 
-        if (!uncategorized.isEmpty())
-            result.add(new RopeCategory(uncategorizedId,
-                    Component.translatable("ropecategory.vstuff.uncategorized"), Integer.MAX_VALUE, uncategorized));
-
-
-        return result.stream().sorted(Comparator.comparingInt(RopeCategory::order)).toList();
+        return result.stream().filter(RopeCategory::hasStyles).sorted(Comparator.comparingInt(RopeCategory::order)).toList();
     }
 }

@@ -9,6 +9,7 @@ import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -31,6 +32,7 @@ import yay.evy.everest.vstuff.index.VStuffSounds;
 import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 import yay.evy.everest.vstuff.internal.utility.ShipUtils;
+import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
 import static yay.evy.everest.vstuff.internal.utility.ShipUtils.getLoadedShipIdAtPos;
 
@@ -159,7 +161,7 @@ public class RopeThrowerItem extends Item {
             try {
                 type = RopeUtils.ConnectionType.valueOf(tag.getString("type"));
             } catch (Exception e) {
-                resetState(serverLevel, stack);
+                resetTag(stack);
                 return InteractionResultHolder.fail(stack);
             }
 
@@ -214,7 +216,7 @@ public class RopeThrowerItem extends Item {
     private void resetStateWithMessage(ServerLevel level, ItemStack stack, Player player, String name) {
         sendRopeMessage(player, name);
 
-        resetState(level, stack);
+        resetTag(stack);
     }
 
     private void sendRopeMessage(Player player, String name) {
@@ -225,16 +227,18 @@ public class RopeThrowerItem extends Item {
     }
 
 
-    private void resetState(ServerLevel level, ItemStack stack) {
-        if (isFoil(stack)) {
-            CompoundTag tag = stack.getTagElement("data");
-
-            if (RopeUtils.ConnectionType.valueOf(tag.getString("type")) == RopeUtils.ConnectionType.PULLEY) {
-                PhysPulleyBlockEntity pulleyBE = (PhysPulleyBlockEntity) level.getBlockEntity(NbtUtils.readBlockPos(tag.getCompound("pos")));
-            }
-
-            stack.setTag(null);
+    private void resetTag(ItemStack stack) {
+        ResourceLocation lastStyle = null;
+        if (stack.getTag().contains("style")) {
+            lastStyle = TagUtils.readResourceLocation(stack.getTagElement("style"));
         }
+
+        stack.setTag(null);
+
+        if (lastStyle != null) {
+            stack.getOrCreateTag().put("style", TagUtils.writeResourceLocation(lastStyle));
+        }
+        // clears tag then puts the style back if there was one
     }
 
     @Override

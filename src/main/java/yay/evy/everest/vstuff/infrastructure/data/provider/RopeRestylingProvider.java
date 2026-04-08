@@ -2,8 +2,6 @@ package yay.evy.everest.vstuff.infrastructure.data.provider;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.simibubi.create.AllBlocks;
-import com.simibubi.create.AllItems;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
@@ -12,13 +10,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.ForgeRegistries;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.internal.RopeCategory;
-import yay.evy.everest.vstuff.internal.RopeType;
 
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 import static yay.evy.everest.vstuff.infrastructure.data.DatagenUtils.*;
 
