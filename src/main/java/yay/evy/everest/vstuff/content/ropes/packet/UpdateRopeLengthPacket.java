@@ -13,7 +13,7 @@ public class UpdateRopeLengthPacket extends SimplePacketBase {
     private Integer ropeId;
     private double newLength;
 
-    public UpdateRopeLengthPacket(Integer ropeId, double newLength, ResourceLocation newStyle) {
+    public UpdateRopeLengthPacket(Integer ropeId, double newLength) {
         this.ropeId = ropeId;
         this.newLength = newLength;
     }

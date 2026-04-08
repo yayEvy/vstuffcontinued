@@ -9,24 +9,28 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.mod.api.BlockEntityPhysicsListener;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import yay.evy.everest.vstuff.client.ClientRopeManager;
 import yay.evy.everest.vstuff.content.ropes.IRopeActor;
 import yay.evy.everest.vstuff.content.ropes.RopeManager;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 import yay.evy.everest.vstuff.content.ropes.RopeFactory;
+import yay.evy.everest.vstuff.content.ropes.packet.UpdateRopeLengthPacket;
 import yay.evy.everest.vstuff.index.VStuffBlockEntities;
+import yay.evy.everest.vstuff.index.VStuffPackets;
 
 import java.util.List;
 import java.util.Objects;
 
 public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEntityPhysicsListener, IRopeActor {
 
-    private Integer ropeId = null;
-    private ReworkedRope rope = null;
+    private volatile Integer ropeId = null;
 
     public PhysPulleyBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
@@ -38,7 +42,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         if (ropeId == null || !RopeManager.get(serverLevel).hasRope(ropeId)) return;
 
         this.ropeId = ropeId;
-        this.rope = RopeManager.get(serverLevel).getRope(ropeId);
 
         blockConnect(state, level, pos);
 
@@ -48,7 +51,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     @Override
     public void removeRope(Integer ropeId, BlockState state, Level level, BlockPos pos) {
         this.ropeId = null;
-        this.rope = null;
 
         blockRemove(state, level, pos);
 
@@ -71,14 +73,19 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
     @Override
     public void physTick(@Nullable PhysShip physShip, @NotNull PhysLevel physLevel) {
+        assert level != null;
+        VSGameUtilsKt.executeOrSchedule(level, this::tickPulley);
+    }
+
+    private void tickPulley() {
         if (!(level instanceof ServerLevel serverLevel)) return;
 
         if (IRopeActor.canActorAttach(this.getBlockState())) return;
         if (ropeId == null) {
-            if (rope != null) removeRope(null, getBlockState(), serverLevel, getBlockPos());
             return;
         }
 
+        ReworkedRope rope = RopeManager.get(serverLevel).getRope(this.ropeId);
 
         if (!RopeManager.get(serverLevel).hasRope(ropeId)) {
             removeRope(ropeId, getBlockState(), serverLevel, getBlockPos());
@@ -96,6 +103,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         if (Math.abs(newLength - oldLength) < 0.0001f) return;
 
         rope.setJointLength(serverLevel, newLength);
+        VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new UpdateRopeLengthPacket(ropeId, rope.jointValues.maxLength()));
     }
 
     @Override public void setDimension(@NotNull String s) {}
@@ -104,25 +112,41 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);
 
-        boolean hasRope = ropeId != null;
+        boolean hasRope = ropeId != null && ClientRopeManager.getClientConstraints().containsKey(ropeId);
 
         tooltip.add(Component.literal(" "));
 
         if (hasRope) {
-            tooltip.add(Component.literal("Length: " + String.format("%.1f", rope.jointValues.maxLength()) + " blocks")
-                    .withStyle(ChatFormatting.BLUE));
+
+            tooltip.add(Component.literal("Length: ")
+                    .withStyle(ChatFormatting.AQUA)
+                    .append(Component.literal( String.format("%.1f", ClientRopeManager.getClientConstraints().get(ropeId).maxLength()) + " blocks")
+                            .withStyle(ChatFormatting.GRAY)
+                    )
+            );
+
 
             float speed = getSpeed();
-            if (Math.abs(speed) > 4) {
+            if (Math.abs(speed) > 0) {
                 String direction = speed > 0 ? "Extending" : "Retracting";
-                tooltip.add(Component.literal("Status: " + direction + " (" + String.format("%.1f", Math.abs(speed)) + " RPM )")
-                        .withStyle(ChatFormatting.GREEN));
+
+                tooltip.add(Component.literal("Status: ")
+                        .withStyle(ChatFormatting.YELLOW)
+                        .append(Component.literal(direction + " (" + String.format("%.1f", Math.abs(speed)) + " RPM )")
+                                .withStyle(ChatFormatting.GRAY)
+                        )
+                );
+
             } else {
-                tooltip.add(Component.literal("Status: Idle")
-                        .withStyle(ChatFormatting.GRAY));
+                tooltip.add(Component.literal("Status: ")
+                        .withStyle(ChatFormatting.YELLOW)
+                        .append(Component.literal("Idle")
+                                .withStyle(ChatFormatting.GRAY)
+                        )
+                );
             }
         } else {
-            tooltip.add(Component.literal("No rope attached").withStyle(ChatFormatting.AQUA));
+            tooltip.add(Component.literal("No rope attached").withStyle(ChatFormatting.RED));
         }
         return true;
     }
@@ -167,7 +191,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
         if (!powered) return;
 
-        if (ropeId == null || rope == null) return;
+        if (ropeId == null) return;
 
         RopeFactory.removeRope(serverLevel, ropeId);
     }

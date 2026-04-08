@@ -69,7 +69,7 @@ public class GTPAUtils {
 
         if (resolvedJoint != null) {
             gtpa.updateJoint(new VSJointAndId(resolvedJoint.getJointId(), newDistanceJoint));
-            rope.setRopeId(resolvedJoint.getJointId());
+//            rope.setRopeId(resolvedJoint.getJointId());
             JointUtils.removeMatchingJointsExcept(gtpa, newDistanceJoint, resolvedJoint.getJointId());
             return;
         }
