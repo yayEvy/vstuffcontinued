@@ -58,7 +58,7 @@ public class RopeArrowItem extends ArrowItem {
 
             if (serverPlayer.isShiftKeyDown()) {
                 if (isFoil(stack)) {
-                    resetStateWithMessage((ServerLevel) ctext.getLevel(), stack, serverPlayer, "rope_reset");
+                    resetStateWithMessage((ServerLevel) ctext.getLevel(), stack, serverPlayer, "rope.reset");
                     VStuffPackets.channel().send(
                             PacketDistributor.PLAYER.with(() -> serverPlayer),
                             new OutlinePacket(ctext.getClickedPos(), OutlinePacket.RED)
@@ -79,7 +79,7 @@ public class RopeArrowItem extends ArrowItem {
                     new OutlinePacket(clickedPos, OutlinePacket.GREEN)
             );
 
-            sendRopeMessage(ctext.getPlayer(), "rope_first");
+            sendRopeMessage(ctext.getPlayer(), "rope.first");
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.FAIL;

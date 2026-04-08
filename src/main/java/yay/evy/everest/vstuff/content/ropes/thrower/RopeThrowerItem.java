@@ -100,7 +100,7 @@ public class RopeThrowerItem extends Item {
 
         if (player.isShiftKeyDown()) {
             if (isFoil(stack)) {
-                resetStateWithMessage(serverLevel, stack, player, "message.rope.reset");
+                resetStateWithMessage(serverLevel, stack, player, "rope.reset");
                 if (player instanceof ServerPlayer serverPlayer) {
                     //NetworkHandler.sendOutlineToPlayer(serverPlayer, pos, ClientOutlineHandler.GREEN);
                     VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> serverPlayer), new OutlinePacket(pos, OutlinePacket.GREEN));

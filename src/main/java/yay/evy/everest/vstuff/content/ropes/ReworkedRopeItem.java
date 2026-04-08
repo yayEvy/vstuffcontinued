@@ -73,7 +73,7 @@ public class ReworkedRopeItem extends Item {
             return InteractionResult.SUCCESS;
 
         } else if (player.isShiftKeyDown()) {
-            player.displayClientMessage(VStuff.translate("rope.reset").withStyle(ChatFormatting.GREEN), true);
+            player.displayClientMessage(VStuff.translate("message.rope.reset").withStyle(ChatFormatting.GREEN), true);
             resetTag(heldItem);
             return InteractionResult.SUCCESS;
         }
