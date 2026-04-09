@@ -93,7 +93,7 @@ public class ReworkedRopeItem extends Item {
         if (ropeResult.valid()) {
             player.displayClientMessage(VStuff.translate("rope.created").withStyle(ChatFormatting.GREEN), true);
 
-            RopeUtils.playPlaceSound(serverLevel, clickedPos, (ropeResult.rope().style.rendererTypeId().equals(RopeRendererTypes.CHAIN.getId())));
+            RopeUtils.playSound(serverLevel, clickedPos, ropeResult.rope().style.placeSound());
 
         } else {
             player.displayClientMessage(VStuff.translate(ropeResult.message()).withStyle(ChatFormatting.RED), true);

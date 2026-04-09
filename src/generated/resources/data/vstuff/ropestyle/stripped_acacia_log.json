@@ -1,6 +1,8 @@
 {
+  "break_sound": "minecraft:block.wool.break",
   "category": "vstuff:log_styles",
   "name": "Stripped Acacia",
+  "place_sound": "minecraft:block.wool.place",
   "renderer": "vstuff:normal",
   "renderer_params": {
     "scale": 0.5,

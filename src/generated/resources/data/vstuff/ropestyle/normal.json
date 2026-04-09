@@ -1,6 +1,8 @@
 {
+  "break_sound": "minecraft:block.wool.break",
   "category": "vstuff:basic_styles",
   "name": "Normal",
+  "place_sound": "minecraft:block.wool.place",
   "renderer": "vstuff:normal",
   "renderer_params": {
     "scale": 1.0,

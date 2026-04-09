@@ -5,6 +5,8 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.VStuff;
 
@@ -31,7 +33,7 @@ public class RopeStyleProvider implements DataProvider {
         List<CompletableFuture<?>> futures = new ArrayList<>();
 
         futures.add(ropeStyle(output, "Normal", "basic_styles", "normal"));
-        futures.add(ropeStyle(output,"Chain","basic_styles","chain"));
+        futures.add(ropeStyle(output,"Chain","basic_styles","chain", SoundEvents.CHAIN_PLACE, SoundEvents.CHAIN_BREAK));
 
         futures.addAll(woolStyles(output));
 
@@ -80,12 +82,22 @@ public class RopeStyleProvider implements DataProvider {
         return ropeStyle(output, fileName, name, category, renderer, textureParams(asResource("textures/rope/rope_" + fileName + ".png")));
     }
 
+    private CompletableFuture<?> ropeStyle(CachedOutput output, String name, String category, String renderer, SoundEvent placeSound, SoundEvent breakSound) {
+        String fileName = name.toLowerCase(Locale.ROOT).replace(" ", "_");
+        return ropeStyle(output, fileName, name, category, renderer, textureParams(asResource("textures/rope/rope_" + fileName + ".png")), placeSound, breakSound);
+    }
     private CompletableFuture<?> ropeStyle(CachedOutput output, String fileName, String name, String category, String renderer, JsonObject rendererParams) {
+        return ropeStyle(output, fileName, name, category, renderer, rendererParams, SoundEvents.WOOL_PLACE, SoundEvents.WOOL_BREAK);
+    }
+
+    private CompletableFuture<?> ropeStyle(CachedOutput output, String fileName, String name, String category, String renderer, JsonObject rendererParams, SoundEvent placeSound, SoundEvent breakSound) {
         JsonObject json = new JsonObject();
         json.addProperty("name", name);
         json.addProperty("category", asResource(category).toString());
         json.addProperty("renderer", asResource(renderer).toString());
         json.add("renderer_params", rendererParams);
+        json.addProperty("place_sound", placeSound.getLocation().toString());
+        json.addProperty("break_sound", breakSound.getLocation().toString());
 
         Path path = generator.getPackOutput().getOutputFolder()
                 .resolve("data")

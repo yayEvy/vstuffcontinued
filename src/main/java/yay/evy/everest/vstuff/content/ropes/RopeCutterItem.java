@@ -29,14 +29,13 @@ public class RopeCutterItem extends Item {
         if (rope == null) return InteractionResultHolder.pass(itemStack);
 
         try {
-            boolean chain = (rope.style.rendererTypeId().equals(RopeRendererTypes.CHAIN.getId()));
             RopeFactory.removeRope(serverLevel, rope.ropeId);
             player.displayClientMessage(
-                    Component.translatable("vstuff.message." + (chain ? "chain" : "rope") + "_break"),
+                    Component.translatable("vstuff.message.rope_break"),
                     true
             );
 
-            RopeUtils.playBreakSound(serverLevel, player.blockPosition(), chain);
+            RopeUtils.playSound(serverLevel, player.blockPosition(), rope.style.breakSound());
 
 
             if (!player.isCreative()) {

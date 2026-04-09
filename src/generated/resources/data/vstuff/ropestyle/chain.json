@@ -1,6 +1,8 @@
 {
+  "break_sound": "minecraft:block.chain.break",
   "category": "vstuff:basic_styles",
   "name": "Chain",
+  "place_sound": "minecraft:block.chain.place",
   "renderer": "vstuff:chain",
   "renderer_params": {
     "scale": 1.0,

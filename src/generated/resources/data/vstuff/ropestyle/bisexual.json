@@ -1,6 +1,8 @@
 {
+  "break_sound": "minecraft:block.wool.break",
   "category": "vstuff:pride_styles",
   "name": "Bisexual",
+  "place_sound": "minecraft:block.wool.place",
   "renderer": "vstuff:normal",
   "renderer_params": {
     "scale": 1.0,

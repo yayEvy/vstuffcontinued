@@ -1,6 +1,8 @@
 {
+  "break_sound": "minecraft:block.wool.break",
   "category": "vstuff:dyed_styles",
   "name": "Black",
+  "place_sound": "minecraft:block.wool.place",
   "renderer": "vstuff:solid_colour",
   "renderer_params": {
     "color": "#1D1D21"
