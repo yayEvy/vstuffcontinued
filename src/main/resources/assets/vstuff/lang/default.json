@@ -29,6 +29,8 @@
   "vstuff.rope.created": "Successfully created rope!",
   "vstuff.message.chain_created": "Successfully created chain!",
   "vstuff.message.interdimensional_fail": "Cannot create rope across dimensions!",
+  "vstuff.message.too_long": "Rope too long!",
+  "vstuff.message.actor_connected": "Actor connected",
   "vstuff.message.nonfullblock_fail": "Cannot create rope connected to a non-full block!",
   "vstuff.message.rope.first": "First position selected.",
   "vstuff.message.rope_break": "Rope broken!",
