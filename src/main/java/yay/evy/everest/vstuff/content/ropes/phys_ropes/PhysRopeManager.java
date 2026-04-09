@@ -1,8 +1,7 @@
-package yay.evy.everest.vstuff.content.ropes;
+package yay.evy.everest.vstuff.content.ropes.phys_ropes;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.LongArrayTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -19,7 +18,6 @@ import yay.evy.everest.vstuff.content.ropes.packet.RemoveRopePacket;
 import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.internal.utility.RopePosData;
 import yay.evy.everest.vstuff.internal.utility.TagUtils;
-import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
 import java.util.*;
 

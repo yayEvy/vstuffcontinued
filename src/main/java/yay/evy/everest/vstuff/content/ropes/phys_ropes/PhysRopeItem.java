@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.ropes;
+package yay.evy.everest.vstuff.content.ropes.phys_ropes;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -14,8 +14,8 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.network.PacketDistributor;
-import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.content.ropes.IRopeActor;
 import yay.evy.everest.vstuff.content.ropes.packet.OutlinePacket;
 import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.internal.utility.ShipUtils;

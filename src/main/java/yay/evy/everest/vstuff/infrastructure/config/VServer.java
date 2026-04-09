@@ -17,7 +17,7 @@ public class VServer extends ConfigBase {
     public final ConfigFloat ropeMaxLength = f(32, 8, 256, "ropeMaxLength", Comments.inBlocks, Comments.ropeMaxLength);
     public final ConfigBool ropeSounds = b(true, "ropeSounds", Comments.ropeSounds);
 
-    public final ConfigInt physRopeSegments = i(8, 2, 64, "physRopeSegments", Comments.physRopeSegments);
+    public final ConfigFloat physRopeSegmentLength = f(1f, 0.5f, 16f, "physRopeSegmentLength", Comments.physRopeSegmentLength);
     public final ConfigFloat physRopeCapsuleRadius = f(0.1f, 0.01f, 1.0f, "physRopeCapsuleRadius", Comments.inBlocks, Comments.physRopeCapsuleRadius);
     public final ConfigFloat physRopeMassPerSegment = f(10.0f, 0.1f, 10000.0f, "physRopeMassPerSegment", Comments.physRopeMassPerSegment);
 
@@ -51,7 +51,7 @@ public class VServer extends ConfigBase {
         static String ropeMaxLength = "The maximum length of a rope";
         static String ropeSounds = "Whether ropes make sounds when created";
 
-        static String physRopeSegments = "Number of physics segments in a phys rope";
+        static String physRopeSegmentLength = "length of phys segments in a phys rope";
         static String physRopeCapsuleRadius = "Radius of each phys rope capsule collider";
         static String physRopeMassPerSegment = "Mass of each phys rope segment";
 

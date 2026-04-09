@@ -22,6 +22,8 @@ import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3d;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.ropes.*;
+import yay.evy.everest.vstuff.content.ropes.phys_ropes.PhysRopeConstraint;
+import yay.evy.everest.vstuff.content.ropes.phys_ropes.PhysRopeManager;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.infrastructure.data.listener.RopeCategoryReloadListener;
 import yay.evy.everest.vstuff.infrastructure.data.listener.RopeRestyleReloadListener;

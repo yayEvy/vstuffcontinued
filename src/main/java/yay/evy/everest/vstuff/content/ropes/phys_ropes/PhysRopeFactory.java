@@ -1,23 +1,16 @@
-package yay.evy.everest.vstuff.content.ropes;
+package yay.evy.everest.vstuff.content.ropes.phys_ropes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.network.PacketDistributor;
-import org.joml.Vector3d;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.ropes.packet.AddRopePacket;
-import yay.evy.everest.vstuff.content.ropes.packet.PhysRopeSegmentsPacket;
 import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.internal.utility.RopePosData;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class PhysRopeFactory {
 

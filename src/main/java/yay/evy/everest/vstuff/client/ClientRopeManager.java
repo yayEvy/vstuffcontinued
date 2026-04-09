@@ -223,21 +223,35 @@ public class ClientRopeManager {
         worldPoints.addAll(segments);
         worldPoints.add(new Vector3d(endRelative.x + cameraPos.x, endRelative.y + cameraPos.y, endRelative.z + cameraPos.z));
 
+        int n = worldPoints.size();
         Vector3d[] curve = new Vector3d[RopeRenderUtils.ROPE_CURVE_SEGMENTS + 1];
-        int n = worldPoints.size() - 1;
+
         for (int i = 0; i <= RopeRenderUtils.ROPE_CURVE_SEGMENTS; i++) {
             float t = (float) i / RopeRenderUtils.ROPE_CURVE_SEGMENTS;
-            float scaled = t * n;
+            float scaled = t * (n - 1);
             int idx = (int) scaled;
             float frac = scaled - idx;
-            Vector3d a = worldPoints.get(Math.min(idx, n));
-            Vector3d b = worldPoints.get(Math.min(idx + 1, n));
-            curve[i] = new Vector3d(
-                    a.x + (b.x - a.x) * frac - cameraPos.x,
-                    a.y + (b.y - a.y) * frac - cameraPos.y,
-                    a.z + (b.z - a.z) * frac - cameraPos.z
-            );
+
+            int i0 = Math.max(idx - 1, 0);
+            int i1 = idx;
+            int i2 = Math.min(idx + 1, n - 1);
+            int i3 = Math.min(idx + 2, n - 1);
+
+            Vector3d p0 = worldPoints.get(i0);
+            Vector3d p1 = worldPoints.get(i1);
+            Vector3d p2 = worldPoints.get(i2);
+            Vector3d p3 = worldPoints.get(i3);
+
+            double f2 = frac * frac;
+            double f3 = f2 * frac;
+
+            double x = 0.5 * ((2*p1.x) + (-p0.x + p2.x)*frac + (2*p0.x - 5*p1.x + 4*p2.x - p3.x)*f2 + (-p0.x + 3*p1.x - 3*p2.x + p3.x)*f3);
+            double y = 0.5 * ((2*p1.y) + (-p0.y + p2.y)*frac + (2*p0.y - 5*p1.y + 4*p2.y - p3.y)*f2 + (-p0.y + 3*p1.y - 3*p2.y + p3.y)*f3);
+            double z = 0.5 * ((2*p1.z) + (-p0.z + p2.z)*frac + (2*p0.z - 5*p1.z + 4*p2.z - p3.z)*f2 + (-p0.z + 3*p1.z - 3*p2.z + p3.z)*f3);
+
+            curve[i] = new Vector3d(x - cameraPos.x, y - cameraPos.y, z - cameraPos.z);
         }
+
         return curve;
     }
     public static void updatePhysRopeSegments(int ropeId, List<Vector3d> positions) {
