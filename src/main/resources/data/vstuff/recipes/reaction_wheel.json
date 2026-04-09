@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BBB",
+    "IFI",
+    "BBB"
+  ],
+  "key": {
+    "B": { "item": "create:brass_block" },
+    "F": { "item": "create:flywheel" },
+    "I": { "item": "create:industrial_iron_block" }
+  },
+  "result": {
+    "item": "vstuff:reaction_wheel",
+    "count": 1
+  }
+}
