@@ -67,7 +67,9 @@ public class RopeStyleProvider implements DataProvider {
     private List<? extends CompletableFuture<?>> logStyles(CachedOutput output) {
         return LOGS.stream().map(log -> {
             String fileName = log.toLowerCase(Locale.ROOT).replace(" ", "_") + "_log";
-            return ropeStyle(output, fileName, log, "log_styles", "normal", halfSizeTextureParams(mcResource("textures/block/" + fileName + ".png")));
+            return ropeStyle(output, fileName, log, "log_styles", "normal",
+                    halfSizeTextureParams(mcResource("textures/block/" + fileName + ".png")),
+                    SoundEvents.WOOD_PLACE, SoundEvents.WOOD_BREAK);
         }).toList();
     }
 

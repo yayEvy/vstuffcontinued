@@ -1,8 +1,8 @@
 {
-  "break_sound": "minecraft:block.wool.break",
+  "break_sound": "minecraft:block.wood.break",
   "category": "vstuff:log_styles",
   "name": "Dark Oak",
-  "place_sound": "minecraft:block.wool.place",
+  "place_sound": "minecraft:block.wood.place",
   "renderer": "vstuff:normal",
   "renderer_params": {
     "scale": 0.5,

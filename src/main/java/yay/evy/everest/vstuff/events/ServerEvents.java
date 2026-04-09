@@ -37,48 +37,6 @@ import java.util.Set;
 @Mod.EventBusSubscriber(modid = VStuff.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.DEDICATED_SERVER)
 public class ServerEvents {
 
-    @SubscribeEvent
-    public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer player)) return;
-        RopeManager.syncAllRopesToPlayer(player);
-        VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeStylesPacket());
-        VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeCategoriesPacket());
-        VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeRestylesPacket());
-    }
+    // :wtfdidjcmdothistime:
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public static void onPlayerRightClickItem(PlayerInteractEvent.RightClickItem event) { // fired when right-clicking air // i see
-        handleRightClickEvent(event);
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public static void onPlayerRightClickBlock(PlayerInteractEvent.RightClickBlock event) { // fired when right-clicking a block // oh ok
-        handleRightClickEvent(event);
-    }
-
-    private static void handleRightClickEvent(PlayerInteractEvent event) {
-        ItemStack itemStack = event.getItemStack();
-        if (RopeRestyleManager.isValidRetyping(itemStack.getItem())) {
-            if ((event.getLevel() instanceof ServerLevel level)) {
-                Player player = event.getEntity();
-                ReworkedRope rope = RopeUtils.findRope(level, player);
-                if (rope == null) return;
-
-                if (RopeRestyleManager.canRetype(rope.style, itemStack.getItem())) {
-                    RopeStyle newType = RopeRestyleManager.retype(rope.style, itemStack.getItem());
-                    if (newType == null) {
-                        System.out.println("something is cooked");
-                        return;
-                    }
-                    RopeFactory.retypeRope(level, rope.getRopeId(), newType.id());
-
-                    RopeUtils.playSound(level, rope.posData0.blockPos(), rope.style.placeSound());
-                    RopeUtils.playSound(level, rope.posData1.blockPos(), rope.style.breakSound());
-
-                    event.setCanceled(true);
-                    event.setCancellationResult(InteractionResult.SUCCESS);
-                }
-            }
-        }
-    }
 }
