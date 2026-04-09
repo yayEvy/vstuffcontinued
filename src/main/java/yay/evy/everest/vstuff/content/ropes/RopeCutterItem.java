@@ -35,8 +35,8 @@ public class RopeCutterItem extends Item {
                     true
             );
 
-            RopeUtils.playSound(serverLevel, player.blockPosition(), rope.style.breakSound());
-
+            RopeUtils.playSound(serverLevel, rope.posData0.blockPos(), rope.style.breakSound());
+            RopeUtils.playSound(serverLevel, rope.posData1.blockPos(), rope.style.breakSound());
 
             if (!player.isCreative()) {
                 itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));

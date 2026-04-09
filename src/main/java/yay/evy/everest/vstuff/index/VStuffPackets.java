@@ -31,6 +31,9 @@ public enum VStuffPackets {
     ROPE_LENGTH_UPDATE(UpdateRopeLengthPacket.class, UpdateRopeLengthPacket::new, PLAY_TO_CLIENT),
     ROPE_STYLE_UPDATE(UpdateRopeStylePacket.class, UpdateRopeStylePacket::new, PLAY_TO_CLIENT),
     ROPE_CLEAR_ALL(ClearAllRopesPacket.class, ClearAllRopesPacket::new, PLAY_TO_CLIENT),
+    ROPE_STYLES_SYNC(SyncRopeStylesPacket.class, SyncRopeStylesPacket::new, PLAY_TO_CLIENT),
+    ROPE_CATEGORIES_SYNC(SyncRopeCategoriesPacket.class, SyncRopeCategoriesPacket::new, PLAY_TO_CLIENT),
+    ROPE_RESTYLES_SYNC(SyncRopeRestylesPacket.class, SyncRopeRestylesPacket::new, PLAY_TO_CLIENT),
 
     // client -> server packets
     STYLE_SELECT(StyleSelectPacket.class, StyleSelectPacket::new, PLAY_TO_SERVER),

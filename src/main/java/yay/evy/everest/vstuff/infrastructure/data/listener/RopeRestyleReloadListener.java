@@ -7,7 +7,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.content.ropes.packet.SyncRopeCategoriesPacket;
+import yay.evy.everest.vstuff.content.ropes.packet.SyncRopeRestylesPacket;
+import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.internal.styling.RopeRestyleManager;
 import yay.evy.everest.vstuff.internal.styling.data.RopeRestyle;
 
@@ -69,6 +74,8 @@ public class RopeRestyleReloadListener extends SimpleJsonResourceReloadListener 
         }
 
         VStuff.LOGGER.info("Loaded {} restyles from data.", RopeRestyleManager.getAll().size());
-
+        if (ServerLifecycleHooks.getCurrentServer() != null) {
+            VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new SyncRopeRestylesPacket());
+        }
     }
 }

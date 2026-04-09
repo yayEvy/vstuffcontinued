@@ -2,22 +2,35 @@ package yay.evy.everest.vstuff.internal.styling;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.infrastructure.data.provider.RopeStyleProvider;
 import yay.evy.everest.vstuff.internal.styling.data.RopeCategory;
 import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 
 import java.util.*;
 
 public final class RopeStyleManager {
-    private static final Map<ResourceLocation, RopeStyle> STYLES = new LinkedHashMap<>();
-    private static final Map<ResourceLocation, RopeCategory> CATEGORIES = new LinkedHashMap<>();
+    public static Map<ResourceLocation, RopeStyle> STYLES = new LinkedHashMap<>();
+    public static Map<ResourceLocation, RopeCategory> CATEGORIES = new LinkedHashMap<>();
 
     public static final ResourceLocation FALLBACK_ID = VStuff.asResource("normal");
 
+    public static final RopeStyle FALLBACK_STYLE = registerStyle(new RopeStyle(
+            FALLBACK_ID,
+            Component.literal("Dummy"),
+            VStuff.asResource("dummy"),
+            VStuff.asResource("normal"),
+            RopeStyleProvider.textureParams(VStuff.asResource("textures/rope/rope_normal.png")),
+            SoundEvents.WOOL_PLACE,
+            SoundEvents.WOOL_BREAK
+    ));
+
     private RopeStyleManager() {}
 
-    public static void registerStyle(RopeStyle type) {
+    public static RopeStyle registerStyle(RopeStyle type) {
         STYLES.put(type.id(), type);
+        return type;
     }
 
     public static void registerCategory(RopeCategory category) {
@@ -27,7 +40,7 @@ public final class RopeStyleManager {
     public static RopeStyle get(ResourceLocation id) {
         RopeStyle t = STYLES.get(id);
         if (t == null) {
-            VStuff.LOGGER.warn("Unknown rope type '{}', falling back to '{}'", id, FALLBACK_ID);
+            VStuff.LOGGER.warn("Unknown rope type '{}', falling back to dummy", id);
             return STYLES.get(FALLBACK_ID);
         }
         return t;

@@ -13,8 +13,14 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.RopeRendererTypes;
+import yay.evy.everest.vstuff.content.ropes.packet.SyncRopeCategoriesPacket;
+import yay.evy.everest.vstuff.content.ropes.packet.SyncRopeStylesPacket;
+import yay.evy.everest.vstuff.content.ropes.packet.UpdateRopeLengthPacket;
+import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
 
@@ -55,5 +61,9 @@ public class RopeStyleReloadListener extends SimpleJsonResourceReloadListener {
             ));
         }
         VStuff.LOGGER.info("Loaded {} rope types from data.", RopeStyleManager.styleCount());
+        if (ServerLifecycleHooks.getCurrentServer() != null) {
+            VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new SyncRopeStylesPacket());
+            VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new SyncRopeCategoriesPacket());
+        }
     }
 }

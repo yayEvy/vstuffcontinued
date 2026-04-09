@@ -32,7 +32,7 @@ public class ReworkedRopeItem extends Item {
     }
 
     @Override
-    public InteractionResult useOn(UseOnContext context) {
+    public @NotNull InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
         BlockPos clickedPos = context.getClickedPos().immutable();
         BlockState state = level.getBlockState(clickedPos);

@@ -12,7 +12,7 @@ import java.util.List;
 
 public class RopeRestyleManager {
 
-    private static final List<RopeRestyle> RESTYLES = new ArrayList<>();
+    public static List<RopeRestyle> RESTYLES = new ArrayList<>();
 
     public static void clear() { RESTYLES.clear(); }
 

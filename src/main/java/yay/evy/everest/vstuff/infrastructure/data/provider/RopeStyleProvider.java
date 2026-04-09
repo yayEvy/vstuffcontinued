@@ -108,11 +108,11 @@ public class RopeStyleProvider implements DataProvider {
         return DataProvider.saveStable(output, json, path);
     }
 
-    private JsonObject textureParams(ResourceLocation texture) {
+    public static JsonObject textureParams(ResourceLocation texture) {
         return textureParams(texture, 1.0f);
     }
 
-    private JsonObject textureParams(ResourceLocation texture, float scale) {
+    public static JsonObject textureParams(ResourceLocation texture, float scale) {
         JsonObject p = new JsonObject();
         p.addProperty("texture", texture.toString());
         p.addProperty("scale", scale);
