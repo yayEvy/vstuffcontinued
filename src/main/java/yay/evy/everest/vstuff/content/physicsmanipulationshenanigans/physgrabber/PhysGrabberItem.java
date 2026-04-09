@@ -48,13 +48,16 @@ public class PhysGrabberItem extends Item implements CustomArmPoseItem {
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
         if (!(entity instanceof Player player)) return;
-        if (!isSelected) PhysGrabberClientHandler.forceRelease(Minecraft.getInstance(), player);
-        // automatically release if not selected
+        if (!isSelected && level.isClientSide()) {
+            PhysGrabberClientHandler.forceRelease(Minecraft.getInstance(), player);
+        }
     }
 
     @Override
     public boolean onDroppedByPlayer(ItemStack item, Player player) {
-        PhysGrabberClientHandler.forceRelease(Minecraft.getInstance(), player);
+        if (player.level().isClientSide()) {
+            PhysGrabberClientHandler.forceRelease(Minecraft.getInstance(), player);
+        }
         return true;
     }
 
