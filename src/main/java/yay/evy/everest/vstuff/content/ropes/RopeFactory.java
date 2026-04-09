@@ -11,6 +11,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.PacketDistributor;
 import yay.evy.everest.vstuff.content.ropes.packet.UpdateRopeStylePacket;
 import yay.evy.everest.vstuff.index.VStuffPackets;
+import yay.evy.everest.vstuff.infrastructure.config.VServer;
+import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
 import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 import yay.evy.everest.vstuff.internal.utility.*;
@@ -37,7 +39,7 @@ public class  RopeFactory {
 
         if (!originDimension.equals(level.dimension().location().toString()))
             return RopeResult.withMessage("dimension");
-        if (length > 100f) // todo replace with config value
+        if (length > VStuffConfigs.server().ropeMaxLength.get())
             return RopeResult.withMessage("too_long");
         if (!IRopeActor.canAttach(level.getBlockState(blockPos1)))
             return RopeResult.withMessage("actor_connected");
