@@ -38,35 +38,6 @@ import java.util.Set;
 public class ServerEvents {
 
     @SubscribeEvent
-    public static void onBlockBreak(BlockEvent.BreakEvent event) {
-        if (!(event.getLevel() instanceof ServerLevel level)) return;
-
-        BlockPos brokenPos = event.getPos();
-        Vector3d worldBreakPos = RopeUtils.getWorldPos(level, brokenPos);
-        Set<Integer> idsToRemove = new HashSet<>();
-
-        for (ReworkedRope rope : RopeManager.get(level).getRopeList())
-            if (rope.atBlockPos(brokenPos)) {
-                idsToRemove.add(rope.getRopeId());
-            }
-
-        for (Integer id : idsToRemove) {
-            ItemStack drop = new ItemStack(VStuffItems.ROPE.get());
-            ItemEntity droppedEntity = new ItemEntity(
-                    level,
-                    worldBreakPos.x,
-                    worldBreakPos.y,
-                    worldBreakPos.z,
-                    drop
-            );
-
-            level.addFreshEntity(droppedEntity);
-
-            RopeFactory.removeRope(level, id);
-        }
-    }
-
-    @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         RopeManager.syncAllRopesToPlayer(player);
