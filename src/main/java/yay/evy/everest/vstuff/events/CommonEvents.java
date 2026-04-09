@@ -38,9 +38,9 @@ import java.util.Set;
 
 @Mod.EventBusSubscriber(modid = VStuff.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class CommonEvents {
+
     @SubscribeEvent
     public static void addReloadListeners(AddReloadListenerEvent event) {
-        System.out.println("reload listener");
         event.addListener(new RopeStyleReloadListener());
         event.addListener(new RopeCategoryReloadListener());
         event.addListener(new RopeRestyleReloadListener());
@@ -105,7 +105,6 @@ public class CommonEvents {
                 if (RopeRestyleManager.canRetype(rope.style, itemStack.getItem())) {
                     RopeStyle newType = RopeRestyleManager.retype(rope.style, itemStack.getItem());
                     if (newType == null) {
-                        System.out.println("something is cooked");
                         return;
                     }
                     RopeFactory.retypeRope(level, rope.getRopeId(), newType.id());
