@@ -33,14 +33,14 @@ public class ClientRopeManager {
 
     public record ClientRopeData(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, RopeStyle style) {
 
-            public ClientRopeData(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, RopeStyle style) {
-                this.ship0 = ship0;
-                this.ship1 = ship1;
-                this.localPos0 = new Vector3d(localPos0);
-                this.localPos1 = new Vector3d(localPos1);
-                this.maxLength = maxLength;
-                this.style = style;
-            }
+        public ClientRopeData(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, RopeStyle style) {
+            this.ship0 = ship0;
+            this.ship1 = ship1;
+            this.localPos0 = new Vector3d(localPos0);
+            this.localPos1 = new Vector3d(localPos1);
+            this.maxLength = maxLength;
+            this.style = style;
+        }
 
         public boolean canRender(Level level) {
             if (level == null) return false;

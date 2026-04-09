@@ -30,13 +30,20 @@ public record RopePosData(@Nullable Long shipId, BlockPos blockPos, Vector3d loc
         RopePosData first = RopePosData.create(level, ship0, blockPos0);
         RopePosData second = RopePosData.create(level, ship1, blockPos1);
 
+        if (first.isPulley()) {
+            return new Pair<>(second, first);
+        }
+
+        if (second.isPulley()) {
+            return new Pair<>(first, second);
+        }
+
         if (!first.isWorld && second.isWorld) {
             return new Pair<>(second, first);
         } else {
             return new Pair<>(first, second);
         }
     }
-
     public void attach(ServerLevel level, Integer ropeId) {
         //System.out.println("attaching for " + ropeId);
         if (selectType == RopeUtils.SelectType.ACTOR) {
@@ -71,5 +78,9 @@ public record RopePosData(@Nullable Long shipId, BlockPos blockPos, Vector3d loc
     @Override
     public @NotNull String toString() {
         return "RopePosData with shipId " + shipId + ", blockPos " + blockPos + ", localPos " + localPos + ", selectType " + selectType;
+    }
+
+    public boolean isPulley() {
+        return selectType == RopeUtils.SelectType.ACTOR;
     }
 }
