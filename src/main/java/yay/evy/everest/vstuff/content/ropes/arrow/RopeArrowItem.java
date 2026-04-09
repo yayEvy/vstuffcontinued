@@ -8,6 +8,7 @@ import net.minecraft.core.Position;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -24,15 +25,18 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.network.PacketDistributor;
+import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 import yay.evy.everest.vstuff.content.ropes.RopeFactory;
 import yay.evy.everest.vstuff.content.ropes.packet.OutlinePacket;
 import yay.evy.everest.vstuff.content.ropes.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.index.VStuffEntities;
 import yay.evy.everest.vstuff.index.VStuffPackets;
+import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 import yay.evy.everest.vstuff.internal.utility.GTPAUtils;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 import yay.evy.everest.vstuff.internal.utility.ShipUtils;
+import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
 import java.util.GregorianCalendar;
 import java.util.function.Supplier;
@@ -46,8 +50,12 @@ public class RopeArrowItem extends ArrowItem {
 
     @Override
     public AbstractArrow createArrow(Level level, ItemStack stack, LivingEntity shooter) {
-
-        return new RopeArrowEntity(VStuffEntities.ROPE_ARROW.get(), shooter, level);
+        RopeArrowEntity arrow = new RopeArrowEntity(VStuffEntities.ROPE_ARROW.get(), shooter, level);
+        if (stack.hasTag() && stack.getTag().contains("style")) {
+            ResourceLocation styleId = TagUtils.readResourceLocation(stack.getTagElement("style"));
+            arrow.setStyle(styleId);
+        }
+        return arrow;
     }
 
     @Override
@@ -113,30 +121,43 @@ public class RopeArrowItem extends ArrowItem {
 
         CompoundTag tag = stack.getTagElement("data");
         if (tag != null) {
-
             if (tag.contains("type")) {
                 try {
-                    RopeUtils.ConnectionType type =
-                            RopeUtils.ConnectionType.valueOf(tag.getString("type"));
-
+                    RopeUtils.ConnectionType type = RopeUtils.ConnectionType.valueOf(tag.getString("type"));
                     if (type == RopeUtils.ConnectionType.PULLEY && tag.contains("pos")) {
                         BlockPos pos = NbtUtils.readBlockPos(tag.getCompound("pos"));
                         if (level.getBlockEntity(pos) instanceof PhysPulleyBlockEntity pulleyBE) {
-                            // ion know
                         }
                     }
-
                 } catch (IllegalArgumentException ignored) {
                 }
             }
         }
 
+        ResourceLocation lastStyle = null;
+        if (stack.hasTag() && stack.getTag().contains("style")) {
+            lastStyle = TagUtils.readResourceLocation(stack.getTagElement("style"));
+        }
+
         stack.setTag(null);
+
+        if (lastStyle != null) {
+            stack.getOrCreateTag().put("style", TagUtils.writeResourceLocation(lastStyle));
+        }
     }
+
 
     @Override
     public boolean isFoil(ItemStack stack) {
         return stack.hasTag() && stack.getTag().contains("data");
+    }
+
+    @Override
+    public @NotNull Component getName(@NotNull ItemStack stack) {
+        return Component.translatable(this.getDescriptionId(stack))
+                .append(" (")
+                .append(RopeStyle.getOrDefault(stack.getOrCreateTag()).name())
+                .append(")");
     }
 
 }

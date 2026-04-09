@@ -68,7 +68,7 @@ public class GTPAUtils {
         VSJointAndId resolvedJoint = resolveTrackedJoint(level, gtpa, rope, newDistanceJoint);
 
         if (resolvedJoint != null) {
-            System.out.println("update joint");
+           // System.out.println("update joint");
             gtpa.updateJoint(new VSJointAndId(resolvedJoint.getJointId(), newDistanceJoint));
 //            rope.setRopeId(resolvedJoint.getJointId());
             JointUtils.removeMatchingJointsExcept(gtpa, newDistanceJoint, resolvedJoint.getJointId());

@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -27,6 +28,7 @@ import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 
 public class RopeArrowEntity extends AbstractArrow {
 
+    private ResourceLocation styleId;
 
 
     public RopeArrowEntity(EntityType<? extends AbstractArrow> pEntityType, Level pLevel) {
@@ -60,34 +62,24 @@ public class RopeArrowEntity extends AbstractArrow {
         super.onHitBlock(result);
         BlockPos secondPos = result.getBlockPos();
         Entity entity = this.getOwner();
-        ItemStack itemStack = this.getPickupItem();
 
-        if (entity instanceof Player player){
-        if (RopeArrowItem.getClickedPos() != null) {
-        if (this.level() instanceof ServerLevel serverLevel) {
+        if (entity instanceof Player player) {
+            if (RopeArrowItem.getClickedPos() != null) {
+                if (this.level() instanceof ServerLevel serverLevel) {
+                    BlockPos firstPos = RopeArrowItem.getClickedPos();
+                    Long firstShipId = getShipIdAtPos(serverLevel, firstPos);
+                    Long secondShipId = getShipIdAtPos(serverLevel, secondPos);
 
-            BlockPos firstPos = RopeArrowItem.getClickedPos();
+                    ResourceLocation style = styleId != null
+                            ? styleId
+                            : RopeStyle.getOrDefaultStyleId(new net.minecraft.nbt.CompoundTag());
 
-            Long firstShipId = getShipIdAtPos(serverLevel, firstPos);
-            Long secondShipId = getShipIdAtPos(serverLevel, secondPos);
-
-            RopeFactory.createNewRope(serverLevel,firstShipId,secondShipId,firstPos,secondPos,
-                    RopeStyle.getOrDefaultStyleId(itemStack.getOrCreateTag()), player);
-
-
-
-
-          //  System.out.println("FIRST: " + firstPos);
-        //    System.out.println("SECOND: " + secondPos);
-        }
-        }
-        if(RopeArrowItem.getClickedPos() == null){
+                    RopeFactory.createNewRope(serverLevel, firstShipId, secondShipId, firstPos, secondPos, style, player);
+                }
+            } else {
                 sendRopeMessage(player, "no_first_pos");
             }
         }
-
-       // discard();
-
     }
 
     @Override
@@ -110,6 +102,14 @@ public class RopeArrowEntity extends AbstractArrow {
                 Component.translatable("vstuff.message." + name),
                 true
         );
+    }
+
+    public void setStyle(ResourceLocation styleId) {
+        this.styleId = styleId;
+    }
+
+    public ResourceLocation getStyle() {
+        return styleId;
     }
 
 }

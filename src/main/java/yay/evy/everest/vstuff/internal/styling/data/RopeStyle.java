@@ -30,7 +30,11 @@ public record RopeStyle(
     }
 
     public static void set(Player player, ResourceLocation style) {
-        InteractionHand hand = EntityUtils.holdingInHand(player, (s) -> VStuffItems.ROPE.isIn(s) || VStuffItems.ROPE_THROWER.isIn(s));
+        InteractionHand hand = EntityUtils.holdingInHand(player, (s) ->
+                VStuffItems.ROPE.isIn(s) ||
+                        VStuffItems.ROPE_THROWER.isIn(s) ||
+                        VStuffItems.ROPE_ARROW.isIn(s)
+        );
         if (hand == null) return;
         set(player.getItemInHand(hand), style);
     }

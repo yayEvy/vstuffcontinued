@@ -36,11 +36,17 @@ public class RopeStyleMenuHandler {
 
         boolean holdingLead = EntityUtils.isHolding(player, VStuffItems.ROPE::isIn);
         boolean holdingThrower = EntityUtils.isHolding(player, VStuffItems.ROPE_THROWER::isIn);
+        boolean holdingArrow = EntityUtils.isHolding(player, VStuffItems.ROPE_ARROW::isIn);
 
-        if (!holdingLead && !holdingThrower)
+
+        if (!holdingLead && !holdingThrower && !holdingArrow)
             return;
 
-        InteractionHand hand = EntityUtils.holdingInHand(player, (s) -> VStuffItems.ROPE.isIn(s) || VStuffItems.ROPE_THROWER.isIn(s));
+        InteractionHand hand = EntityUtils.holdingInHand(player, (s) ->
+                VStuffItems.ROPE.isIn(s) ||
+                        VStuffItems.ROPE_THROWER.isIn(s) ||
+                        VStuffItems.ROPE_ARROW.isIn(s)
+        );
         if (hand == null) return;
 
         ScreenOpener.open(new RopeStylerScreen(player));
