@@ -27,7 +27,7 @@ public class GTPAUtils {
 
 
     public static void addRopeJoint(ServerLevel level, ReworkedRope rope, Player player) {
-        VSDistanceJoint distanceJoint = rope.makeJoint();
+        VSDistanceJoint distanceJoint = (VSDistanceJoint) rope.makeJoint().serialized();
         GameToPhysicsAdapter gtpa = getGTPA(level);
         if (!JointUtils.isJointPoseFinite(distanceJoint)) {
             VStuff.LOGGER.warn("Rejecting corrupted rope during creation: non-finite pose data.");
@@ -54,7 +54,7 @@ public class GTPAUtils {
     }
 
     public static void editJoint(ServerLevel level, ReworkedRope rope) {
-        VSDistanceJoint newDistanceJoint = rope.makeJoint();
+        VSDistanceJoint newDistanceJoint = (VSDistanceJoint) rope.makeJoint().serialized();
         GameToPhysicsAdapter gtpa = getGTPA(level);
         if (!JointUtils.isJointPoseFinite(newDistanceJoint)) {
             VStuff.LOGGER.warn(
