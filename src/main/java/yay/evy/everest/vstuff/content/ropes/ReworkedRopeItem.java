@@ -47,7 +47,7 @@ public class ReworkedRopeItem extends Item implements ILikeRopes {
             if (player.isShiftKeyDown()) return InteractionResult.FAIL;
 
             if (!IRopeActor.canAttach(state)) {
-                player.displayClientMessage(VStuff.translate("rope.actor_connected", blockName).withStyle(ChatFormatting.RED), true);
+                player.displayClientMessage(VStuff.translate("message.rope.actor_connected", blockName).withStyle(ChatFormatting.RED), true);
                 if (player instanceof ServerPlayer serverPlayer) {
                     VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> serverPlayer), new OutlinePacket(clickedPos, OutlinePacket.RED));
                 }
@@ -77,7 +77,7 @@ public class ReworkedRopeItem extends Item implements ILikeRopes {
         BlockPos firstClickedPos = NbtUtils.readBlockPos(tag.getCompound("firstClickedPos"));
 
         if (clickedPos.equals(firstClickedPos)) {
-            player.displayClientMessage(VStuff.translate("rope.reset").withStyle(ChatFormatting.GREEN), true);
+            player.displayClientMessage(VStuff.translate("message.rope.reset").withStyle(ChatFormatting.GREEN), true);
             resetTag(heldItem);
             return InteractionResult.SUCCESS;
         }
@@ -86,7 +86,7 @@ public class ReworkedRopeItem extends Item implements ILikeRopes {
 
 
         if (ropeResult.valid()) {
-            player.displayClientMessage(VStuff.translate("rope.created").withStyle(ChatFormatting.GREEN), true);
+            player.displayClientMessage(VStuff.translate("message.rope.created").withStyle(ChatFormatting.GREEN), true);
 
             RopeUtils.playSound(serverLevel, clickedPos, ropeResult.rope().style.placeSound());
 

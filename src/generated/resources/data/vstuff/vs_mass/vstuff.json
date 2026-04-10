@@ -22,6 +22,6 @@
   {
     "block": "vstuff:levituff",
     "friction": 0.7,
-    "mass": 1000.0
+    "mass": 1600.0
   }
 ]

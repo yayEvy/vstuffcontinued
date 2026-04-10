@@ -8,6 +8,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.RopeRendererTypes;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
@@ -31,9 +32,10 @@ public class RopeCutterItem extends Item {
         try {
             RopeFactory.removeRope(serverLevel, rope.ropeId);
             player.displayClientMessage(
-                    Component.translatable("vstuff.message.rope_break"),
+                    VStuff.translate("message.rope.break"),
                     true
             );
+
 
             RopeUtils.playSound(serverLevel, rope.posData0.blockPos(), rope.style.breakSound());
             RopeUtils.playSound(serverLevel, rope.posData1.blockPos(), rope.style.breakSound());

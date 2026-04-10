@@ -88,7 +88,7 @@ public class RopeArrowItem extends ArrowItem implements ILikeRopes {
         String blockName = state.getBlock().getName().getString();
 
         if (!IRopeActor.canAttach(state)) {
-            player.displayClientMessage(VStuff.translate("rope.actor_connected", blockName).withStyle(ChatFormatting.RED), true);
+            player.displayClientMessage(VStuff.translate("message.rope.actor_connected", blockName).withStyle(ChatFormatting.RED), true);
             if (player instanceof ServerPlayer serverPlayer) {
                 VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> serverPlayer), new OutlinePacket(clickedPos, OutlinePacket.RED));
             }
