@@ -31,15 +31,20 @@ public class  RopeFactory {
         }
     }
 
-    public static RopeResult tryCreateNewRope(ServerLevel level, ItemStack ropeItem, BlockPos blockPos0, BlockPos blockPos1, Player player) {
+    public static RopeResult tryCreateNewRope(ServerLevel level, ItemStack ropeItem, BlockPos blockPos0, BlockPos blockPos1, Entity player) {
         CompoundTag tag = ropeItem.getOrCreateTagElement("data");
+        String originDimension = tag.getString("dim");
+
+        return tryCreateNewRope(level, originDimension, blockPos0, blockPos1, player, RopeStyle.getOrDefaultStyleId(ropeItem.getOrCreateTag()));
+    }
+
+    public static RopeResult tryCreateNewRope(ServerLevel level, String dim, BlockPos blockPos0, BlockPos blockPos1, Entity player, ResourceLocation style) {
         Long ship0 = ShipUtils.getLoadedShipIdAtPos(level, blockPos0);
         Long ship1 = ShipUtils.getLoadedShipIdAtPos(level, blockPos1);
-        String originDimension = tag.getString("dim");
 
         float length = (float) RopeUtils.getWorldPos(level, blockPos0, ship0).distance(RopeUtils.getWorldPos(level, blockPos1, ship1)) + 0.5f;
 
-        if (!originDimension.equals(level.dimension().location().toString()))
+        if (!dim.equals(level.dimension().location().toString()))
             return RopeResult.withMessage("message.interdimensional_fail");
         if (length > VStuffConfigs.server().ropeMaxLength.get())
             return RopeResult.withMessage("message.too_long");
@@ -52,7 +57,7 @@ public class  RopeFactory {
                 ship1,
                 blockPos0,
                 blockPos1,
-                RopeStyle.getOrDefaultStyleId(ropeItem.getOrCreateTag()),
+                RopeStyleManager.returnOrFallback(style),
                 player
         ));
     }

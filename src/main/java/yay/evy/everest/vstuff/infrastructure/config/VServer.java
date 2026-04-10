@@ -23,7 +23,7 @@ public class VServer extends ConfigBase {
     public final ConfigFloat thrusterMaxPushDistance = f(32, 0, 256, "thrusterMaxPushDistance", Comments.inBlocks, Comments.thrusterMaxPushDistance);
 
     public final ConfigGroup physPulley = group(1, "physPulley", Comments.physPulley);
-    public final ConfigFloat pulleySpeed = f(0.5f, 0.1f, 64, "pulleySpeed", "[in Blocks per second per RPM]", Comments.pulleySpeed);
+    //public final ConfigFloat pulleySpeed = f(0.5f, 0.1f, 64, "pulleySpeed", "[in Blocks per second per RPM]", Comments.pulleySpeed);
 
     public final ConfigGroup physGrabber = group(1, "physGrabber", Comments.physGrabber);
     public final ConfigFloat physGrabberMaxMass = f(500000, 0, "physGrabberMaxMass", Comments.physGrabberMaxMass);
@@ -31,6 +31,10 @@ public class VServer extends ConfigBase {
     public final ConfigGroup reactionWheel = group(1, "reactionWheel", Comments.reactionWheel);
     public final ConfigFloat reactionWheelMaxSpeed = f(256, 1, 256, "reactionWheelMaxSpeed", Comments.inRpm, Comments.reactionWheelMaxSpeed);
     public final ConfigFloat reactionWheelMaxTorque = f(50000, 0, 100000, "reactionWheelMaxTorque", Comments.reactionWheelMaxTorque);
+
+    public final ConfigGroup levituff = group(1, "levituff");
+    public final ConfigFloat levituffStrengthMultiplier = f(3, 0, 64, "levituffStrengthMultiplier");
+    public final ConfigFloat levituffForceDamping = f(0.15f, 0, 1, "levituffForceDamping");
 
     @Override
     public @NotNull String getName() {

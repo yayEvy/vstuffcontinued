@@ -1,6 +1,7 @@
 package yay.evy.everest.vstuff.events;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -32,8 +33,11 @@ import yay.evy.everest.vstuff.infrastructure.data.listener.RopeStyleReloadListen
 import yay.evy.everest.vstuff.internal.styling.RopeRestyleManager;
 import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
+import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Mod.EventBusSubscriber(modid = VStuff.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -52,26 +56,28 @@ public class CommonEvents {
 
         BlockPos brokenPos = event.getPos();
         Vector3d worldBreakPos = RopeUtils.getWorldPos(level, brokenPos);
-        Set<Integer> idsToRemove = new HashSet<>();
+        Map<Integer, ResourceLocation> idsToRemove = new HashMap<>();
 
         for (ReworkedRope rope : RopeManager.get(level).getRopeList())
             if (rope.atBlockPos(brokenPos)) {
-                idsToRemove.add(rope.getRopeId());
+                idsToRemove.put(rope.getRopeId(), rope.style.id());
             }
 
-        for (Integer id : idsToRemove) {
-            ItemStack drop = new ItemStack(VStuffItems.ROPE.get());
+        for (Map.Entry<Integer, ResourceLocation> entry : idsToRemove.entrySet()) {
+            ItemStack ropeStack = new ItemStack(VStuffItems.ROPE.get());
+            ropeStack.getOrCreateTag().put("style", TagUtils.writeResourceLocation(entry.getValue()));
+
             ItemEntity droppedEntity = new ItemEntity(
                     level,
                     worldBreakPos.x,
                     worldBreakPos.y,
                     worldBreakPos.z,
-                    drop
+                    ropeStack
             );
 
             level.addFreshEntity(droppedEntity);
 
-            RopeFactory.removeRope(level, id);
+            RopeFactory.removeRope(level, entry.getKey());
         }
     }
 

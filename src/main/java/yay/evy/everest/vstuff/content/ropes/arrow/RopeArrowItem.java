@@ -26,7 +26,6 @@ import yay.evy.everest.vstuff.content.ropes.IRopeActor;
 import yay.evy.everest.vstuff.content.ropes.packet.OutlinePacket;
 import yay.evy.everest.vstuff.index.VStuffEntities;
 import yay.evy.everest.vstuff.index.VStuffPackets;
-import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
 public class RopeArrowItem extends ArrowItem implements ILikeRopes {
@@ -37,15 +36,23 @@ public class RopeArrowItem extends ArrowItem implements ILikeRopes {
     @Override
     public @NotNull AbstractArrow createArrow(Level level, ItemStack stack, LivingEntity shooter) {
         RopeArrowEntity arrow = new RopeArrowEntity(VStuffEntities.ROPE_ARROW.get(), shooter, level);
-        if (stack.hasTag() && stack.getTag().contains("style")) {
-            ResourceLocation styleId = TagUtils.readResourceLocation(stack.getTagElement("style"));
-            arrow.setStyle(styleId);
-        }
-         if (stack.hasTag() && stack.getTag().contains("data")) {
-             CompoundTag data = stack.getTagElement("data");
-             arrow.setFirstPos(NbtUtils.readBlockPos(data.getCompound("firstPos")));
-             arrow.setFirstDim(data.getString("firstDim"));
-         }
+
+        if (stack.hasTag() && stack.getTag().contains("data")) {
+            CompoundTag data = stack.getTagElement("data");
+
+            if (!data.contains("firstPos") || !data.contains("firstDim")) {
+                arrow.setInvalid();
+            } else {
+                arrow.setFirstPos(NbtUtils.readBlockPos(data.getCompound("firstPos")));
+                arrow.setFirstDim(data.getString("firstDim"));
+            }
+
+            if (stack.getTag().contains("style")) {
+                ResourceLocation styleId = TagUtils.readResourceLocation(stack.getTagElement("style"));
+                arrow.setStyle(styleId);
+            }
+        } else arrow.setInvalid();
+
         return arrow;
     }
 

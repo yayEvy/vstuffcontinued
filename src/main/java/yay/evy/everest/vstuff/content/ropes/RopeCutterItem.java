@@ -11,6 +11,7 @@ import net.minecraft.world.level.Level;
 import yay.evy.everest.vstuff.client.RopeRendererTypes;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
+import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
 public class RopeCutterItem extends Item {
     public RopeCutterItem(Properties pProperties) {
@@ -23,7 +24,6 @@ public class RopeCutterItem extends Item {
         if (!(level instanceof ServerLevel serverLevel)) {
             return InteractionResultHolder.pass(itemStack);
         }
-
 
         ReworkedRope rope = RopeUtils.findRope(serverLevel, player);
         if (rope == null) return InteractionResultHolder.pass(itemStack);
@@ -40,7 +40,10 @@ public class RopeCutterItem extends Item {
 
             if (!player.isCreative()) {
                 itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
-                player.drop(new ItemStack(VStuffItems.ROPE.get()), false);
+                ItemStack ropeStack = new ItemStack(VStuffItems.ROPE.get());
+                ropeStack.getOrCreateTag().put("style", TagUtils.writeResourceLocation(rope.style.id()));
+
+                player.drop(ropeStack, false);
             }
 
             return InteractionResultHolder.success(itemStack);

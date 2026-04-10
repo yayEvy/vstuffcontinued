@@ -3,12 +3,10 @@ package yay.evy.everest.vstuff;
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import net.createmod.catnip.lang.LangBuilder;
-import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -20,7 +18,6 @@ import org.slf4j.Logger;
 import org.valkyrienskies.core.api.ships.ShipPhysicsListener;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff.LevituffAttachment;
-import yay.evy.everest.vstuff.content.ropes.arrow.RopeArrowRenderer;
 import yay.evy.everest.vstuff.content.ships.reactionwheel.ReactionWheelAttachment;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.PhysGrabberServerAttachment;
 import yay.evy.everest.vstuff.content.ships.thrust.ThrusterForceAttachment;
@@ -42,20 +39,17 @@ public class VStuff {
     public VStuff(FMLJavaModLoadingContext modLoadingContext) {
         IEventBus modEventBus = modLoadingContext.getModEventBus();
 
-        VStuffCreativeModeTabs.register(modEventBus);
 
         REGISTRATE.registerEventListeners(modEventBus);
-        REGISTRATE.setCreativeTab(VStuffCreativeModeTabs.VSTUFF_MAIN);
 
         VStuffSounds.register(modEventBus);
-
         VStuffBlocks.register();
         VStuffItems.register();
         VStuffEntities.register();
-
-
+        VStuffCreativeModeTabs.register(modEventBus);
         VStuffBlockEntities.register();
         VStuffPackets.register();
+
         VStuffConfigs.register(modLoadingContext);
 
         MinecraftForge.EVENT_BUS.register(this);

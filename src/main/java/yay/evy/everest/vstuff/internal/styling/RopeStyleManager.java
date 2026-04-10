@@ -26,6 +26,10 @@ public final class RopeStyleManager {
             SoundEvents.WOOL_BREAK
     ));
 
+    public static ResourceLocation returnOrFallback(ResourceLocation original) {
+        return original == null ? FALLBACK_ID : original;
+    }
+
     private RopeStyleManager() {}
 
     public static RopeStyle registerStyle(RopeStyle type) {

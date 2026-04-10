@@ -26,9 +26,6 @@ public class LevituffBlock extends Block implements IBE<LevituffBlockEntity> {
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        if (type == VStuffBlockEntities.LEVITUFF_BE.get()) {
-            return (BlockEntityTicker<T>) (BlockEntityTicker<LevituffBlockEntity>) LevituffBlockEntity::clientTick;
-        }
-        return null;
+        return (l, p, s, be) -> LevituffBlockEntity.tick(l, p, (LevituffBlockEntity) be);
     }
 }

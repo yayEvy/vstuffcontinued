@@ -1,27 +1,27 @@
 [
   {
     "block": "vstuff:mechanical_thruster",
-    "mass": 2000.0,
-    "friction": 0.6
+    "friction": 0.6,
+    "mass": 2000.0
   },
   {
     "block": "vstuff:phys_pulley",
-    "mass": 2000.0,
-    "friction": 0.6
+    "friction": 0.6,
+    "mass": 2000.0
   },
   {
     "block": "vstuff:pulley_anchor",
-    "mass": 100.0,
-    "friction": 0.2
+    "friction": 0.2,
+    "mass": 100.0
   },
   {
     "block": "vstuff:reaction_wheel",
-    "mass": 2000.0,
-    "friction": 0.6
+    "friction": 0.6,
+    "mass": 2000.0
   },
   {
     "block": "vstuff:levituff",
-    "mass": 300.0,
-    "friction": 0.6
+    "friction": 0.7,
+    "mass": 1000.0
   }
 ]
