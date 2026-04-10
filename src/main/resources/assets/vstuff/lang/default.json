@@ -42,6 +42,7 @@
   "vstuff.message.pulley_fail": "You must attach the rope to a Pulley Anchor!",
   "vstuff.message.rope_thrown": "Rope thrown!",
   "vstuff.message.anchor_first_fail": "You must select a Phys Pulley first!",
+  "vstuff.message.no_first_pos": "You must select a first pos!!",
 
   "vstuff.ponder.phys_pulley.text_3": "First, shift-right-click the pulley to start defining the rope's path.",
   "vstuff.ponder.phys_pulley.text_4": "Then, right-click another block to set the rope's anchor point and length.",

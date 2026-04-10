@@ -118,4 +118,17 @@ public class CommonEvents {
             }
         }
     }
+
+    // guh
+    @SubscribeEvent
+    public static void onPlayerChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+
+        RopeManager.syncAllRopesToPlayer(player);
+
+        VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeStylesPacket());
+        VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeCategoriesPacket());
+        VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeRestylesPacket());
+    }
+
 }
