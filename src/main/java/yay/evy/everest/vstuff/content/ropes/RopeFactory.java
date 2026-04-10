@@ -45,11 +45,11 @@ public class  RopeFactory {
         float length = (float) RopeUtils.getWorldPos(level, blockPos0, ship0).distance(RopeUtils.getWorldPos(level, blockPos1, ship1)) + 0.5f;
 
         if (!dim.equals(level.dimension().location().toString()))
-            return RopeResult.withMessage("message.interdimensional_fail");
+            return RopeResult.withMessage("message.rope.interdimensional_fail");
         if (length > VStuffConfigs.server().ropeMaxLength.get())
-            return RopeResult.withMessage("message.too_long");
+            return RopeResult.withMessage("message.rope.too_long");
         if (!IRopeActor.canAttach(level.getBlockState(blockPos1)))
-            return RopeResult.withMessage("message.actor_connected");
+            return RopeResult.withMessage("message.rope.actor_connected");
 
         return RopeResult.validResult(createNewRope(
                 level,
