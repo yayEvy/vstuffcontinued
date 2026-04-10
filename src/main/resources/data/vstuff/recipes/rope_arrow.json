@@ -1,20 +1,15 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "LLL",
-    "LIL",
-    "LLL"
-  ],
-  "key": {
-    "L": {
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
       "item": "vstuff:rope"
     },
-    "I": {
+    {
       "item": "minecraft:arrow"
     }
-  },
+  ],
   "result": {
     "item": "vstuff:rope_arrow",
-    "count": 8
+    "count": 1
   }
 }

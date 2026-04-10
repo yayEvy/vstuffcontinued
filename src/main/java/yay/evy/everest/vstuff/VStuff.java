@@ -12,9 +12,7 @@ import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -53,8 +51,7 @@ public class VStuff {
 
         VStuffBlocks.register();
         VStuffItems.register();
-        VStuffEntities.register(modEventBus);
-        modEventBus.addListener(this::onRegisterRenderers);
+        VStuffEntities.register();
 
 
         VStuffBlockEntities.register();
@@ -68,14 +65,7 @@ public class VStuff {
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> VStuffClient.initialize(modEventBus));
 
-
-
-
         LOGGER.info("{} ({}) initialized", VStuff.NAME, VStuff.MOD_ID);
-    }
-
-    private void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        EntityRenderers.register(VStuffEntities.ROPE_ARROW.get(), RopeArrowRenderer::new);
     }
 
     @VsBeta

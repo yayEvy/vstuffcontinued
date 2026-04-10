@@ -31,16 +31,18 @@ public class VStuffItems {
             .properties(p -> p
                 .stacksTo(64)
             )
+            .tag(STYLING_AVAILABLE)
             .defaultModel()
             .register();
 
     public static final ItemEntry<RopeArrowItem> ROPE_ARROW =
         REGISTRATE.item("rope_arrow", RopeArrowItem::new)
-                .properties(p -> p
-                        .stacksTo(64)
-                )
-                .defaultModel()
-                .register();
+            .properties(p -> p
+                .stacksTo(64)
+            )
+            .tag(STYLING_AVAILABLE)
+            .defaultModel()
+            .register();
 
     public static final ItemEntry<RopeCutterItem> ROPE_CUTTER =
         REGISTRATE.item("rope_cutter", RopeCutterItem::new)

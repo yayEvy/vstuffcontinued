@@ -5,7 +5,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -18,14 +17,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.client.RopeRendererTypes;
-import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 import yay.evy.everest.vstuff.content.ropes.packet.OutlinePacket;
 import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
-import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
-public class ReworkedRopeItem extends Item {
+
+public class ReworkedRopeItem extends Item implements ILikeRopes {
 
     public ReworkedRopeItem(Properties properties) {
         super(properties);
@@ -52,7 +49,6 @@ public class ReworkedRopeItem extends Item {
             if (!IRopeActor.canAttach(state)) {
                 player.displayClientMessage(VStuff.translate("rope.actor_connected", blockName).withStyle(ChatFormatting.RED), true);
                 if (player instanceof ServerPlayer serverPlayer) {
-                    //NetworkHandler.sendOutlineToPlayer(serverPlayer, clickedPos, ClientOutlineHandler.RED);
                     VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> serverPlayer), new OutlinePacket(clickedPos, OutlinePacket.RED));
                 }
                 return InteractionResult.SUCCESS;
@@ -66,7 +62,6 @@ public class ReworkedRopeItem extends Item {
             tag.putString("dim", level.dimension().location().toString());
 
             if (player instanceof ServerPlayer serverPlayer) {
-                //NetworkHandler.sendOutlineToPlayer(serverPlayer, clickedPos, ClientOutlineHandler.GREEN);
                 VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> serverPlayer), new OutlinePacket(clickedPos, OutlinePacket.GREEN));
             }
 
@@ -112,28 +107,11 @@ public class ReworkedRopeItem extends Item {
 
     @Override
     public @NotNull Component getName(@NotNull ItemStack stack) {
-        return Component.translatable(this.getDescriptionId(stack))
-                .append(" (")
-                .append(RopeStyle.getOrDefault(stack.getOrCreateTag()).name())
-                .append(")");
+        return getNameWithStyle(this, stack);
     }
 
     @Override
     public boolean isFoil(ItemStack stack) {
-        return stack.hasTag() && stack.getTag().contains("data");
-    }
-
-    private void resetTag(ItemStack stack) {
-        ResourceLocation lastStyle = null;
-        if (stack.getTag().contains("style")) {
-            lastStyle = TagUtils.readResourceLocation(stack.getTagElement("style"));
-        }
-
-        stack.setTag(null);
-
-        if (lastStyle != null) {
-            stack.getOrCreateTag().put("style", TagUtils.writeResourceLocation(lastStyle));
-        }
-        // clears tag then puts the style back if there was one
+        return isItemFoil(stack);
     }
 }

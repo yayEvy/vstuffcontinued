@@ -6,6 +6,8 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
+import yay.evy.everest.vstuff.internal.utility.records.JointValues;
+import yay.evy.everest.vstuff.internal.utility.records.RopePosData;
 
 public class TagUtils {
 

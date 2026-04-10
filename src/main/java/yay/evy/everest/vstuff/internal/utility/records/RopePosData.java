@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.internal.utility;
+package yay.evy.everest.vstuff.internal.utility.records;
 
 import kotlin.Pair;
 import net.minecraft.core.BlockPos;
@@ -6,8 +6,9 @@ import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.ropes.IRopeActor;
-import yay.evy.everest.vstuff.internal.utility.RopeUtils.PosType;
+import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 import org.joml.Vector3d;
+import yay.evy.everest.vstuff.internal.utility.ShipUtils;
 
 import javax.annotation.Nullable;
 

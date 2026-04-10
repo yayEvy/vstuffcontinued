@@ -6,16 +6,18 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.PacketDistributor;
 import yay.evy.everest.vstuff.content.ropes.packet.UpdateRopeStylePacket;
 import yay.evy.everest.vstuff.index.VStuffPackets;
-import yay.evy.everest.vstuff.infrastructure.config.VServer;
 import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
 import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 import yay.evy.everest.vstuff.internal.utility.*;
+import yay.evy.everest.vstuff.internal.utility.records.JointValues;
+import yay.evy.everest.vstuff.internal.utility.records.RopePosData;
 
 public class  RopeFactory {
 
@@ -55,7 +57,7 @@ public class  RopeFactory {
         ));
     }
 
-    public static ReworkedRope createNewRope(ServerLevel level, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1, ResourceLocation style, Player player) {
+    public static ReworkedRope createNewRope(ServerLevel level, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1, ResourceLocation style, Entity player) {
         Pair<RopePosData, RopePosData> posDataPair = RopePosData.create(level, ship0, ship1, blockPos0, blockPos1);
         RopePosData posData0 = posDataPair.component1();
         RopePosData posData1 = posDataPair.component2();

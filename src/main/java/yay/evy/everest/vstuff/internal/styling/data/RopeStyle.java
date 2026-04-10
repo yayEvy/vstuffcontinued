@@ -33,8 +33,12 @@ public record RopeStyle(
         return RopeStyleManager.get(getOrDefaultStyleId(tag));
     }
 
+    public static RopeStyle get(ResourceLocation styleId) {
+        return RopeStyleManager.get(styleId);
+    }
+
     public static void set(Player player, ResourceLocation style) {
-        InteractionHand hand = EntityUtils.holdingInHand(player, (s) -> VStuffItems.ROPE.isIn(s) || VStuffItems.ROPE_ARROW.isIn(s));
+        InteractionHand hand = EntityUtils.holdingInHand(player, stack -> stack.is(VStuffItems.STYLING_AVAILABLE));
         if (hand == null) return;
         set(player.getItemInHand(hand), style);
     }

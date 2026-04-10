@@ -1,10 +1,12 @@
 package yay.evy.everest.vstuff.internal.utility;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -165,17 +167,6 @@ public class RopeUtils {
                 1.0f
         );
     }
-
-//    public static void playBreakSound(ServerLevel serverLevel, BlockPos pos, boolean chain) {
-//        serverLevel.playSound(
-//                null,
-//                pos,
-//                chain ? SoundEvents.CHAIN_BREAK : SoundEvents.WOOL_BREAK,
-//                SoundSource.PLAYERS,
-//                1.0f,
-//                1.0f
-//        );
-//    }
 
     public static SelectType getSelectType(Level level, BlockPos pos) {
         if (level.getBlockEntity(pos) instanceof IRopeActor) {

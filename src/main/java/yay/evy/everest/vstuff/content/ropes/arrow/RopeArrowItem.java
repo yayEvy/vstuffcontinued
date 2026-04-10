@@ -1,163 +1,120 @@
 package yay.evy.everest.vstuff.content.ropes.arrow;//package yay.evy.everest.vstuff.content.ropes.arrow;
 
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Position;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ArrowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
-import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
-import yay.evy.everest.vstuff.content.ropes.RopeFactory;
+import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.content.ropes.ILikeRopes;
+import yay.evy.everest.vstuff.content.ropes.IRopeActor;
 import yay.evy.everest.vstuff.content.ropes.packet.OutlinePacket;
-import yay.evy.everest.vstuff.content.ropes.pulley.PhysPulleyBlockEntity;
 import yay.evy.everest.vstuff.index.VStuffEntities;
 import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
-import yay.evy.everest.vstuff.internal.utility.GTPAUtils;
-import yay.evy.everest.vstuff.internal.utility.RopeUtils;
-import yay.evy.everest.vstuff.internal.utility.ShipUtils;
 import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
-import java.util.GregorianCalendar;
-import java.util.function.Supplier;
-
-public class RopeArrowItem extends ArrowItem {
+public class RopeArrowItem extends ArrowItem implements ILikeRopes {
 
 
     public RopeArrowItem(Properties properties) { super(properties);}
 
-    private static BlockPos clickedPos;
-
     @Override
-    public AbstractArrow createArrow(Level level, ItemStack stack, LivingEntity shooter) {
+    public @NotNull AbstractArrow createArrow(Level level, ItemStack stack, LivingEntity shooter) {
         RopeArrowEntity arrow = new RopeArrowEntity(VStuffEntities.ROPE_ARROW.get(), shooter, level);
         if (stack.hasTag() && stack.getTag().contains("style")) {
             ResourceLocation styleId = TagUtils.readResourceLocation(stack.getTagElement("style"));
             arrow.setStyle(styleId);
         }
+         if (stack.hasTag() && stack.getTag().contains("data")) {
+             CompoundTag data = stack.getTagElement("data");
+             arrow.setFirstPos(NbtUtils.readBlockPos(data.getCompound("firstPos")));
+             arrow.setFirstDim(data.getString("firstDim"));
+         }
         return arrow;
     }
 
     @Override
-    public InteractionResult useOn(UseOnContext ctext) {
-        if (ctext.getPlayer() instanceof ServerPlayer serverPlayer) {
+    public InteractionResult useOn(@NotNull UseOnContext ctx) {
+        Level level = ctx.getLevel();
+        BlockPos clickedPos = ctx.getClickedPos().immutable();
+        Player player = ctx.getPlayer();
+        ItemStack heldItem = ctx.getItemInHand();
 
-            ItemStack stack = ctext.getItemInHand();
-
-            if (serverPlayer.isShiftKeyDown()) {
-                if (isFoil(stack)) {
-                    resetStateWithMessage((ServerLevel) ctext.getLevel(), stack, serverPlayer, "rope.reset");
-                    VStuffPackets.channel().send(
-                            PacketDistributor.PLAYER.with(() -> serverPlayer),
-                            new OutlinePacket(ctext.getClickedPos(), OutlinePacket.RED)
-                    );
-                    return InteractionResult.SUCCESS;
-                }
-                return InteractionResult.FAIL;
-            }
-
-            clickedPos = ctext.getClickedPos();
-
-            CompoundTag tag = stack.getOrCreateTagElement("data");
-            tag.put("pos", NbtUtils.writeBlockPos(clickedPos));
-            tag.putString("dim", ctext.getLevel().dimension().location().toString());
-
-            VStuffPackets.channel().send(
-                    PacketDistributor.PLAYER.with(() -> serverPlayer),
-                    new OutlinePacket(clickedPos, OutlinePacket.GREEN)
-            );
-
-            sendRopeMessage(ctext.getPlayer(), "rope.first");
-            return InteractionResult.SUCCESS;
+        if (!(level instanceof ServerLevel) || player == null) {
+            return InteractionResult.PASS;
         }
+
+        if (!isFoil(heldItem)) {
+            if (player.isShiftKeyDown()) return InteractionResult.FAIL;
+
+            return selection(level, clickedPos, heldItem, player);
+        } else if (player.isShiftKeyDown()) {
+            player.displayClientMessage(VStuff.translate("message.rope.reset").withStyle(ChatFormatting.GREEN), true);
+            resetTag(heldItem);
+            return InteractionResult.SUCCESS;
+        } else if (isFoil(heldItem)) {
+            return selection(level, clickedPos, heldItem, player);
+        }
+
         return InteractionResult.FAIL;
     }
 
-    public static BlockPos getClickedPos(){
-     return clickedPos;
+    private InteractionResult selection(Level level, BlockPos clickedPos, ItemStack heldItem, Player player) {
+        BlockState state = level.getBlockState(clickedPos);
+
+        String blockName = state.getBlock().getName().getString();
+
+        if (!IRopeActor.canAttach(state)) {
+            player.displayClientMessage(VStuff.translate("rope.actor_connected", blockName).withStyle(ChatFormatting.RED), true);
+            if (player instanceof ServerPlayer serverPlayer) {
+                VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> serverPlayer), new OutlinePacket(clickedPos, OutlinePacket.RED));
+            }
+            return InteractionResult.FAIL;
+        }
+
+        player.displayClientMessage(VStuff.translate("message.rope.first", blockName), true);
+
+        CompoundTag tag = heldItem.getOrCreateTagElement("data");
+
+        tag.put("firstPos", NbtUtils.writeBlockPos(clickedPos));
+        tag.putString("firstDim", level.dimension().location().toString());
+
+        if (player instanceof ServerPlayer serverPlayer) {
+            VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> serverPlayer), new OutlinePacket(clickedPos, OutlinePacket.GREEN));
+        }
+
+        return InteractionResult.SUCCESS;
     }
 
     @Override
     public boolean isInfinite(ItemStack stack, ItemStack bow, Player player) {
-        return bow.getEnchantmentLevel(Enchantments.INFINITY_ARROWS) > 0 ;
+        return false;
     }
-
-    private void resetStateWithMessage(ServerLevel level, ItemStack stack, Player player, String name) {
-        sendRopeMessage(player, name);
-
-        resetState(level, stack);
-    }
-
-    private void sendRopeMessage(Player player, String name) {
-        player.displayClientMessage(
-                Component.translatable("vstuff.message." + name),
-                true
-        );
-    }
-
-
-    private void resetState(ServerLevel level, ItemStack stack) {
-        if (!isFoil(stack)) return;
-
-        CompoundTag tag = stack.getTagElement("data");
-        if (tag != null) {
-            if (tag.contains("type")) {
-                try {
-                    RopeUtils.ConnectionType type = RopeUtils.ConnectionType.valueOf(tag.getString("type"));
-                    if (type == RopeUtils.ConnectionType.PULLEY && tag.contains("pos")) {
-                        BlockPos pos = NbtUtils.readBlockPos(tag.getCompound("pos"));
-                        if (level.getBlockEntity(pos) instanceof PhysPulleyBlockEntity pulleyBE) {
-                        }
-                    }
-                } catch (IllegalArgumentException ignored) {
-                }
-            }
-        }
-
-        ResourceLocation lastStyle = null;
-        if (stack.hasTag() && stack.getTag().contains("style")) {
-            lastStyle = TagUtils.readResourceLocation(stack.getTagElement("style"));
-        }
-
-        stack.setTag(null);
-
-        if (lastStyle != null) {
-            stack.getOrCreateTag().put("style", TagUtils.writeResourceLocation(lastStyle));
-        }
-    }
-
 
     @Override
     public boolean isFoil(ItemStack stack) {
-        return stack.hasTag() && stack.getTag().contains("data");
+        return isItemFoil(stack);
     }
 
     @Override
     public @NotNull Component getName(@NotNull ItemStack stack) {
-        return Component.translatable(this.getDescriptionId(stack))
-                .append(" (")
-                .append(RopeStyle.getOrDefault(stack.getOrCreateTag()).name())
-                .append(")");
+        return getNameWithStyle(this, stack);
     }
 
 }

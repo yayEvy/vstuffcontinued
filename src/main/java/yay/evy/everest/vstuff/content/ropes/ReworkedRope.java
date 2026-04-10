@@ -8,6 +8,8 @@ import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.utility.*;
+import yay.evy.everest.vstuff.internal.utility.records.JointValues;
+import yay.evy.everest.vstuff.internal.utility.records.RopePosData;
 
 import javax.annotation.Nullable;
 import java.util.Objects;

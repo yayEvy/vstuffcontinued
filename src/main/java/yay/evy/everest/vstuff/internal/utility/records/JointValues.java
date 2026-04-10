@@ -1,9 +1,7 @@
-package yay.evy.everest.vstuff.internal.utility;
+package yay.evy.everest.vstuff.internal.utility.records;
 
-import net.minecraft.nbt.CompoundTag;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
-import org.joml.Vector3f;
 import org.valkyrienskies.core.internal.joints.VSDistanceJoint;
 import org.valkyrienskies.core.internal.joints.VSJoint;
 import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;

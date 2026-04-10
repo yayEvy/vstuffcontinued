@@ -2,6 +2,7 @@ package yay.evy.everest.vstuff.internal.utility;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import org.valkyrienskies.core.internal.joints.VSDistanceJoint;
 import org.valkyrienskies.core.internal.joints.VSJoint;
@@ -26,7 +27,7 @@ public class GTPAUtils {
     }
 
 
-    public static void addRopeJoint(ServerLevel level, ReworkedRope rope, Player player) {
+    public static void addRopeJoint(ServerLevel level, ReworkedRope rope, Entity player) {
         VSDistanceJoint distanceJoint = (VSDistanceJoint) rope.makeJoint().serialized();
         GameToPhysicsAdapter gtpa = getGTPA(level);
         if (!JointUtils.isJointPoseFinite(distanceJoint)) {
