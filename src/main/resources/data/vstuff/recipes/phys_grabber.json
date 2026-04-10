@@ -1,0 +1,31 @@
+{
+  "type": "create:mechanical_crafting",
+  "accept_mirrored": true,
+  "category": "misc",
+  "key": {
+    "I": {
+      "item": "create:industrial_iron_block"
+    },
+    "L": {
+      "item": "create:andesite_alloy"
+    },
+    "C": {
+      "item": "vstuff:levituff"
+    },
+    "B": {
+      "item": "create:brass_ingot"
+    },
+    "S": {
+      "item": "create:brass_sheet"
+    }
+  },
+  "pattern": [
+    "  SSS",
+    "LCIII",
+    "BB   "
+  ],
+  "result": {
+    "count": 1,
+    "item": "vstuff:phys_grabber"
+  }
+}
