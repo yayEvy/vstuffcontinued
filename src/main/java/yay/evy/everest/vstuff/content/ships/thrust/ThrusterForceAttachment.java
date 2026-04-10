@@ -3,6 +3,7 @@ package yay.evy.everest.vstuff.content.ships.thrust;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -12,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.core.api.ships.*;
 import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
-
 
 @SuppressWarnings("deprecation")
 public final class ThrusterForceAttachment implements ShipPhysicsListener {

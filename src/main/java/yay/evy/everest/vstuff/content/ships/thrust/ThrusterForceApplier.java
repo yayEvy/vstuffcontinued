@@ -1,5 +1,8 @@
 package yay.evy.everest.vstuff.content.ships.thrust;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.properties.ShipTransform;
@@ -10,19 +13,21 @@ import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import net.minecraft.core.BlockPos;
 import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
 
-
 public class ThrusterForceApplier {
     ThrusterData data;
 
-    public ThrusterForceApplier(ThrusterData data){
+    @JsonCreator
+    public ThrusterForceApplier(@JsonProperty("data") ThrusterData data) {
         this.data = data;
     }
 
-    private final Vector3d worldForceDirection = new Vector3d();
-    private final Vector3d worldForce = new Vector3d();
-    private final Vector3d parallelForce = new Vector3d();
-    private final Vector3d perpendicularForce = new Vector3d();
-    private Vector3d velocityDirection = new Vector3d();
+    public ThrusterForceApplier() {}
+
+    @JsonIgnore private final Vector3d worldForceDirection = new Vector3d();
+    @JsonIgnore private final Vector3d worldForce = new Vector3d();
+    @JsonIgnore private final Vector3d parallelForce = new Vector3d();
+    @JsonIgnore private final Vector3d perpendicularForce = new Vector3d();
+    @JsonIgnore private Vector3d velocityDirection = new Vector3d();
 
     private static final Vector3d scaledForce_temp1 = new Vector3d();
     private static final Vector3d scaledForce_temp2 = new Vector3d();
