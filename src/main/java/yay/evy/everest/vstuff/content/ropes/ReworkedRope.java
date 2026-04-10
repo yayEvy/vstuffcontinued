@@ -73,17 +73,19 @@ public class ReworkedRope {
     public void setJointLength(ServerLevel level, Float newLength) {
         setJointValues(level, null, null, newLength, null, null, null, null);
     }
-
     /**
      * sets a rope's joint values. any parameters that are given null will not be changed
      */
-    public void setJointValues(ServerLevel level, @Nullable VSJointMaxForceTorque maxForceTorque, @Nullable Float minLength, @Nullable Float maxLength,
-                               @Nullable Double compliance, @Nullable Float tolerance, @Nullable Float stiffness, @Nullable Float damping) {
-        this.jointValues = this.jointValues.withChanged(maxForceTorque, minLength, maxLength, compliance, tolerance, stiffness, damping);
-
+    public void setJointValues(ServerLevel level, @Nullable VSJointMaxForceTorque maxForceTorque,
+                               @Nullable Float minLength, @Nullable Float maxLength,
+                               @Nullable Double compliance, @Nullable Float tolerance,
+                               @Nullable Float stiffness, @Nullable Float damping) {
+        this.jointValues = this.jointValues.withChanged(maxForceTorque, minLength, maxLength,
+                compliance, tolerance, stiffness, damping);
         GTPAUtils.editJoint(level, this);
-    }
 
+        RopeManager.get(level).setDirty();
+    }
     public VSDistanceJoint makeJoint() {
         return this.jointValues.makeJoint(posData0.shipId(), posData0.localPos(), posData1.shipId(), posData1.localPos());
     }
