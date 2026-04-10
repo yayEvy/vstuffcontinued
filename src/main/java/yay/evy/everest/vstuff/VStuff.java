@@ -19,6 +19,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 import org.valkyrienskies.core.api.ships.ShipPhysicsListener;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
+import yay.evy.everest.vstuff.api.registry.VStuffRegistries;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff.LevituffAttachment;
 import yay.evy.everest.vstuff.content.ropes.arrow.RopeArrowRenderer;
 import yay.evy.everest.vstuff.content.ships.reactionwheel.ReactionWheelAttachment;
@@ -42,21 +43,20 @@ public class VStuff {
     public VStuff(FMLJavaModLoadingContext modLoadingContext) {
         IEventBus modEventBus = modLoadingContext.getModEventBus();
 
+        VStuffRegistries.init();
+
         VStuffCreativeModeTabs.register(modEventBus);
 
         REGISTRATE.registerEventListeners(modEventBus);
         REGISTRATE.setCreativeTab(VStuffCreativeModeTabs.VSTUFF_MAIN);
 
-        VStuffSounds.register(modEventBus);
-
         VStuffBlocks.register();
-        VStuffItems.register();
-        VStuffEntities.register();
-
-
         VStuffBlockEntities.register();
-        VStuffPackets.register();
         VStuffConfigs.register(modLoadingContext);
+        VStuffEntities.register();
+        VStuffItems.register();
+        VStuffPackets.register();
+        VStuffSounds.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
 
