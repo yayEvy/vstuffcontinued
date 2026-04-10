@@ -28,8 +28,9 @@ public class RopeCategoryProvider implements DataProvider {
         futures.add(category(output, "Wool Styles",1));
         futures.add(category(output, "Dyed Styles",2));
         futures.add(category(output, "Pride Styles",3));
-        futures.add(category(output, "Log Styles",4));
-        futures.add(category(output, "Merry VStuffmas",5));
+        futures.add(category(output, "Casing Styles", 4));
+        futures.add(category(output, "Log Styles",5));
+        futures.add(category(output, "Merry VStuffmas",6));
 
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
     }

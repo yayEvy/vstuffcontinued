@@ -39,9 +39,14 @@ public class DatagenUtils {
 
     public static final List<String> WOOLS = COLORS.stream().map(color -> color + " Wool").toList();
 
+    public static final List<String> CASINGS = List.of("Andesite Casing", "Brass Casing", "Copper Casing", "Train Casing", "Industrial Iron");
+
     public static final List<String> dyes = toIds(COLORS, "_dye");
     public static final List<String> wools = toIds(COLORS, "_wool");
     public static final List<String> logs = toIds(LOGS, "_log");
+    public static final List<String> casings = toIds(CASINGS, "");
+
+    // TODO we really need a better way of doing this all these lists are a mess :sob:
 
     public static String[] resourceArray(String... paths) {
         return Arrays.stream(paths).map(path -> VStuff.asResource(path).toString()).toArray(String[]::new);

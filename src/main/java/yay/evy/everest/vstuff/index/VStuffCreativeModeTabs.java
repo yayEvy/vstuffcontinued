@@ -74,13 +74,8 @@ public class VStuffCreativeModeTabs {
         @Override
         public void accept(CreativeModeTab.ItemDisplayParameters params, CreativeModeTab.Output output) {
             List<Item> items = new LinkedList<>();
-            items.addAll(collectBlocks(VSTUFF_MAIN, (item) -> {
-                return false;
-            }));
-            items.addAll(collectItems(VSTUFF_MAIN, (item) -> {
-                return item == VStuffItems.ROPE_THROWER.get()
-                        || item == VStuffItems.CREATIVE_ROPE_EDITOR.get();
-            }));
+            items.addAll(collectBlocks(VSTUFF_MAIN, (item) -> false));
+            items.addAll(collectItems(VSTUFF_MAIN, (item) -> item == VStuffItems.CREATIVE_ROPE_EDITOR.get()));
 
             outputAll(output, items);
         }

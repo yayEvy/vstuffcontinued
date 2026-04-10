@@ -16,16 +16,11 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.ropes.arrow.RopeArrowEntity;
-import yay.evy.everest.vstuff.content.ropes.arrow.RopeArrowRenderer;
-import yay.evy.everest.vstuff.content.ropes.thrower.RopeThrowerEntity;
 
 public class VStuffEntities {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
             DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, VStuff.MOD_ID);
 
-    public static final RegistryObject<EntityType<RopeThrowerEntity>> ROPE_THROWER =
-            ENTITY_TYPES.register("rope_thrower", () -> EntityType.Builder.<RopeThrowerEntity>of(RopeThrowerEntity::new, MobCategory.MISC)
-                    .sized(0.5f, 0.5f).build("rope_thrower"));
 
         public static final RegistryObject<EntityType<RopeArrowEntity>> ROPE_ARROW =
             ENTITY_TYPES.register("rope_arrow", () -> EntityType.Builder.<RopeArrowEntity>of(RopeArrowEntity::new, MobCategory.MISC)

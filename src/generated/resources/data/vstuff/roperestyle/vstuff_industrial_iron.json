@@ -1,0 +1,8 @@
+{
+  "from_category": "vstuff:casing_styles",
+  "input": [
+    "create:industrial_iron_block",
+    "minecraft:iron_ingot"
+  ],
+  "result": "vstuff:industrial_iron"
+}

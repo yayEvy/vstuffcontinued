@@ -17,11 +17,6 @@ public class VStuffClient {
     }
 
     private static void clientInit(final FMLClientSetupEvent event) {
-        event.enqueueWork(() -> EntityRenderers.register(
-                VStuffEntities.ROPE_THROWER.get(),
-                ThrownItemRenderer::new
-        ));
-
         VStuffPartialModels.register();
         RopeRendererTypes.init();
         PonderIndex.addPlugin(new VStuffPonders());

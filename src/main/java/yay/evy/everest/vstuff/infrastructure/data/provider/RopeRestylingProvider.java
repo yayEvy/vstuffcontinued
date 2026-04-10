@@ -2,6 +2,8 @@ package yay.evy.everest.vstuff.infrastructure.data.provider;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.simibubi.create.AllBlocks;
+import com.simibubi.create.AllItems;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
@@ -35,6 +37,8 @@ public class RopeRestylingProvider implements DataProvider {
 
         futures.addAll(dyeRestyles(output));
 
+        futures.addAll(casingRestyles(output));
+
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
     }
 
@@ -57,6 +61,12 @@ public class RopeRestylingProvider implements DataProvider {
     private List<? extends CompletableFuture<?>> dyeRestyles(CachedOutput output) {
         return zipToMap(DYE_ITEMS, resourceList(dyes)).entrySet().stream().map((entry) ->
                         restyling(output, List.of(entry.getKey()), "vstuff:dyed_styles", null, entry.getValue().toString()))
+                .toList();
+    }
+
+    private List<? extends CompletableFuture<?>> casingRestyles(CachedOutput output) {
+        return zipToMap(zipToList(CASING_ITEMS, CASING_INGOT_ITEMS), resourceList(casings)).entrySet().stream().map(entry ->
+                        restyling(output, entry.getKey(), "vstuff:casing_styles", null, entry.getValue().toString()))
                 .toList();
     }
 
@@ -181,5 +191,21 @@ public class RopeRestylingProvider implements DataProvider {
             Items.STRIPPED_ACACIA_LOG,
             Items.STRIPPED_MANGROVE_LOG,
             Items.STRIPPED_CHERRY_LOG
+    );
+
+    static final List<Item> CASING_ITEMS = List.of(
+            AllBlocks.ANDESITE_CASING.asItem(),
+            AllBlocks.BRASS_CASING.asItem(),
+            AllBlocks.COPPER_CASING.asItem(),
+            AllBlocks.RAILWAY_CASING.asItem(),
+            AllBlocks.INDUSTRIAL_IRON_BLOCK.asItem()
+    );
+
+    static final List<Item> CASING_INGOT_ITEMS = List.of(
+            AllItems.ANDESITE_ALLOY.asItem(),
+            AllItems.BRASS_INGOT.asItem(),
+            Items.COPPER_INGOT,
+            AllItems.STURDY_SHEET.asItem(),
+            Items.IRON_INGOT
     );
 }

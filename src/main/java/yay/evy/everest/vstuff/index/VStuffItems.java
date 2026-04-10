@@ -3,6 +3,8 @@ package yay.evy.everest.vstuff.index;
 import com.simibubi.create.foundation.data.AssetLookup;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.ItemEntry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import yay.evy.everest.vstuff.VStuff;
@@ -12,7 +14,6 @@ import yay.evy.everest.vstuff.content.ropes.arrow.RopeArrowItem;
 import yay.evy.everest.vstuff.content.ships.assembly.ExpendableAssemblerItem;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.PhysGrabberItem;
 import yay.evy.everest.vstuff.content.ropes.editor.RopeEditorItem;
-import yay.evy.everest.vstuff.content.ropes.thrower.RopeThrowerItem;
 
 
 public class VStuffItems {
@@ -23,6 +24,8 @@ public class VStuffItems {
         REGISTRATE.setCreativeTab(VStuffCreativeModeTabs.VSTUFF_MAIN);
     }
 
+    public static final TagKey<Item> STYLING_AVAILABLE = TagKey.create(Registries.ITEM, VStuff.asResource("styling_available"));
+
     public static final ItemEntry<ReworkedRopeItem> ROPE =
         REGISTRATE.item("rope", ReworkedRopeItem::new)
             .properties(p -> p
@@ -31,21 +34,13 @@ public class VStuffItems {
             .defaultModel()
             .register();
 
-    public static final ItemEntry<RopeThrowerItem> ROPE_THROWER =
-        REGISTRATE.item("rope_thrower", RopeThrowerItem::new)
-            .properties(p -> p
-                .stacksTo(64)
-            )
-            .defaultModel()
-            .register();
-
-        public static final ItemEntry<RopeArrowItem> ROPE_ARROW =
-            REGISTRATE.item("rope_arrow", RopeArrowItem::new)
-                    .properties(p -> p
-                            .stacksTo(64)
-                    )
-                    .defaultModel()
-                    .register();
+    public static final ItemEntry<RopeArrowItem> ROPE_ARROW =
+        REGISTRATE.item("rope_arrow", RopeArrowItem::new)
+                .properties(p -> p
+                        .stacksTo(64)
+                )
+                .defaultModel()
+                .register();
 
     public static final ItemEntry<RopeCutterItem> ROPE_CUTTER =
         REGISTRATE.item("rope_cutter", RopeCutterItem::new)

@@ -26,11 +26,6 @@ import static yay.evy.everest.vstuff.internal.utility.RopeUtils.findTargetedLead
 public class ClientEvents {
 
         @SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event) {
-            EntityRenderers.register(VStuffEntities.ROPE_THROWER.get(), ThrownItemRenderer::new);
-        }
-
-        @SubscribeEvent
         public static void onClientTick(TickEvent.ClientTickEvent event) {
             switch (event.phase){
                 case START -> onClientTickStart(Minecraft.getInstance());

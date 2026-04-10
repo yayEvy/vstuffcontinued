@@ -1,6 +1,7 @@
 package yay.evy.everest.vstuff.infrastructure.data.provider;
 
 import com.google.gson.JsonObject;
+import com.simibubi.create.AllSoundEvents;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
@@ -41,6 +42,8 @@ public class RopeStyleProvider implements DataProvider {
 
         futures.addAll(ropeStyles(output, List.of("Pride", "Gay", "Lesbian", "Bisexual", "Transgender", "Nonbinary", "Asexual"), "pride_styles", "normal"));
 
+        futures.addAll(ropeStyles(output, List.of("Andesite Casing", "Brass Casing", "Copper Casing", "Train Casing", "Industrial Iron"), "casing_styles", "normal",SoundEvents.WOOD_PLACE, AllSoundEvents.WRENCH_REMOVE.getMainEvent()));
+
         futures.addAll(logStyles(output));
 
         futures.add(ropeStyle(output, "Candycane", "merry_vstuffmas", "normal"));
@@ -76,6 +79,12 @@ public class RopeStyleProvider implements DataProvider {
     private List<? extends CompletableFuture<?>> ropeStyles(CachedOutput output, List<String> names, String category, String renderer) {
         List<CompletableFuture<?>> types = new ArrayList<>();
         names.forEach(name -> types.add(ropeStyle(output, name, category, renderer)));
+        return types;
+    }
+
+    private List<? extends CompletableFuture<?>> ropeStyles(CachedOutput output, List<String> names, String category, String renderer, SoundEvent placeSound, SoundEvent breakSound) {
+        List<CompletableFuture<?>> types = new ArrayList<>();
+        names.forEach(name -> types.add(ropeStyle(output, name, category, renderer, placeSound, breakSound)));
         return types;
     }
 

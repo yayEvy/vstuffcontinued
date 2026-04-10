@@ -1,0 +1,11 @@
+{
+  "break_sound": "create:wrench_remove",
+  "category": "vstuff:casing_styles",
+  "name": "Brass Casing",
+  "place_sound": "minecraft:block.wood.place",
+  "renderer": "vstuff:normal",
+  "renderer_params": {
+    "scale": 1.0,
+    "texture": "vstuff:textures/rope/rope_brass_casing.png"
+  }
+}

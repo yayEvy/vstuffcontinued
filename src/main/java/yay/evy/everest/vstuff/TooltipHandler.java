@@ -78,9 +78,6 @@ public class TooltipHandler {
         tooltipModifications.put(VStuffItems.PHYS_GRABBER.get(),
                 (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
 
-        tooltipModifications.put(VStuffItems.ROPE_THROWER.get(),
-                (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
-
         tooltipModifications.put(VStuffItems.ROPE_ARROW.get(),
                 (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
 

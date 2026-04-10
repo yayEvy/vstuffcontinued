@@ -1,0 +1,8 @@
+{
+  "from_category": "vstuff:casing_styles",
+  "input": [
+    "create:brass_casing",
+    "create:brass_ingot"
+  ],
+  "result": "vstuff:brass_casing"
+}

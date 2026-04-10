@@ -1,0 +1,8 @@
+{
+  "from_category": "vstuff:casing_styles",
+  "input": [
+    "create:copper_casing",
+    "minecraft:copper_ingot"
+  ],
+  "result": "vstuff:copper_casing"
+}
