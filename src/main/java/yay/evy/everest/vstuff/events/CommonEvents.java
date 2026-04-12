@@ -10,9 +10,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -25,6 +28,8 @@ import yay.evy.everest.vstuff.content.ropes.RopeManager;
 import yay.evy.everest.vstuff.content.ropes.packet.SyncRopeCategoriesPacket;
 import yay.evy.everest.vstuff.content.ropes.packet.SyncRopeRestylesPacket;
 import yay.evy.everest.vstuff.content.ropes.packet.SyncRopeStylesPacket;
+import yay.evy.everest.vstuff.content.ropes.phys_ropes.PhysRopeConstraint;
+import yay.evy.everest.vstuff.content.ropes.phys_ropes.PhysRopeManager;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.infrastructure.data.listener.RopeCategoryReloadListener;
@@ -136,5 +141,44 @@ public class CommonEvents {
         VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeCategoriesPacket());
         VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeRestylesPacket());
     }
+    @SubscribeEvent
+    public static void onServerTick(TickEvent.ServerTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) return;
+        ServerLevel level = event.getServer().overworld();
+        PhysRopeManager.get(level).tickSegmentSync(level);
+    }
 
+
+    // todo yeet these well not yeet but like not do it so sussy
+    @SubscribeEvent
+    public static void onServerStarted(ServerStartedEvent event) {
+        ServerLevel level = event.getServer().overworld();
+        level.getServer().tell(new net.minecraft.server.TickTask(
+                level.getServer().getTickCount() + 5,
+                () -> {
+                    PhysRopeManager manager = PhysRopeManager.get(level);
+                    for (Map.Entry<Integer, PhysRopeConstraint> entry : manager.getPhysRopes().entrySet()) {
+                        PhysRopeConstraint c = entry.getValue();
+                        c.recreatePhysEntities(level);
+                        c.posData0.attach(level, entry.getKey());
+                        c.posData1.attach(level, entry.getKey());
+                        manager.setDirty();
+                    }
+                    level.getServer().tell(new net.minecraft.server.TickTask(
+                            level.getServer().getTickCount() + 5,
+                            () -> {
+                                for (PhysRopeConstraint c : manager.getPhysRopes().values()) {
+                                    c.restoreJoints(level, c.getSegments(), c.getSegmentLength());
+                                }
+                            }
+                    ));
+                }
+        ));
+    }
+    @SubscribeEvent
+    public static void onWorldSave(LevelEvent.Save event) {
+        if (!(event.getLevel() instanceof ServerLevel level)) return;
+        if (!level.equals(level.getServer().overworld())) return;
+        PhysRopeManager.get(level).setDirty();
+    }
 }

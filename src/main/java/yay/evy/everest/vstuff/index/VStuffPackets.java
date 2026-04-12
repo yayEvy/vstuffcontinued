@@ -34,6 +34,8 @@ public enum VStuffPackets {
     ROPE_STYLES_SYNC(SyncRopeStylesPacket.class, SyncRopeStylesPacket::new, PLAY_TO_CLIENT),
     ROPE_CATEGORIES_SYNC(SyncRopeCategoriesPacket.class, SyncRopeCategoriesPacket::new, PLAY_TO_CLIENT),
     ROPE_RESTYLES_SYNC(SyncRopeRestylesPacket.class, SyncRopeRestylesPacket::new, PLAY_TO_CLIENT),
+    PHYS_ROPE_SEGMENTS(PhysRopeSegmentsPacket.class, PhysRopeSegmentsPacket::new, PLAY_TO_CLIENT),
+
 
     // client -> server packets
     STYLE_SELECT(StyleSelectPacket.class, StyleSelectPacket::new, PLAY_TO_SERVER),

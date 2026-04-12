@@ -24,12 +24,23 @@ import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.utility.RopeRenderUtils;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ClientRopeManager {
     private static final Map<Integer, ClientRopeData> clientConstraints = new HashMap<>();
     private static final Map<Integer, Pair<Vector3d,Vector3d>> previousStartRelativeAndEndRelativeVectors = new HashMap<>();
+
+    // phys ropes :3dsmile:
+    private static final Map<Integer, List<PhysRopePoint>> physRopeSegments = new HashMap<>();
+    private static final Map<Integer, List<PhysRopePoint>> prevPhysRopeSegments = new HashMap<>();
+    private static final Map<Integer, List<Vector3d>> physRopeSegmentVelocities = new HashMap<>();
+    private static final Map<Integer, Long> physRopeLastUpdateTime = new HashMap<>();
+    public static final int PHYS_ROPE_ID_START = 100_000;
+    public record PhysRopePoint(Vector3d localPos, Long shipId) {}
+
 
     public record ClientRopeData(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, RopeStyle style) {
 
@@ -175,11 +186,18 @@ public class ClientRopeManager {
 
             float stableGameTime = (level.getGameTime() + partialTick) / 20.0f;
 
-            double sagAmount  = RopeRenderUtils.computeSag(actualLength, maxLength);
-            float  windOffset = RopeRenderUtils.computeWindOffset(stableGameTime);
+            Vector3d[] curve;
+            List<PhysRopePoint> physPoints = getInterpolatedPhysRopeSegments(ropeId, partialTick, level);
+            if (physPoints != null && physPoints.size() >= 2) {
+                List<Vector3d> worldSegments = resolvePhysSegmentsToWorld(physPoints, level);
+                curve = interpolateSegmentsToCurve(worldSegments, cameraPos, startRelative, endRelative);
+            } else {
+                double sagAmount  = RopeRenderUtils.computeSag(actualLength, maxLength);
+                float  windOffset = RopeRenderUtils.computeWindOffset(stableGameTime);
+                curve = RopeRenderUtils.computeCurve(startRelative, endRelative, sagAmount, windOffset, stableGameTime);
+            }
 
-            Vector3d[] curve  = RopeRenderUtils.computeCurve(startRelative, endRelative, sagAmount, windOffset, stableGameTime);
-            int[] light  = RopeRenderUtils.computeLighting(curve, level, cameraPos);
+            int[] light = RopeRenderUtils.computeLighting(curve, level, cameraPos);
 
             Pair<Vector3d,Vector3d> prevStartRelativeAndEndRelative = previousStartRelativeAndEndRelativeVectors.computeIfAbsent(ropeId, (id) -> new Pair<>(startRelative, endRelative));
 
@@ -198,5 +216,115 @@ public class ClientRopeManager {
 
             return true;
         }
+    }
+
+    private static Vector3d[] interpolateSegmentsToCurve(List<Vector3d> worldPoints, Vec3 cameraPos,
+                                                         Vector3d startRelative, Vector3d endRelative) {
+        List<Vector3d> pts = new ArrayList<>();
+        pts.add(new Vector3d(startRelative.x + cameraPos.x,
+                startRelative.y + cameraPos.y,
+                startRelative.z + cameraPos.z));
+        pts.addAll(worldPoints);
+        pts.add(new Vector3d(endRelative.x + cameraPos.x,
+                endRelative.y + cameraPos.y,
+                endRelative.z + cameraPos.z));
+
+        Vector3d first = pts.get(0);
+        Vector3d second = pts.get(1);
+        Vector3d secondLast = pts.get(pts.size() - 2);
+        Vector3d last = pts.get(pts.size() - 1);
+        pts.add(0, new Vector3d(2*first.x - second.x, 2*first.y - second.y, 2*first.z - second.z));
+        pts.add(new Vector3d(2*last.x - secondLast.x, 2*last.y - secondLast.y, 2*last.z - secondLast.z));
+
+        Vector3d[] curve = new Vector3d[RopeRenderUtils.ROPE_CURVE_SEGMENTS + 1];
+        int segments = pts.size() - 3;
+
+        for (int i = 0; i <= RopeRenderUtils.ROPE_CURVE_SEGMENTS; i++) {
+            float t = (float) i / RopeRenderUtils.ROPE_CURVE_SEGMENTS;
+            float scaled = t * segments;
+            int span = Math.min((int) scaled, segments - 1);
+            float localT = scaled - span;
+
+            Vector3d p0 = pts.get(span);
+            Vector3d p1 = pts.get(span + 1);
+            Vector3d p2 = pts.get(span + 2);
+            Vector3d p3 = pts.get(span + 3);
+
+            curve[i] = catmullRom(p0, p1, p2, p3, localT, cameraPos);
+        }
+        return curve;
+    }
+
+
+    private static Vector3d catmullRom(Vector3d p0, Vector3d p1, Vector3d p2, Vector3d p3,
+                                       float t, Vec3 cameraPos) {
+        float t2 = t * t;
+        float t3 = t2 * t;
+        double x = 0.5 * ((2*p1.x) + (-p0.x + p2.x)*t + (2*p0.x - 5*p1.x + 4*p2.x - p3.x)*t2 + (-p0.x + 3*p1.x - 3*p2.x + p3.x)*t3);
+        double y = 0.5 * ((2*p1.y) + (-p0.y + p2.y)*t + (2*p0.y - 5*p1.y + 4*p2.y - p3.y)*t2 + (-p0.y + 3*p1.y - 3*p2.y + p3.y)*t3);
+        double z = 0.5 * ((2*p1.z) + (-p0.z + p2.z)*t + (2*p0.z - 5*p1.z + 4*p2.z - p3.z)*t2 + (-p0.z + 3*p1.z - 3*p2.z + p3.z)*t3);
+        return new Vector3d(x - cameraPos.x, y - cameraPos.y, z - cameraPos.z);
+    }
+
+    public static void updatePhysRopeSegments(int ropeId, List<Vector3d> positions, Level level) {
+        long tick = level.getGameTime();
+
+        List<PhysRopePoint> current = physRopeSegments.get(ropeId);
+        if (current != null) {
+            prevPhysRopeSegments.put(ropeId, current);
+        }
+
+        List<PhysRopePoint> newData = new ArrayList<>();
+        for (Vector3d pos : positions) {
+            newData.add(new PhysRopePoint(pos, null));
+        }
+
+        physRopeSegments.put(ropeId, newData);
+        physRopeLastUpdateTime.put(ropeId, tick);
+    }
+
+    public static List<PhysRopePoint> getPhysRopeSegments(int ropeId) {
+        return physRopeSegments.get(ropeId);
+    }
+
+    private static List<Vector3d> resolvePhysSegmentsToWorld(List<PhysRopePoint> points, Level level) {
+        List<Vector3d> world = new ArrayList<>(points.size());
+        for (PhysRopePoint point : points) {
+            world.add(RopeUtils.renderLocalToWorld(level, point.localPos(), point.shipId()));
+        }
+        return world;
+    }
+
+    public static List<PhysRopePoint> getInterpolatedPhysRopeSegments(int ropeId, float partialTick, Level level) {
+        List<PhysRopePoint> current = physRopeSegments.get(ropeId);
+        List<PhysRopePoint> previous = prevPhysRopeSegments.get(ropeId);
+        Long lastUpdateTick = physRopeLastUpdateTime.get(ropeId);
+
+        if (current == null) return null;
+        if (previous == null || previous.size() != current.size() || lastUpdateTick == null) {
+            return current;
+        }
+
+        float ticksSinceUpdate = (float)(level.getGameTime() - lastUpdateTick);
+        float lerpAlpha = ticksSinceUpdate + partialTick;
+        lerpAlpha = Math.min(lerpAlpha, 1.0f);
+
+        List<PhysRopePoint> result = new ArrayList<>(current.size());
+        for (int i = 0; i < current.size(); i++) {
+            Vector3d from = previous.get(i).localPos();
+            Vector3d to = current.get(i).localPos();
+
+            Vector3d blendedPos = new Vector3d(
+                    from.x + (to.x - from.x) * lerpAlpha,
+                    from.y + (to.y - from.y) * lerpAlpha,
+                    from.z + (to.z - from.z) * lerpAlpha
+            );
+
+            result.add(new PhysRopePoint(blendedPos, current.get(i).shipId()));
+        }
+        return result;
+    }
+    public static void clearNormalRopeConstraints() {
+        clientConstraints.keySet().removeIf(id -> id < PHYS_ROPE_ID_START);
     }
 }
