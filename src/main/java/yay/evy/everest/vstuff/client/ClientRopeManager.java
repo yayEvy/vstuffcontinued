@@ -33,14 +33,19 @@ public class ClientRopeManager {
     private static final Map<Integer, ClientRopeData> clientConstraints = new HashMap<>();
     private static final Map<Integer, Pair<Vector3d,Vector3d>> previousStartRelativeAndEndRelativeVectors = new HashMap<>();
 
-    // phys ropes :3dsmile:
     private static final Map<Integer, List<PhysRopePoint>> physRopeSegments = new HashMap<>();
     private static final Map<Integer, List<PhysRopePoint>> prevPhysRopeSegments = new HashMap<>();
     private static final Map<Integer, List<Vector3d>> physRopeSegmentVelocities = new HashMap<>();
     private static final Map<Integer, Long> physRopeLastUpdateTime = new HashMap<>();
     public static final int PHYS_ROPE_ID_START = 100_000;
     public record PhysRopePoint(Vector3d localPos, Long shipId) {}
+    private static final Map<Integer, List<PhysRopePoint>> targetPhysRopeSegments = new HashMap<>();
+    private static final Map<Integer, Long> physRopeTargetTick = new HashMap<>();
 
+    private static final Map<Integer, Long> physRopeLastUpdateMs = new HashMap<>();
+    private static final Map<Integer, Long> physRopeIntervalMs = new HashMap<>();
+
+    public static Vector3d[] lastComputedNormals = null;
 
     public record ClientRopeData(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, RopeStyle style) {
 
@@ -78,7 +83,6 @@ public class ClientRopeManager {
         public ClientRopeData withStyle(RopeStyle newStyle) {
             return new ClientRopeData(ship0, ship1, localPos0, localPos1, maxLength, newStyle);
         }
-
     }
 
     public static void updateClientRopeLength(Integer ropeId, double length) {
@@ -96,7 +100,6 @@ public class ClientRopeManager {
 
     public static void removeClientConstraint(Integer constraintId) {
         if (constraintId == null) return;
-
         clientConstraints.remove(constraintId);
     }
 
@@ -148,7 +151,6 @@ public class ClientRopeManager {
             }
         }
 
-
         private static boolean renderClientRope(PoseStack poseStack, MultiBufferSource bufferSource,
                                                 ClientRopeData ropeData,
                                                 Level level, Vec3 cameraPos, float partialTick, int ropeId) {
@@ -197,6 +199,8 @@ public class ClientRopeManager {
                 curve = RopeRenderUtils.computeCurve(startRelative, endRelative, sagAmount, windOffset, stableGameTime);
             }
 
+            Vector3d[] normals = computeParallelTransportFrames(curve);
+
             int[] light = RopeRenderUtils.computeLighting(curve, level, cameraPos);
 
             Pair<Vector3d,Vector3d> prevStartRelativeAndEndRelative = previousStartRelativeAndEndRelativeVectors.computeIfAbsent(ropeId, (id) -> new Pair<>(startRelative, endRelative));
@@ -211,6 +215,7 @@ public class ClientRopeManager {
             previousStartRelativeAndEndRelativeVectors.put(ropeId, new Pair<>(startRelative, endRelative));
 
             poseStack.pushPose();
+            lastComputedNormals = normals;
             renderer.render(ctx, poseStack, bufferSource, curve, light);
             poseStack.popPose();
 
@@ -252,9 +257,49 @@ public class ClientRopeManager {
 
             curve[i] = catmullRom(p0, p1, p2, p3, localT, cameraPos);
         }
-        return curve;
+
+        return arcLengthReparameterize(curve);
     }
 
+    public static Vector3d[] computeParallelTransportFrames(Vector3d[] curve) {
+        int n = curve.length;
+        Vector3d[] normals = new Vector3d[n];
+        Vector3d[] tangents = new Vector3d[n];
+
+        for (int i = 0; i < n - 1; i++) {
+            tangents[i] = new Vector3d(curve[i+1]).sub(curve[i]).normalize();
+        }
+        tangents[n-1] = new Vector3d(tangents[n-2]);
+
+        Vector3d startT = tangents[0];
+        Vector3d binormal = new Vector3d(0, 1, 0);
+        if (Math.abs(startT.dot(binormal)) > 0.9) {
+            binormal.set(1, 0, 0);
+        }
+        normals[0] = new Vector3d(startT).cross(binormal).normalize();
+
+        for (int i = 0; i < n - 1; i++) {
+            Vector3d v1 = new Vector3d(curve[i+1]).sub(curve[i]);
+            double c1 = v1.dot(v1);
+            if (c1 < 1e-12) {
+                normals[i+1] = new Vector3d(normals[i]);
+                continue;
+            }
+
+            Vector3d r_i = new Vector3d(normals[i]).sub(new Vector3d(v1).mul(2.0 * v1.dot(normals[i]) / c1));
+            Vector3d t_i = new Vector3d(tangents[i]).sub(new Vector3d(v1).mul(2.0 * v1.dot(tangents[i]) / c1));
+
+            Vector3d v2 = new Vector3d(tangents[i+1]).sub(t_i);
+            double c2 = v2.dot(v2);
+            if (c2 < 1e-12) {
+                normals[i+1] = r_i.normalize();
+            } else {
+                normals[i+1] = new Vector3d(r_i).sub(new Vector3d(v2).mul(2.0 * v2.dot(r_i) / c2)).normalize();
+            }
+        }
+
+        return normals;
+    }
 
     private static Vector3d catmullRom(Vector3d p0, Vector3d p1, Vector3d p2, Vector3d p3,
                                        float t, Vec3 cameraPos) {
@@ -267,7 +312,16 @@ public class ClientRopeManager {
     }
 
     public static void updatePhysRopeSegments(int ropeId, List<Vector3d> positions, Level level) {
-        long tick = level.getGameTime();
+        long now = System.currentTimeMillis();
+
+        Long lastMs = physRopeLastUpdateMs.get(ropeId);
+        if (lastMs != null) {
+            long interval = now - lastMs;
+            if (interval > 0 && interval < 2000) {
+                physRopeIntervalMs.put(ropeId, interval);
+            }
+        }
+        physRopeLastUpdateMs.put(ropeId, now);
 
         List<PhysRopePoint> current = physRopeSegments.get(ropeId);
         if (current != null) {
@@ -280,7 +334,7 @@ public class ClientRopeManager {
         }
 
         physRopeSegments.put(ropeId, newData);
-        physRopeLastUpdateTime.put(ropeId, tick);
+        physRopeLastUpdateTime.put(ropeId, level.getGameTime());
     }
 
     public static List<PhysRopePoint> getPhysRopeSegments(int ropeId) {
@@ -298,33 +352,64 @@ public class ClientRopeManager {
     public static List<PhysRopePoint> getInterpolatedPhysRopeSegments(int ropeId, float partialTick, Level level) {
         List<PhysRopePoint> current = physRopeSegments.get(ropeId);
         List<PhysRopePoint> previous = prevPhysRopeSegments.get(ropeId);
-        Long lastUpdateTick = physRopeLastUpdateTime.get(ropeId);
+        Long lastUpdateMs = physRopeLastUpdateMs.get(ropeId);
+        Long intervalMs = physRopeIntervalMs.get(ropeId);
 
         if (current == null) return null;
-        if (previous == null || previous.size() != current.size() || lastUpdateTick == null) {
+        if (previous == null || previous.size() != current.size()
+                || lastUpdateMs == null || intervalMs == null) {
             return current;
         }
 
-        float ticksSinceUpdate = (float)(level.getGameTime() - lastUpdateTick);
-        float lerpAlpha = ticksSinceUpdate + partialTick;
-        lerpAlpha = Math.min(lerpAlpha, 1.0f);
+        long now = System.currentTimeMillis();
+        float msSinceUpdate = (float)(now - lastUpdateMs);
+        float lerpAlpha = Math.min(msSinceUpdate / intervalMs, 1.0f);
 
         List<PhysRopePoint> result = new ArrayList<>(current.size());
         for (int i = 0; i < current.size(); i++) {
             Vector3d from = previous.get(i).localPos();
-            Vector3d to = current.get(i).localPos();
-
-            Vector3d blendedPos = new Vector3d(
-                    from.x + (to.x - from.x) * lerpAlpha,
-                    from.y + (to.y - from.y) * lerpAlpha,
-                    from.z + (to.z - from.z) * lerpAlpha
-            );
-
-            result.add(new PhysRopePoint(blendedPos, current.get(i).shipId()));
+            Vector3d to   = current.get(i).localPos();
+            result.add(new PhysRopePoint(
+                    new Vector3d(
+                            from.x + (to.x - from.x) * lerpAlpha,
+                            from.y + (to.y - from.y) * lerpAlpha,
+                            from.z + (to.z - from.z) * lerpAlpha
+                    ),
+                    current.get(i).shipId()
+            ));
         }
         return result;
     }
+
     public static void clearNormalRopeConstraints() {
         clientConstraints.keySet().removeIf(id -> id < PHYS_ROPE_ID_START);
+    }
+
+    private static Vector3d[] arcLengthReparameterize(Vector3d[] curve) {
+        double[] arcLen = new double[curve.length];
+        arcLen[0] = 0;
+        for (int i = 1; i < curve.length; i++) {
+            arcLen[i] = arcLen[i-1] + curve[i].distance(curve[i-1]);
+        }
+        double totalLen = arcLen[curve.length - 1];
+        if (totalLen < 1e-6) return curve;
+
+        Vector3d[] result = new Vector3d[curve.length];
+        result[0] = curve[0];
+        result[curve.length - 1] = curve[curve.length - 1];
+
+        int j = 1;
+        for (int i = 1; i < curve.length - 1; i++) {
+            double targetLen = totalLen * i / (curve.length - 1);
+            while (j < curve.length - 1 && arcLen[j] < targetLen) j++;
+            double segLen = arcLen[j] - arcLen[j-1];
+            double t = segLen < 1e-9 ? 0 : (targetLen - arcLen[j-1]) / segLen;
+            result[i] = new Vector3d(
+                    curve[j-1].x + (curve[j].x - curve[j-1].x) * t,
+                    curve[j-1].y + (curve[j].y - curve[j-1].y) * t,
+                    curve[j-1].z + (curve[j].z - curve[j-1].z) * t
+            );
+        }
+        return result;
     }
 }
