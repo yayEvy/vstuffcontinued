@@ -42,7 +42,7 @@ public class RopeStyleProvider implements DataProvider {
 
         futures.addAll(ropeStyles(output, List.of("Pride", "Gay", "Lesbian", "Bisexual", "Transgender", "Nonbinary", "Asexual"), "pride_styles", "normal"));
 
-        futures.addAll(ropeStyles(output, List.of("Andesite Casing", "Brass Casing", "Copper Casing", "Train Casing", "Industrial Iron"), "casing_styles", "normal",SoundEvents.WOOD_PLACE, AllSoundEvents.WRENCH_REMOVE.getMainEvent()));
+        futures.addAll(ropeStyles(output, List.of("Andesite Casing", "Brass Casing", "Copper Casing", "Train Casing", "Industrial Iron"), "casing_styles", "normal", SoundEvents.WOOD_PLACE, SoundEvents.WOOD_BREAK));
 
         futures.addAll(logStyles(output));
 

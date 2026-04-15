@@ -14,7 +14,7 @@ import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
-public class RopeCutterItem extends Item {
+public class RopeCutterItem extends Item implements ILikeRopes{
     public RopeCutterItem(Properties pProperties) {
         super(pProperties);
     }
@@ -31,11 +31,11 @@ public class RopeCutterItem extends Item {
 
         try {
             RopeFactory.removeRope(serverLevel, rope.ropeId);
+
             player.displayClientMessage(
                     VStuff.translate("message.rope.break"),
                     true
             );
-
 
             RopeUtils.playSound(serverLevel, rope.posData0.blockPos(), rope.style.breakSound());
             RopeUtils.playSound(serverLevel, rope.posData1.blockPos(), rope.style.breakSound());
@@ -43,7 +43,7 @@ public class RopeCutterItem extends Item {
             if (!player.isCreative()) {
                 itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
                 ItemStack ropeStack = new ItemStack(VStuffItems.ROPE.get());
-                ropeStack.getOrCreateTag().put("style", TagUtils.writeResourceLocation(rope.style.id()));
+                addStyleToTag(ropeStack, rope.style);
 
                 player.drop(ropeStack, false);
             }

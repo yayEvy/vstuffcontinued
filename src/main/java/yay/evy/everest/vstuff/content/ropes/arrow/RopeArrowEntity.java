@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.ropes.arrow;//package yay.evy.everest.vstuff.content.ropes.arrow;
+package yay.evy.everest.vstuff.content.ropes.arrow;
 
 
 import net.minecraft.core.BlockPos;
@@ -25,6 +25,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
+import yay.evy.everest.vstuff.content.ropes.ILikeRopes;
 import yay.evy.everest.vstuff.content.ropes.RopeFactory;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
@@ -33,7 +34,7 @@ import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
 import static yay.evy.everest.vstuff.internal.utility.ShipUtils.getShipIdAtPos;
 
-public class RopeArrowEntity extends AbstractArrow {
+public class RopeArrowEntity extends AbstractArrow implements ILikeRopes {
 
     private ResourceLocation styleId;
     private BlockPos firstPos;
@@ -67,8 +68,6 @@ public class RopeArrowEntity extends AbstractArrow {
         BlockPos secondPos = bhr.getBlockPos();
         Entity entity = this.getOwner();
 
-        System.out.println(pickup);
-
         if (!(this.level() instanceof ServerLevel serverLevel)) return;
         if (!isMainProjectile()) return;
 
@@ -77,12 +76,12 @@ public class RopeArrowEntity extends AbstractArrow {
                 RopeFactory.RopeResult result = RopeFactory.tryCreateNewRope(serverLevel, firstDim, firstPos, secondPos, entity, styleId);
 
                 if (!result.valid()) {
-                    createFailDrop(serverLevel, secondPos);
+                    createRopeDrop(serverLevel, secondPos, styleId);
                 } else {
                     hasCreated = true;
                 }
             } else {
-                createFailDrop(serverLevel, secondPos);
+                createRopeDrop(serverLevel, secondPos, styleId);
             }
         }
     }
@@ -92,23 +91,6 @@ public class RopeArrowEntity extends AbstractArrow {
         if (!(entity instanceof Player player)) return pickup == Pickup.ALLOWED;
         if (player.isCreative()) return pickup == Pickup.CREATIVE_ONLY;
         return pickup == Pickup.ALLOWED;
-    }
-
-    private void createFailDrop(ServerLevel serverLevel, BlockPos hitPos) {
-        Vector3d worldPos = RopeUtils.getWorldPos(serverLevel, hitPos);
-
-        ItemStack ropeStack = new ItemStack(VStuffItems.ROPE.get());
-        ropeStack.getOrCreateTag().put("style", TagUtils.writeResourceLocation(RopeStyleManager.returnOrFallback(styleId)));
-
-        ItemEntity ropeDrop = new ItemEntity(
-                serverLevel,
-                worldPos.x,
-                worldPos.y + 0.5,
-                worldPos.z,
-                ropeStack
-        );
-
-        serverLevel.addFreshEntity(ropeDrop);
     }
 
     @Override
