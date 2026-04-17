@@ -6,6 +6,7 @@ import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.resources.ResourceKey;
+import org.jetbrains.annotations.ApiStatus;
 import yay.evy.everest.vstuff.internal.rendering.RegistryRopeRendererType;
 import yay.evy.everest.vstuff.internal.styling.data.RegistryRopeCategory;
 import yay.evy.everest.vstuff.internal.styling.data.RegistryRopeStyle;
@@ -25,5 +26,8 @@ public class VStuffBuiltInRegistries {
         BuiltInRegistriesAccessor.create$getWRITABLE_REGISTRY().register((ResourceKey<WritableRegistry<?>>) (Object) key, registry, Lifecycle.stable());
         return registry;
     }
+
+    @ApiStatus.Internal
+    public static void init() {}
 
 }

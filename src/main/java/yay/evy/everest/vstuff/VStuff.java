@@ -16,6 +16,7 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.RegisterEvent;
 import org.slf4j.Logger;
 import org.valkyrienskies.core.api.ships.ShipPhysicsListener;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
@@ -43,8 +44,6 @@ public class VStuff {
     public VStuff(FMLJavaModLoadingContext modLoadingContext) {
         IEventBus modEventBus = modLoadingContext.getModEventBus();
 
-        VStuffRegistries.init();
-
         VStuffCreativeModeTabs.register(modEventBus);
 
         REGISTRATE.registerEventListeners(modEventBus);
@@ -61,6 +60,7 @@ public class VStuff {
         MinecraftForge.EVENT_BUS.register(this);
 
         modEventBus.addListener(VStuff::commonSetup);
+        modEventBus.addListener(VStuff::onRegister);
         modEventBus.addListener(EventPriority.LOWEST, VStuffDatagen::gatherData);
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> VStuffClient.initialize(modEventBus));
@@ -88,7 +88,9 @@ public class VStuff {
         });
     }
 
+    private static void onRegister(final RegisterEvent event) {
 
+    }
 
     public static CreateRegistrate registrate() {
         return REGISTRATE;
