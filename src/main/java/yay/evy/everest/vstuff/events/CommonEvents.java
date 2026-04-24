@@ -89,7 +89,11 @@ public class CommonEvents {
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        ServerLevel level = player.serverLevel();
         RopeManager.syncAllRopesToPlayer(player);
+        // sync phys ropes
+        PhysRopeManager.get(level).syncAllToPlayer(level, player);
+        // wisconsin
         VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeStylesPacket());
         VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeCategoriesPacket());
         VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeRestylesPacket());
@@ -134,8 +138,13 @@ public class CommonEvents {
     @SubscribeEvent
     public static void onPlayerChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        ServerLevel level = player.serverLevel();
 
         RopeManager.syncAllRopesToPlayer(player);
+
+        // sink them here too
+        PhysRopeManager.get(level).syncAllToPlayer(level, player);
+        // hell michigan
 
         VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeStylesPacket());
         VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeCategoriesPacket());
@@ -144,37 +153,34 @@ public class CommonEvents {
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
-        ServerLevel level = event.getServer().overworld();
-        PhysRopeManager.get(level).tickSegmentSync(level);
+
+        for (ServerLevel level : event.getServer().getAllLevels()) {
+            PhysRopeManager.get(level).tickSegmentSync(level);
+        }
     }
-
-
+    /* yeet
     // todo yeet these well not yeet but like not do it so sussy
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
         ServerLevel level = event.getServer().overworld();
-        level.getServer().tell(new net.minecraft.server.TickTask(
-                level.getServer().getTickCount() + 5,
-                () -> {
-                    PhysRopeManager manager = PhysRopeManager.get(level);
-                    for (Map.Entry<Integer, PhysRopeConstraint> entry : manager.getPhysRopes().entrySet()) {
-                        PhysRopeConstraint c = entry.getValue();
-                        c.recreatePhysEntities(level);
-                        c.posData0.attach(level, entry.getKey());
-                        c.posData1.attach(level, entry.getKey());
-                        manager.setDirty();
-                    }
-                    level.getServer().tell(new net.minecraft.server.TickTask(
-                            level.getServer().getTickCount() + 5,
-                            () -> {
-                                for (PhysRopeConstraint c : manager.getPhysRopes().values()) {
-                                    c.restoreJoints(level, c.getSegments(), c.getSegmentLength());
-                                }
-                            }
-                    ));
-                }
-        ));
+
+        PhysRopeManager manager = PhysRopeManager.get(level);
+
+        for (Map.Entry<Integer, PhysRopeConstraint> entry : manager.getPhysRopes().entrySet()) {
+            PhysRopeConstraint c = entry.getValue();
+            c.recreatePhysEntities(level);
+            c.posData0.attach(level, entry.getKey());
+            c.posData1.attach(level, entry.getKey());
+        }
+
+        manager.setDirty();
+
+        for (PhysRopeConstraint c : manager.getPhysRopes().values()) {
+            c.restoreJoints(level, c.getSegments(), c.getSegmentLength());
+        }
     }
+
+     */
     @SubscribeEvent
     public static void onWorldSave(LevelEvent.Save event) {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
