@@ -4,14 +4,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff.sound.LevituffSoundPlayer;
-import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
 import yay.evy.everest.vstuff.internal.utility.ShipUtils;
+
+import java.util.function.Consumer;
 
 public class LevituffBlockEntity extends BlockEntity {
 
@@ -22,30 +21,19 @@ public class LevituffBlockEntity extends BlockEntity {
     @Override
     public void onLoad() {
         super.onLoad();
-
-        if (level instanceof ServerLevel serverLevel) {
-            LoadedServerShip ship = ShipUtils.getLoadedServerShipAtPos(serverLevel, getBlockPos());
-
-            if (ship != null) {
-                LevituffAttachment attachment = LevituffAttachment.getOrCreateAsAttachment(ship);
-
-                attachment.addBlock(getBlockPos());
-            }
-        }
+        withAttachment(a -> a.addBlock(getBlockPos()));
     }
     @Override
     public void setRemoved() {
-        if (level instanceof ServerLevel serverLevel) {
-            LoadedServerShip ship = ShipUtils.getLoadedServerShipAtPos(serverLevel, getBlockPos());
-
-            if (ship != null) {
-                LevituffAttachment attachment = LevituffAttachment.getOrCreateAsAttachment(ship);
-
-                attachment.removeBlock(getBlockPos());
-            }
-        }
-
+        withAttachment(a -> a.removeBlock(getBlockPos()));
         super.setRemoved();
+    }
+
+    private void withAttachment(Consumer<LevituffAttachment> action) {
+        if (!(level instanceof ServerLevel serverLevel)) return;
+        LoadedServerShip ship = ShipUtils.getLoadedServerShipAtPos(serverLevel, getBlockPos());
+        if (ship == null) return;
+        action.accept(LevituffAttachment.getOrCreateAsAttachment(ship));
     }
 
     private final LevituffSoundPlayer soundPlayer = new LevituffSoundPlayer();

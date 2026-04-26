@@ -34,7 +34,7 @@ public class VStuff {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String NAME = "VStuff";
 
-    private static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MOD_ID); //todo implement tooltip modifier factory like create's
+    private static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MOD_ID);
 
     public VStuff(FMLJavaModLoadingContext modLoadingContext) {
         IEventBus modEventBus = modLoadingContext.getModEventBus();
