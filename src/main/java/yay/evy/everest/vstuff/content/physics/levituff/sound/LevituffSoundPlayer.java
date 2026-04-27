@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff.sound;
+package yay.evy.everest.vstuff.content.physics.levituff.sound;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;

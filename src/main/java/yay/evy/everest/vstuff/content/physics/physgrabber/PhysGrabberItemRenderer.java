@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber;
+package yay.evy.everest.vstuff.content.physics.physgrabber;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -14,7 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.TransformData;
+import yay.evy.everest.vstuff.content.physics.TransformData;
 
 public class PhysGrabberItemRenderer extends CustomRenderedItemModelRenderer {
 

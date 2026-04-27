@@ -11,7 +11,7 @@ import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import yay.evy.everest.vstuff.content.ships.thrust.AttachmentUtils;
+import yay.evy.everest.vstuff.internal.utility.AttachmentUtils;
 
 public final class ReactionWheelAttachment implements ShipPhysicsListener {
     public Map<Long, ReactionWheelForceApplier> appliersMapping = new ConcurrentHashMap<>();
@@ -29,16 +29,7 @@ public final class ReactionWheelAttachment implements ShipPhysicsListener {
         appliersMapping.put(pos.asLong(), applier);
     }
 
-    public void removeApplier(ServerLevel level, BlockPos pos) {
+    public void removeApplier(BlockPos pos) {
         appliersMapping.remove(pos.asLong());
-    }
-
-    //Getters
-    public static ReactionWheelAttachment getOrCreateAsAttachment(LoadedServerShip ship) {
-        return AttachmentUtils.getOrCreate(ship, ReactionWheelAttachment.class, ReactionWheelAttachment::new);
-    }
-
-    public static ReactionWheelAttachment get(Level level, BlockPos pos) {
-        return AttachmentUtils.get(level, pos, ReactionWheelAttachment.class, ReactionWheelAttachment::new);
     }
 }

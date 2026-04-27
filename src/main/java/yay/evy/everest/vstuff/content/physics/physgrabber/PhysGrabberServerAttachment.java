@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber;
+package yay.evy.everest.vstuff.content.physics.physgrabber;
 
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
@@ -7,8 +7,6 @@ import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.*;
 import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
-
-import yay.evy.everest.vstuff.content.ships.thrust.AttachmentUtils;
 
 public final class PhysGrabberServerAttachment implements ShipPhysicsListener {
 
@@ -65,13 +63,5 @@ public final class PhysGrabberServerAttachment implements ShipPhysicsListener {
     public PhysGrabberServerAttachment creative(boolean creative) {
         this.isCreative = creative;
         return this;
-    }
-
-
-    public static PhysGrabberServerAttachment getOrCreate(LoadedServerShip ship) {
-        PhysGrabberServerAttachment grabber =
-                AttachmentUtils.getOrCreate(ship, PhysGrabberServerAttachment.class, PhysGrabberServerAttachment::new);
-        ship.setAttachment(PhysGrabberServerAttachment.class, grabber);
-        return grabber;
     }
 }

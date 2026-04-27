@@ -12,7 +12,7 @@ import yay.evy.everest.vstuff.content.ropes.ReworkedRopeItem;
 import yay.evy.everest.vstuff.content.ropes.RopeCutterItem;
 import yay.evy.everest.vstuff.content.ropes.arrow.RopeArrowItem;
 import yay.evy.everest.vstuff.content.ships.assembly.ExpendableAssemblerItem;
-import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.PhysGrabberItem;
+import yay.evy.everest.vstuff.content.physics.physgrabber.PhysGrabberItem;
 import yay.evy.everest.vstuff.content.ropes.editor.RopeEditorItem;
 
 

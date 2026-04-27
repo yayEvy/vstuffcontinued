@@ -9,6 +9,10 @@ import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
+import javax.annotation.Nullable;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 public class ShipUtils {
 
     public static Long getGroundBodyId(ServerLevel level) {
@@ -27,26 +31,8 @@ public class ShipUtils {
         return loadedShip != null ? loadedShip.getId() : null;
     }
 
-    public static @NotNull Long getSafeLoadedShipIdAtPos(ServerLevel level, BlockPos pos) {
-        LoadedShip loadedShip = VSGameUtilsKt.getLoadedShipManagingPos(level, pos);
-        return loadedShip != null ? loadedShip.getId() : getGroundBodyId(level);
-    }
-
-    public static @NotNull Long getSafeShipIdAtPos(ServerLevel level, BlockPos pos) {
-        Ship ship = VSGameUtilsKt.getShipManagingPos(level, pos);
-        return ship != null ? ship.getId() : getGroundBodyId(level);
-    }
-
-    public static LoadedShip getLoadedShipAtPos(ServerLevel level, BlockPos pos) {
-        return VSGameUtilsKt.getLoadedShipManagingPos(level, pos);
-    }
-
     public static LoadedServerShip getLoadedServerShipAtPos(ServerLevel level, BlockPos pos) {
         return VSGameUtilsKt.getLoadedShipManagingPos(level, pos);
-    }
-
-    public static Ship getShipAtPos(Level level, BlockPos pos) {
-        return VSGameUtilsKt.getShipManagingPos(level, pos);
     }
 
     public static Float getMassForShip(ServerLevel level, Long shipId) {
@@ -73,5 +59,4 @@ public class ShipUtils {
         }
         return 1000.0f;
     }
-
 }

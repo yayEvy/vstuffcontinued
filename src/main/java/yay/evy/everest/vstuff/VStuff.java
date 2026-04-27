@@ -17,9 +17,10 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 import org.valkyrienskies.core.api.ships.ShipPhysicsListener;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
-import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff.LevituffAttachment;
+import yay.evy.everest.vstuff.content.physics.levituff.attachment.LevituffAttachment;
+import yay.evy.everest.vstuff.content.physics.levituff.attachment.RefinedLevituffAttachment;
 import yay.evy.everest.vstuff.content.ships.reactionwheel.ReactionWheelAttachment;
-import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.PhysGrabberServerAttachment;
+import yay.evy.everest.vstuff.content.physics.physgrabber.PhysGrabberServerAttachment;
 import yay.evy.everest.vstuff.content.ships.thrust.ThrusterForceAttachment;
 import yay.evy.everest.vstuff.index.*;
 import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
@@ -73,6 +74,7 @@ public class VStuff {
         registerAttachment(ReactionWheelAttachment.class);
         System.out.println("vstuff more like vs tuff");
         registerAttachment(LevituffAttachment.class);
+        registerAttachment(RefinedLevituffAttachment.class);
     }
 
     private static <A extends ShipPhysicsListener> void registerAttachment(Class<A> attachment) {

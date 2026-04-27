@@ -1,7 +1,6 @@
 package yay.evy.everest.vstuff.index;
 
 import com.simibubi.create.AllBlocks;
-import com.simibubi.create.content.decoration.palettes.AllPaletteStoneTypes;
 import com.simibubi.create.foundation.data.BlockStateGen;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.BlockEntry;
@@ -9,7 +8,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff.LevituffBlock;
+import yay.evy.everest.vstuff.content.physics.levituff.LevituffBlock;
+import yay.evy.everest.vstuff.content.physics.levituff.RefinedLevituffBlock;
 import yay.evy.everest.vstuff.content.ships.reactionwheel.ReactionWheelBlock;
 import yay.evy.everest.vstuff.content.ropes.pulley.PhysPulleyBlock;
 import yay.evy.everest.vstuff.content.ropes.pulley.PulleyAnchorBlock;
@@ -77,6 +77,13 @@ public class VStuffBlocks  {
     public static final BlockEntry<LevituffBlock> LEVITUFF =
             REGISTRATE.block("levituff", LevituffBlock::new)
                     .initialProperties(() -> Blocks.TUFF)
+                    .transform(pickaxeOnly())
+                    .simpleItem()
+                    .register();
+
+    public static final BlockEntry<RefinedLevituffBlock> REFINED_LEVITUFF =
+            REGISTRATE.block("refined_levituff", RefinedLevituffBlock::new)
+                    .initialProperties(AllBlocks.ANDESITE_ALLOY_BLOCK)
                     .transform(pickaxeOnly())
                     .simpleItem()
                     .register();

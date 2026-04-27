@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff;
+package yay.evy.everest.vstuff.content.physics.levituff;
 
 import net.minecraft.util.Mth;
 import org.apache.logging.log4j.util.TriConsumer;
@@ -17,16 +17,17 @@ public enum LevituffBehavior {
     UP_TO_Y_LEVEL((level, ship, levituffBlocks) -> {
         final double gravity = -level.getGravity().y();
 
-        final double damping = -ship.getVelocity().y() * ship.getMass() * VStuffConfigs.server().levituffForceDamping.get();
-        final double strengthMult = VStuffConfigs.server().levituffStrengthMultiplier.get() * 1024;
+        final double strengthMult = VStuffConfigs.server().levituffStrengthMultiplier.get();
 
         levituffBlocks.forEach(pos -> {
-            final double worldY = ship.getTransform().getShipToWorld().transformPosition(pos).y();
-            final double t = Mth.clamp(worldY / 256, 0.0, 1.0);
+            final double worldY = ship.getTransform().getShipToWorld().transformPosition(new Vector3d(pos)).y();
+            final double error = 256.0 - worldY;
 
-            final double forceY = (strengthMult * (1.0 - (t*t)) * gravity) + damping;
+            final double spring = error * strengthMult * ship.getMass() * gravity;
+            final double damping = -ship.getVelocity().y() * ship.getMass() * VStuffConfigs.server().levituffForceDamping.get() / levituffBlocks.size();
 
-            ship.applyWorldForceToModelPos(new Vector3d(0, forceY, 0), pos);
+            final double forceY = spring + damping;
+            ship.applyModelForce(new Vector3d(0, forceY, 0), pos);
         });
     }),
     UNSTOPPABLE_WHIMSY((level, ship, levituffBlocks) -> {

@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber;
+package yay.evy.everest.vstuff.content.physics.physgrabber;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -10,9 +10,9 @@ import net.minecraft.world.phys.Vec3;
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
-import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.packet.GrabPacket;
-import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.packet.ReleasePacket;
-import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.packet.UpdatePacket;
+import yay.evy.everest.vstuff.content.physics.physgrabber.packet.GrabPacket;
+import yay.evy.everest.vstuff.content.physics.physgrabber.packet.ReleasePacket;
+import yay.evy.everest.vstuff.content.physics.physgrabber.packet.UpdatePacket;
     import yay.evy.everest.vstuff.index.VStuffSounds;
 import yay.evy.everest.vstuff.index.VStuffPackets;
 

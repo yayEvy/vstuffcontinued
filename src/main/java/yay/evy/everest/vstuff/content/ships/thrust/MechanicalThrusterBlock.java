@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import yay.evy.everest.vstuff.index.VStuffBlockEntities;
 import yay.evy.everest.vstuff.index.VStuffShapes;
+import yay.evy.everest.vstuff.internal.utility.AttachmentUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -60,27 +61,12 @@ public class MechanicalThrusterBlock extends DirectionalAxisKineticBlock impleme
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (!(blockEntity instanceof MechanicalThrusterBlockEntity thrusterBE)) return;
 
-        ThrusterForceAttachment attachment = ThrusterForceAttachment.get(level, pos);
-
         ThrusterData data = thrusterBE.getThrusterData();
         data.setDirection(VectorConversionsMCKt.toJOMLD(state.getValue(FACING).getOpposite().getNormal()));
         data.setThrust(0);
 
-        if (attachment != null) {
-            ThrusterForceApplier applier = new ThrusterForceApplier(data);
-            attachment.addApplier(pos, applier);
-        } else {
-            level.getServer().execute(() -> {
-                ThrusterForceAttachment deferredAttachment = ThrusterForceAttachment.get(level, pos);
-                if (deferredAttachment != null) {
-                    ThrusterForceApplier applier = new ThrusterForceApplier(data);
-                    deferredAttachment.addApplier(pos, applier);
-                } else {
-                }
-            });
-        }
+        AttachmentUtils.getOrCreateAttachment(level, pos, ThrusterForceAttachment.class, ThrusterForceAttachment::new, a -> a.addApplier(pos, new ThrusterForceApplier(data)));
 
-        // Initial obstruction check & thrust update
         thrusterBE.calculateObstruction(level, pos, state.getValue(FACING));
         thrusterBE.updateThrust(state);
         thrusterBE.setChanged();
@@ -99,10 +85,7 @@ public class MechanicalThrusterBlock extends DirectionalAxisKineticBlock impleme
         super.onRemove(state, level, pos, newState, isMoving);
         if (level.isClientSide()) return;
 
-        ThrusterForceAttachment ship = ThrusterForceAttachment.get(level, pos);
-        if (ship != null) {
-            ship.removeApplier((ServerLevel) level, pos);
-        }
+        AttachmentUtils.getAttachment(level, pos, ThrusterForceAttachment.class, a -> a.removeApplier(pos), a -> a.appliersMapping.isEmpty());
     }
 
     @Override

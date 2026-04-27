@@ -33,8 +33,8 @@ public class VServer extends ConfigBase {
     public final ConfigFloat reactionWheelMaxTorque = f(50000, 0, 100000, "reactionWheelMaxTorque", Comments.reactionWheelMaxTorque);
 
     public final ConfigGroup levituff = group(1, "levituff");
-    public final ConfigFloat levituffStrengthMultiplier = f(3, 0, 64, "levituffStrengthMultiplier");
-    public final ConfigFloat levituffForceDamping = f(0.15f, 0, 1, "levituffForceDamping");
+    public final ConfigFloat levituffStrengthMultiplier = f(2, 0, 64, "levituffStrengthMultiplier");
+    public final ConfigFloat levituffForceDamping = f(3, 0, 1, "levituffForceDamping");
 
     @Override
     public @NotNull String getName() {

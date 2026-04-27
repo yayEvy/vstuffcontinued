@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff;
+package yay.evy.everest.vstuff.content.physics.levituff;
 
 import com.simibubi.create.foundation.block.IBE;
 import net.minecraft.world.level.Level;

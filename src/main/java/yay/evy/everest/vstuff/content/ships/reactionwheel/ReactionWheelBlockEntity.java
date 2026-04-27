@@ -8,6 +8,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import yay.evy.everest.vstuff.internal.utility.AttachmentUtils;
+import yay.evy.everest.vstuff.internal.utility.ShipUtils;
 
 public class ReactionWheelBlockEntity extends KineticBlockEntity {
 
@@ -23,7 +25,6 @@ public class ReactionWheelBlockEntity extends KineticBlockEntity {
     }
 
 
-    @SuppressWarnings("null")
     @Override
     public void initialize() {
         super.initialize();
@@ -31,11 +32,7 @@ public class ReactionWheelBlockEntity extends KineticBlockEntity {
             Direction facingDirection = this.getBlockState().getValue(ReactionWheelBlock.FACING);
             reactionWheelData.facing = new Vector3i(facingDirection.getStepX(), facingDirection.getStepY(), facingDirection.getStepZ());
 
-            ReactionWheelAttachment ship = ReactionWheelAttachment.get(level, worldPosition);
-            if (ship != null) {
-                ReactionWheelForceApplier applier = new ReactionWheelForceApplier(reactionWheelData);
-                ship.addApplier(worldPosition, applier);
-            }
+            AttachmentUtils.getOrCreateAttachment(level, getBlockPos(), ReactionWheelAttachment.class, ReactionWheelAttachment::new, a -> a.addApplier(getBlockPos(), new ReactionWheelForceApplier(reactionWheelData)));
         }
     }
 
