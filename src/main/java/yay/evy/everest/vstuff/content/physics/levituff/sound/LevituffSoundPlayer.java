@@ -4,25 +4,33 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
+import yay.evy.everest.vstuff.index.VStuffBlocks;
 import yay.evy.everest.vstuff.index.VStuffSounds;
 import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
 
-import java.util.*;
+import java.util.Random;
 
 public class LevituffSoundPlayer {
 
-    private int grindCooldown = 0;
+    public static LevituffSoundPlayer get() { return INSTANCE; }
+    public LevituffSoundPlayer() {}
+
+    private boolean levituffNearby = false;
+    private int scanCooldown = 0;
+    private static final int SCAN_INTERVAL = 20;
+
+    private static final Random RAND = new Random();
+
+    private int grindCooldown = randBetween(60, 120);
     private int grindDuration = 0;
     private boolean grindActive = false;
 
-    private int noteCooldown = randBetween(40, 120);
+    private int noteCooldown = randBetween(200, 400);
 
     private SoundEvent pendingNote = null;
     private int pendingNoteDelay = 0;
 
-    private boolean playerNearbyCache = false;
-    private int playerCheckCooldown = 0;
-    private static final int PLAYER_CHECK_INTERVAL = 20;
+    private BlockPos lastFoundPos = null;
 
     private static final SoundEvent[] NOTES = {
             VStuffSounds.LEVITUFF_D.get(),
@@ -32,54 +40,68 @@ public class LevituffSoundPlayer {
             VStuffSounds.LEVITUFF_C.get()
     };
 
+    private static final LevituffSoundPlayer INSTANCE = new LevituffSoundPlayer();
+
     private final SoundEvent[] noteScratchBuffer = new SoundEvent[NOTES.length];
 
-    private static final Random RAND = new Random();
-
-    public void tick(Level level, BlockPos pos, int applierCount) {
-        // i am so sorry :sob:
+    public void tick(Level level, BlockPos pos, int count) {
         if (!VStuffConfigs.client().levituffSounds.get()) {
             reset();
             return;
         }
-        boolean playerNearby = getPlayerNearby(level, pos);
 
-        tickGrind(level, pos, applierCount, playerNearby);
-        tickNotes(level, pos, applierCount, playerNearby);
-        tickPendingNote(level, pos);
-    }
+        tickScan(level, pos);
 
-    private boolean getPlayerNearby(Level level, BlockPos pos) {
-        if (playerCheckCooldown > 0) {
-            playerCheckCooldown--;
-            return playerNearbyCache;
-        }
-        playerCheckCooldown = PLAYER_CHECK_INTERVAL;
-        playerNearbyCache = level.getNearestPlayer(
-                pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
-                16.0, false
-        ) != null;
-        return playerNearbyCache;
-    }
-
-    private void tickGrind(Level level, BlockPos pos, int applierCount, boolean playerNearby) {
-        if (!playerNearby) {
+        if (!levituffNearby || lastFoundPos == null) {
             grindActive = false;
             return;
         }
+
+        tickGrind(level, pos);
+        tickNotes(level, pos);
+        tickPendingNote(level, pos);
+    }
+
+    private void tickScan(Level level, BlockPos playerPos) {
+        if (scanCooldown-- > 0) return;
+        scanCooldown = SCAN_INTERVAL;
+
+        lastFoundPos = findClosestLevituff(level, playerPos);
+        levituffNearby = lastFoundPos != null;
+    }
+
+    private static BlockPos findClosestLevituff(Level level, BlockPos center) {
+        int r = 16;
+        double closestDistSq = 256.0;
+        BlockPos closestPos = null;
+
+        for (BlockPos pos : BlockPos.betweenClosed(
+                center.offset(-r, -r, -r),
+                center.offset(r, r, r)
+        )) {
+            if (level.getBlockState(pos).is(VStuffBlocks.LEVITUFF.get())) {
+                double distSq = pos.distSqr(center);
+                if (distSq <= 256.0 && distSq < closestDistSq) {
+                    closestDistSq = distSq;
+                    closestPos = pos.immutable();
+                }
+            }
+        }
+        return closestPos;
+    }
+
+    private void tickGrind(Level level, BlockPos pos) {
         if (grindActive) {
-            grindDuration--;
-            if (grindDuration <= 0) {
+            if (--grindDuration <= 0) {
                 grindActive = false;
-                grindCooldown = randBetween(30, 80) * applierCount;
+                grindCooldown = randBetween(80, 160);
             }
         } else {
-            grindCooldown--;
-            if (grindCooldown <= 0) {
+            if (--grindCooldown <= 0) {
                 grindActive = true;
                 grindDuration = randBetween(40, 100);
                 level.playLocalSound(
-                        pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
+                        lastFoundPos.getX() + 0.5, lastFoundPos.getY() + 0.5, lastFoundPos.getZ() + 0.5,
                         VStuffSounds.LEVITUFF_GRIND.get(),
                         SoundSource.BLOCKS,
                         0.18f, randPitch(0.85f, 1.05f), false
@@ -88,17 +110,13 @@ public class LevituffSoundPlayer {
         }
     }
 
-    private void tickNotes(Level level, BlockPos pos, int applierCount, boolean playerNearby) {
-        if (!playerNearby) return;
+    private void tickNotes(Level level, BlockPos pos) {
+        if (--noteCooldown > 0) return;
 
-        noteCooldown--;
-        if (noteCooldown > 0) return;
-
-        noteCooldown = randBetween(300, 500) * Math.max(1, applierCount);
+        noteCooldown = randBetween(400, 700);
 
         boolean twoNotes = RAND.nextInt(4) == 0;
-        int noteCount = twoNotes ? 2 : 1;
-        pickNotes(noteCount);
+        pickNotes(twoNotes ? 2 : 1);
 
         playNote(level, pos, noteScratchBuffer[0]);
 
@@ -110,16 +128,16 @@ public class LevituffSoundPlayer {
 
     private void tickPendingNote(Level level, BlockPos pos) {
         if (pendingNote == null) return;
-        pendingNoteDelay--;
-        if (pendingNoteDelay <= 0) {
+        if (--pendingNoteDelay <= 0) {
             playNote(level, pos, pendingNote);
             pendingNote = null;
         }
     }
 
     private void playNote(Level level, BlockPos pos, SoundEvent note) {
+        if (lastFoundPos == null) return;
         level.playLocalSound(
-                pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
+                lastFoundPos.getX() + 0.5, lastFoundPos.getY() + 0.5, lastFoundPos.getZ() + 0.5,
                 note, SoundSource.BLOCKS,
                 0.12f, randPitch(0.95f, 1.05f), false
         );
@@ -145,9 +163,13 @@ public class LevituffSoundPlayer {
 
     public void reset() {
         grindActive = false;
-        grindCooldown = 0;
+        grindCooldown = randBetween(60, 120);
+        grindDuration = 0;
+        noteCooldown = randBetween(200, 400);
         pendingNote = null;
-        playerNearbyCache = false;
-        playerCheckCooldown = 0;
+        pendingNoteDelay = 0;
+        levituffNearby = false;
+        scanCooldown = 0;
+        lastFoundPos = null;
     }
 }
