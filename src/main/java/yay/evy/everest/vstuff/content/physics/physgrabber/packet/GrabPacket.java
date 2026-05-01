@@ -5,22 +5,23 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkEvent;
 import org.joml.Vector3d;
+import org.joml.Vector3dc;
 
 public class GrabPacket extends SimplePacketBase {
 
     private long shipId;
     private double x, y, z;
+    private double lx, ly, lz;
     private boolean creative;
 
-    public GrabPacket(long shipId, Vec3 vec3, boolean creative) {
-        this(shipId, vec3.x, vec3.y, vec3.z, creative);
-    }
-
-    public GrabPacket(long shipId, double x, double y, double z, boolean creative) {
+    public GrabPacket(long shipId, Vec3 target, Vector3dc localHit, boolean creative) {
         this.shipId = shipId;
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.x = target.x;
+        this.y = target.y;
+        this.z = target.z;
+        this.lx = localHit.x();
+        this.ly = localHit.y();
+        this.lz = localHit.z();
         this.creative = creative;
     }
 
@@ -29,6 +30,9 @@ public class GrabPacket extends SimplePacketBase {
         this.x = buffer.readDouble();
         this.y = buffer.readDouble();
         this.z = buffer.readDouble();
+        this.lx = buffer.readDouble();
+        this.ly = buffer.readDouble();
+        this.lz = buffer.readDouble();
         this.creative = buffer.readBoolean();
     }
 
@@ -38,12 +42,21 @@ public class GrabPacket extends SimplePacketBase {
         buffer.writeDouble(x);
         buffer.writeDouble(y);
         buffer.writeDouble(z);
+        buffer.writeDouble(lx);
+        buffer.writeDouble(ly);
+        buffer.writeDouble(lz);
         buffer.writeBoolean(creative);
     }
 
     @Override
     public boolean handle(NetworkEvent.Context context) {
-        context.enqueueWork(() -> GrabberHandler.handleGrab(context.getSender(), shipId, new Vector3d(x, y, z), creative));
+        context.enqueueWork(() -> GrabberHandler.handleGrab(
+                context.getSender(),
+                shipId,
+                new Vector3d(x, y, z),
+                new Vector3d(lx, ly, lz),
+                creative
+        ));
         return true;
     }
 }

@@ -21,6 +21,7 @@ public class PhysGrabberClientHandler {
 
     private static LoadedShip grabbedShip = null;
     private static SoundInstance humSound = null;
+    private static float grabDistance = 5.0f;
 
 
     public static boolean tryGrabOrRelease(Minecraft mc, Player player) {
@@ -37,9 +38,16 @@ public class PhysGrabberClientHandler {
             );
 
             if (ship != null) {
-                Vec3 target = player.getEyePosition(1.0F).add(player.getLookAngle().scale(5.0));
-                //PhysGrabberNetwork.sendGrab(ship.getId(), target, player.isCreative());
-                VStuffPackets.channel().sendToServer(new GrabPacket(ship.getId(), target, player.isCreative()));
+                Vec3 hitLocation = blockHit.getLocation();
+                grabDistance = (float) player.getEyePosition(1.0F).distanceTo(hitLocation);
+
+                org.joml.Vector3d jomlHit = new org.joml.Vector3d(hitLocation.x, hitLocation.y, hitLocation.z);
+                var localHit = ship.getWorldToShip().transformPosition(jomlHit);
+
+                Vec3 target = player.getEyePosition(1.0F).add(player.getLookAngle().scale(grabDistance));
+
+                VStuffPackets.channel().sendToServer(new GrabPacket(ship.getId(), target, localHit, player.isCreative()));
+
                 grabbedShip = ship;
 
                 if (mc.level != null) {
@@ -50,7 +58,6 @@ public class PhysGrabberClientHandler {
             }
             return false;
         } else {
-            //PhysGrabberNetwork.sendRelease(grabbedShip.getId());
             VStuffPackets.channel().sendToServer(new ReleasePacket(grabbedShip.getId()));
             grabbedShip = null;
 
@@ -79,16 +86,8 @@ public class PhysGrabberClientHandler {
         if (grabbedShip == null) return;
 
         Vec3 eyePos = player.getEyePosition(1.0F);
-        if (mc.options.getCameraType().isFirstPerson()) {
-            eyePos = eyePos.add(player.getLookAngle().scale(0.5));
-        }
-
-        Vec3 lookDir = player.getLookAngle();
-        Vec3 target = eyePos.add(lookDir.scale(5.0)).add(0, 0.5, 0);
-        boolean creative = player.isCreative();
-        //PhysGrabberNetwork.sendUpdate(grabbedShip.getId(), target, creative);
-        VStuffPackets.channel().sendToServer(new UpdatePacket(grabbedShip.getId(), target, creative));
-
+        Vec3 target = eyePos.add(player.getLookAngle().scale(grabDistance));
+        VStuffPackets.channel().sendToServer(new UpdatePacket(grabbedShip.getId(), target, player.isCreative()));
     }
 
     public static Vec3 getGrabbedShipPos(float partialTicks) {

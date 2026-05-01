@@ -13,13 +13,13 @@ import yay.evy.everest.vstuff.internal.utility.AttachmentUtils;
 
 public class GrabberHandler {
 
-    public static void handleGrab(ServerPlayer sender, long shipId, Vector3d initialTarget, boolean creative) {
+    public static void handleGrab(ServerPlayer sender, long shipId, Vector3d initialTarget, Vector3d localHit, boolean creative) {
         if (sender == null) return;
         ServerLevel level = sender.serverLevel();
         LoadedServerShip ship = VSGameUtilsKt.getShipObjectWorld(level).getLoadedShips().getById(shipId);
         if (ship == null) return;
 
-        AttachmentUtils.getOrCreateAttachment(ship, PhysGrabberServerAttachment.class, PhysGrabberServerAttachment::new, a -> a.target(initialTarget).creative(creative));
+        AttachmentUtils.getOrCreateAttachment(ship, PhysGrabberServerAttachment.class, PhysGrabberServerAttachment::new, a -> {a.target(initialTarget);a.creative(creative);a.setLocalHit(localHit);});
     }
 
     public static void handleUpdate(ServerPlayer sender, long shipId, Vector3d newTarget, boolean creative) {
