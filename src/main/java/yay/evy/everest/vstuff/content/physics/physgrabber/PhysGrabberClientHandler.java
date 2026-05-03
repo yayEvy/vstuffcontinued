@@ -74,7 +74,6 @@ public class PhysGrabberClientHandler{
 
     public static void forceRelease(Minecraft mc, Player player) {
         if (grabbedShip != null) {
-            //PhysGrabberNetwork.sendRelease(grabbedShip.getId());
             VStuffPackets.channel().sendToServer(new ReleasePacket(grabbedShip.getId()));
             grabbedShip = null;
 
@@ -93,11 +92,11 @@ public class PhysGrabberClientHandler{
         VStuffPackets.channel().sendToServer(new UpdatePacket(grabbedShip.getId(), target, player.isCreative()));
     }
 
-    public static void changeDistance( double y){
+    public static void changeDistance(double y){
         if(grabbedShip != null) {
             float y2 = (float)(grabDistance + y);
 
-            if (y2 <= 2.0f) y2 = 2.0f;
+            if (y2 <= 2.0f) y2 = 2.0f; ///todo: make these configable
             if (y2 >= 25.0f) y2 = 25.0f;
 
             grabDistance = y2;
