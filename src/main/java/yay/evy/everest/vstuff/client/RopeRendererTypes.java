@@ -9,7 +9,6 @@ import yay.evy.everest.vstuff.client.renderers.ChainRopeRenderer;
 import yay.evy.everest.vstuff.client.renderers.SolidColourRopeRenderer;
 import yay.evy.everest.vstuff.client.renderers.NormalRopeRenderer;
 import yay.evy.everest.vstuff.internal.rendering.IRopeRenderer;
-import yay.evy.everest.vstuff.internal.rendering.RegistryRopeRendererType;
 import yay.evy.everest.vstuff.internal.rendering.RopeRendererType;
 
 import javax.annotation.Nullable;
@@ -68,7 +67,7 @@ public final class RopeRendererTypes {
      * Required params: { "texture": "vstuff:textures/rope/rope_normal.png" }
      */
     public static final RopeRendererType NORMAL = register(new RopeRendererType(
-            VStuff.asResource(RegistryRopeRendererType.BuiltInRenderers.NORMAL),
+            VStuff.asResource("normal"),
             (params) -> {
                 ResourceLocation texture = ResourceLocation.tryParse(
                         params.get("texture").getAsString()
@@ -83,7 +82,7 @@ public final class RopeRendererTypes {
      * Required params: { "texture": "vstuff:textures/rope/rope_chain.png" }
      */
     public static final RopeRendererType CHAIN = register(new RopeRendererType(
-            VStuff.asResource(RegistryRopeRendererType.BuiltInRenderers.CHAIN),
+            VStuff.asResource("chain"),
             params -> {
                 ResourceLocation texture = ResourceLocation.bySeparator(
                         params.get("texture").getAsString(), ':'
@@ -98,7 +97,7 @@ public final class RopeRendererTypes {
      * colour is ARGB hex, # is optional, alpha defaults to FF if omitted.
      */
     public static final RopeRendererType SOLID_COLOUR = register(new RopeRendererType(
-            VStuff.asResource(RegistryRopeRendererType.BuiltInRenderers.COLOR),
+            VStuff.asResource("solid_colour"),
             params -> {
                 int argb = parseColour(params.get("color").getAsString());
                 return new SolidColourRopeRenderer(argb);
