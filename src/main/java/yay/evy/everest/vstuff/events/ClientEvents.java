@@ -59,6 +59,7 @@ public class ClientEvents {
 
         @SubscribeEvent
         public static void onScone(InputEvent.MouseScrollingEvent event){
+            PhysGrabberClientHandler.changeDistance(event.getScrollDelta());
            if (PhysGrabberClientHandler.isHoldingGrabber(Minecraft.getInstance().player) && PhysGrabberClientHandler.isGrabbing()) {
                if (VStuffKeys.GRABBER_DISTANCE.isPressed()) event.cancel();
            }
