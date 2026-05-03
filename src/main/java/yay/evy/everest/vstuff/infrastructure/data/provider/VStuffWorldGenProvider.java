@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.infrastructure.data;
+package yay.evy.everest.vstuff.infrastructure.data.provider;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;

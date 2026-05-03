@@ -13,6 +13,8 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import yay.evy.everest.vstuff.index.VStuffBlockEntities;
+import yay.evy.everest.vstuff.internal.utility.AttachmentUtils;
+import yay.evy.everest.vstuff.internal.utility.ShipUtils;
 
 public class ReactionWheelBlock extends DirectionalKineticBlock implements IBE<ReactionWheelBlockEntity> {
     public ReactionWheelBlock(Properties properties) {
@@ -45,14 +47,9 @@ public class ReactionWheelBlock extends DirectionalKineticBlock implements IBE<R
 
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (state.hasBlockEntity() && (!state.is(newState.getBlock()) || !newState.hasBlockEntity())) {
-            if (!level.isClientSide) {
-                ReactionWheelAttachment ship = ReactionWheelAttachment.get(level, pos);
-                if (ship != null) {
-                    ship.removeApplier((ServerLevel) level, pos);
-                }
-            }
-        }
+        if (state.hasBlockEntity() && (!state.is(newState.getBlock()) || !newState.hasBlockEntity()))
+            if (!level.isClientSide)
+                AttachmentUtils.getAttachment(level, pos, ReactionWheelAttachment.class, a -> a.removeApplier(pos), a -> a.appliersMapping.isEmpty());
         super.onRemove(state, level, pos, newState, isMoving);
     }
 

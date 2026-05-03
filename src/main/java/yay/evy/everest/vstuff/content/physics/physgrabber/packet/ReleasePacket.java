@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.packet;
+package yay.evy.everest.vstuff.content.physics.physgrabber.packet;
 
 import com.simibubi.create.foundation.networking.SimplePacketBase;
 import net.minecraft.network.FriendlyByteBuf;

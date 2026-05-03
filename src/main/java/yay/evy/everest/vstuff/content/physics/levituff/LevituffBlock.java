@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff;
+package yay.evy.everest.vstuff.content.physics.levituff;
 
 import com.simibubi.create.foundation.block.IBE;
 import net.minecraft.world.level.Level;
@@ -26,9 +26,6 @@ public class LevituffBlock extends Block implements IBE<LevituffBlockEntity> {
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        if (type == VStuffBlockEntities.LEVITUFF_BE.get()) {
-            return (BlockEntityTicker<T>) (BlockEntityTicker<LevituffBlockEntity>) LevituffBlockEntity::clientTick;
-        }
-        return null;
+        return (l, p, s, be) -> LevituffBlockEntity.tick(l, p, (LevituffBlockEntity) be);
     }
 }

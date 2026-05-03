@@ -19,6 +19,8 @@ import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import com.simibubi.create.content.kinetics.fan.IAirCurrentSource;
 import com.simibubi.create.content.kinetics.fan.AirCurrent;
 import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
+import yay.evy.everest.vstuff.internal.utility.AttachmentUtils;
+import yay.evy.everest.vstuff.internal.utility.ShipUtils;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -193,20 +195,17 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
         if (level instanceof ServerLevel serverLevel) {
             MinecraftServer server = serverLevel.getServer();
             server.execute(() -> {
-
                 if (!server.isSameThread()) return;
 
                 recalcThruster();
 
-                ThrusterForceAttachment attachment = ThrusterForceAttachment.get(serverLevel, worldPosition);
-
-                if (attachment != null) {
+                AttachmentUtils.getAttachment(serverLevel, getBlockPos(), ThrusterForceAttachment.class, a -> {
                     ThrusterData data = getThrusterData();
                     data.setDirection(VectorConversionsMCKt.toJOMLD(getBlockState().getValue(MechanicalThrusterBlock.FACING).getOpposite().getNormal()));
 
                     ThrusterForceApplier applier = new ThrusterForceApplier(data);
-                    attachment.addApplier(worldPosition, applier);
-                }
+                    a.addApplier(worldPosition, applier);
+                });
             });
         }
     }

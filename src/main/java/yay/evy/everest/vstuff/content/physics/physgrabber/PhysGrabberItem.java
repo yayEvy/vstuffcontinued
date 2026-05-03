@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber;
+package yay.evy.everest.vstuff.content.physics.physgrabber;
 
 import com.simibubi.create.foundation.item.CustomArmPoseItem;
 import com.simibubi.create.foundation.item.render.SimpleCustomRenderer;

@@ -9,6 +9,8 @@ public class VClient extends ConfigBase {
 
     public final ConfigFloat ropeThickness = f(0.25f, 0.01f, 1f, "ropeThickness", Comments.ropeThickness);
     public final ConfigBool ropeKnots = b(false, "ropeKnots", Comments.ropeKnots);
+    public final ConfigBool levituffSounds = b(true, "levituffSounds", Comments.levituffSounds);
+
 
     @Override
     public @NotNull String getName() {
@@ -21,6 +23,9 @@ public class VClient extends ConfigBase {
         static String[] ropeThickness = new String[]{
                 "[in Blocks]",
                 "How thick a rope is rendered"
+        };
+        static String[] levituffSounds = new String[]{
+                "Toggle sounds for Levituff"
         };
     }
 

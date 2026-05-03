@@ -48,15 +48,7 @@ public class RopeUtils {
     }
 
     public static Vector3d getWorldPos(Level level, BlockPos pos) {
-        Vector3d localPos = getLocalPos(level, pos);
-        Long shipId = ShipUtils.getLoadedShipIdAtPos(level, pos);
-        if (shipId != null) {
-            Ship shipObject = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
-            if (shipObject != null) {
-                return shipObject.getTransform().getShipToWorld().transformPosition(localPos, new Vector3d());
-            }
-        }
-        return localPos;
+        return getWorldPos(level, pos,  ShipUtils.getLoadedShipIdAtPos(level, pos));
     }
 
     public static BlockPos containingBlockPos(Vector3d pos) {

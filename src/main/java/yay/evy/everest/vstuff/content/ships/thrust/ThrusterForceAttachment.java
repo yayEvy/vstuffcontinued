@@ -12,9 +12,9 @@ import org.jetbrains.annotations.NotNull;
 import org.valkyrienskies.core.api.ships.*;
 import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.core.impl.game.ships.PhysShipImpl;
+import yay.evy.everest.vstuff.internal.utility.AttachmentUtils;
+import yay.evy.everest.vstuff.internal.utility.ShipUtils;
 
-
-@SuppressWarnings("deprecation")
 public final class ThrusterForceAttachment implements ShipPhysicsListener {
 
     public Map<Long, ThrusterForceApplier> appliersMapping = new ConcurrentHashMap<>();
@@ -26,23 +26,8 @@ public final class ThrusterForceAttachment implements ShipPhysicsListener {
         appliersMapping.put(pos.asLong(), applier);
     }
 
-    public void removeApplier(ServerLevel level, BlockPos pos) {
+    public void removeApplier(BlockPos pos) {
         appliersMapping.remove(pos.asLong());
-
-        if (appliersMapping.isEmpty()) {
-            LoadedServerShip ship = AttachmentUtils.getShipAt(level, pos);
-            if (ship != null) {
-                ship.setAttachment(ThrusterForceAttachment.class, null);
-            }
-        }
-    }
-
-    public static ThrusterForceAttachment getOrCreateAsAttachment(LoadedServerShip ship) {
-        return AttachmentUtils.getOrCreate(ship, ThrusterForceAttachment.class, ThrusterForceAttachment::new);
-    }
-
-    public static ThrusterForceAttachment get(Level level, BlockPos pos) {
-        return AttachmentUtils.get(level, pos, ThrusterForceAttachment.class, ThrusterForceAttachment::new);
     }
 
     @Override

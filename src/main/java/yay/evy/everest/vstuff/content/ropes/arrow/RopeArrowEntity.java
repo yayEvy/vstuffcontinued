@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.ropes.arrow;//package yay.evy.everest.vstuff.content.ropes.arrow;
+package yay.evy.everest.vstuff.content.ropes.arrow;
 
 
 import net.minecraft.core.BlockPos;
@@ -12,6 +12,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
@@ -23,16 +24,23 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3d;
+import yay.evy.everest.vstuff.content.ropes.ILikeRopes;
 import yay.evy.everest.vstuff.content.ropes.RopeFactory;
+import yay.evy.everest.vstuff.index.VStuffItems;
+import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
+import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
 import static yay.evy.everest.vstuff.internal.utility.ShipUtils.getShipIdAtPos;
 
-public class RopeArrowEntity extends AbstractArrow {
+public class RopeArrowEntity extends AbstractArrow implements ILikeRopes {
 
     private ResourceLocation styleId;
     private BlockPos firstPos;
     private String firstDim;
+    private boolean canCreate = true;
+    private boolean hasCreated = false;
 
     public RopeArrowEntity(EntityType<? extends AbstractArrow> entityType, Level level) {
         super(entityType, level);
@@ -55,27 +63,34 @@ public class RopeArrowEntity extends AbstractArrow {
     }
 
     @Override
-    protected void onHitBlock(BlockHitResult result) {
-        super.onHitBlock(result);
-        BlockPos secondPos = result.getBlockPos();
+    protected void onHitBlock(BlockHitResult bhr) {
+        super.onHitBlock(bhr);
+        BlockPos secondPos = bhr.getBlockPos();
         Entity entity = this.getOwner();
 
-        if (firstPos != null) {
-            if (!(this.level() instanceof ServerLevel serverLevel)) return;
+        if (!(this.level() instanceof ServerLevel serverLevel)) return;
+        if (!isMainProjectile()) return;
 
-            Long firstShipId = getShipIdAtPos(serverLevel, firstPos);
-            Long secondShipId = getShipIdAtPos(serverLevel, secondPos);
+        if (!hasCreated) {
+            if (canCreate) {
+                RopeFactory.RopeResult result = RopeFactory.tryCreateNewRope(serverLevel, firstDim, firstPos, secondPos, entity, styleId);
 
-            RopeFactory.createNewRope(serverLevel, firstShipId, secondShipId, firstPos, secondPos, styleId, entity);
-
-        } else {
-            if (entity instanceof Player player) {
-                player.displayClientMessage(
-                        Component.translatable("vstuff.message.no_first_pos"),
-                        true
-                );
+                if (!result.valid()) {
+                    createRopeDrop(serverLevel, secondPos, styleId);
+                } else {
+                    hasCreated = true;
+                }
+            } else {
+                createRopeDrop(serverLevel, secondPos, styleId);
             }
         }
+    }
+
+    private boolean isMainProjectile() {
+        Entity entity = this.getOwner();
+        if (!(entity instanceof Player player)) return pickup == Pickup.ALLOWED;
+        if (player.isCreative()) return pickup == Pickup.CREATIVE_ONLY;
+        return pickup == Pickup.ALLOWED;
     }
 
     @Override
@@ -134,6 +149,10 @@ public class RopeArrowEntity extends AbstractArrow {
 
     public void setStyle(ResourceLocation styleId) {
         this.styleId = styleId;
+    }
+
+    public void setInvalid() {
+        this.canCreate = false;
     }
 
     public ResourceLocation getStyle() {

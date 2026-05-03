@@ -4,7 +4,8 @@ import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
 
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff.LevituffBlockEntity;
+import yay.evy.everest.vstuff.content.physics.levituff.LevituffBlockEntity;
+import yay.evy.everest.vstuff.content.physics.levituff.RefinedLevituffBlockEntity;
 import yay.evy.everest.vstuff.content.ships.reactionwheel.ReactionWheelBlockEntity;
 import yay.evy.everest.vstuff.content.ships.reactionwheel.ReactionWheelRenderer;
 import yay.evy.everest.vstuff.content.ships.reactionwheel.ReactionWheelVisual;
@@ -49,6 +50,11 @@ public class VStuffBlockEntities {
     public static final BlockEntityEntry<LevituffBlockEntity> LEVITUFF_BE =
             REGISTRATE.blockEntity("levituff", LevituffBlockEntity::new)
                     .validBlocks(VStuffBlocks.LEVITUFF)
+                    .register();
+
+    public static final BlockEntityEntry<RefinedLevituffBlockEntity> REFINED_LEVITUFF_BE =
+            REGISTRATE.blockEntity("refined_levituff", RefinedLevituffBlockEntity::new)
+                    .validBlocks(VStuffBlocks.REFINED_LEVITUFF)
                     .register();
 
     public static void register() {}

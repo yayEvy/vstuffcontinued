@@ -8,11 +8,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.RopeRendererTypes;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
+import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
-public class RopeCutterItem extends Item {
+public class RopeCutterItem extends Item implements ILikeRopes{
     public RopeCutterItem(Properties pProperties) {
         super(pProperties);
     }
@@ -24,14 +26,14 @@ public class RopeCutterItem extends Item {
             return InteractionResultHolder.pass(itemStack);
         }
 
-
         ReworkedRope rope = RopeUtils.findRope(serverLevel, player);
         if (rope == null) return InteractionResultHolder.pass(itemStack);
 
         try {
             RopeFactory.removeRope(serverLevel, rope.ropeId);
+
             player.displayClientMessage(
-                    Component.translatable("vstuff.message.rope_break"),
+                    VStuff.translate("message.rope.break"),
                     true
             );
 
@@ -40,7 +42,10 @@ public class RopeCutterItem extends Item {
 
             if (!player.isCreative()) {
                 itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
-                player.drop(new ItemStack(VStuffItems.ROPE.get()), false);
+                ItemStack ropeStack = new ItemStack(VStuffItems.ROPE.get());
+                addStyleToTag(ropeStack, rope.style);
+
+                player.drop(ropeStack, false);
             }
 
             return InteractionResultHolder.success(itemStack);

@@ -9,10 +9,7 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraftforge.data.event.GatherDataEvent;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.infrastructure.data.provider.RopeCategoryProvider;
-import yay.evy.everest.vstuff.infrastructure.data.provider.RopeLangProvider;
-import yay.evy.everest.vstuff.infrastructure.data.provider.RopeRestylingProvider;
-import yay.evy.everest.vstuff.infrastructure.data.provider.RopeStyleProvider;
+import yay.evy.everest.vstuff.infrastructure.data.provider.*;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -28,6 +25,7 @@ public class VStuffDatagen {
         generator.addProvider(event.includeServer(), new RopeStyleProvider(generator));
         generator.addProvider(event.includeServer(), new RopeCategoryProvider(generator));
         generator.addProvider(event.includeServer(), new RopeRestylingProvider(generator));
+        generator.addProvider(event.includeServer(), new VStuffWeightsProvider(generator));
         generator.addProvider(event.includeServer(), new VStuffWorldGenProvider(output, lookupProvider));
         gatherAllLang(generator);
     }

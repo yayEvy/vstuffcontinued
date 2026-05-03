@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.Block;
 
 import net.minecraftforge.common.ForgeConfigSpec.Builder;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+import yay.evy.everest.vstuff.VStuff;
 
 public class VStress extends ConfigBase {
 
@@ -55,7 +56,7 @@ public class VStress extends ConfigBase {
 
     public static <B extends Block, P> NonNullUnaryOperator<BlockBuilder<B, P>> setImpact(double value) {
         return builder -> {
-            ResourceLocation id = Create.asResource(builder.getName());
+            ResourceLocation id = VStuff.asResource(builder.getName());
             DEFAULT_IMPACTS.put(id, value);
             return builder;
         };

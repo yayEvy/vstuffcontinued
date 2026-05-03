@@ -3,12 +3,10 @@ package yay.evy.everest.vstuff;
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import net.createmod.catnip.lang.LangBuilder;
-import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -24,7 +22,7 @@ import yay.evy.everest.vstuff.api.registry.VStuffRegistries;
 import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff.LevituffAttachment;
 import yay.evy.everest.vstuff.content.ropes.arrow.RopeArrowRenderer;
 import yay.evy.everest.vstuff.content.ships.reactionwheel.ReactionWheelAttachment;
-import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.physgrabber.PhysGrabberServerAttachment;
+import yay.evy.everest.vstuff.content.physics.physgrabber.PhysGrabberServerAttachment;
 import yay.evy.everest.vstuff.content.ships.thrust.ThrusterForceAttachment;
 import yay.evy.everest.vstuff.index.*;
 import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
@@ -39,15 +37,13 @@ public class VStuff {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String NAME = "VStuff";
 
-    private static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MOD_ID); //todo implement tooltip modifier factory like create's
+    private static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MOD_ID);
 
     public VStuff(FMLJavaModLoadingContext modLoadingContext) {
         IEventBus modEventBus = modLoadingContext.getModEventBus();
 
-        VStuffCreativeModeTabs.register(modEventBus);
 
         REGISTRATE.registerEventListeners(modEventBus);
-        REGISTRATE.setCreativeTab(VStuffCreativeModeTabs.VSTUFF_MAIN);
 
         VStuffBlocks.register();
         VStuffBlockEntities.register();
@@ -79,6 +75,7 @@ public class VStuff {
         registerAttachment(ReactionWheelAttachment.class);
         System.out.println("vstuff more like vs tuff");
         registerAttachment(LevituffAttachment.class);
+        registerAttachment(RefinedLevituffAttachment.class);
     }
 
     private static <A extends ShipPhysicsListener> void registerAttachment(Class<A> attachment) {

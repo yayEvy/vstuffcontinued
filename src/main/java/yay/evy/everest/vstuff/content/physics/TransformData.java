@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.physicsmanipulationshenanigans;
+package yay.evy.everest.vstuff.content.physics;
 
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
