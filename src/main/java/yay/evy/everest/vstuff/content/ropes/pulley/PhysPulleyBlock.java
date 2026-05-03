@@ -33,7 +33,7 @@ import yay.evy.everest.vstuff.index.VStuffShapes;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import static yay.evy.everest.vstuff.content.ropes.IRopeActor.CONNECTED;
+import static yay.evy.everest.vstuff.content.ropes.util.IRopeActor.CONNECTED;
 
 public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysPulleyBlockEntity>, IWrenchable {
 

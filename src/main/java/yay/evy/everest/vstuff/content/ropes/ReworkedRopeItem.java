@@ -18,6 +18,8 @@ import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.ropes.packet.OutlinePacket;
+import yay.evy.everest.vstuff.content.ropes.util.ILikeRopes;
+import yay.evy.everest.vstuff.content.ropes.util.IRopeActor;
 import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
@@ -85,13 +87,13 @@ public class ReworkedRopeItem extends Item implements ILikeRopes {
         RopeFactory.RopeResult ropeResult = RopeFactory.tryCreateNewRope(serverLevel, heldItem, firstClickedPos, clickedPos, player);
 
 
-        if (ropeResult.valid()) {
+        if (ropeResult.valid) {
             player.displayClientMessage(VStuff.translate("message.rope.created").withStyle(ChatFormatting.GREEN), true);
 
-            RopeUtils.playSound(serverLevel, clickedPos, ropeResult.rope().style.placeSound());
+            RopeUtils.playSound(serverLevel, clickedPos, ropeResult.rope.style.placeSound());
 
         } else {
-            player.displayClientMessage(VStuff.translate(ropeResult.message()).withStyle(ChatFormatting.RED), true);
+            player.displayClientMessage(VStuff.translate(ropeResult.message).withStyle(ChatFormatting.RED), true);
 
             return InteractionResult.FAIL;
         }

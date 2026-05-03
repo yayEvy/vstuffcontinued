@@ -23,6 +23,7 @@ public class ReworkedRope {
     public JointValues jointValues;
     public RopeStyle style;
     public final boolean hasJoint;
+    public boolean hasDrop = true;
 
     protected ReworkedRope(RopePosData posData0, RopePosData posData1, JointValues values, ResourceLocation style) {
         this.posData0 = posData0;
@@ -30,6 +31,11 @@ public class ReworkedRope {
         this.jointValues = values;
         this.style = RopeStyleManager.get(style);
         this.hasJoint = !posData0.sameShip(posData1);
+    }
+
+    public ReworkedRope setDrop(boolean drop) {
+        this.hasDrop = drop;
+        return this;
     }
 
     public Integer getRopeId() {

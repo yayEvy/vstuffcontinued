@@ -7,10 +7,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.PacketDistributor;
 import yay.evy.everest.vstuff.content.ropes.packet.UpdateRopeStylePacket;
+import yay.evy.everest.vstuff.content.ropes.util.IRopeActor;
 import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
 import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
@@ -21,7 +21,17 @@ import yay.evy.everest.vstuff.internal.utility.records.RopePosData;
 
 public class  RopeFactory {
 
-    public record RopeResult(ReworkedRope rope, boolean valid, String message) {
+    public static class RopeResult {
+        public final ReworkedRope rope;
+        public final boolean valid;
+        public final String message;
+
+        protected RopeResult(ReworkedRope rope, boolean valid, String message) {
+            this.rope = rope;
+            this.valid = valid;
+            this.message = message;
+        }
+
         public static RopeResult withMessage(String message) {
             return new RopeResult(null, false, message);
         }
@@ -109,8 +119,6 @@ public class  RopeFactory {
 
         rope.style = RopeStyleManager.get(newTypeId);
 
-        //NetworkHandler.sendRopeUpdate(ropeId, rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.style.id());
-
         VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new UpdateRopeStylePacket(ropeId, rope.style.id()));
     }
 
@@ -123,6 +131,7 @@ public class  RopeFactory {
         ropeTag.put("posData1", TagUtils.writePosData(rope.posData1));
         ropeTag.put("jointValues", TagUtils.writeJointValues(rope.jointValues));
         ropeTag.put("style", TagUtils.writeResourceLocation(rope.style.id()));
+        ropeTag.putBoolean("drop", rope.hasDrop);
 
         return ropeTag;
     }
@@ -133,7 +142,7 @@ public class  RopeFactory {
                 TagUtils.readPosData(ropeTag.getCompound("posData1")),
                 TagUtils.readJointValues(ropeTag.getCompound("jointValues")),
                 TagUtils.readResourceLocation(ropeTag.getCompound("style"))
-        ).setRopeId(ropeTag.getInt("ropeId"));
+        ).setRopeId(ropeTag.getInt("ropeId")).setDrop(ropeTag.getBoolean("drop"));
 
         if (ropeTag.getInt("jointId") != -1) {
             rope.setJointId(ropeTag.getInt("jointId"));
