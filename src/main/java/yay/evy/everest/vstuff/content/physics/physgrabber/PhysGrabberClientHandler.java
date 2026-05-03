@@ -13,11 +13,14 @@ import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import yay.evy.everest.vstuff.content.physics.physgrabber.packet.GrabPacket;
 import yay.evy.everest.vstuff.content.physics.physgrabber.packet.ReleasePacket;
 import yay.evy.everest.vstuff.content.physics.physgrabber.packet.UpdatePacket;
-    import yay.evy.everest.vstuff.index.VStuffSounds;
+import yay.evy.everest.vstuff.index.VStuffItems;
+import yay.evy.everest.vstuff.index.VStuffSounds;
 import yay.evy.everest.vstuff.index.VStuffPackets;
 
+import javax.xml.transform.Result;
 
-public class PhysGrabberClientHandler {
+
+public class PhysGrabberClientHandler{
 
     private static LoadedShip grabbedShip = null;
     private static SoundInstance humSound = null;
@@ -90,6 +93,17 @@ public class PhysGrabberClientHandler {
         VStuffPackets.channel().sendToServer(new UpdatePacket(grabbedShip.getId(), target, player.isCreative()));
     }
 
+    public static void changeDistance( double y){
+        if(grabbedShip != null) {
+            float y2 = (float)(grabDistance + y);
+
+            if (y2 <= 2.0f) y2 = 2.0f;
+            if (y2 >= 25.0f) y2 = 25.0f;
+
+            grabDistance = y2;
+        }
+    }
+
     public static Vec3 getGrabbedShipPos(float partialTicks) {
         if (grabbedShip == null) return null;
 
@@ -98,6 +112,12 @@ public class PhysGrabberClientHandler {
 
         var shipWorldPos = transform.getPositionInWorld();
         return new Vec3(shipWorldPos.x(), shipWorldPos.y(), shipWorldPos.z());
+    }
+
+    public static boolean isHoldingGrabber(Player player){
+        if (player.getMainHandItem().getItem() instanceof PhysGrabberItem) return true;
+
+        else return false;
     }
 
     public static LoadedShip getGrabbedShip() {

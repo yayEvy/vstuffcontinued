@@ -5,6 +5,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
@@ -16,8 +17,10 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.content.physics.physgrabber.PhysGrabberClientHandler;
 import yay.evy.everest.vstuff.content.ropes.styler.RopeStyleMenuHandler;
 import yay.evy.everest.vstuff.index.VStuffEntities;
+import yay.evy.everest.vstuff.index.VStuffKeys;
 import yay.evy.everest.vstuff.internal.styling.RopeRestyleManager;
 
 import static yay.evy.everest.vstuff.internal.utility.RopeUtils.findTargetedLeadClient;
@@ -54,8 +57,18 @@ public class ClientEvents {
             RopeStyleMenuHandler.onKeyInput(key, pressed);
         }
 
+        @SubscribeEvent
+        public static void onScone(InputEvent.MouseScrollingEvent event){
+            PhysGrabberClientHandler.changeDistance(event.getScrollDelta());
+           if (PhysGrabberClientHandler.isHoldingGrabber(Minecraft.getInstance().player)) {
+               if (PhysGrabberClientHandler.isGrabbing()) {
+                   if (VStuffKeys.ROPE_MENU.isPressed()) event.cancel();
+               }
+           }
+        }
+
         @SubscribeEvent(priority = EventPriority.HIGHEST)
-        public static void onPlayerRightClickItem(PlayerInteractEvent.RightClickItem event) { // fired when right-clicking air // i see
+        public static void onPlayerRightClickItem(PlayerInteractEvent.RightClickItem event) { // fired when right-clicking air // icee
             handleRightClickEvent(event);
         }
 
