@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "priority": 1100,
+  "package": "yay.evy.everest.vstuff.internal.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "vstuff.refmap.json",
+  "mixins": [
+    "BuiltInRegistriesMixin"
+  ]
+}

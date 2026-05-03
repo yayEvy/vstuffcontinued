@@ -14,11 +14,13 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.RegisterEvent;
 import org.slf4j.Logger;
 import org.valkyrienskies.core.api.ships.ShipPhysicsListener;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
-import yay.evy.everest.vstuff.content.physics.levituff.attachment.LevituffAttachment;
-import yay.evy.everest.vstuff.content.physics.levituff.attachment.RefinedLevituffAttachment;
+import yay.evy.everest.vstuff.api.registry.VStuffRegistries;
+import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff.LevituffAttachment;
+import yay.evy.everest.vstuff.content.ropes.arrow.RopeArrowRenderer;
 import yay.evy.everest.vstuff.content.ships.reactionwheel.ReactionWheelAttachment;
 import yay.evy.everest.vstuff.content.physics.physgrabber.PhysGrabberServerAttachment;
 import yay.evy.everest.vstuff.content.ships.thrust.ThrusterForceAttachment;
@@ -43,19 +45,18 @@ public class VStuff {
 
         REGISTRATE.registerEventListeners(modEventBus);
 
-        VStuffSounds.register(modEventBus);
         VStuffBlocks.register();
-        VStuffItems.register();
-        VStuffEntities.register();
-        VStuffCreativeModeTabs.register(modEventBus);
         VStuffBlockEntities.register();
-        VStuffPackets.register();
-
         VStuffConfigs.register(modLoadingContext);
+        VStuffEntities.register();
+        VStuffItems.register();
+        VStuffPackets.register();
+        VStuffSounds.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
 
         modEventBus.addListener(VStuff::commonSetup);
+        modEventBus.addListener(VStuff::onRegister);
         modEventBus.addListener(EventPriority.LOWEST, VStuffDatagen::gatherData);
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> VStuffClient.initialize(modEventBus));
@@ -84,7 +85,9 @@ public class VStuff {
         });
     }
 
+    private static void onRegister(final RegisterEvent event) {
 
+    }
 
     public static CreateRegistrate registrate() {
         return REGISTRATE;

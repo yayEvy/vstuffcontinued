@@ -42,6 +42,11 @@ base {
     archivesName = mod_id
 }
 
+mixin {
+    add(sourceSets.main, "vstuff.refmap.json")
+    config "vstuff.mixins.json"
+}
+
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(17)
 }
@@ -130,6 +135,9 @@ dependencies {
     implementation "org.joml:joml:1.10.5"
     implementation "com.fasterxml.jackson.core:jackson-annotations:2.13.3"
     implementation 'thedarkcolour:kotlinforforge:4.10.0'
+
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:${mixin_extras_version}"))
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
 
     implementation(fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_major_version}-${create_minor_version}:slim") { transitive = false })
     implementation(fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}"))
