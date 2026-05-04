@@ -2,23 +2,27 @@ package yay.evy.everest.vstuff.api.registry;
 
 import com.mojang.serialization.Lifecycle;
 import com.simibubi.create.foundation.mixin.accessor.BuiltInRegistriesAccessor;
+import com.simibubi.create.impl.registry.MappedRegistryWithFreezeCallback;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.ApiStatus;
+import yay.evy.everest.vstuff.client.VStuffRopeRendererTypes;
 import yay.evy.everest.vstuff.internal.rendering.RegistryRopeRendererType;
 import yay.evy.everest.vstuff.internal.styling.data.RegistryRopeCategory;
 import yay.evy.everest.vstuff.internal.styling.data.RegistryRopeStyle;
 
 public class VStuffBuiltInRegistries {
 
-    public static final Registry<RegistryRopeStyle> STYLES = reg(VStuffRegistries.STYLES);
-    public static final Registry<RegistryRopeCategory> CATEGORIES = reg(VStuffRegistries.CATEGORIES);
-    public static final Registry<RegistryRopeRendererType> RENDERERS = reg(VStuffRegistries.RENDERERS);
+    public static final Registry<RegistryRopeRendererType> ROPE_RENDERERS = reg(VStuffRegistries.ROPE_RENDERERS, VStuffRopeRendererTypes::init);
 
     private static <T> Registry<T> reg(ResourceKey<Registry<T>> key) {
         return register(key, new MappedRegistry<>(key, Lifecycle.stable(), false));
+    }
+
+    private static <T> Registry<T> reg(ResourceKey<Registry<T>> key, Runnable freezeCallback) {
+        return register(key, new MappedRegistryWithFreezeCallback<>(key, Lifecycle.stable(), freezeCallback));
     }
 
     @SuppressWarnings("unchecked")

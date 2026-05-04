@@ -1,0 +1,16 @@
+{
+  "breakSound": {
+    "sound_id": "minecraft:block.wood.break"
+  },
+  "category": "vstuff:wood_styles",
+  "name": "ropestyle.vstuff.dark_oak",
+  "placeSound": {
+    "sound_id": "minecraft:block.wood.place"
+  },
+  "rawName": "Dark Oak",
+  "renderer": "vstuff:normal",
+  "rendererParams": {
+    "scale": 0.5,
+    "texture": "minecraft:textures/block/dark_oak.png"
+  }
+}

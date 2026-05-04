@@ -62,14 +62,9 @@
 
   "vstuff.rope_arrow.tooltip.summary": "Click on a block with rope arrows to set it's _first_ position. You can then _load it into bows_ & the point that the arrow _hits_ will be the rope end point. _Rope Throwers_ hate this one simple trick!",
 
-
   "vstuff.rope_cutter.tooltip.summary": "_Cuts the rope_ you are looking at.",
   "vstuff.phys_grabber.tooltip.summary": "A method of _moving ships_ around!",
   "vstuff.tooltip.hold_for_details": "Hold [%s] for summary",
-
-  "ropecategory.vstuff.uncategorized": "Uncategorized",
-
-  "vstuff.keyinfo.rope_menu_open": "Open Rope Styler",
 
   "vstuff.message.grabber_limit": "Ship is too heavy!",
 

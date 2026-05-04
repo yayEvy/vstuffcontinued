@@ -4,9 +4,18 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.*;
 import com.mojang.serialization.codecs.PrimitiveCodec;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.LiteralContents;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.resources.ResourceLocation;
+import yay.evy.everest.vstuff.api.registry.VStuffBuiltInRegistries;
+import yay.evy.everest.vstuff.internal.rendering.RegistryRopeRendererType;
+import yay.evy.everest.vstuff.internal.rendering.RendererParamHelper;
+
+import java.util.Locale;
+import java.util.Optional;
 
 public class CodecUtil {
 
@@ -41,4 +50,8 @@ public class CodecUtil {
 
     public static final Codec<JsonObject> JSON_OBJECT = CodecUtil.JSON_ELEMENT.xmap(JsonElement::getAsJsonObject, jsonObject -> jsonObject);
 
+    public static String sanitizeFileName(String name) {
+        return name.toLowerCase(Locale.ROOT)
+                .replaceAll("[^a-z0-9_]", "_");
+    }
 }

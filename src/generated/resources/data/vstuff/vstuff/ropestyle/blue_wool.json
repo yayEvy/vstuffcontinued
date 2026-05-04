@@ -1,0 +1,16 @@
+{
+  "breakSound": {
+    "sound_id": "minecraft:block.wool.break"
+  },
+  "category": "vstuff:wool_styles",
+  "name": "ropestyle.vstuff.blue_wool",
+  "placeSound": {
+    "sound_id": "minecraft:block.wool.place"
+  },
+  "rawName": "Blue Wool",
+  "renderer": "vstuff:normal",
+  "rendererParams": {
+    "scale": 0.5,
+    "texture": "minecraft:textures/block/blue_wool.png"
+  }
+}

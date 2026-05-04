@@ -13,21 +13,32 @@ import yay.evy.everest.vstuff.VStuff;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public enum VStuffKeys {
 
-    ROPE_MENU("rope_menu_open", GLFW.GLFW_KEY_LEFT_ALT),
-    GRABBER_DISTANCE("phys_grabber_distance_change", GLFW.GLFW_KEY_LEFT_ALT)
+    ROPE_MENU("rope_menu_open", GLFW.GLFW_KEY_LEFT_ALT, "Open Rope Styling Menu"),
+    GRABBER_DISTANCE("phys_grabber_distance_change", GLFW.GLFW_KEY_LEFT_ALT, "Phys Grabber Distance Changing")
     ;
 
     private KeyMapping keybind;
     private final String description;
-    private int key;
+    private final String translation;
+    private final int key;
+    private final boolean modifiable;
 
-    VStuffKeys(String description, int defaultKey) {
+    VStuffKeys(String description, int defaultKey, String translation) {
         this.description = VStuff.MOD_ID + ".keyinfo." + description;
         this.key = defaultKey;
+        this.modifiable = !description.isEmpty();
+        this.translation = translation;
+    }
+
+    public static void provideLang(BiConsumer<String, String> consumer) {
+        for (VStuffKeys key : values())
+            if (key.modifiable)
+                consumer.accept(key.description, key.translation);
     }
 
     @SubscribeEvent

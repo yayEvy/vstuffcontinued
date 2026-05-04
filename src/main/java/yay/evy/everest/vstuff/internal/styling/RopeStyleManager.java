@@ -2,9 +2,7 @@ package yay.evy.everest.vstuff.internal.styling;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.infrastructure.data.provider.RopeStyleProvider;
 import yay.evy.everest.vstuff.internal.styling.data.RopeCategory;
 import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 
@@ -16,15 +14,6 @@ public final class RopeStyleManager {
 
     public static final ResourceLocation FALLBACK_ID = VStuff.asResource("normal");
 
-    public static final RopeStyle FALLBACK_STYLE = registerStyle(new RopeStyle(
-            FALLBACK_ID,
-            Component.literal("Dummy"),
-            VStuff.asResource("dummy"),
-            VStuff.asResource("normal"),
-            RopeStyleProvider.textureParams(VStuff.asResource("textures/rope/rope_normal.png")),
-            SoundEvents.WOOL_PLACE,
-            SoundEvents.WOOL_BREAK
-    ));
 
     public static ResourceLocation returnOrFallback(ResourceLocation original) {
         return original == null ? FALLBACK_ID : original;

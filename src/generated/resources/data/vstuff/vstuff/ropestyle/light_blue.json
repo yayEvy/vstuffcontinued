@@ -1,0 +1,15 @@
+{
+  "breakSound": {
+    "sound_id": "minecraft:entity.item_frame.remove_item"
+  },
+  "category": "vstuff:color_styles",
+  "name": "ropestyle.vstuff.light_blue",
+  "placeSound": {
+    "sound_id": "minecraft:entity.item_frame.add_item"
+  },
+  "rawName": "Light Blue",
+  "renderer": "vstuff:solid_color",
+  "rendererParams": {
+    "hex": "#3ABEC7"
+  }
+}

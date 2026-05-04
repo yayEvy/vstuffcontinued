@@ -1,0 +1,16 @@
+{
+  "breakSound": {
+    "sound_id": "minecraft:block.amethyst_block.break"
+  },
+  "category": "vstuff:merry_vstuffmas",
+  "name": "ropestyle.vstuff.candycane",
+  "placeSound": {
+    "sound_id": "minecraft:block.amethyst_block.chime"
+  },
+  "rawName": "Candycane",
+  "renderer": "vstuff:normal",
+  "rendererParams": {
+    "scale": 1,
+    "texture": "vstuff:textures/rope/rope_candycane.png"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "breakSound": {
+    "sound_id": "minecraft:block.metal.break"
+  },
+  "category": "vstuff:casing_styles",
+  "name": "ropestyle.vstuff.train_casing",
+  "placeSound": {
+    "sound_id": "minecraft:block.metal.place"
+  },
+  "rawName": "Train Casing",
+  "renderer": "vstuff:normal",
+  "rendererParams": {
+    "scale": 1,
+    "texture": "vstuff:textures/rope/rope_train_casing.png"
+  }
+}

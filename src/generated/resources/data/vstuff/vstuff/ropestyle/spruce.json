@@ -1,0 +1,16 @@
+{
+  "breakSound": {
+    "sound_id": "minecraft:block.wood.break"
+  },
+  "category": "vstuff:wood_styles",
+  "name": "ropestyle.vstuff.spruce",
+  "placeSound": {
+    "sound_id": "minecraft:block.wood.place"
+  },
+  "rawName": "Spruce",
+  "renderer": "vstuff:normal",
+  "rendererParams": {
+    "scale": 0.5,
+    "texture": "minecraft:textures/block/spruce.png"
+  }
+}

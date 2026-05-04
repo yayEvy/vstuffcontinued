@@ -1,0 +1,16 @@
+{
+  "breakSound": {
+    "sound_id": "minecraft:block.wool.break"
+  },
+  "category": "vstuff:basic_styles",
+  "name": "ropestyle.vstuff.normal",
+  "placeSound": {
+    "sound_id": "minecraft:block.wool.place"
+  },
+  "rawName": "Normal",
+  "renderer": "vstuff:normal",
+  "rendererParams": {
+    "scale": 1,
+    "texture": "vstuff:textures/rope/rope_normal.png"
+  }
+}

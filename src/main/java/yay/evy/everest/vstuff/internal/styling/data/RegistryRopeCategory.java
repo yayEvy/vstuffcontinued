@@ -7,6 +7,7 @@ import net.minecraft.core.RegistryCodecs;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import yay.evy.everest.vstuff.api.registry.VStuffRegistries;
+import yay.evy.everest.vstuff.infrastructure.data.provider.RopeLangProvider;
 import yay.evy.everest.vstuff.internal.utility.CodecUtil;
 
 import java.util.List;
@@ -25,6 +26,29 @@ public record RegistryRopeCategory(
             Codec.STRING.fieldOf("rawName").forGetter(RegistryRopeCategory::rawName),
             CodecUtil.COMPONENT_TRANSLATABLE.fieldOf("name").forGetter(RegistryRopeCategory::name),
             Codec.INT.fieldOf("order").forGetter(RegistryRopeCategory::order),
-            RegistryCodecs.homogeneousList(VStuffRegistries.STYLES).optionalFieldOf("styles", HolderSet.direct()).forGetter(RegistryRopeCategory::styles)
+            RegistryCodecs.homogeneousList(VStuffRegistries.ROPE_STYLES).optionalFieldOf("styles", HolderSet.direct()).forGetter(RegistryRopeCategory::styles)
     ).apply(instance, RegistryRopeCategory::new));
+
+    public static class Builder {
+        private String rawName;
+        private Component name;
+        private int order;
+
+        public Builder name(String rawName) {
+            this.rawName = rawName;
+            String translationKey = "ropecategory.vstuff." + CodecUtil.sanitizeFileName(rawName);
+            this.name = Component.translatable(translationKey);
+            RopeLangProvider.addTranslation(translationKey, rawName);
+            return this;
+        }
+
+        public Builder order(int order) {
+            this.order = order;
+            return this;
+        }
+
+        public RegistryRopeCategory build() {
+            return new RegistryRopeCategory(rawName, name, order, HolderSet.direct());
+        }
+    }
 }

@@ -1,0 +1,16 @@
+{
+  "breakSound": {
+    "sound_id": "minecraft:block.chain.break"
+  },
+  "category": "vstuff:basic_styles",
+  "name": "ropestyle.vstuff.chain",
+  "placeSound": {
+    "sound_id": "minecraft:block.chain.place"
+  },
+  "rawName": "Chain",
+  "renderer": "vstuff:chain",
+  "rendererParams": {
+    "scale": 1,
+    "texture": "vstuff:textures/rope/rope_normal.png"
+  }
+}

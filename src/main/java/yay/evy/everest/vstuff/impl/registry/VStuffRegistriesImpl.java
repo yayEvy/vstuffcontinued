@@ -15,12 +15,12 @@ public class VStuffRegistriesImpl {
     @SubscribeEvent
     public static void registerDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
         event.dataPackRegistry(
-                VStuffRegistries.STYLES,
+                VStuffRegistries.ROPE_STYLES,
                 RegistryRopeStyle.CODEC,
                 RegistryRopeStyle.CODEC
         );
         event.dataPackRegistry(
-                VStuffRegistries.CATEGORIES,
+                VStuffRegistries.ROPE_CATEGORIES,
                 RegistryRopeCategory.CODEC,
                 RegistryRopeCategory.CODEC
         );

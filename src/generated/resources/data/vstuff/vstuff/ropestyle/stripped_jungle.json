@@ -1,0 +1,16 @@
+{
+  "breakSound": {
+    "sound_id": "minecraft:block.wood.break"
+  },
+  "category": "vstuff:wood_styles",
+  "name": "ropestyle.vstuff.stripped_jungle",
+  "placeSound": {
+    "sound_id": "minecraft:block.wood.place"
+  },
+  "rawName": "Stripped Jungle",
+  "renderer": "vstuff:normal",
+  "rendererParams": {
+    "scale": 0.5,
+    "texture": "minecraft:textures/block/stripped_jungle.png"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "breakSound": {
+    "sound_id": "minecraft:block.wood.break"
+  },
+  "category": "vstuff:casing_styles",
+  "name": "ropestyle.vstuff.andesite_casing",
+  "placeSound": {
+    "sound_id": "minecraft:block.wood.place"
+  },
+  "rawName": "Andesite Casing",
+  "renderer": "vstuff:normal",
+  "rendererParams": {
+    "scale": 1,
+    "texture": "vstuff:textures/rope/rope_andesite_casing.png"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "breakSound": {
+    "sound_id": "minecraft:block.wool.break"
+  },
+  "category": "vstuff:pride_styles",
+  "name": "ropestyle.vstuff.transgender",
+  "placeSound": {
+    "sound_id": "minecraft:block.wool.place"
+  },
+  "rawName": "Transgender",
+  "renderer": "vstuff:normal",
+  "rendererParams": {
+    "scale": 1,
+    "texture": "vstuff:textures/rope/rope_transgender.png"
+  }
+}

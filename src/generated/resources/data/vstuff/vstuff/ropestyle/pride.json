@@ -1,0 +1,16 @@
+{
+  "breakSound": {
+    "sound_id": "minecraft:block.wool.break"
+  },
+  "category": "vstuff:pride_styles",
+  "name": "ropestyle.vstuff.pride",
+  "placeSound": {
+    "sound_id": "minecraft:block.wool.place"
+  },
+  "rawName": "Pride",
+  "renderer": "vstuff:normal",
+  "rendererParams": {
+    "scale": 1,
+    "texture": "vstuff:textures/rope/rope_pride.png"
+  }
+}

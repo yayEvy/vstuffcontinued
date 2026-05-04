@@ -9,10 +9,9 @@ import yay.evy.everest.vstuff.internal.styling.data.*;
 
 public class VStuffRegistries {
 
-    public static final ResourceKey<Registry<RegistryRopeStyle>> STYLES = key("style");
-    public static final ResourceKey<Registry<RegistryRopeCategory>> CATEGORIES = key("category");
-
-    public static final ResourceKey<Registry<RegistryRopeRendererType>> RENDERERS = key("renderer");
+    public static final ResourceKey<Registry<RegistryRopeStyle>> ROPE_STYLES = key("ropestyle");
+    public static final ResourceKey<Registry<RegistryRopeCategory>> ROPE_CATEGORIES = key("ropecategory");
+    public static final ResourceKey<Registry<RegistryRopeRendererType>> ROPE_RENDERERS = key("roperenderer");
 
     private static <T> ResourceKey<Registry<T>> key(String name) {
         return ResourceKey.createRegistryKey(VStuff.asResource(name));

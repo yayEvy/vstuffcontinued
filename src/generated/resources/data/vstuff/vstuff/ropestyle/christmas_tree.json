@@ -1,0 +1,16 @@
+{
+  "breakSound": {
+    "sound_id": "minecraft:block.grass.break"
+  },
+  "category": "vstuff:merry_vstuffmas",
+  "name": "ropestyle.vstuff.christmas_tree",
+  "placeSound": {
+    "sound_id": "minecraft:block.grass.place"
+  },
+  "rawName": "Christmas Tree",
+  "renderer": "vstuff:normal",
+  "rendererParams": {
+    "scale": 1,
+    "texture": "vstuff:textures/rope/rope_christmas_tree.png"
+  }
+}

@@ -18,9 +18,9 @@ import net.minecraftforge.registries.RegisterEvent;
 import org.slf4j.Logger;
 import org.valkyrienskies.core.api.ships.ShipPhysicsListener;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
-import yay.evy.everest.vstuff.api.registry.VStuffRegistries;
-import yay.evy.everest.vstuff.content.physicsmanipulationshenanigans.levituff.LevituffAttachment;
-import yay.evy.everest.vstuff.content.ropes.arrow.RopeArrowRenderer;
+import yay.evy.everest.vstuff.client.VStuffRopeRendererTypes;
+import yay.evy.everest.vstuff.content.physics.levituff.attachment.LevituffAttachment;
+import yay.evy.everest.vstuff.content.physics.levituff.attachment.RefinedLevituffAttachment;
 import yay.evy.everest.vstuff.content.ships.reactionwheel.ReactionWheelAttachment;
 import yay.evy.everest.vstuff.content.physics.physgrabber.PhysGrabberServerAttachment;
 import yay.evy.everest.vstuff.content.ships.thrust.ThrusterForceAttachment;
@@ -86,7 +86,7 @@ public class VStuff {
     }
 
     private static void onRegister(final RegisterEvent event) {
-
+        VStuffRopeRendererTypes.init();
     }
 
     public static CreateRegistrate registrate() {
