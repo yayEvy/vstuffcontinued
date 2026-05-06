@@ -30,6 +30,11 @@ apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: "org.jetbrains.kotlin.jvm"
 
+mixin {
+    add sourceSets.main, "vstuff.refmap.json"
+    config "vstuff.mixins.json"
+}
+
 
 String gitRevision = 'git rev-parse HEAD'.execute().text.trim()
 if (gitRevision.length() >= 10) {
@@ -200,11 +205,10 @@ tasks.named('jar', Jar).configure {
                 "Implementation-Title": project.name,
                 "Implementation-Version": project.jar.archiveVersion,
                 "Implementation-Vendor": mod_authors,
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                "MixinConfigs": "vstuff.mixins.json"
         ])
     }
-
-    //finalizedBy 'reobfJar'
 }
 
 tasks.withType(JavaCompile).configureEach {
