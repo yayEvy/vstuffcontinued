@@ -70,7 +70,7 @@
   "ropecategory.vstuff.uncategorized": "Uncategorized",
 
   "vstuff.keyinfo.rope_menu_open": "Opens Rope Styler",
-  "vstuff.keyinfo.phys_grabber_distance_change": "Allows to change held ship distance",
+  "vstuff.keyinfo.phys_grabber_distance_change": "Change Held Ship Distance",
 
   "vstuff.message.grabber_limit": "Ship is too heavy!",
 
