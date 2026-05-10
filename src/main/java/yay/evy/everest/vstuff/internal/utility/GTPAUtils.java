@@ -54,6 +54,33 @@ public class GTPAUtils {
         }));
     }
 
+    public static void reAddRopeJoint(ServerLevel level, ReworkedRope rope, Entity player) {
+        VSDistanceJoint distanceJoint = (VSDistanceJoint) rope.makeJoint().serialized();
+        GameToPhysicsAdapter gtpa = getGTPA(level);
+        if (!JointUtils.isJointPoseFinite(distanceJoint)) {
+            VStuff.LOGGER.warn("Rejecting corrupted rope during creation: non-finite pose data.");
+            return;
+        }
+
+        gtpa.addJoint(distanceJoint, 1, (jointId) -> VSGameUtilsKt.executeOrSchedule(level, () -> {
+            if (jointId == -1) {
+                VStuff.LOGGER.warn("Failed to create rope joint, returning.");
+                return;
+            }
+
+            RopeManager.get(level).addRope(rope);
+
+            rope.setJointId(jointId);
+            JointUtils.removeMatchingJointsExcept(gtpa, distanceJoint, jointId);
+
+            rope.attachActors(level);
+
+            if (player instanceof ServerPlayer serverPlayer) {
+                RopeManager.syncAllRopesToPlayer(serverPlayer);
+            }
+        }));
+    }
+
     public static void editJoint(ServerLevel level, ReworkedRope rope) {
         VSDistanceJoint newDistanceJoint = (VSDistanceJoint) rope.makeJoint().serialized();
         GameToPhysicsAdapter gtpa = getGTPA(level);

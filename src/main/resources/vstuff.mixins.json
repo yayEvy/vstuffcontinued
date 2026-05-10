@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "yay.evy.everest.vstuff.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "vstuff.refmap.json",
+  "mixins": [
+    "ShipAssemblyMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

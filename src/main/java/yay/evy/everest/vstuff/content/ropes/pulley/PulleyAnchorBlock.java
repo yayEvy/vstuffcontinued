@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.index.VStuffBlockEntities;
 import yay.evy.everest.vstuff.index.VStuffShapes;
 
-import static yay.evy.everest.vstuff.content.ropes.IRopeActor.CONNECTED;
+import static yay.evy.everest.vstuff.content.ropes.util.IRopeActor.CONNECTED;
 
 public class PulleyAnchorBlock extends DirectionalBlock implements IBE<PulleyAnchorBlockEntity> {
 
