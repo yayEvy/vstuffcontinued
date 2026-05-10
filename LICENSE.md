@@ -246,7 +246,7 @@ them.
 
 ---
 
-*Horizons is an unofficial, fan-made modification for Minecraft. It
+*VStuff is an unofficial, fan-made modification for Minecraft. It
 is not affiliated with, endorsed by, or sponsored by Mojang Studios,
 Microsoft, or any of their affiliates. "Minecraft" is a trademark of Mojang
 Studios.*
