@@ -88,7 +88,7 @@ under which You distribute Your Independent Module, **provided that:**
   **(c)** Your Independent Module does not hold itself out as the Software,
   as an official version, fork, or successor of the Software, or as endorsed
   by the Licensor, except for factual statements of compatibility (e.g.,
-  "requires Horizons" or "compatible with Horizons version X").
+  "requires VStuff" or "compatible with VStuff version X").
 
 For clarity: combining the Software with an Independent Module via the Java
 classpath does not, by itself, cause the Independent Module to become a
@@ -246,7 +246,7 @@ them.
 
 ---
 
-*Horizons is an unofficial, fan-made modification for Minecraft. It
+*VStuff is an unofficial, fan-made modification for Minecraft. It
 is not affiliated with, endorsed by, or sponsored by Mojang Studios,
 Microsoft, or any of their affiliates. "Minecraft" is a trademark of Mojang
 Studios.*
