@@ -1,201 +1,101 @@
-                                 Apache License
-                           Version 2.0, January 2004
-                        http://www.apache.org/licenses/
+Valkyrien Skies "Don't Just Take It" License
+Copyright (c) 2026, flarelog. All rights reserved.
 
-   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+This Software is made available under the terms of this License. By downloading, installing, using, copying, or interacting with the Software in any way, You agree to be bound by the terms below. If You do not agree, do not use the Software.
 
-   1. Definitions.
+1. Definitions
+"Software" means the Minecraft mod identified above, including its compiled binaries (e.g., .jar files), source code, assets, textures, models, sounds, configuration files, documentation, and any other materials made available by the Licensor under this License.
 
-      "License" shall mean the terms and conditions for use, reproduction,
-      and distribution as defined by Sections 1 through 9 of this document.
+"Licensor" means whimsicalwren, the copyright holder of the Software.
 
-      "Licensor" shall mean the copyright owner or entity authorized by
-      the copyright owner that is granting the License.
+"You" (or "Your") means the individual or legal entity exercising rights under this License.
 
-      "Legal Entity" shall mean the union of the acting entity and all
-      other entities that control, are controlled by, or are under common
-      control with that entity. For the purposes of this definition,
-      "control" means (i) the power, direct or indirect, to cause the
-      direction or management of such entity, whether by contract or
-      otherwise, or (ii) ownership of fifty percent (50%) or more of the
-      outstanding shares, or (iii) beneficial ownership of such entity.
+"Independent Module" means a module that is not derived from or based on the Software, and that interoperates with the Software solely by means of the public programming interfaces (classes, methods, fields, events, and other symbols) exposed by the Software on the Java classpath.
 
-      "You" (or "Your") shall mean an individual or Legal Entity
-      exercising permissions granted by this License.
+"Derivative Work" means any work that is based on, modified from, translated from, adapted from, or otherwise derived from the Software, in whole or in any substantial part. For the avoidance of doubt, and as further described in Section 3, an Independent Module that is combined with the Software solely by linkage on the Java classpath is not a Derivative Work for the purposes of this License.
 
-      "Source" form shall mean the preferred form for making modifications,
-      including but not limited to software source code, documentation
-      source, and configuration files.
+"Contribution" means any patch, bug fix, code change, asset, translation, documentation update, or other material You intentionally submit to the Licensor for inclusion in the Software (for example, by opening a pull request, an issue with attached code, or a similar submission).
 
-      "Object" form shall mean any form resulting from mechanical
-      transformation or translation of a Source form, including but
-      not limited to compiled object code, generated documentation,
-      and conversions to other media types.
+2. Grant of Rights
+Subject to Your full compliance with this License, the Licensor grants You a worldwide, non-exclusive, non-transferable, royalty-free, revocable license to:
 
-      "Work" shall mean the work of authorship, whether in Source or
-      Object form, made available under the License, as indicated by a
-      copyright notice that is included in or attached to the work
-      (an example is provided in the Appendix below).
+(a) Personal Use. Download, install, and use the Software for Your own personal, non-commercial gameplay, including on private servers You operate or participate in.
 
-      "Derivative Works" shall mean any work, whether in Source or Object
-      form, that is based on (or derived from) the Work and for which the
-      editorial revisions, annotations, elaborations, or other modifications
-      represent, as a whole, an original work of authorship. For the purposes
-      of this License, Derivative Works shall not include works that remain
-      separable from, or merely link (or bind by name) to the interfaces of,
-      the Work and Derivative Works thereof.
+(b) Study. Read and study the Software's source code (where made available by the Licensor) for personal educational purposes.
 
-      "Contribution" shall mean any work of authorship, including
-      the original version of the Work and any modifications or additions
-      to that Work or Derivative Works thereof, that is intentionally
-      submitted to Licensor for inclusion in the Work by the copyright owner
-      or by an individual or Legal Entity authorized to submit on behalf of
-      the copyright owner. For the purposes of this definition, "submitted"
-      means any form of electronic, verbal, or written communication sent
-      to the Licensor or its representatives, including but not limited to
-      communication on electronic mailing lists, source code control systems,
-      and issue tracking systems that are managed by, or on behalf of, the
-      Licensor for the purpose of discussing and improving the Work, but
-      excluding communication that is conspicuously marked or otherwise
-      designated in writing by the copyright owner as "Not a Contribution."
+(c) Submit Contributions. Submit Contributions to the Licensor under the terms of Section 5.
 
-      "Contributor" shall mean Licensor and any individual or Legal Entity
-      on behalf of whom a Contribution has been received by Licensor and
-      subsequently incorporated within the Work.
+The right to develop and distribute Independent Modules that link against the Software is granted separately under Section 3.
 
-   2. Grant of Copyright License. Subject to the terms and conditions of
-      this License, each Contributor hereby grants to You a perpetual,
-      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
-      copyright license to reproduce, prepare Derivative Works of,
-      publicly display, publicly perform, sublicense, and distribute the
-      Work and such Derivative Works in Source or Object form.
+No other rights are granted, whether by implication, estoppel, or otherwise.
 
-   3. Grant of Patent License. Subject to the terms and conditions of
-      this License, each Contributor hereby grants to You a perpetual,
-      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
-      (except as stated in this section) patent license to make, have made,
-      use, offer to sell, sell, import, and otherwise transfer the Work,
-      where such license applies only to those patent claims licensable
-      by such Contributor that are necessarily infringed by their
-      Contribution(s) alone or by combination of their Contribution(s)
-      with the Work to which such Contribution(s) was submitted. If You
-      institute patent litigation against any entity (including a
-      cross-claim or counterclaim in a lawsuit) alleging that the Work
-      or a Contribution incorporated within the Work constitutes direct
-      or contributory patent infringement, then any patent licenses
-      granted to You under this License for that Work shall terminate
-      as of the date such litigation is filed.
+3. Classpath Linking Exception
+As a special permission, and notwithstanding any other provision of this License, You may develop, compile, distribute, and publicly release Independent Modules that link against the Software on the Java classpath (whether at compile time, runtime, or both), regardless of the license terms under which You distribute Your Independent Module, provided that:
 
-   4. Redistribution. You may reproduce and distribute copies of the
-      Work or Derivative Works thereof in any medium, with or without
-      modifications, and in Source or Object form, provided that You
-      meet the following conditions:
+(a) Your Independent Module is genuinely independent — it is Your own original work (or work You have the right to license) and does not incorporate, copy, embed, or repackage any portion of the Software's source code, compiled bytecode, assets, or other materials, except for the minimum declarations (such as import statements, type references, and method signatures) necessary to invoke the Software's public interfaces;
 
-      (a) You must give any other recipients of the Work or
-          Derivative Works a copy of this License; and
+(b) Your Independent Module is distributed separately from the Software and does not bundle, mirror, or redistribute the Software itself, in source or binary form, in whole or in any substantial part. End users must obtain the Software directly from the Licensor or an authorized distribution channel; and
 
-      (b) You must cause any modified files to carry prominent notices
-          stating that You changed the files; and
+(c) Your Independent Module does not hold itself out as the Software, as an official version, fork, or successor of the Software, or as endorsed by the Licensor, except for factual statements of compatibility (e.g., "requires Horizons" or "compatible with Horizons version X").
 
-      (c) You must retain, in the Source form of any Derivative Works
-          that You distribute, all copyright, patent, trademark, and
-          attribution notices from the Source form of the Work,
-          excluding those notices that do not pertain to any part of
-          the Derivative Works; and
+For clarity: combining the Software with an Independent Module via the Java classpath does not, by itself, cause the Independent Module to become a Derivative Work or to be subject to this License. The Software itself, however, remains governed by this License at all times.
 
-      (d) If the Work includes a "NOTICE" text file as part of its
-          distribution, then any Derivative Works that You distribute must
-          include a readable copy of the attribution notices contained
-          within such NOTICE file, excluding those notices that do not
-          pertain to any part of the Derivative Works, in at least one
-          of the following places: within a NOTICE text file distributed
-          as part of the Derivative Works; within the Source form or
-          documentation, if provided along with the Derivative Works; or,
-          within a display generated by the Derivative Works, if and
-          wherever such third-party notices normally appear. The contents
-          of the NOTICE file are for informational purposes only and
-          do not modify the License. You may add Your own attribution
-          notices within Derivative Works that You distribute, alongside
-          or as an addendum to the NOTICE text from the Work, provided
-          that such additional attribution notices cannot be construed
-          as modifying the License.
+4. Restrictions
+Except as expressly permitted by Sections 2, 3, or 6, You may NOT:
 
-      You may add Your own copyright statement to Your modifications and
-      may provide additional or different license terms and conditions
-      for use, reproduction, or distribution of Your modifications, or
-      for any such Derivative Works as a whole, provided Your use,
-      reproduction, and distribution of the Work otherwise complies with
-      the conditions stated in this License.
+(a) Redistribute, republish, mirror, host, share, sublicense, sell, rent, lease, or otherwise make the Software (in source or binary form, in whole or in any substantial part) available to any third party.
 
-   5. Submission of Contributions. Unless You explicitly state otherwise,
-      any Contribution intentionally submitted for inclusion in the Work
-      by You to the Licensor shall be under the terms and conditions of
-      this License, without any additional terms or conditions.
-      Notwithstanding the above, nothing herein shall supersede or modify
-      the terms of any separate license agreement you may have executed
-      with Licensor regarding such Contributions.
+(b) Create, distribute, or publicly display any Derivative Work without the Licensor's prior written permission.
 
-   6. Trademarks. This License does not grant permission to use the trade
-      names, trademarks, service marks, or product names of the Licensor,
-      except as required for reasonable and customary use in describing the
-      origin of the Work and reproducing the content of the NOTICE file.
+(c) Modify the Software, except (i) for Your own private use on Your own machine, and (ii) for the purpose of preparing a Contribution to be submitted to the Licensor.
 
-   7. Disclaimer of Warranty. Unless required by applicable law or
-      agreed to in writing, Licensor provides the Work (and each
-      Contributor provides its Contributions) on an "AS IS" BASIS,
-      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-      implied, including, without limitation, any warranties or conditions
-      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
-      PARTICULAR PURPOSE. You are solely responsible for determining the
-      appropriateness of using or redistributing the Work and assume any
-      risks associated with Your exercise of permissions under this License.
+(d) Bundle, repackage, or include the Software (in whole or in substantial part) within any modpack, distribution, launcher, server pack, or other compilation, regardless of whether the compilation is offered for free or for a fee, without the Licensor's prior written permission.
 
-   8. Limitation of Liability. In no event and under no legal theory,
-      whether in tort (including negligence), contract, or otherwise,
-      unless required by applicable law (such as deliberate and grossly
-      negligent acts) or agreed to in writing, shall any Contributor be
-      liable to You for damages, including any direct, indirect, special,
-      incidental, or consequential damages of any character arising as a
-      result of this License or out of the use or inability to use the
-      Work (including but not limited to damages for loss of goodwill,
-      work stoppage, computer failure or malfunction, or any and all
-      other commercial damages or losses), even if such Contributor
-      has been advised of the possibility of such damages.
+(e) Remove, alter, obscure, or replace any copyright notice, license notice, attribution, or branding contained in the Software.
 
-   9. Accepting Warranty or Additional Liability. While redistributing
-      the Work or Derivative Works thereof, You may choose to offer,
-      and charge a fee for, acceptance of support, warranty, indemnity,
-      or other liability obligations and/or rights consistent with this
-      License. However, in accepting such obligations, You may act only
-      on Your own behalf and on Your sole responsibility, not on behalf
-      of any other Contributor, and only if You agree to indemnify,
-      defend, and hold each Contributor harmless for any liability
-      incurred by, or claims asserted against, such Contributor by reason
-      of your accepting any such warranty or additional liability.
+(f) Reverse engineer, decompile, or disassemble the Software, except (i) strictly to the extent necessary to develop an Independent Module under Section 3, or (ii) to the extent such restriction is prohibited by applicable law.
 
-   END OF TERMS AND CONDITIONS
+(g) Use the Software, or any portion of it, as training data, input, or evaluation material for a machine-learning model, or for any other form of automated content generation, without the Licensor's prior written permission.
 
-   APPENDIX: How to apply the Apache License to your work.
+(h) Use the Licensor's name, logo, or trademarks to endorse or promote any product without the Licensor's prior written permission, except for the factual compatibility statements permitted by Section 3(c).
 
-      To apply the Apache License to your work, attach the following
-      boilerplate notice, with the fields enclosed by brackets "[]"
-      replaced with your own identifying information. (Don't include
-      the brackets!)  The text should be enclosed in the appropriate
-      comment syntax for the file format. We also recommend that a
-      file or class name and description of purpose be included on the
-      same "printed page" as the copyright notice for easier
-      identification within third-party archives.
+5. Contributions
+If You submit a Contribution to the Licensor:
 
-   Copyright [yyyy] [name of copyright owner]
+(a) You represent that the Contribution is Your original work, or that You otherwise have the right to submit it under the terms of this License, and that no third party has rights in the Contribution that would be inconsistent with the rights granted in this Section.
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+(b) You grant the Licensor a perpetual, worldwide, non-exclusive, royalty-free, irrevocable license to use, reproduce, modify, prepare derivative works of, publicly display, publicly perform, sublicense, and distribute Your Contribution and such derivative works as part of the Software, under this License or any future license the Licensor chooses to apply to the Software.
 
-       http://www.apache.org/licenses/LICENSE-2.0
+(c) You also grant the Licensor a perpetual, worldwide, non-exclusive, royalty-free, irrevocable patent license, under any patent claims You own or control that are necessarily infringed by Your Contribution alone or in combination with the Software, to make, use, sell, offer for sale, import, and otherwise transfer Your Contribution as part of the Software.
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+(d) You waive, to the maximum extent permitted by applicable law, any moral rights or similar rights You may have in the Contribution that would prevent the Licensor from exercising the rights granted in this Section.
+
+(e) Contributions are accepted at the Licensor's sole discretion. The Licensor is under no obligation to incorporate any Contribution.
+
+6. Permission Requests
+Any use not granted by this License including, but not limited to, redistribution, modpack inclusion, the creation of Derivative Works, or commercial use requires the Licensor's prior written permission.
+
+7. Termination
+This License, and the rights granted under it, terminate automatically and without notice if You breach any of its terms. Upon termination, You must immediately cease all use of the Software and destroy all copies in Your possession or control. Sections 4, 5, 8, 9, 10, and 11 survive termination.
+
+The classpath linking permission granted in Section 3 with respect to Independent Modules You have already publicly distributed in good-faith compliance with this License prior to termination shall continue with respect to those previously distributed Independent Modules, but no further linking, distribution, or use of the Software itself is permitted after termination.
+
+8. No Warranty
+THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, ACCURACY, AND NON-INFRINGEMENT. THE LICENSOR DOES NOT WARRANT THAT THE SOFTWARE WILL BE ERROR-FREE, SECURE, OR UNINTERRUPTED, OR THAT IT WILL BE COMPATIBLE WITH ANY PARTICULAR VERSION OF MINECRAFT, MOD LOADER, OR OTHER MOD.
+
+9. Limitation of Liability
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES (INCLUDING, BUT NOT LIMITED TO, LOSS OF DATA, LOSS OF PROFITS, LOSS OF GOODWILL, BUSINESS INTERRUPTION, OR ANY OTHER COMMERCIAL DAMAGES OR LOSSES) ARISING OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THIS LICENSE, WHETHER IN CONTRACT, TORT (INCLUDING NEGLIGENCE), STRICT LIABILITY, OR ANY OTHER LEGAL THEORY, EVEN IF THE LICENSOR HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+10. Third-Party Rights
+This License does not grant any rights with respect to Minecraft, Mojang Studios, Microsoft, or any third-party mod loaders, libraries, or APIs. Your use of those products and platforms is governed by their respective licenses and terms of service, and You are solely responsible for compliance with them.
+
+11. General
+(a) Severability. If any provision of this License is held unenforceable, the remaining provisions shall continue in full force and effect, and the unenforceable provision shall be modified to the minimum extent necessary to make it enforceable while preserving its intent.
+
+(b) No Waiver. The Licensor's failure to enforce any provision of this License is not a waiver of the right to enforce that or any other provision in the future.
+
+(c) Entire Agreement. This License constitutes the entire agreement between You and the Licensor concerning the Software and supersedes any prior or contemporaneous communications regarding the Software.
+
+(d) Assignment. You may not assign or transfer this License or any rights under it without the Licensor's prior written consent. The Licensor may freely assign this License.
+
+Horizons is an unofficial, fan-made modification for Minecraft. It is not affiliated with, endorsed by, or sponsored by Mojang Studios, Microsoft, or any of their affiliates. "Minecraft" is a trademark of Mojang Studios.
