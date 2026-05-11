@@ -104,6 +104,19 @@ public class RopeUtils {
         return minDistanceToRope;
     }
 
+    public static Vector3d worldToShipLocal(Level level, Vector3d worldPos, Long shipId) {
+        if (shipId == null) return new Vector3d(worldPos);
+
+        Ship shipObject = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(shipId);
+        if (shipObject != null) {
+            Vector3d local = new Vector3d();
+            shipObject.getTransform().getWorldToShip().transformPosition(worldPos, local);
+            return local;
+        }
+
+        return new Vector3d(worldPos);
+    }
+
     public static @Nullable ReworkedRope findRope(ServerLevel level, Player player) {
         Vec3 eyePos = player.getEyePosition();
         Vec3 lookVec = player.getViewVector(1.0f);

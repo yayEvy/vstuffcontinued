@@ -99,6 +99,7 @@
   "vstuff.expendable_assembler.tooltip.summary": "A _single use_ method of assembling ships! Who knows how this thing works... Very _fragile!_",
   "vstuff.gui.rope_menu.title": "Rope Styles",
   "vstuff.keyinfo.rope_menu_open": "Open Rope Styler",
+  "vstuff.keyinfo.phys_grabber_distance_change": "Change Held Ship Distance",
   "vstuff.levituff.tooltip.summary": "Whimsical _floaty_ block that is found in patches _underground_ around the world, do _not_ eat with _salt._",
   "vstuff.message.chain.break": "Chain broken!",
   "vstuff.message.chain.created": "Successfully created chain!",

@@ -46,7 +46,7 @@
 
   "vstuff.ponder.mechanical_thruster.text_1": "This is the Mechanical Thruster!",
   "vstuff.ponder.mechanical_thruster.text_2": "By giving it rotational force...",
-  "vstuff.ponder.mechanical_thruster.text_3": "...it produces a bit of thrust! (massive news)",
+  "vstuff.ponder.mechanical_thruster.text_3": "...it produces a bit of thrust! (wonderful news)",
   "vstuff.ponder.mechanical_thruster.text_4": "Entities can also be pushed around like Encased Fans.",
   "vstuff.ponder.mechanical_thruster.header": "Mechanical Thruster",
 
@@ -69,7 +69,8 @@
 
   "ropecategory.vstuff.uncategorized": "Uncategorized",
 
-  "vstuff.keyinfo.rope_menu_open": "Open Rope Styler",
+  "vstuff.keyinfo.rope_menu_open": "Opens Rope Styler",
+  "vstuff.keyinfo.phys_grabber_distance_change": "Change Held Ship Distance",
 
   "vstuff.message.grabber_limit": "Ship is too heavy!",
 
