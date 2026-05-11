@@ -4,7 +4,6 @@ package yay.evy.everest.vstuff.content.ropes.arrow;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
@@ -12,7 +11,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
@@ -24,15 +22,9 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Vector3d;
-import yay.evy.everest.vstuff.content.ropes.ILikeRopes;
+import yay.evy.everest.vstuff.content.ropes.util.ILikeRopes;
 import yay.evy.everest.vstuff.content.ropes.RopeFactory;
-import yay.evy.everest.vstuff.index.VStuffItems;
-import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
-import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 import yay.evy.everest.vstuff.internal.utility.TagUtils;
-
-import static yay.evy.everest.vstuff.internal.utility.ShipUtils.getShipIdAtPos;
 
 public class RopeArrowEntity extends AbstractArrow implements ILikeRopes {
 

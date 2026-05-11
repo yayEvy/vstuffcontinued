@@ -9,6 +9,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -49,6 +50,12 @@ public class ClientEvents {
         }
 
         @SubscribeEvent
+        public static void onRenderLevel(RenderLevelStageEvent event) {
+            if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_ENTITIES)
+
+        }
+
+        @SubscribeEvent
         public static void onKeyInput(InputEvent.Key event) {
             if (Minecraft.getInstance().screen != null)
                 return;
@@ -58,9 +65,12 @@ public class ClientEvents {
         }
 
         @SubscribeEvent
-        public static void onScone(InputEvent.MouseScrollingEvent event){
+        public static void onScroll(InputEvent.MouseScrollingEvent event){
            if (PhysGrabberClientHandler.isHoldingGrabber(Minecraft.getInstance().player) && PhysGrabberClientHandler.isGrabbing()) {
-               if (VStuffKeys.GRABBER_DISTANCE.isPressed()) event.cancel();
+               if (VStuffKeys.GRABBER_DISTANCE.isPressed()) {
+                   PhysGrabberClientHandler.changeDistance(event.getScrollDelta());
+                   event.cancel();
+               }
            }
         }
 

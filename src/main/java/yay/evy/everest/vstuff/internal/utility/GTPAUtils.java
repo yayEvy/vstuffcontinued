@@ -27,7 +27,7 @@ public class GTPAUtils {
     }
 
 
-    public static void addRopeJoint(ServerLevel level, ReworkedRope rope, Entity player) {
+    public static void addRopeJoint(ServerLevel level, ReworkedRope rope, Entity entity) {
         VSDistanceJoint distanceJoint = (VSDistanceJoint) rope.makeJoint().serialized();
         GameToPhysicsAdapter gtpa = getGTPA(level);
         if (!JointUtils.isJointPoseFinite(distanceJoint)) {
@@ -48,7 +48,7 @@ public class GTPAUtils {
 
             rope.attachActors(level);
 
-            if (player instanceof ServerPlayer serverPlayer) {
+            if (entity instanceof ServerPlayer serverPlayer) {
                 RopeManager.syncAllRopesToPlayer(serverPlayer);
             }
         }));

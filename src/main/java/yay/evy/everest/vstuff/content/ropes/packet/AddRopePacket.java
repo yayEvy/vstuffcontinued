@@ -7,7 +7,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 import org.joml.Vector3d;
-import yay.evy.everest.vstuff.client.ClientRopeManager;
+import yay.evy.everest.vstuff.client.rope.ClientRopeManager;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
 
@@ -60,7 +60,7 @@ public class AddRopePacket extends SimplePacketBase {
 
     @Override
     public boolean handle(NetworkEvent.Context context) {
-        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientRopeManager.addClientConstraint(ropeId, ship0, ship1, localPos0, localPos1, maxLength, RopeStyleManager.get(typeId))));
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientRopeManager.addClientRope(ropeId, ship0, ship1, localPos0, localPos1, maxLength, RopeStyleManager.get(typeId))));
         return true;
     }
 

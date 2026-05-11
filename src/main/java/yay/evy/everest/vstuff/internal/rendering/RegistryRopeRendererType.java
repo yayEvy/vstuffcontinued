@@ -6,6 +6,7 @@ import com.mojang.serialization.DataResult;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import yay.evy.everest.vstuff.api.registry.VStuffBuiltInRegistries;
+import yay.evy.everest.vstuff.client.rope.render.IRopeRenderer;
 
 import javax.annotation.Nullable;
 import java.util.Optional;

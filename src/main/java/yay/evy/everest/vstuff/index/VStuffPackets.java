@@ -12,7 +12,7 @@ import yay.evy.everest.vstuff.content.physics.physgrabber.packet.GrabPacket;
 import yay.evy.everest.vstuff.content.physics.physgrabber.packet.ReleasePacket;
 import yay.evy.everest.vstuff.content.physics.physgrabber.packet.UpdatePacket;
 import yay.evy.everest.vstuff.content.ropes.packet.*;
-import yay.evy.everest.vstuff.content.ropes.packet.OutlinePacket;
+import yay.evy.everest.vstuff.content.misc.packet.OutlinePacket;
 import yay.evy.everest.vstuff.content.ropes.packet.StyleSelectPacket;
 
 import java.util.function.BiConsumer;
@@ -31,8 +31,6 @@ public enum VStuffPackets {
     ROPE_LENGTH_UPDATE(UpdateRopeLengthPacket.class, UpdateRopeLengthPacket::new, PLAY_TO_CLIENT),
     ROPE_STYLE_UPDATE(UpdateRopeStylePacket.class, UpdateRopeStylePacket::new, PLAY_TO_CLIENT),
     ROPE_CLEAR_ALL(ClearAllRopesPacket.class, ClearAllRopesPacket::new, PLAY_TO_CLIENT),
-    ROPE_STYLES_SYNC(SyncRopeStylesPacket.class, SyncRopeStylesPacket::new, PLAY_TO_CLIENT),
-    ROPE_CATEGORIES_SYNC(SyncRopeCategoriesPacket.class, SyncRopeCategoriesPacket::new, PLAY_TO_CLIENT),
     ROPE_RESTYLES_SYNC(SyncRopeRestylesPacket.class, SyncRopeRestylesPacket::new, PLAY_TO_CLIENT),
 
     // client -> server packets
@@ -40,7 +38,6 @@ public enum VStuffPackets {
     PHYS_GRABBER_GRAB(GrabPacket.class, GrabPacket::new, PLAY_TO_SERVER),
     PHYS_GRABBER_UPDATE(UpdatePacket.class, UpdatePacket::new, PLAY_TO_SERVER),
     PHYS_GRABBER_RELEASE(ReleasePacket.class, ReleasePacket::new, PLAY_TO_SERVER)
-
     ;
 
     public static SimpleChannel channel() {

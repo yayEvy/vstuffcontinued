@@ -6,7 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
-import yay.evy.everest.vstuff.client.ClientRopeManager;
+import yay.evy.everest.vstuff.client.rope.ClientRopeManager;
 import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
 
 public class UpdateRopeStylePacket extends SimplePacketBase {

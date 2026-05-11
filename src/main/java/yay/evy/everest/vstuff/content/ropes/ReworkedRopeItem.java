@@ -17,7 +17,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.ropes.packet.OutlinePacket;
+import yay.evy.everest.vstuff.content.misc.packet.OutlinePacket;
+import yay.evy.everest.vstuff.content.ropes.util.ILikeRopes;
+import yay.evy.everest.vstuff.content.ropes.util.IRopeActor;
 import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 

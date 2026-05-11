@@ -1,21 +1,21 @@
 package yay.evy.everest.vstuff.internal.utility;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.core.internal.world.VsiShipWorld;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import yay.evy.everest.vstuff.client.ClientRopeManager;
-import yay.evy.everest.vstuff.content.ropes.IRopeActor;
+import yay.evy.everest.vstuff.client.rope.ClientRope;
+import yay.evy.everest.vstuff.client.rope.ClientRopeManager;
+import yay.evy.everest.vstuff.content.ropes.util.IRopeActor;
 import yay.evy.everest.vstuff.content.ropes.RopeManager;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 
@@ -73,14 +73,12 @@ public class RopeUtils {
     }
 
     public static Vector3d renderLocalToWorld(Level level, Vector3d localPos, Long ship) {
-        if (ship == null || level == null) return localPos;
+        Vector3d localPosCopy = new Vector3d(localPos);
+        if (ship == null || level == null) return localPosCopy;
 
-        var shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
-
-        ClientShip clientShip = (ClientShip) shipWorld.getAllShips().getById(ship);
-        if (clientShip == null) return localPos;
-        Vector3d transformedPos = clientShip.getRenderTransform().getShipToWorld().transformPosition(new Vector3d(localPos), new Vector3d());
-        return new Vector3d(transformedPos.x, transformedPos.y, transformedPos.z);
+        ClientShip clientShip = (ClientShip) VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(ship);
+        if (clientShip != null) clientShip.getRenderTransform().getShipToWorld().transformPosition(localPosCopy);
+        return localPosCopy;
     }
 
     public static double getDistanceToRope(Vec3 eyePos, Vec3 lookVec, Vector3d ropeStart, Vector3d ropeEnd, double maxDistance) {
@@ -128,16 +126,16 @@ public class RopeUtils {
         return foundRope;
     }
 
-    public static @Nullable ClientRopeManager.ClientRopeData findTargetedLeadClient(Level level, Player player) {
+    public static @Nullable ClientRope findTargetedLeadClient(Level level, Player player) {
         Vec3 eyePos = player.getEyePosition();
         Vec3 lookVec = player.getViewVector(1.0f);
         double maxDistance = player.getBlockReach();
         double minDistance = Double.MAX_VALUE;
-        ClientRopeManager.ClientRopeData foundRope = null;
+        ClientRope foundRope = null;
 
-        for (ClientRopeManager.ClientRopeData rope : ClientRopeManager.getClientConstraints().values()) {
-            Vector3d worldPosA = convertLocalToWorld(level, rope.localPos0(), rope.ship0());
-            Vector3d worldPosB = convertLocalToWorld(level, rope.localPos1(), rope.ship1());
+        for (ClientRope rope : ClientRopeManager.getClientRopes().values()) {
+            Vector3d worldPosA = convertLocalToWorld(level, rope.localPos0, rope.ship0);
+            Vector3d worldPosB = convertLocalToWorld(level, rope.localPos1, rope.ship1);
 
             double distance = getDistanceToRope(eyePos, lookVec, worldPosA, worldPosB, maxDistance);
             if (distance < minDistance && distance <= 1.0) {

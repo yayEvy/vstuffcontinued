@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.impl.registry;
+package yay.evy.everest.vstuff.events;
 
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -9,7 +9,7 @@ import yay.evy.everest.vstuff.internal.styling.data.RegistryRopeCategory;
 import yay.evy.everest.vstuff.internal.styling.data.RegistryRopeStyle;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
-public class VStuffRegistriesImpl {
+public class ModEvents {
 
     @ApiStatus.Internal
     @SubscribeEvent
@@ -17,7 +17,7 @@ public class VStuffRegistriesImpl {
         event.dataPackRegistry(
                 VStuffRegistries.ROPE_STYLES,
                 RegistryRopeStyle.CODEC,
-                RegistryRopeStyle.CODEC
+                RegistryRopeStyle.NETWORK_CODEC
         );
         event.dataPackRegistry(
                 VStuffRegistries.ROPE_CATEGORIES,

@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.ropes.packet;
+package yay.evy.everest.vstuff.content.misc.packet;
 
 import com.simibubi.create.foundation.networking.SimplePacketBase;
 import net.createmod.catnip.outliner.Outline;

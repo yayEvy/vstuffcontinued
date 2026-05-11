@@ -15,9 +15,8 @@ import org.jetbrains.annotations.Nullable;
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.mod.api.BlockEntityPhysicsListener;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import yay.evy.everest.vstuff.client.ClientRopeManager;
-import yay.evy.everest.vstuff.content.ropes.IRopeActor;
+import yay.evy.everest.vstuff.client.rope.ClientRopeManager;
+import yay.evy.everest.vstuff.content.ropes.util.IRopeActor;
 import yay.evy.everest.vstuff.content.ropes.RopeManager;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 import yay.evy.everest.vstuff.content.ropes.RopeFactory;
@@ -113,7 +112,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);
 
-        boolean hasRope = ropeId != null && ClientRopeManager.getClientConstraints().containsKey(ropeId);
+        boolean hasRope = ropeId != null && ClientRopeManager.getClientRopes().containsKey(ropeId);
 
         tooltip.add(Component.literal(" "));
 
@@ -121,7 +120,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
             tooltip.add(Component.literal("Length: ")
                     .withStyle(ChatFormatting.AQUA)
-                    .append(Component.literal( String.format("%.1f", ClientRopeManager.getClientConstraints().get(ropeId).maxLength()) + " blocks")
+                    .append(Component.literal( String.format("%.1f", ClientRopeManager.getClientRopes().get(ropeId).getLength()) + " blocks")
                             .withStyle(ChatFormatting.GRAY)
                     )
             );

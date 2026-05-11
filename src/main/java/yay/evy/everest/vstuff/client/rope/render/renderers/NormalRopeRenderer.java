@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.client.renderers;
+package yay.evy.everest.vstuff.client.rope.render.renderers;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -7,8 +7,8 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
-import yay.evy.everest.vstuff.internal.rendering.IRopeRenderer;
-import yay.evy.everest.vstuff.internal.rendering.RopeRenderContext;
+import yay.evy.everest.vstuff.client.rope.render.IRopeRenderer;
+import yay.evy.everest.vstuff.client.rope.render.RopeRenderContext;
 import yay.evy.everest.vstuff.index.VStuffRenderTypes;
 import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
 

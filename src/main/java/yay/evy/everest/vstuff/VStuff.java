@@ -14,11 +14,9 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.RegisterEvent;
 import org.slf4j.Logger;
 import org.valkyrienskies.core.api.ships.ShipPhysicsListener;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
-import yay.evy.everest.vstuff.client.VStuffRopeRendererTypes;
 import yay.evy.everest.vstuff.content.physics.levituff.attachment.LevituffAttachment;
 import yay.evy.everest.vstuff.content.physics.levituff.attachment.RefinedLevituffAttachment;
 import yay.evy.everest.vstuff.content.ships.reactionwheel.ReactionWheelAttachment;
@@ -56,7 +54,6 @@ public class VStuff {
         MinecraftForge.EVENT_BUS.register(this);
 
         modEventBus.addListener(VStuff::commonSetup);
-        modEventBus.addListener(VStuff::onRegister);
         modEventBus.addListener(EventPriority.LOWEST, VStuffDatagen::gatherData);
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> VStuffClient.initialize(modEventBus));
@@ -83,10 +80,6 @@ public class VStuff {
             attachmentBuilder.build();
             return null;
         });
-    }
-
-    private static void onRegister(final RegisterEvent event) {
-        VStuffRopeRendererTypes.init();
     }
 
     public static CreateRegistrate registrate() {

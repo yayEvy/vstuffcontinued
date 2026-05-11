@@ -1,19 +1,19 @@
-package yay.evy.everest.vstuff.client;
+package yay.evy.everest.vstuff.client.rope;
 
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.api.registry.VStuffBuiltInRegistries;
-import yay.evy.everest.vstuff.client.renderers.ChainRopeRenderer;
-import yay.evy.everest.vstuff.client.renderers.NormalRopeRenderer;
-import yay.evy.everest.vstuff.client.renderers.SolidColourRopeRenderer;
+import yay.evy.everest.vstuff.client.rope.render.renderers.ChainRopeRenderer;
+import yay.evy.everest.vstuff.client.rope.render.renderers.NormalRopeRenderer;
+import yay.evy.everest.vstuff.client.rope.render.renderers.SolidColourRopeRenderer;
 import yay.evy.everest.vstuff.internal.rendering.RegistryRopeRendererType;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static yay.evy.everest.vstuff.internal.rendering.RendererParamHelper.parseColour;
-
 
 public class VStuffRopeRendererTypes {
 
@@ -47,6 +47,10 @@ public class VStuffRopeRendererTypes {
         map.put("SOLID_COLOR", SOLID_COLOR);
         map.trim();
         RENDERER_MAP = map;
+    }
+
+    public static Optional<RegistryRopeRendererType> get(String str) {
+        return Optional.ofNullable(RegistryRopeRendererType.parse(str));
     }
 
     private static <T extends RegistryRopeRendererType> T register(String name, T type) {

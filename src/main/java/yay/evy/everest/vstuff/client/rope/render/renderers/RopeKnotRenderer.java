@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.client.renderers;
+package yay.evy.everest.vstuff.client.rope.render.renderers;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.joml.Matrix4f;

@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.content.ropes;
+package yay.evy.everest.vstuff.content.ropes.util;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -7,7 +7,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;

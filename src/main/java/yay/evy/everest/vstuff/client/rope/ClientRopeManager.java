@@ -1,99 +1,64 @@
-package yay.evy.everest.vstuff.client;
+package yay.evy.everest.vstuff.client.rope;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3d;
-import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.internal.rendering.IRopeRenderer;
-import yay.evy.everest.vstuff.internal.rendering.RopeRenderContext;
-import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
-import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
+import yay.evy.everest.vstuff.client.rope.render.IRopeRenderer;
+import yay.evy.everest.vstuff.client.rope.render.RopeRenderContext;
+import yay.evy.everest.vstuff.internal.styling.data.RegistryRopeStyle;
 import yay.evy.everest.vstuff.internal.utility.RopeRenderUtils;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@OnlyIn(Dist.CLIENT)
 public class ClientRopeManager {
-    private static final Map<Integer, ClientRopeData> clientConstraints = new HashMap<>();
+    private static final Map<Integer, ClientRope> clientConstraints = new HashMap<>();
     private static final Map<Integer, Pair<Vector3d,Vector3d>> previousStartRelativeAndEndRelativeVectors = new HashMap<>();
 
-    public record ClientRopeData(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, RopeStyle style) {
-
-        public ClientRopeData(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, RopeStyle style) {
-            this.ship0 = ship0;
-            this.ship1 = ship1;
-            this.localPos0 = new Vector3d(localPos0);
-            this.localPos1 = new Vector3d(localPos1);
-            this.maxLength = maxLength;
-            this.style = style;
-        }
-
-        public boolean canRender(Level level) {
-            if (level == null) return false;
-
-            var shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
-
-            if (ship0 != null && ship0 != 0L) {
-                Ship a = shipWorld.getAllShips().getById(ship0);
-                return a instanceof ClientShip;
-            }
-
-            if (ship1 != null && ship1 != 0L) {
-                Ship b = shipWorld.getAllShips().getById(ship1);
-                return b instanceof ClientShip;
-            }
-
-            return true;
-        }
-
-        public ClientRopeData withLength(double newLength) {
-            return new ClientRopeData(ship0, ship1, localPos0, localPos1, newLength, style);
-        }
-
-        public ClientRopeData withStyle(RopeStyle newStyle) {
-            return new ClientRopeData(ship0, ship1, localPos0, localPos1, maxLength, newStyle);
-        }
-
-    }
-
     public static void updateClientRopeLength(Integer ropeId, double length) {
-        clientConstraints.computeIfPresent(ropeId, (k, ropeData) -> ropeData.withLength(length));
+        clientConstraints.computeIfPresent(ropeId, (k, rope) -> {
+            rope.setLength(length);
+            return rope;
+        });
     }
 
-    public static void updateClientRopeStyle(Integer ropeId, RopeStyle style) {
-        clientConstraints.computeIfPresent(ropeId, (k, ropeData) -> ropeData.withStyle(style));
+    public static void updateClientRopeStyle(Integer ropeId, RegistryRopeStyle style) {
+        clientConstraints.computeIfPresent(ropeId, (k, rope) -> {
+            rope.setStyle(style);
+            return rope;
+        });
     }
 
-    public static void addClientConstraint(Integer constraintId, Long shipA, Long shipB,
-                                           Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyle style) {
-        clientConstraints.put(constraintId, new ClientRopeData(shipA, shipB, localPosA, localPosB, maxLength, style));
+    public static void addClientRope(Integer constraintId, Long shipA, Long shipB,
+                                           Vector3d localPosA, Vector3d localPosB, double maxLength, RegistryRopeStyle style) {
+        clientConstraints.put(constraintId, new ClientRope(shipA, shipB, localPosA, localPosB, maxLength, style));
     }
 
-    public static void removeClientConstraint(Integer constraintId) {
+    public static void removeClientRope(Integer constraintId) {
         if (constraintId == null) return;
 
         clientConstraints.remove(constraintId);
     }
 
-    public static Map<Integer, ClientRopeData> getClientConstraints() {
+    public static Map<Integer, ClientRope> getClientRopes() {
         return clientConstraints;
     }
 
-    public static void clearAllClientConstraints() {
+    public static void clearAllClientRopes() {
         clientConstraints.clear();
     }
 
@@ -116,7 +81,7 @@ public class ClientRopeManager {
 
                 boolean renderedAny = false;
 
-                for (Map.Entry<Integer, ClientRopeData> entry : getClientConstraints().entrySet()) {
+                for (Map.Entry<Integer, ClientRope> entry : getClientRopes().entrySet()) {
                     try {
                         boolean rendered = renderClientRope(
                                 poseStack, bufferSource, entry.getValue(),
@@ -138,14 +103,13 @@ public class ClientRopeManager {
         }
 
 
-        private static boolean renderClientRope(PoseStack poseStack, MultiBufferSource bufferSource,
-                                                ClientRopeData ropeData,
+        private static boolean renderClientRope(PoseStack poseStack, MultiBufferSource bufferSource, ClientRope rope,
                                                 Level level, Vec3 cameraPos, float partialTick, int ropeId) {
             if (!level.isClientSide) return false;
-            if (!ropeData.canRender(level)) return false;
+            if (!rope.canRender(level)) return false;
 
-            Vector3d startPos = RopeUtils.renderLocalToWorld(level, ropeData.localPos0(), ropeData.ship0());
-            Vector3d endPos   = RopeUtils.renderLocalToWorld(level, ropeData.localPos1(), ropeData.ship1());
+            Vector3d startPos = RopeUtils.renderLocalToWorld(level, rope.localPos0, rope.ship0);
+            Vector3d endPos   = RopeUtils.renderLocalToWorld(level, rope.localPos1, rope.ship1);
 
             if (VSGameUtilsKt.isBlockInShipyard(level, startPos.x, startPos.y, startPos.z)) return false;
             if (VSGameUtilsKt.isBlockInShipyard(level, endPos.x,   endPos.y,   endPos.z))   return false;
@@ -162,16 +126,11 @@ public class ClientRopeManager {
 
             if (startRelative.distance(endRelative) < 0.1) return false;
 
-            ResourceLocation ropeTypeId = ropeData.style().id();
-            RopeStyle ropeType = RopeStyleManager.get(ropeTypeId);
-            if (ropeType == null) return false;
-
-            IRopeRenderer renderer = RopeRendererTypes.getOrCreate(
-                    ropeTypeId, ropeType.rendererTypeId(), ropeType.rendererParams());
+            IRopeRenderer renderer = rope.getStyle().createRenderer();
             if (renderer == null) return false;
 
             double actualLength = startPos.distance(endPos);
-            double maxLength    = ropeData.maxLength();
+            double maxLength    = rope.getLength();
 
             float stableGameTime = (level.getGameTime() + partialTick) / 20.0f;
 

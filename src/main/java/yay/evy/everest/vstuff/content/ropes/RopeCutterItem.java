@@ -1,6 +1,5 @@
 package yay.evy.everest.vstuff.content.ropes;
 
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -9,12 +8,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.client.RopeRendererTypes;
+import yay.evy.everest.vstuff.content.ropes.util.ILikeRopes;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
-import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
-public class RopeCutterItem extends Item implements ILikeRopes{
+public class RopeCutterItem extends Item implements ILikeRopes {
     public RopeCutterItem(Properties pProperties) {
         super(pProperties);
     }

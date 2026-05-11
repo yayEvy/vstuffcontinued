@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.internal.rendering;
+package yay.evy.everest.vstuff.client.rope.render;
 
 import net.minecraft.world.level.Level;
 import org.joml.Vector3d;

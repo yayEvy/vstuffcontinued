@@ -21,9 +21,7 @@ import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 import yay.evy.everest.vstuff.content.ropes.RopeFactory;
 import yay.evy.everest.vstuff.content.ropes.RopeManager;
-import yay.evy.everest.vstuff.content.ropes.packet.SyncRopeCategoriesPacket;
 import yay.evy.everest.vstuff.content.ropes.packet.SyncRopeRestylesPacket;
-import yay.evy.everest.vstuff.content.ropes.packet.SyncRopeStylesPacket;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.infrastructure.data.listener.RopeRestyleReloadListener;
@@ -78,8 +76,6 @@ public class CommonEvents {
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         RopeManager.syncAllRopesToPlayer(player);
-        VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeStylesPacket());
-        VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeCategoriesPacket());
         VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeRestylesPacket());
     }
 
@@ -125,9 +121,7 @@ public class CommonEvents {
 
         RopeManager.syncAllRopesToPlayer(player);
 
-        VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeStylesPacket());
-        VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeCategoriesPacket());
-        VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeRestylesPacket());
+        VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeRestylesPacket()); // why do we need this
     }
 
 }

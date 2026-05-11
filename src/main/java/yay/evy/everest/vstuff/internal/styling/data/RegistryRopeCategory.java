@@ -2,9 +2,11 @@ package yay.evy.everest.vstuff.internal.styling.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryCodecs;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.RegistryFileCodec;
 import net.minecraft.resources.ResourceLocation;
 import yay.evy.everest.vstuff.api.registry.VStuffRegistries;
 import yay.evy.everest.vstuff.infrastructure.data.provider.RopeLangProvider;
@@ -28,6 +30,9 @@ public record RegistryRopeCategory(
             Codec.INT.fieldOf("order").forGetter(RegistryRopeCategory::order),
             RegistryCodecs.homogeneousList(VStuffRegistries.ROPE_STYLES).optionalFieldOf("styles", HolderSet.direct()).forGetter(RegistryRopeCategory::styles)
     ).apply(instance, RegistryRopeCategory::new));
+
+    public static final Codec<List<Holder<RegistryRopeCategory>>> LIST_CODEC = RegistryFileCodec.create(VStuffRegistries.ROPE_CATEGORIES, RegistryRopeCategory.CODEC).listOf();
+    public static final Codec<List<Holder<RegistryRopeCategory>>> NETWORK_LIST_CODEC = CODEC.xmap(Holder::direct, Holder::value).listOf();
 
     public static class Builder {
         private String rawName;
