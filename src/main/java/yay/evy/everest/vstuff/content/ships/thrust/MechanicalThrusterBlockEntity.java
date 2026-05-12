@@ -20,7 +20,6 @@ import com.simibubi.create.content.kinetics.fan.IAirCurrentSource;
 import com.simibubi.create.content.kinetics.fan.AirCurrent;
 import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
 import yay.evy.everest.vstuff.internal.utility.AttachmentUtils;
-import yay.evy.everest.vstuff.internal.utility.ShipUtils;
 
 import javax.annotation.Nullable;
 import java.util.List;

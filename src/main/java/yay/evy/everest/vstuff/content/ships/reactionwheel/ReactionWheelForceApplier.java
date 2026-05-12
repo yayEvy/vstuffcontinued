@@ -12,13 +12,12 @@ import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
         fieldVisibility = JsonAutoDetect.Visibility.ANY
 )
 public class ReactionWheelForceApplier {
-    private ReactionWheelData data;
+    private final ReactionWheelData data;
 
     public ReactionWheelForceApplier(ReactionWheelData data) {
         this.data = data;
     }
 
-    public ReactionWheelForceApplier() {}
 
     public void applyForces(BlockPos pos, PhysShipImpl ship) {
         if (data.rotationSpeed == 0 || data.facing == null) return;

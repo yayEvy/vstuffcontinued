@@ -21,7 +21,6 @@ public class ThrusterForceApplier {
         this.data = data;
     }
 
-    public ThrusterForceApplier() {}
 
     @JsonIgnore private final Vector3d worldForceDirection = new Vector3d();
     @JsonIgnore private final Vector3d worldForce = new Vector3d();

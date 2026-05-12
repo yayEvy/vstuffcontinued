@@ -10,6 +10,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.assembly.ShipAssembler;
+import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.index.VStuffSounds;
 
 import java.util.Set;
@@ -63,7 +64,7 @@ public class ExpendableAssemblerItem extends Item {
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+            VStuff.LOGGER.error("Something Fucked Up - ExpendableAssemblerItem ", e);
             return InteractionResult.CONSUME;
         }
     }
