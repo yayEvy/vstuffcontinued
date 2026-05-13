@@ -39,7 +39,7 @@
 ## Other planned features
 - More sounds for different things in the mod
 - General QOL and or improvements
-
+- Stuff (little on the nose, but we are technically a misc. mod :catthink:)
 ## Things that will not happen:
 - Anything related to Sable.
 - Other stuff probably
