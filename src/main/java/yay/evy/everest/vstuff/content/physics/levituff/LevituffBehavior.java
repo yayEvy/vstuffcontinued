@@ -15,7 +15,7 @@ import static org.joml.Math.lerp;
 
 public enum LevituffBehavior {
     UP_TO_Y_LEVEL((level, ship, levituffBlocks) -> {
-        final double gravity = -level.getGravity().y();
+         final double gravity = VStuffConfigs.server().gravity.get(); // idk what to do abt this rn srry, temp
 
         final double strengthMult = VStuffConfigs.server().levituffStrengthMultiplier.get();
 
@@ -52,14 +52,12 @@ public enum LevituffBehavior {
         return 0.3;
     }
 
+    private final TriConsumer<PhysLevel, PhysShip, Set<Vector3d>> onPhysTick;
 
-    private final TriConsumer<FU, PhysShipImpl, Set<Vector3d>> onPhysTick;
-
-    LevituffBehavior(TriConsumer<FU, PhysShipImpl, Set<Vector3d>> onPhysTick) {
+    LevituffBehavior(TriConsumer<PhysLevel, PhysShip, Set<Vector3d>> onPhysTick) {
         this.onPhysTick = onPhysTick;
     }
-
     public void physTick(PhysLevel level, PhysShip ship, Set<Vector3d> levituffBlocks) {
-        this.onPhysTick.accept((FU) level, (PhysShipImpl) ship, levituffBlocks);
+        this.onPhysTick.accept(level, ship, levituffBlocks);
     }
 }
