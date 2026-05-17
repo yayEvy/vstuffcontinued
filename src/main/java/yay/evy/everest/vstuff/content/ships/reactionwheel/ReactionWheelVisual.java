@@ -52,9 +52,7 @@ public class ReactionWheelVisual extends KineticBlockEntityVisual<ReactionWheelB
 
     @Override
     public void updateLight(float partialTick) {
-        BlockPos bottom = pos.relative(direction);
-        relight(bottom, shaftHalf);
-
+        relight(shaftHalf);
         relight(core);
     }
 

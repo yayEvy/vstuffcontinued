@@ -25,18 +25,33 @@ public class ReactionWheelRenderer extends KineticBlockEntityRenderer<ReactionWh
     protected void renderSafe(ReactionWheelBlockEntity be, float partialTicks, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
 
         BlockState state = be.getBlockState();
-        Direction direction = state.getValue(ReactionWheelBlock.FACING).getOpposite();
+        Direction facing = state.getValue(ReactionWheelBlock.FACING);
+        Direction direction = facing.getOpposite();
+
         VertexConsumer vb = buffer.getBuffer(RenderType.cutoutMipped());
 
-        int lightBehind = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(direction));
+        boolean ponder = be.getLevel() != null
+                && be.getLevel().getClass().getName().contains("Ponder");
 
-        SuperByteBuffer shaftHalf = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, state, direction);
-        SuperByteBuffer coreModel = CachedBuffers.partialFacing(VStuffPartialModels.REACTION_WHEEL_CORE, state, direction);
+        int renderLight = ponder ? 0xF000F0 : light;
+        Direction shaftDirection = ponder
+                ? Direction.UP
+                : (facing == Direction.DOWN ? Direction.DOWN : direction);
 
-        standardKineticRotationTransform(shaftHalf, be, lightBehind).renderInto(ms, vb);
-        standardKineticRotationTransform(coreModel, be, lightBehind).renderInto(ms, vb);
+        Direction coreDirection = ponder
+                ? Direction.NORTH
+                : (facing == Direction.DOWN ? Direction.UP : direction);
+
+        SuperByteBuffer shaftHalf =
+                CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, state, shaftDirection);
+
+        SuperByteBuffer coreModel =
+                CachedBuffers.partialFacing(VStuffPartialModels.REACTION_WHEEL_CORE, state, coreDirection);
+
+        standardKineticRotationTransform(shaftHalf, be, renderLight)
+                .renderInto(ms, vb);
+
+        standardKineticRotationTransform(coreModel, be, renderLight)
+                .renderInto(ms, vb);
     }
-
-
 }
-
