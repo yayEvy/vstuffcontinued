@@ -29,7 +29,7 @@ public class VStuffCommands {
 
         vstuffCommand.then(Commands.literal("DeleteRope")
                 .then(Commands.argument("RopeID", IntegerArgumentType.integer())
-                        .executes(DeleteRopeCommand::deleteRope)));
+                         .executes(DeleteRopeCommand::deleteRope)));
 
         policeDispatcher.register(vstuffCommand);
 

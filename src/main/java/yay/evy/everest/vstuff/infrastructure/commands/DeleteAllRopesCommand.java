@@ -20,7 +20,7 @@ public class DeleteAllRopesCommand {
         } else { Objects.requireNonNull(csx.getSource().getPlayer()).displayClientMessage(Component.literal("Deleted 0 Ropes"), false);}
 
         for (int evil : manager.getIdList()) {
-            RopeFactory.removeRope(csx.getSource().getLevel(), evil);
+             RopeFactory.removeRope(csx.getSource().getLevel(), evil);
         }
 
 

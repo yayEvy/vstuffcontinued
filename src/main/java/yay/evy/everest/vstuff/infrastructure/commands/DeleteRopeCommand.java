@@ -13,7 +13,7 @@ public class DeleteRopeCommand {
 
     public static int deleteRope (CommandContext<CommandSourceStack> csx) {
         int idToDelete = IntegerArgumentType.getInteger(csx, "RopeID");
-        RopeManager level = RopeManager.get(csx.getSource().getLevel());
+         RopeManager level = RopeManager.get(csx.getSource().getLevel());
 
         if(level.hasRope(idToDelete)){
             Objects.requireNonNull(csx.getSource().getPlayer()).displayClientMessage(Component.literal("Deleted Rope with ID: " + idToDelete), false);
