@@ -62,7 +62,7 @@ public class GTPAUtils {
             return;
         }
 
-        gtpa.addJoint(distanceJoint, 1, (jointId) -> VSGameUtilsKt.executeOrSchedule(level, () -> {
+        gtpa.addJoint(distanceJoint, 6, (jointId) -> VSGameUtilsKt.executeOrSchedule(level, () -> {
             if (jointId == -1) {
                 VStuff.LOGGER.warn("Failed to create rope joint, returning.");
                 return;

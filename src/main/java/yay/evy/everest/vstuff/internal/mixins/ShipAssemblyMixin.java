@@ -1,4 +1,4 @@
-package yay.evy.everest.vstuff.mixins;
+package yay.evy.everest.vstuff.internal.mixins;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
