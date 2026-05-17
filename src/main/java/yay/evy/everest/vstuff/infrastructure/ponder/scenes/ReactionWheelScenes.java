@@ -6,6 +6,7 @@ import net.createmod.ponder.api.scene.SceneBuildingUtil;
 import net.createmod.ponder.api.scene.Selection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import yay.evy.everest.vstuff.content.ships.reactionwheel.ReactionWheelBlock;
 
 public class ReactionWheelScenes {
 
@@ -26,6 +27,9 @@ public class ReactionWheelScenes {
         Selection schematic = util.select().fromTo(0, 0, 0, 4, 3, 4)
                 .substract(util.select().position(motorPos));
         scene.world().showSection(schematic, Direction.DOWN);
+        scene.world().showSection(schematic, Direction.DOWN);
+        scene.world().setBlock(wheelPos, yay.evy.everest.vstuff.index.VStuffBlocks.REACTION_WHEEL.getDefaultState()
+                .setValue(ReactionWheelBlock.FACING, Direction.DOWN), false);
 
         cscene.world().setKineticSpeed(wheelSelection, 0);
 
