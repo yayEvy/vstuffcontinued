@@ -25,7 +25,7 @@ public class RopeManager extends SavedData {
 
     private static int nextId = 0;
 
-    private final Map<Integer, ReworkedRope> ropes = new HashMap<>();
+    public final Map<Integer, ReworkedRope> ropes = new HashMap<>();
 
     public static RopeManager get(ServerLevel level) {
         DimensionDataStorage storage = level.getDataStorage();
