@@ -8,8 +8,8 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
@@ -25,6 +25,7 @@ import yay.evy.everest.vstuff.content.ropes.RopeManager;
 import yay.evy.everest.vstuff.content.ropes.packet.SyncRopeCategoriesPacket;
 import yay.evy.everest.vstuff.content.ropes.packet.SyncRopeRestylesPacket;
 import yay.evy.everest.vstuff.content.ropes.packet.SyncRopeStylesPacket;
+import yay.evy.everest.vstuff.index.VStuffCommands;
 import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.infrastructure.data.listener.RopeCategoryReloadListener;
@@ -36,9 +37,7 @@ import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 @Mod.EventBusSubscriber(modid = VStuff.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class CommonEvents {
@@ -48,6 +47,11 @@ public class CommonEvents {
         event.addListener(new RopeStyleReloadListener());
         event.addListener(new RopeCategoryReloadListener());
         event.addListener(new RopeRestyleReloadListener());
+    }
+
+    @SubscribeEvent
+    public static void registerTheseDamnCommandsSob (RegisterCommandsEvent event){
+        VStuffCommands.register(event.getDispatcher());
     }
 
     @SubscribeEvent

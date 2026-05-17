@@ -74,6 +74,9 @@
 
   "vstuff.message.grabber_limit": "Ship is too heavy!",
 
+  "vstuff.message.general_error": "Something went wrong...",
+  "vstuff.message.pos_is_air": "Cannot create a rope in the air",
+
   "subtitles.vstuff.assemble": "Assembler Assembles Whimsically"
 
 }
