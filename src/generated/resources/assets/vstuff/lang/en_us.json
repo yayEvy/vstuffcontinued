@@ -104,6 +104,8 @@
   "vstuff.message.chain.break": "Chain broken!",
   "vstuff.message.chain.created": "Successfully created chain!",
   "vstuff.message.grabber_limit": "Ship is too heavy!",
+  "vstuff.message.general_error": "Something Went Wrong...",
+  "vstuff.message.pos_is_air": "Cannot create a rope in the air",
   "vstuff.message.rope.actor_connected": "Actor connected",
   "vstuff.message.rope.break": "Rope broken!",
   "vstuff.message.rope.created": "Successfully created rope!",

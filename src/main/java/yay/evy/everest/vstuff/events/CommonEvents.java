@@ -9,6 +9,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
@@ -18,6 +19,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.PacketDistributor;
 import org.joml.Vector3d;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.index.VStuffCommands;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 import yay.evy.everest.vstuff.content.ropes.RopeFactory;
 import yay.evy.everest.vstuff.content.ropes.RopeManager;
@@ -45,6 +47,11 @@ public class CommonEvents {
         event.addListener(new RopeStyleReloadListener());
         event.addListener(new RopeCategoryReloadListener());
         event.addListener(new RopeRestyleReloadListener());
+    }
+
+    @SubscribeEvent
+    public static void registerTheseDamnCommandsSob (RegisterCommandsEvent event){
+        VStuffCommands.register(event.getDispatcher());
     }
 
     @SubscribeEvent
@@ -85,6 +92,7 @@ public class CommonEvents {
         VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeCategoriesPacket());
         VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeRestylesPacket());
     }
+
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onPlayerRightClickItem(PlayerInteractEvent.RightClickItem event) { // fired when right-clicking air // i see
