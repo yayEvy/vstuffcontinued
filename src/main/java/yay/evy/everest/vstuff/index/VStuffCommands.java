@@ -14,7 +14,7 @@ public class VStuffCommands {
 
         LiteralArgumentBuilder<CommandSourceStack> vstuffCommand = Commands.literal("vstuff");
 
-        vstuffCommand.then(Commands.literal("test")
+        vstuffCommand.then(Commands.literal("create-new-rope")
                         .then(Commands.argument("from", BlockPosArgument.blockPos())
                         .then(Commands.argument("to", BlockPosArgument.blockPos())
                         .then(Commands.argument("style", StringArgumentType.string())

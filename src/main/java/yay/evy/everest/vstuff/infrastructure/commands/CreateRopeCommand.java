@@ -44,14 +44,14 @@ public class CreateRopeCommand {
 
 
         if (blocky.toString().equals("Block{minecraft:air}") || rocky.toString().equals("Block{minecraft:air}")) {
-            Objects.requireNonNull(csx.getSource().getPlayer()).displayClientMessage(VStuff.translate("vstuff.message.pos_is_air").withStyle(ChatFormatting.RED), true);
+            Objects.requireNonNull(csx.getSource().getPlayer()).displayClientMessage(VStuff.translate("message.pos_is_air").withStyle(ChatFormatting.RED), true);
             return 1;
         } else {
         ReworkedRope rope = RopeFactory.createNewRope(level,shipOne,shipTwo,from,to,location,toSuffer);
 
         if(RopeFactory.RopeResult.validResult(rope).valid) {
-            Objects.requireNonNull(csx.getSource().getPlayer()).displayClientMessage(VStuff.translate("vstuff.message.rope.created").withStyle(ChatFormatting.GREEN), true);
-        } else Objects.requireNonNull(csx.getSource().getPlayer()).displayClientMessage(VStuff.translate("vstuff.message.general_error").withStyle(ChatFormatting.YELLOW), true);
+            Objects.requireNonNull(csx.getSource().getPlayer()).displayClientMessage(VStuff.translate("message.rope.created").withStyle(ChatFormatting.GREEN), true);
+        } else Objects.requireNonNull(csx.getSource().getPlayer()).displayClientMessage(VStuff.translate("message.general_error").withStyle(ChatFormatting.YELLOW), true);
 
         return 1;
         }
