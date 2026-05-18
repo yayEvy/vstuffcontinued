@@ -19,7 +19,6 @@ import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.RopeRendererTypes;
 import yay.evy.everest.vstuff.content.ropes.packet.SyncRopeCategoriesPacket;
 import yay.evy.everest.vstuff.content.ropes.packet.SyncRopeStylesPacket;
-import yay.evy.everest.vstuff.content.ropes.packet.UpdateRopeLengthPacket;
 import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;

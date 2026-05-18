@@ -6,6 +6,7 @@ import net.createmod.ponder.api.registration.PonderPlugin;
 import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper;
 import net.minecraft.resources.ResourceLocation;
 
+import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.infrastructure.ponder.scenes.PhysPulleyScenes;
 import yay.evy.everest.vstuff.infrastructure.ponder.scenes.MechanicalThrusterScenes;
@@ -16,7 +17,7 @@ public class VStuffPonders implements PonderPlugin {
 
 
     @Override
-    public String getModId() {
+    public @NotNull String getModId() {
         return VStuff.MOD_ID;
     }
 

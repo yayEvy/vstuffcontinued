@@ -7,7 +7,6 @@ import java.util.function.DoubleSupplier;
 
 import org.jetbrains.annotations.Nullable;
 
-import com.simibubi.create.Create;
 import com.tterrag.registrate.builders.BlockBuilder;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
 

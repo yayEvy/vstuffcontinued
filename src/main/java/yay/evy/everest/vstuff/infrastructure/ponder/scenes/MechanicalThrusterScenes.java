@@ -3,7 +3,6 @@ package yay.evy.everest.vstuff.infrastructure.ponder.scenes;
 
 import com.simibubi.create.foundation.ponder.CreateSceneBuilder;
 import net.createmod.ponder.api.element.ElementLink;
-import net.createmod.ponder.api.element.EntityElement;
 import net.createmod.ponder.api.element.ParrotElement;
 import net.createmod.ponder.api.scene.SceneBuilder;
 import net.createmod.ponder.api.scene.SceneBuildingUtil;
@@ -11,10 +10,7 @@ import net.createmod.ponder.api.scene.Selection;
 import net.createmod.ponder.foundation.PonderScene;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Parrot;
-import net.minecraft.world.phys.AABB;
 import net.createmod.ponder.api.element.ParrotPose;
 import net.minecraft.world.phys.Vec3;
 

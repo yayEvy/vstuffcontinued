@@ -1,7 +1,6 @@
 package yay.evy.everest.vstuff.infrastructure.data.provider;
 
 import com.google.gson.JsonObject;
-import com.simibubi.create.AllSoundEvents;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;

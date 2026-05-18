@@ -13,7 +13,7 @@ public class RopeArrowRenderer extends ArrowRenderer<RopeArrowEntity> {
     }
 
     @Override
-    public @NotNull ResourceLocation getTextureLocation(RopeArrowEntity entity) {
+    public @NotNull ResourceLocation getTextureLocation(@NotNull RopeArrowEntity entity) {
         return VStuff.asResource("textures/item/arrow.png");
     }
 }

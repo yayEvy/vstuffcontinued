@@ -13,12 +13,8 @@ import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import yay.evy.everest.vstuff.content.physics.physgrabber.packet.GrabPacket;
 import yay.evy.everest.vstuff.content.physics.physgrabber.packet.ReleasePacket;
 import yay.evy.everest.vstuff.content.physics.physgrabber.packet.UpdatePacket;
-import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.index.VStuffSounds;
 import yay.evy.everest.vstuff.index.VStuffPackets;
-
-import javax.xml.transform.Result;
-
 
 public class PhysGrabberClientHandler{
 

@@ -49,13 +49,13 @@ public class RopeArrowEntity extends AbstractArrow implements ILikeRopes {
     }
 
     @Override
-    protected void onHitEntity(EntityHitResult result) {
+    protected void onHitEntity(@NotNull EntityHitResult result) {
         super.onHitEntity(result);
         discard();
     }
 
     @Override
-    protected void onHitBlock(BlockHitResult bhr) {
+    protected void onHitBlock(@NotNull BlockHitResult bhr) {
         super.onHitBlock(bhr);
         BlockPos secondPos = bhr.getBlockPos();
         Entity entity = this.getOwner();
@@ -87,7 +87,7 @@ public class RopeArrowEntity extends AbstractArrow implements ILikeRopes {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
+    public void addAdditionalSaveData(@NotNull CompoundTag tag) {
         super.addAdditionalSaveData(tag);
 
         if (styleId != null)
@@ -102,7 +102,7 @@ public class RopeArrowEntity extends AbstractArrow implements ILikeRopes {
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
+    public void readAdditionalSaveData(@NotNull CompoundTag tag) {
         super.readAdditionalSaveData(tag);
 
         if (tag.contains("style"))

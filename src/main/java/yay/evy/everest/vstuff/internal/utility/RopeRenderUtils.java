@@ -5,7 +5,6 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fml.config.ModConfig;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
 import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;

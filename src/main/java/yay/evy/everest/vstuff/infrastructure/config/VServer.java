@@ -1,11 +1,8 @@
 package yay.evy.everest.vstuff.infrastructure.config;
 
 import net.createmod.catnip.config.ConfigBase;
-import net.minecraftforge.common.ForgeConfigSpec;
 import org.jetbrains.annotations.NotNull;
-import org.valkyrienskies.core.impl.shadow.Co;
 
-import java.util.List;
 
 public class VServer extends ConfigBase {
 

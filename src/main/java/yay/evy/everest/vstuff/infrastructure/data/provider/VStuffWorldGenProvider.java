@@ -6,6 +6,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.infrastructure.worldgen.VStuffBiomeModifiers;
 import yay.evy.everest.vstuff.infrastructure.worldgen.VStuffConfiguredFeatures;
@@ -26,5 +27,5 @@ public class VStuffWorldGenProvider extends DatapackBuiltinEntriesProvider {
     }
 
     @Override
-    public String getName() { return "vstuff_worldgen"; }
+    public @NotNull String getName() { return "vstuff_worldgen"; }
 }

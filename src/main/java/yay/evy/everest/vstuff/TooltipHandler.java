@@ -3,7 +3,6 @@ package yay.evy.everest.vstuff;
 import com.simibubi.create.foundation.item.TooltipHelper;
 import net.createmod.catnip.lang.FontHelper;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
@@ -12,7 +11,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraft.core.Registry;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +18,6 @@ import java.util.List;
 import java.util.function.Function;
 
 import net.minecraftforge.registries.ForgeRegistries;
-import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.index.VStuffBlocks;
 import yay.evy.everest.vstuff.index.VStuffItems;
 
