@@ -3,6 +3,7 @@ package yay.evy.everest.vstuff;
 import com.simibubi.create.foundation.item.TooltipHelper;
 import net.createmod.catnip.lang.FontHelper;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
@@ -41,7 +42,6 @@ public class TooltipHandler {
         if (tooltipModifications.containsKey(item)) {
             handleItemTooltip(tooltipList, item);
         }
-
         tooltip.addAll(1, tooltipList);
     }
 

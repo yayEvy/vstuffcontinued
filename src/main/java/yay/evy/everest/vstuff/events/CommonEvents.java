@@ -84,7 +84,6 @@ public class CommonEvents {
             RopeFactory.removeRope(level, entry.getKey());
         }
     }
-
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
@@ -93,6 +92,7 @@ public class CommonEvents {
         VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeCategoriesPacket());
         VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new SyncRopeRestylesPacket());
     }
+
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onPlayerRightClickItem(PlayerInteractEvent.RightClickItem event) { // fired when right-clicking air // i see

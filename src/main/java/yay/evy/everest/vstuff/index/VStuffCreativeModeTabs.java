@@ -77,7 +77,6 @@ public class VStuffCreativeModeTabs {
             items.addAll(collectBlocks(VSTUFF_MAIN, (item) -> item == VStuffBlocks.REFINED_LEVITUFF.get().asItem()));
             items.addAll(collectItems(VSTUFF_MAIN, (item) -> item == VStuffItems.CREATIVE_ROPE_EDITOR.get()));
 
-
             outputAll(output, items);
         }
     }

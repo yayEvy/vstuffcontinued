@@ -88,8 +88,8 @@ public class NormalRopeRenderer implements IRopeRenderer {
     }
 
     private void renderRopeFaceWithGapFilling(VertexConsumer vertexConsumer, Matrix4f matrix,
-                                                     Vector3d[] strip1, Vector3d[] strip2, Vector3d normal,
-                                                     Vector3d[] curvePoints, int[] lightValues) {
+                                              Vector3d[] strip1, Vector3d[] strip2, Vector3d normal,
+                                              Vector3d[] curvePoints, int[] lightValues) {
         float uOffset = (1.0f - uMax) / 2.0f;
 
         double[] cumulativeDistances = new double[ROPE_CURVE_SEGMENTS + 1];

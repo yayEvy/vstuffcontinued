@@ -1,5 +1,5 @@
 {
-  "break_sound": "create:wrench_remove",
+  "break_sound": "minecraft:block.wood.break",
   "category": "vstuff:casing_styles",
   "name": "Andesite Casing",
   "place_sound": "minecraft:block.wood.place",

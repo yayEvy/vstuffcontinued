@@ -17,19 +17,19 @@ public class VStuffCommands {
 
         LiteralArgumentBuilder<CommandSourceStack> vstuffCommand = Commands.literal("vstuff");
 
-        vstuffCommand.then(Commands.literal("create-new-rope")
-                .then(Commands.argument("from", BlockPosArgument.blockPos())
+        vstuffCommand.then(Commands.literal("CreateNewRope")
+                        .then(Commands.argument("from", BlockPosArgument.blockPos())
                         .then(Commands.argument("to", BlockPosArgument.blockPos())
-                                .then(Commands.argument("style", StringArgumentType.string())
-                                        .executes(CreateRopeCommand::createNewRope)))));
+                        .then(Commands.argument("style", StringArgumentType.string())
+                        .executes(CreateRopeCommand::createNewRope)))));
         /// todo create a RopeStylesArgument class for allowing this thing to make rope styles.
 
         vstuffCommand.then(Commands.literal("DeleteAllRopes")
-                .executes(DeleteAllRopesCommand::deleteCantaRopes));
+                        .executes(DeleteAllRopesCommand::deleteCantaRopes));
 
         vstuffCommand.then(Commands.literal("DeleteRope")
-                .then(Commands.argument("RopeID", IntegerArgumentType.integer())
-                         .executes(DeleteRopeCommand::deleteRope)));
+                        .then(Commands.argument("RopeID", IntegerArgumentType.integer())
+                        .executes(DeleteRopeCommand::deleteRope)));
 
         policeDispatcher.register(vstuffCommand);
 
