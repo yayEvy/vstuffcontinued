@@ -12,6 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import org.valkyrienskies.core.api.ships.ShipPhysicsListener;
+import yay.evy.everest.vstuff.VStuff;
 
 public class AttachmentUtils {
 
@@ -69,7 +70,7 @@ public class AttachmentUtils {
 
         LoadedServerShip ship = ShipUtils.getLoadedServerShipAtPos(serverLevel, pos);
 
-        System.out.println("got attachment " + attachmentClass);
+        VStuff.LOGGER.info("got attachment {}", attachmentClass);
         return ship != null ? ship.getAttachment(attachmentClass) : null;
     }
 
