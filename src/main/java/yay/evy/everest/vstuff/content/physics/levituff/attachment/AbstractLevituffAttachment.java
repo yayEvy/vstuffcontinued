@@ -33,12 +33,10 @@ public abstract sealed class AbstractLevituffAttachment implements ShipPhysicsLi
     }
 
     public void addBlock(BlockPos pos) {
-        System.out.println(pos);
         levituffBlocks.add(toV3D(pos));
     }
 
     public void removeBlock(BlockPos pos) {
-        System.out.println(pos);
         levituffBlocks.remove(toV3D(pos));
     }
 

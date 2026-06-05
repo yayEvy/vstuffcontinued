@@ -88,7 +88,7 @@ public class  RopeFactory {
 
         if (!rope.hasJoint) {
             RopeManager.get(level).addRope(rope);
-            //System.out.println("attach actors");
+
             rope.attachActors(level);
 
             if (player instanceof ServerPlayer serverPlayer) {
@@ -117,7 +117,6 @@ public class  RopeFactory {
 
         if (!rope.hasJoint) {
             RopeManager.get(level).addRope(rope);
-            //System.out.println("attach actors");
             rope.attachActors(level);
 
             if (player instanceof ServerPlayer serverPlayer) {

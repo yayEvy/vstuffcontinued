@@ -12,7 +12,6 @@ public class VStuffSounds {
     public static final DeferredRegister<SoundEvent> SOUND_EVENTS =
             DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, VStuff.MOD_ID);
 
-    public static final RegistryObject<SoundEvent> ROPE_THROW = evilSoundRegister("rope_throw");
     public static final RegistryObject<SoundEvent> GRABBER_HUM = evilSoundRegister("grabber_hum");
     public static final RegistryObject<SoundEvent> ASSEMBLE = evilSoundRegister("assemble");
 

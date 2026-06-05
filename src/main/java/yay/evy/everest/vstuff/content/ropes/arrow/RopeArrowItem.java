@@ -28,18 +28,16 @@ import yay.evy.everest.vstuff.index.VStuffEntities;
 import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
-import java.util.Objects;
-
 public class RopeArrowItem extends ArrowItem implements ILikeRopes {
 
 
     public RopeArrowItem(Properties properties) { super(properties);}
 
     @Override
-    public @NotNull AbstractArrow createArrow(@NotNull Level level, ItemStack stack, @NotNull LivingEntity shooter) {
+    public @NotNull AbstractArrow createArrow(Level level, ItemStack stack, LivingEntity shooter) {
         RopeArrowEntity arrow = new RopeArrowEntity(VStuffEntities.ROPE_ARROW.get(), shooter, level);
 
-        if (stack.hasTag() && Objects.requireNonNull(stack.getTag()).contains("data")) {
+        if (stack.hasTag() && stack.getTag().contains("data")) {
             CompoundTag data = stack.getTagElement("data");
 
             if (!data.contains("firstPos") || !data.contains("firstDim")) {
@@ -50,7 +48,7 @@ public class RopeArrowItem extends ArrowItem implements ILikeRopes {
             }
 
             if (stack.getTag().contains("style")) {
-                ResourceLocation styleId = TagUtils.readResourceLocation(Objects.requireNonNull(stack.getTagElement("style")));
+                ResourceLocation styleId = TagUtils.readResourceLocation(stack.getTagElement("style"));
                 arrow.setStyle(styleId);
             }
         } else arrow.setInvalid();
@@ -59,7 +57,7 @@ public class RopeArrowItem extends ArrowItem implements ILikeRopes {
     }
 
     @Override
-    public @NotNull InteractionResult useOn(@NotNull UseOnContext ctx) {
+    public InteractionResult useOn(@NotNull UseOnContext ctx) {
         Level level = ctx.getLevel();
         BlockPos clickedPos = ctx.getClickedPos().immutable();
         Player player = ctx.getPlayer();
