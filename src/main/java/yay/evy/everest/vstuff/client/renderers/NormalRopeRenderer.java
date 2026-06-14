@@ -77,19 +77,32 @@ public class NormalRopeRenderer implements IRopeRenderer {
         renderRopeFaceWithGapFilling(vertexConsumer, matrix, strips[3], strips[1], neg(right), curvePoints, lightValues);
         renderRopeFaceWithGapFilling(vertexConsumer, matrix, strips[2], strips[3], neg(up), curvePoints, lightValues);
 
-        // todo make it work better with 99% of blocks, "im just gonna make rope knots a config thats off by default until we find a better way to implement it for like 99% of blocks, but ill keep it in cause it does look sweet..."
-        // so for now it's a config, being off by default
         if (VStuffConfigs.client().ropeKnots.get()) {
-            int startLight = lightValues[0];
-            int endLight   = lightValues[ROPE_CURVE_SEGMENTS];
-            RopeKnotRenderer.renderKnot(vertexConsumer, matrix, curvePoints[0], startLight);
-            RopeKnotRenderer.renderKnot(vertexConsumer, matrix, curvePoints[ROPE_CURVE_SEGMENTS], endLight);
+
+            Vector3d startDirection = new Vector3d(curvePoints[1])
+                    .sub(curvePoints[0])
+                    .normalize();
+
+            Vector3d startUp = new Vector3d();
+            Vector3d startRight = right(startDirection, startUp);
+
+            RopeKnotRenderer.renderKnot(
+                    vertexConsumer,
+                    matrix,
+                    curvePoints[0],
+                    lightValues[0],
+                    startDirection,
+                    startUp,
+                    startRight
+            );
+
+            // chickven
         }
     }
 
     private void renderRopeFaceWithGapFilling(VertexConsumer vertexConsumer, Matrix4f matrix,
-                                                     Vector3d[] strip1, Vector3d[] strip2, Vector3d normal,
-                                                     Vector3d[] curvePoints, int[] lightValues) {
+                                              Vector3d[] strip1, Vector3d[] strip2, Vector3d normal,
+                                              Vector3d[] curvePoints, int[] lightValues) {
         float uOffset = (1.0f - uMax) / 2.0f;
 
         double[] cumulativeDistances = new double[ROPE_CURVE_SEGMENTS + 1];

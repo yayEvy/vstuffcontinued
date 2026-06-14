@@ -46,7 +46,8 @@ public final class PhysGrabberServerAttachment implements ShipPhysicsListener {
             velError.normalize().mul(maxVelError);
         }
 
-        double mass = ship.getInertia$impl().getMass();
+        // changed from getInertia$Impl, because why
+        double mass = ship.getMass();
 
         Vector3d force = new Vector3d(velError)
                 .mul(Math.min(mass, 20000.0))

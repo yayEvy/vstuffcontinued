@@ -13,6 +13,8 @@ import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import yay.evy.everest.vstuff.client.ClientRopeManager;
+import yay.evy.everest.vstuff.content.ropes.phys_ropes.PhysRope;
+import yay.evy.everest.vstuff.content.ropes.phys_ropes.PhysRopeManager;
 import yay.evy.everest.vstuff.content.ropes.util.IRopeActor;
 import yay.evy.everest.vstuff.content.ropes.RopeManager;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
@@ -158,6 +160,27 @@ public class RopeUtils {
         }
 
         return foundRope;
+    }
+
+    public static @Nullable PhysRope findPhysRope(ServerLevel level, Player player) {
+        Vec3 eyePos = player.getEyePosition();
+        Vec3 lookVec = player.getViewVector(1.0f);
+        double maxDistance = player.getBlockReach();
+        double minDistance = Double.MAX_VALUE;
+        PhysRope closest = null;
+
+        for (PhysRope rope : PhysRopeManager.get(level).getAllRopes()) {
+            Vector3d a = rope.posData0.getWorldPos(level);
+            Vector3d b = rope.posData1.getWorldPos(level);
+
+            double dist = getDistanceToRope(eyePos, lookVec, a, b, maxDistance);
+            if (dist < minDistance && dist <= 1.0) {
+                minDistance = dist;
+                closest = rope;
+            }
+        }
+
+        return closest;
     }
 
     public static void playSound(ServerLevel serverLevel, BlockPos pos, SoundEvent sound) {

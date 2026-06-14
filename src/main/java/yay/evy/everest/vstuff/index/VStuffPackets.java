@@ -24,7 +24,6 @@ import static net.minecraftforge.network.NetworkDirection.PLAY_TO_SERVER;
 
 public enum VStuffPackets {
 
-    // server -> client packets
     OUTLINE(OutlinePacket.class, OutlinePacket::new, PLAY_TO_CLIENT),
     ROPE_ADD(AddRopePacket.class, AddRopePacket::new, PLAY_TO_CLIENT),
     ROPE_REMOVE(RemoveRopePacket.class, RemoveRopePacket::new, PLAY_TO_CLIENT),
@@ -34,8 +33,8 @@ public enum VStuffPackets {
     ROPE_STYLES_SYNC(SyncRopeStylesPacket.class, SyncRopeStylesPacket::new, PLAY_TO_CLIENT),
     ROPE_CATEGORIES_SYNC(SyncRopeCategoriesPacket.class, SyncRopeCategoriesPacket::new, PLAY_TO_CLIENT),
     ROPE_RESTYLES_SYNC(SyncRopeRestylesPacket.class, SyncRopeRestylesPacket::new, PLAY_TO_CLIENT),
+    PHYS_ROPE_POS_UPDATE(PhysRopePosPacket.class, PhysRopePosPacket::new, PLAY_TO_CLIENT),
 
-    // client -> server packets
     STYLE_SELECT(StyleSelectPacket.class, StyleSelectPacket::new, PLAY_TO_SERVER),
     PHYS_GRABBER_GRAB(GrabPacket.class, GrabPacket::new, PLAY_TO_SERVER),
     PHYS_GRABBER_UPDATE(UpdatePacket.class, UpdatePacket::new, PLAY_TO_SERVER),

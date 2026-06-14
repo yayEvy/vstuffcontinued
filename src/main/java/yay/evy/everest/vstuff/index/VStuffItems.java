@@ -12,6 +12,7 @@ import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRopeItem;
 import yay.evy.everest.vstuff.content.ropes.RopeCutterItem;
 import yay.evy.everest.vstuff.content.ropes.arrow.RopeArrowItem;
+import yay.evy.everest.vstuff.content.ropes.phys_ropes.PhysRopeItem;
 import yay.evy.everest.vstuff.content.ships.assembly.ExpendableAssemblerItem;
 import yay.evy.everest.vstuff.content.physics.physgrabber.PhysGrabberItem;
 import yay.evy.everest.vstuff.content.ropes.editor.RopeEditorItem;
@@ -28,58 +29,67 @@ public class VStuffItems {
     public static final TagKey<Item> STYLING_AVAILABLE = TagKey.create(Registries.ITEM, VStuff.asResource("styling_available"));
 
     public static final ItemEntry<ReworkedRopeItem> ROPE =
-        REGISTRATE.item("rope", ReworkedRopeItem::new)
-            .properties(p -> p
-                .stacksTo(64)
-            )
-            .tag(STYLING_AVAILABLE)
-            .model(AssetLookup.existingItemModel())
-            .register();
+            REGISTRATE.item("rope", ReworkedRopeItem::new)
+                    .properties(p -> p
+                            .stacksTo(64)
+                    )
+                    .tag(STYLING_AVAILABLE)
+                    .model(AssetLookup.existingItemModel())
+                    .register();
+
+    public static final ItemEntry<PhysRopeItem> PHYS_ROPE =
+            REGISTRATE.item("phys_rope", PhysRopeItem::new)
+                    .properties(p -> p
+                            .stacksTo(64)
+                    )
+                    .tag(STYLING_AVAILABLE)
+                    .model(AssetLookup.existingItemModel())
+                    .register();
 
     public static final ItemEntry<RopeArrowItem> ROPE_ARROW =
-        REGISTRATE.item("rope_arrow", RopeArrowItem::new)
-            .properties(p -> p
-                .stacksTo(64)
-            )
-            .tag(STYLING_AVAILABLE)
-            .defaultModel()
-            .register();
+            REGISTRATE.item("rope_arrow", RopeArrowItem::new)
+                    .properties(p -> p
+                            .stacksTo(64)
+                    )
+                    .tag(STYLING_AVAILABLE)
+                    .defaultModel()
+                    .register();
 
     public static final ItemEntry<RopeCutterItem> ROPE_CUTTER =
-        REGISTRATE.item("rope_cutter", RopeCutterItem::new)
-            .properties(p -> p
-                .stacksTo(1)
-                .durability(238)
-            )
-            .defaultModel()
-            .register();
+            REGISTRATE.item("rope_cutter", RopeCutterItem::new)
+                    .properties(p -> p
+                            .stacksTo(1)
+                            .durability(238)
+                    )
+                    .defaultModel()
+                    .register();
 
     public static final ItemEntry<PhysGrabberItem> PHYS_GRABBER =
-        REGISTRATE.item("phys_grabber", PhysGrabberItem::new)
-            .properties(p -> p
-                .stacksTo(1)
-                .rarity(Rarity.UNCOMMON)
-                .durability(1096))
-            .model(AssetLookup.itemModelWithPartials())
-            .register();
+            REGISTRATE.item("phys_grabber", PhysGrabberItem::new)
+                    .properties(p -> p
+                            .stacksTo(1)
+                            .rarity(Rarity.UNCOMMON)
+                            .durability(1096))
+                    .model(AssetLookup.itemModelWithPartials())
+                    .register();
 
     public static final ItemEntry<ExpendableAssemblerItem> EXPENDABLE_ASSEMBLER =
-        REGISTRATE.item("expendable_assembler", ExpendableAssemblerItem::new)
-            .properties(p -> p
-                .stacksTo(16)
-                .rarity(Rarity.UNCOMMON)
-            )
-            .defaultModel()
-            .register();
+            REGISTRATE.item("expendable_assembler", ExpendableAssemblerItem::new)
+                    .properties(p -> p
+                            .stacksTo(16)
+                            .rarity(Rarity.UNCOMMON)
+                    )
+                    .defaultModel()
+                    .register();
 
     public static final ItemEntry<RopeEditorItem> CREATIVE_ROPE_EDITOR =
-        REGISTRATE.item("creative_rope_editor", RopeEditorItem::new)
-            .properties(p -> p
-                .stacksTo(1)
-                .rarity(Rarity.RARE)
-            )
-            .defaultModel()
-            .register();
+            REGISTRATE.item("creative_rope_editor", RopeEditorItem::new)
+                    .properties(p -> p
+                            .stacksTo(1)
+                            .rarity(Rarity.RARE)
+                    )
+                    .defaultModel()
+                    .register();
 
     /*
     public static final ItemEntry<Item> REFINED_LEVITUFF =
