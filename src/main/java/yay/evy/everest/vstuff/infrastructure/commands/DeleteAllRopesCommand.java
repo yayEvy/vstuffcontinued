@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class DeleteAllRopesCommand {
 
-public static int deleteCantaRopes(CommandContext<CommandSourceStack> csx) {
+public static int deleteAllRopes(CommandContext<CommandSourceStack> csx) { // why is it spanish
 
     RopeManager manager = RopeManager.get(csx.getSource().getLevel());
 
