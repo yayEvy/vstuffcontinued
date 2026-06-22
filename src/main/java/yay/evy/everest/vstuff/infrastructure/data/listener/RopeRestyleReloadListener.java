@@ -10,11 +10,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.ropes.packet.SyncRopeCategoriesPacket;
-import yay.evy.everest.vstuff.content.ropes.packet.SyncRopeRestylesPacket;
 import yay.evy.everest.vstuff.index.VStuffPackets;
-import yay.evy.everest.vstuff.internal.styling.RopeRestyleManager;
-import yay.evy.everest.vstuff.internal.styling.data.RopeRestyle;
 
 import java.util.ArrayList;
 import java.util.List;

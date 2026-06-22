@@ -8,7 +8,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.ApiStatus;
-\import yay.evy.everest.vstuff.internal.rendering.RopeRendererType;
+import yay.evy.everest.vstuff.client.VStuffRopeRendererTypes;
+import yay.evy.everest.vstuff.internal.rendering.RopeRendererType;
 
 public class VStuffBuiltInRegistries {
 

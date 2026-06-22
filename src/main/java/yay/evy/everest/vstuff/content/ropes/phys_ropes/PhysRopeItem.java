@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -36,11 +37,11 @@ public class PhysRopeItem extends Item implements ILikeRopes {
 
     @Override
     public @NotNull InteractionResult useOn(UseOnContext context) {
-        Level level       = context.getLevel();
-        BlockPos clicked  = context.getClickedPos().immutable();
-        BlockState state  = level.getBlockState(clicked);
-        Player player     = context.getPlayer();
-        ItemStack held    = context.getItemInHand();
+        Level level = context.getLevel();
+        BlockPos clicked = context.getClickedPos().immutable();
+        BlockState state = level.getBlockState(clicked);
+        Player player = context.getPlayer();
+        ItemStack held = context.getItemInHand();
 
         if (!(level instanceof ServerLevel serverLevel) || player == null) {
             return InteractionResult.PASS;
@@ -98,8 +99,7 @@ public class PhysRopeItem extends Item implements ILikeRopes {
 
         if (!IRopeActor.canAttach(state)) {
             player.displayClientMessage(
-                    VStuff.translate("message.rope.actor_connected", blockName)
-                            .withStyle(ChatFormatting.RED), true);
+                    VStuff.translate("message.rope.actor_connected", blockName).withStyle(ChatFormatting.RED), true);
             if (player instanceof ServerPlayer sp) {
                 VStuffPackets.channel().send(
                         PacketDistributor.PLAYER.with(() -> sp),
@@ -130,15 +130,14 @@ public class PhysRopeItem extends Item implements ILikeRopes {
         RopePosData posData0 = RopePosData.create(serverLevel, ship0, firstPos);
         RopePosData posData1 = RopePosData.create(serverLevel, ship1, clicked);
 
-        RopeStyle style = RopeStyle.get(RopeStyleManager.returnOrFallback(
-                RopeStyle.getOrDefaultStyleId(held.getOrCreateTag())));
+        ResourceKey<RopeStyle> style = RopeStyleManager.get(held.getOrCreateTag());
 
         PhysRope rope = PhysRopeFactory.createPhysRope(serverLevel, posData0, posData1, style, player);
 
         if (rope != null) {
             player.displayClientMessage(
                     VStuff.translate("message.rope.created").withStyle(ChatFormatting.GREEN), true);
-            RopeUtils.playSound(serverLevel, clicked, rope.style.placeSound());
+            RopeUtils.playSound(serverLevel, clicked, rope.getStyle(serverLevel.registryAccess()).placeSound());
         } else {
             player.displayClientMessage(
                     VStuff.translate("message.rope.actor_connected").withStyle(ChatFormatting.RED), true);

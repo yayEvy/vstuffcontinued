@@ -1,92 +1,109 @@
 package yay.evy.everest.vstuff.internal.styling;
 
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.index.VStuffItems;
 import yay.evy.everest.vstuff.infrastructure.data.provider.RopeStyleProvider;
+import yay.evy.everest.vstuff.infrastructure.registry.VStuffRegistries;
 import yay.evy.everest.vstuff.internal.styling.data.RopeCategory;
 import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
+import yay.evy.everest.vstuff.internal.utility.CodecUtil;
+import yay.evy.everest.vstuff.internal.utility.EntityUtils;
+import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
 import java.util.*;
 
 public final class RopeStyleManager {
-    public static Map<ResourceLocation, RopeStyle> STYLES = new LinkedHashMap<>();
-    public static Map<ResourceLocation, RopeCategory> CATEGORIES = new LinkedHashMap<>();
 
-    public static final ResourceLocation FALLBACK_ID = VStuff.asResource("normal");
+    public static LinkedHashMap<RopeCategory, List<RopeStyle>> getCategoriesWithStyles(RegistryAccess regAccess) {
+        Registry<RopeStyle> styleReg = regAccess.registryOrThrow(VStuffRegistries.ROPE_STYLE);
+        Registry<RopeCategory> categoryReg = regAccess.registryOrThrow(VStuffRegistries.ROPE_CATEGORY);
 
-    public static final RopeStyle FALLBACK_STYLE = registerStyle(new RopeStyle(
-            FALLBACK_ID,
-            Component.literal("Dummy"),
-            VStuff.asResource("dummy"),
-            VStuff.asResource("normal"),
-            RopeStyleProvider.textureParams(VStuff.asResource("textures/rope/rope_normal.png")),
-            SoundEvents.WOOL_PLACE,
-            SoundEvents.WOOL_BREAK
-    ));
+        List<RopeCategory> categories = categoryReg.stream().sorted(Comparator.comparingInt(RopeCategory::order)).toList();
 
-    public static ResourceLocation returnOrFallback(ResourceLocation original) {
-        return original == null ? FALLBACK_ID : original;
-    }
+        LinkedHashMap<RopeCategory, List<RopeStyle>> categoryWithStylesMap = new LinkedHashMap<>();
 
-    private RopeStyleManager() {}
+        for (RopeCategory category : categories) {
+            ResourceLocation categoryKey = categoryReg.getKey(category); // resource location of the category
+            List<RopeStyle> stylesForCategory = styleReg
+                    .stream()
+                    .filter(style -> style.categories()
+                            .stream()
+                            .anyMatch(h -> h.is(categoryKey))
+                    ) // filter styles by if any of their categories match the given resource location
+                    .toList();
 
-    public static RopeStyle registerStyle(RopeStyle type) {
-        STYLES.put(type.id(), type);
-        return type;
-    }
-
-    public static void registerCategory(RopeCategory category) {
-        CATEGORIES.put(category.id(), category);
-    }
-
-    public static RopeStyle get(ResourceLocation id) {
-        RopeStyle t = STYLES.get(id);
-        if (t == null) {
-            VStuff.LOGGER.warn("Unknown rope type '{}', falling back to dummy", id);
-            return STYLES.get(FALLBACK_ID);
-        }
-        return t;
-    }
-
-    public static Collection<RopeStyle> getAllStyles() { return STYLES.values(); }
-
-    public static Collection<RopeCategory> getAllCategories() { return CATEGORIES.values(); }
-
-    public static int styleCount() { return STYLES.size(); }
-
-    public static void clearAll() {
-        STYLES.clear();
-        CATEGORIES.clear();
-    }
-
-    // group types by le category field.
-    public static List<RopeCategory> buildSortedCategories() {
-        Map<ResourceLocation, List<RopeStyle>> grouped = new LinkedHashMap<>();
-        for (RopeCategory cat : CATEGORIES.values()) {
-            grouped.put(cat.id(), new ArrayList<>());
-        }
-        // Uncategorized bucket always exists
-        ResourceLocation uncategorizedId = VStuff.asResource("uncategorized");
-        grouped.putIfAbsent(uncategorizedId, new ArrayList<>());
-
-        for (RopeStyle style : STYLES.values()) {
-            grouped.computeIfAbsent(style.category(), k -> new ArrayList<>()).add(style);
+            categoryWithStylesMap.put(category, stylesForCategory);
         }
 
-        List<RopeCategory> result = new ArrayList<>();
-        for (RopeCategory cat : CATEGORIES.values()) {
-            List<RopeStyle> types = grouped.getOrDefault(cat.id(), List.of());
-            if (!types.isEmpty()) {
-                result.add(new RopeCategory(cat.id(), cat.name(), cat.order(), types));
-                grouped.remove(cat.id());
-            }
-        }
-        // all extras are dumped here
-        List<RopeStyle> uncategorized = grouped.entrySet().stream().sorted().map(Map.Entry::getValue).flatMap(Collection::stream).toList();
-        result.add(new RopeCategory(uncategorizedId, Component.translatable("ropecategory.vstuff.uncategorized"), Integer.MAX_VALUE, uncategorized));
-
-        return result.stream().filter(RopeCategory::hasStyles).sorted(Comparator.comparingInt(RopeCategory::order)).toList();
+        return categoryWithStylesMap;
     }
+
+    public static final ResourceLocation DEFAULT_ID = VStuff.asResource("normal");
+
+    public static final ResourceKey<RopeStyle> DEFAULT_KEY = ResourceKey.create(VStuffRegistries.ROPE_STYLE, DEFAULT_ID);
+
+    public static RopeStyle get(String name) {
+        return Optional.ofNullable(VStuff.registrate().get(name, VStuffRegistries.ROPE_STYLE).getUnchecked()).orElseThrow();
+    }
+
+    public static ResourceKey<RopeStyle> get(CompoundTag tag) {
+        if (!tag.contains("style", Tag.TAG_COMPOUND)) return DEFAULT_KEY;
+        return TagUtils.readResourceKey(tag.getCompound("style"));
+    }
+
+    public static void encodeStyle(CompoundTag tag, RopeStyle style) {
+        CodecUtil.encodeToTag(tag, "style", RopeStyle.CODEC, style);
+    }
+
+    public static RopeStyle decodeStyle(CompoundTag tag) {
+        return CodecUtil.decodeFromTag(tag, "style", RopeStyle.CODEC).orElse(get("normal"));
+    }
+
+    public static void set(Player player, ResourceKey<RopeStyle> style) {
+        InteractionHand hand = EntityUtils.holdingInHand(player, stack -> stack.is(VStuffItems.STYLING_AVAILABLE));
+        if (hand == null) return;
+        set(player.getItemInHand(hand), style);
+    }
+
+    public static void set(ItemStack stack, ResourceKey<RopeStyle> style) {
+        if (stack.isEmpty()) return;
+        CompoundTag tag = stack.getOrCreateTag();
+        tag.put("style", TagUtils.writeResourceKey(style));
+    }
+
+    public static final List<String> COLORS = List.of("Red", "Orange", "Yellow", "Lime", "Green", "Cyan",
+            "Blue", "Light Blue", "Purple", "Pink", "Magenta", "Brown", "Black", "Gray", "Light Gray", "White");
+
+    public static final List<String> WOOLS = COLORS.stream().map(color -> color + " Wool").toList();
+
+    public static final Map<String, String> DYE_COLORS = Map.ofEntries(
+            Map.entry("Red",        "#FF6961"),
+            Map.entry("Orange",     "#FF9F33"),
+            Map.entry("Yellow",     "#FFFF00"),
+            Map.entry("Lime",       "#7FFF00"),
+            Map.entry("Green",      "#3D7B3F"),
+            Map.entry("Cyan",       "#169C9C"),
+            Map.entry("Blue",       "#3C44AA"),
+            Map.entry("Light Blue", "#3ABEC7"),
+            Map.entry("Purple",     "#8932B8"),
+            Map.entry("Pink",       "#F38BAA"),
+            Map.entry("Magenta",    "#C74EBD"),
+            Map.entry("Brown",      "#835432"),
+            Map.entry("Black",      "#1D1D21"),
+            Map.entry("Gray",       "#474F52"),
+            Map.entry("Light Gray", "#9D9D97"),
+            Map.entry("White",      "#F9FFFE")
+    );
+
 }

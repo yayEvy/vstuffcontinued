@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,6 +23,7 @@ import yay.evy.everest.vstuff.content.ropes.packet.PhysRopePosPacket;
 import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
+import yay.evy.everest.vstuff.internal.utility.TagUtils;
 import yay.evy.everest.vstuff.internal.utility.records.RopePosData;
 
 import java.util.*;
@@ -51,7 +53,7 @@ public class PhysRopeManager extends SavedData {
                 CompoundTag ropeTag = new CompoundTag();
                 ropeTag.put("pos0", savePosData(rope.posData0));
                 ropeTag.put("pos1", savePosData(rope.posData1));
-                ropeTag.putString("style", rope.style.id().toString());
+                ropeTag.put("style", TagUtils.writeResourceKey(rope.styleKey));
                 ropeTag.putFloat("segLen", rope.segmentLength);
 
                 ListTag segList = new ListTag();
@@ -92,11 +94,7 @@ public class PhysRopeManager extends SavedData {
                 RopePosData pos0 = RopePosData.create(level, shipId0, bp0);
                 RopePosData pos1 = RopePosData.create(level, shipId1, bp1);
 
-                RopeStyle style = RopeStyleManager.get(new ResourceLocation(ropeTag.getString("style")));
-                if (style == null) {
-                    VStuff.LOGGER.warn("PhysRopeManager: unknown style '{}' on load, skipping rope.", ropeTag.getString("style"));
-                    continue;
-                }
+                ResourceKey<RopeStyle> styleKey = TagUtils.readResourceKey(ropeTag.getCompound("style"));
 
                 float segLen = ropeTag.getFloat("segLen");
 
@@ -108,9 +106,9 @@ public class PhysRopeManager extends SavedData {
                 }
 
                 if (!savedPositions.isEmpty()) {
-                    PhysRopeFactory.createPhysRopeAtPositions(level, pos0, pos1, style, savedPositions, segLen, null);
+                    PhysRopeFactory.createPhysRopeAtPositions(level, pos0, pos1, styleKey, savedPositions, segLen, null);
                 } else {
-                    PhysRopeFactory.createPhysRope(level, pos0, pos1, style, null);
+                    PhysRopeFactory.createPhysRope(level, pos0, pos1, styleKey, null);
                 }
             } catch (Exception e) {
                 VStuff.LOGGER.error("PhysRopeManager: failed to load rope {}: {}", i, e.getMessage());

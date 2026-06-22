@@ -16,7 +16,6 @@ import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.physics.physgrabber.PhysGrabberClientHandler;
 import yay.evy.everest.vstuff.content.ropes.styler.RopeStyleMenuHandler;
 import yay.evy.everest.vstuff.index.VStuffKeys;
-import yay.evy.everest.vstuff.internal.styling.RopeRestyleManager;
 
 import static yay.evy.everest.vstuff.internal.utility.RopeUtils.findTargetedLeadClient;
 
