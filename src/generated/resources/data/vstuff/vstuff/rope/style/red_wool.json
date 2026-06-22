@@ -1,0 +1,12 @@
+{
+  "categories": [
+    "vstuff:wool_styles"
+  ],
+  "name": "ropestyle.vstuff.red_wool",
+  "rawName": "Red Wool",
+  "renderer": "vstuff:normal",
+  "rendererParams": {
+    "scale": 0.5,
+    "texture": "minecraft:textures/block/red_wool.png"
+  }
+}

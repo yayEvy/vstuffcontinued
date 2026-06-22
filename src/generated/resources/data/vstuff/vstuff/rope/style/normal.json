@@ -1,0 +1,12 @@
+{
+  "categories": [
+    "vstuff:basic_styles"
+  ],
+  "name": "ropestyle.vstuff.normal",
+  "rawName": "Normal",
+  "renderer": "vstuff:normal",
+  "rendererParams": {
+    "scale": 1,
+    "texture": "vstuff:textures/rope/rope_normal.png"
+  }
+}

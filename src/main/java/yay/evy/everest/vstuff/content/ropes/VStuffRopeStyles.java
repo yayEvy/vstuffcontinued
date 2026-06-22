@@ -12,13 +12,14 @@ import java.util.Map;
 
 import static yay.evy.everest.vstuff.internal.styling.RopeStyleManager.DYE_COLORS;
 import static yay.evy.everest.vstuff.internal.styling.RopeStyleManager.WOOLS;
+import static yay.evy.everest.vstuff.internal.styling.data.RopeStyle.Builder;
 import static yay.evy.everest.vstuff.internal.utility.TagUtils.sanitizeFileName;
 
 public class VStuffRopeStyles {
 
     public static void bootstrap(BootstapContext<RopeStyle> ctx) {
         register(ctx, "normal",
-                new RopeStyle.Builder()
+                new Builder()
                         .name("Normal")
                         .defaultCategory(ctx)
                         .defaultRenderer(ctx)
@@ -27,7 +28,7 @@ public class VStuffRopeStyles {
         );
 
         register(ctx, "chain",
-                new RopeStyle.Builder()
+                new Builder()
                         .name("Chain")
                         .defaultCategory(ctx)
                         .renderer(ctx, "chain")
@@ -38,7 +39,7 @@ public class VStuffRopeStyles {
 
         for (String wool : WOOLS) {
             register(ctx, sanitizeFileName(wool),
-                    new RopeStyle.Builder()
+                    new Builder()
                             .name(wool)
                             .defaultRenderer(ctx)
                             .category(ctx, "wool_styles")
@@ -49,7 +50,7 @@ public class VStuffRopeStyles {
 
         for (Map.Entry<String, String> color : DYE_COLORS.entrySet()) {
             register(ctx, sanitizeFileName(color.getKey()),
-                    new RopeStyle.Builder()
+                    new Builder()
                             .name(color.getKey())
                             .renderer(ctx, "solid_color")
                             .category(ctx, "color_styles")
