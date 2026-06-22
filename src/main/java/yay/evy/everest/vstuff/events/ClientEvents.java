@@ -59,25 +59,25 @@ public class ClientEvents {
            }
         }
 
-        @SubscribeEvent(priority = EventPriority.HIGHEST)
-        public static void onPlayerRightClickItem(PlayerInteractEvent.RightClickItem event) { // fired when right-clicking air // icee
-            handleRightClickEvent(event);
-        }
-
-        @SubscribeEvent(priority = EventPriority.HIGHEST)
-        public static void onPlayerRightClickBlock(PlayerInteractEvent.RightClickBlock event) { // fired when right-clicking a block // oh ok
-            handleRightClickEvent(event);
-        }
-
-        private static void handleRightClickEvent(PlayerInteractEvent event) {
-            ItemStack itemStack = event.getItemStack();
-            if (RopeRestyleManager.isValidRetyping(itemStack.getItem())) {
-                if ((event.getLevel() instanceof ClientLevel level)) {
-                    if (findTargetedLeadClient(level, event.getEntity()) != null) {
-                        event.setCanceled(true);
-                        event.setCancellationResult(InteractionResult.SUCCESS);
-                    }
-                }
-            }
-        }
+//        @SubscribeEvent(priority = EventPriority.HIGHEST)
+//        public static void onPlayerRightClickItem(PlayerInteractEvent.RightClickItem event) { // fired when right-clicking air // icee
+//            handleRightClickEvent(event);
+//        }
+//
+//        @SubscribeEvent(priority = EventPriority.HIGHEST)
+//        public static void onPlayerRightClickBlock(PlayerInteractEvent.RightClickBlock event) { // fired when right-clicking a block // oh ok
+//            handleRightClickEvent(event);
+//        }
+//
+//        private static void handleRightClickEvent(PlayerInteractEvent event) {
+//            ItemStack itemStack = event.getItemStack();
+//            if (RopeRestyleManager.isValidRetyping(itemStack.getItem())) {
+//                if ((event.getLevel() instanceof ClientLevel level)) {
+//                    if (findTargetedLeadClient(level, event.getEntity()) != null) {
+//                        event.setCanceled(true);
+//                        event.setCancellationResult(InteractionResult.SUCCESS);
+//                    }
+//                }
+//            }
+//        }
 }

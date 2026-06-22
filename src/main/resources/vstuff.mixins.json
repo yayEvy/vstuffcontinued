@@ -4,7 +4,8 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "vstuff.refmap.json",
   "mixins": [
-    "ShipAssemblyMixin"
+    "ShipAssemblyMixin",
+    "BuiltInRegistriesMixin"
   ],
   "injectors": {
     "defaultRequire": 1

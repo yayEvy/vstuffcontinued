@@ -174,11 +174,6 @@ dependencies {
     implementation(jarJar("io.github.llamalad7:mixinextras-forge:${mixin_extras_version}"))
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
 
-    // adding ts back cause i need a gyro rn sonion :sob:
-    runtimeOnly fg.deobf("maven.modrinth:create-clockwork:1.20.1-forge-0.5.6") { exclude group: "org.valkyrienskies.kelvin"}
-    runtimeOnly fg.deobf("org.valkyrienskies.kelvin:kelvin-forge:${rootProject.minecraft_version}-${rootProject.kelvin_version}")
-    implementation fg.deobf("maven.modrinth:architectury-api:9.2.14+forge")
-
 }
 
 configurations {

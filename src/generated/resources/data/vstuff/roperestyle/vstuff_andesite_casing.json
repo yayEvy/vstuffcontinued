@@ -1,8 +1,0 @@
-{
-  "from_category": "vstuff:casing_styles",
-  "input": [
-    "create:andesite_casing",
-    "create:andesite_alloy"
-  ],
-  "result": "vstuff:andesite_casing"
-}
