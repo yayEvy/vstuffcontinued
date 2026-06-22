@@ -8,6 +8,7 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 import org.joml.Vector3d;
 import yay.evy.everest.vstuff.client.ClientRopeManager;
+import yay.evy.everest.vstuff.client.ClientRopeStyle;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
 
@@ -19,20 +20,20 @@ public class AddRopePacket extends SimplePacketBase {
     private Vector3d localPos0;
     private Vector3d localPos1;
     private double maxLength;
-    private ResourceLocation typeId;
+    private ClientRopeStyle style;
 
-    public AddRopePacket(ReworkedRope rope) {
-        this(rope.getRopeId(), rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), rope.style.id());
+    public AddRopePacket(ReworkedRope rope, ClientRopeStyle style) {
+        this(rope.getRopeId(), rope.posData0.shipId(), rope.posData1.shipId(), rope.posData0.localPos(), rope.posData1.localPos(), rope.jointValues.maxLength(), style);
     }
 
-    public AddRopePacket(Integer ropeId, Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, ResourceLocation typeId) {
+    public AddRopePacket(Integer ropeId, Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, ClientRopeStyle style) {
         this.ropeId = ropeId;
         this.ship0 = ship0;
         this.ship1 = ship1;
         this.localPos0 = localPos0;
         this.localPos1 = localPos1;
         this.maxLength = maxLength;
-        this.typeId = typeId;
+        this.style = style;
     }
 
     public AddRopePacket(FriendlyByteBuf buffer) {
@@ -44,7 +45,7 @@ public class AddRopePacket extends SimplePacketBase {
         this.localPos0 = readVector3d(buffer);
         this.localPos1 = readVector3d(buffer);
         this.maxLength = buffer.readDouble();
-        this.typeId = buffer.readResourceLocation();
+        this.style = buffer.readJsonWithCodec(ClientRopeStyle.CODEC);
     }
 
     @Override
@@ -55,12 +56,12 @@ public class AddRopePacket extends SimplePacketBase {
         writeVector3d(buffer, localPos0);
         writeVector3d(buffer, localPos1);
         buffer.writeDouble(maxLength);
-        buffer.writeResourceLocation(typeId);
+        buffer.writeJsonWithCodec(ClientRopeStyle.CODEC, style);
     }
 
     @Override
     public boolean handle(NetworkEvent.Context context) {
-        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientRopeManager.addClientConstraint(ropeId, ship0, ship1, localPos0, localPos1, maxLength, RopeStyleManager.get(typeId))));
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientRopeManager.addClientConstraint(ropeId, ship0, ship1, localPos0, localPos1, maxLength, style)));
         return true;
     }
 

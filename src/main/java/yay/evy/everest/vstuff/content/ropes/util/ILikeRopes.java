@@ -65,10 +65,6 @@ public interface ILikeRopes {
         stack.getOrCreateTag().put("style", TagUtils.writeResourceKey(style));
     }
 
-    default void addStyleToTag(ItemStack stack, RopeStyle style) {
-        addStyleToTag(stack, style.id());
-    }
-
     default Component getNameWithStyle(Item item, ItemStack stack) {
         if (stack.getTagElement("style") == null) addStyleToTag(stack, RopeStyleManager.DEFAULT_KEY);
         ResourceLocation location = TagUtils.readResourceKey(stack.getTagElement("style")).location();

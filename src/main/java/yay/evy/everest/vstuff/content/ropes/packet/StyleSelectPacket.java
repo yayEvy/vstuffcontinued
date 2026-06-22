@@ -3,7 +3,6 @@ package yay.evy.everest.vstuff.content.ropes.packet;
 import com.simibubi.create.foundation.networking.SimplePacketBase;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 import yay.evy.everest.vstuff.infrastructure.registry.VStuffRegistries;

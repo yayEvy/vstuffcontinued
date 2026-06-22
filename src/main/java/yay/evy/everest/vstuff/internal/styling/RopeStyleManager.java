@@ -6,6 +6,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -52,6 +53,10 @@ public final class RopeStyleManager {
 
     public static RopeStyle get(String name) {
         return Optional.ofNullable(VStuff.registrate().get(name, VStuffRegistries.ROPE_STYLE).getUnchecked()).orElseThrow();
+    }
+
+    public static RopeStyle resolveStyle(ResourceKey<RopeStyle> styleKey, RegistryAccess regAccess) {
+        return regAccess.registryOrThrow(VStuffRegistries.ROPE_STYLE).get(styleKey);
     }
 
     public static ResourceKey<RopeStyle> get(CompoundTag tag) {

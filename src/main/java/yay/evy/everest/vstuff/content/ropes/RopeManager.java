@@ -10,10 +10,12 @@ import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.client.ClientRopeStyle;
 import yay.evy.everest.vstuff.content.ropes.packet.AddRopePacket;
 import yay.evy.everest.vstuff.content.ropes.packet.ClearAllRopesPacket;
 import yay.evy.everest.vstuff.content.ropes.packet.RemoveRopePacket;
 import yay.evy.everest.vstuff.index.VStuffPackets;
+import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
 
 import java.util.HashMap;
 import java.util.List;
@@ -57,12 +59,12 @@ public class RopeManager extends SavedData {
     }
 
 
-    public void addRope(ReworkedRope rope) {
+    public void addRope(ReworkedRope rope, ClientRopeStyle style) {
         rope.setRopeId(nextId++);
 
         ropes.put(rope.ropeId, rope);
 
-        VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new AddRopePacket(rope));
+        VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new AddRopePacket(rope, style));
 
         setDirty();
     }
@@ -105,23 +107,13 @@ public class RopeManager extends SavedData {
 
     public static void syncAllRopesToPlayer(ServerPlayer player) {
         RopeManager manager = RopeManager.get(player.serverLevel());
-        //NetworkHandler.sendClearAllConstraintsToPlayer(player);
         VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new ClearAllRopesPacket());
 
         VStuff.LOGGER.info("Syncing all ropes to player {} ({})", player.getName().getString(), player.getUUID());
 
+
         for (ReworkedRope rope : manager.getRopeList()) {
-            VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new AddRopePacket(rope));
-//            NetworkHandler.sendConstraintAddToPlayer(
-//                    player,
-//                    entry.getKey(),
-//                    data.posData0.shipId(),
-//                    data.posData1.shipId(),
-//                    data.posData0.localPos(),
-//                    data.posData1.localPos(),
-//                    data.jointValues.maxLength(),
-//                    data.style.id()
-//            );
+            VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new AddRopePacket(rope, ClientRopeStyle.fromStyle(RopeStyleManager.resolveStyle(rope.styleKey, player.level().registryAccess()))));
         }
     }
 }

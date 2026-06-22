@@ -21,6 +21,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.ClientRopeManager;
+import yay.evy.everest.vstuff.client.ClientRopeStyle;
 import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 import yay.evy.everest.vstuff.internal.utility.GTPAUtils;
 import yay.evy.everest.vstuff.internal.utility.records.RopePosData;
@@ -108,7 +109,7 @@ public class PhysRopeFactory
         return rope;
     }
 
-    public static PhysRope createPhysRopeAtPositions(ServerLevel level, RopePosData posData0, RopePosData posData1, RopeStyle style, List<Vector3d> segmentPositions, float actualSegLen, Entity entity) {
+    public static PhysRope createPhysRopeAtPositions(ServerLevel level, RopePosData posData0, RopePosData posData1, ResourceKey<RopeStyle> style, List<Vector3d> segmentPositions, float actualSegLen, Entity entity) {
         Vector3d worldStart = posData0.getWorldPos(level);
         Vector3d worldEnd   = posData1.getWorldPos(level);
 
@@ -300,7 +301,7 @@ public class PhysRopeFactory
             ClientRopeManager.addClientConstraint(
                     clientId, renderShip0, renderShip1,
                     lp0, lp1,
-                    segmentLength, rope.styleKey
+                    segmentLength, ClientRopeStyle.fromStyle(rope.getStyle(level.registryAccess()))
             );
 
             if (!isDynamicEnd0 && renderShip0 == null) {

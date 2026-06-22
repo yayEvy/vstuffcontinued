@@ -4,15 +4,12 @@ import kotlin.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.PacketDistributor;
-import yay.evy.everest.vstuff.content.ropes.packet.UpdateRopeStylePacket;
+import yay.evy.everest.vstuff.client.ClientRopeStyle;
 import yay.evy.everest.vstuff.content.ropes.util.IRopeActor;
-import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
 import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
@@ -20,7 +17,7 @@ import yay.evy.everest.vstuff.internal.utility.*;
 import yay.evy.everest.vstuff.internal.utility.records.JointValues;
 import yay.evy.everest.vstuff.internal.utility.records.RopePosData;
 
-public class  RopeFactory {
+public class RopeFactory {
 
     public static class RopeResult {
         public final ReworkedRope rope;
@@ -88,7 +85,7 @@ public class  RopeFactory {
         ReworkedRope rope = new ReworkedRope(posData0, posData1, JointValues.withDefault(maxForce, maxForce, length), style);
 
         if (!rope.hasJoint) {
-            RopeManager.get(level).addRope(rope);
+            RopeManager.get(level).addRope(rope, ClientRopeStyle.fromStyle(rope.getStyle(level.registryAccess())));
 
             rope.attachActors(level);
 
@@ -117,7 +114,7 @@ public class  RopeFactory {
         ReworkedRope rope = new ReworkedRope(posData0, posData1, JointValues.withDefault(maxForce, maxForce, length), style);
 
         if (!rope.hasJoint) {
-            RopeManager.get(level).addRope(rope);
+            RopeManager.get(level).addRope(rope, ClientRopeStyle.fromStyle(rope.getStyle(level.registryAccess())));
             rope.attachActors(level);
 
             if (player instanceof ServerPlayer serverPlayer) {
