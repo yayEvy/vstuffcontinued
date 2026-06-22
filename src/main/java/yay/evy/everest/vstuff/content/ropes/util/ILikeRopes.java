@@ -2,6 +2,7 @@ package yay.evy.everest.vstuff.content.ropes.util;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -17,9 +18,9 @@ import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
 public interface ILikeRopes {
     default void resetTag(ItemStack stack) {
-        ResourceLocation lastStyle = null;
+        ResourceKey<RopeStyle> lastStyle = null;
         if (stack.getTag().contains("style")) {
-            lastStyle = TagUtils.readResourceLocation(stack.getTagElement("style"));
+            lastStyle = TagUtils.readResourceKey(stack.getTagElement("style"));
         }
 
         stack.setTag(null);
@@ -30,7 +31,7 @@ public interface ILikeRopes {
         // clears tag then puts the style back if there was one
     }
 
-    default void createRopeDrop(ServerLevel serverLevel, BlockPos pos, ResourceLocation style) {
+    default void createRopeDrop(ServerLevel serverLevel, BlockPos pos, ResourceKey<RopeStyle> style) {
         Vector3d worldPos = RopeUtils.getWorldPos(serverLevel, pos);
 
         ItemStack ropeStack = new ItemStack(VStuffItems.ROPE.get());
@@ -48,7 +49,7 @@ public interface ILikeRopes {
         serverLevel.addFreshEntity(ropeDrop);
     }
 
-    default void createRopeDrop(Player player, ResourceLocation style) {
+    default void createRopeDrop(Player player, ResourceKey<RopeStyle> style) {
         ItemStack ropeStack = new ItemStack(VStuffItems.ROPE.get());
 
         addStyleToTag(ropeStack, style);
@@ -60,8 +61,8 @@ public interface ILikeRopes {
         createRopeDrop(serverLevel, pos, null);
     }
 
-    default void addStyleToTag(ItemStack stack, ResourceLocation style) {
-        stack.getOrCreateTag().put("style", TagUtils.writeResourceLocation(RopeStyleManager.returnOrFallback(style)));
+    default void addStyleToTag(ItemStack stack, ResourceKey<RopeStyle> style) {
+        stack.getOrCreateTag().put("style", TagUtils.writeResourceKey(style));
     }
 
     default void addStyleToTag(ItemStack stack, RopeStyle style) {
@@ -69,9 +70,11 @@ public interface ILikeRopes {
     }
 
     default Component getNameWithStyle(Item item, ItemStack stack) {
+        if (stack.getTagElement("style") == null) addStyleToTag(stack, RopeStyleManager.DEFAULT_KEY);
+        ResourceLocation location = TagUtils.readResourceKey(stack.getTagElement("style")).location();
         return Component.translatable(item.getDescriptionId(stack))
                 .append(" (")
-                .append(RopeStyle.getOrDefault(stack.getOrCreateTag()).name())
+                .append(Component.translatable("ropestyle." + location.getNamespace() + "." + location.getPath())) // this should always be the correct translation key
                 .append(")");
     }
 

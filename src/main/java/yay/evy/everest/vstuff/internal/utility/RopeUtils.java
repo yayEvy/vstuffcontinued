@@ -141,6 +141,11 @@ public class RopeUtils {
         return foundRope;
     }
 
+    public static @Nullable Integer findRopeId(ServerLevel level, Player player) {
+        ReworkedRope rope = findRope(level, player);
+        return rope == null ? null : rope.getRopeId();
+    }
+
     public static @Nullable ClientRopeManager.ClientRopeData findTargetedLeadClient(Level level, Player player) {
         Vec3 eyePos = player.getEyePosition();
         Vec3 lookVec = player.getViewVector(1.0f);

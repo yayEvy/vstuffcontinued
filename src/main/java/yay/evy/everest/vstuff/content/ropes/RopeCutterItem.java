@@ -12,6 +12,7 @@ import yay.evy.everest.vstuff.content.ropes.phys_ropes.PhysRope;
 import yay.evy.everest.vstuff.content.ropes.phys_ropes.PhysRopeFactory;
 import yay.evy.everest.vstuff.content.ropes.phys_ropes.PhysRopeManager;
 import yay.evy.everest.vstuff.content.ropes.util.ILikeRopes;
+import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
 
 public class RopeCutterItem extends Item implements ILikeRopes {
@@ -36,12 +37,14 @@ public class RopeCutterItem extends Item implements ILikeRopes {
                         true
                 );
 
-                RopeUtils.playSound(serverLevel, physRope.posData0.blockPos(), physRope.style.breakSound());
-                RopeUtils.playSound(serverLevel, physRope.posData1.blockPos(), physRope.style.breakSound());
+                RopeStyle style = physRope.getStyle(serverLevel.registryAccess());
+
+                RopeUtils.playSound(serverLevel, physRope.posData0.blockPos(), style.breakSound());
+                RopeUtils.playSound(serverLevel, physRope.posData1.blockPos(), style.breakSound());
 
                 if (!player.isCreative()) {
                     itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
-                    createRopeDrop(player, physRope.style.id());
+                    createRopeDrop(player, physRope.styleKey);
                 }
 
                 return InteractionResultHolder.success(itemStack);
@@ -62,12 +65,14 @@ public class RopeCutterItem extends Item implements ILikeRopes {
                     true
             );
 
-            RopeUtils.playSound(serverLevel, rope.posData0.blockPos(), rope.style.breakSound());
-            RopeUtils.playSound(serverLevel, rope.posData1.blockPos(), rope.style.breakSound());
+            RopeStyle style = rope.getStyle(serverLevel.registryAccess());
+
+            RopeUtils.playSound(serverLevel, rope.posData0.blockPos(), style.breakSound());
+            RopeUtils.playSound(serverLevel, rope.posData1.blockPos(), style.breakSound());
 
             if (!player.isCreative() && rope.hasDrop) {
                 itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
-                createRopeDrop(player, rope.style.id());
+                createRopeDrop(player, rope.styleKey);
             }
 
             return InteractionResultHolder.success(itemStack);

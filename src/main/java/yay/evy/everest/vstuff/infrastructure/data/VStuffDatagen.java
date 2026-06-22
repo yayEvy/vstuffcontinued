@@ -18,24 +18,22 @@ import java.util.function.BiConsumer;
 public class VStuffDatagen {
 
     public static void gatherData(GatherDataEvent event) {
+        gatherAllLang();
+
         DataGenerator generator = event.getGenerator();
         PackOutput output = generator.getPackOutput();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 
-        generator.addProvider(event.includeServer(), new RopeStyleProvider(generator));
-        generator.addProvider(event.includeServer(), new RopeCategoryProvider(generator));
-        generator.addProvider(event.includeServer(), new RopeRestylingProvider(generator));
         generator.addProvider(event.includeServer(), new VStuffWeightsProvider(generator));
-        generator.addProvider(event.includeServer(), new VStuffWorldGenProvider(output, lookupProvider));
-        gatherAllLang(generator);
+        generator.addProvider(event.includeServer(), new VStuffDatapackEntriesProvider(output, lookupProvider));
     }
 
-    private static void gatherAllLang(DataGenerator generator) {
+    private static void gatherAllLang() {
         VStuff.registrate().addDataGenerator(ProviderType.LANG, registrateLangProvider -> {
             BiConsumer<String, String> langConsumer = registrateLangProvider::add;
 
             provideDefaultLang("default", langConsumer);
-            RopeLangProvider.provideLang(generator, langConsumer);
+            RopeLangProvider.provideLang(langConsumer);
         });
     }
 
