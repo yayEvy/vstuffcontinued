@@ -1,0 +1,17 @@
+{
+  "breakSound": {
+    "sound_id": "minecraft:entity.item_frame.remove_item"
+  },
+  "categories": [
+    "vstuff:color_styles"
+  ],
+  "name": "ropestyle.vstuff.lime",
+  "placeSound": {
+    "sound_id": "minecraft:entity.item_frame.add_item"
+  },
+  "rawName": "Lime",
+  "renderer": "vstuff:solid_color",
+  "rendererParams": {
+    "hex": "#7FFF00"
+  }
+}

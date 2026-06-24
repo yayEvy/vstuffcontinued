@@ -6,6 +6,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -25,11 +26,12 @@ import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 import yay.evy.everest.vstuff.content.ropes.util.ILikeRopes;
 import yay.evy.everest.vstuff.content.ropes.RopeFactory;
+import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
 public class RopeArrowEntity extends AbstractArrow implements ILikeRopes {
 
-    private ResourceLocation styleId;
+    private ResourceKey<RopeStyle> styleKey;
     private BlockPos firstPos;
     private String firstDim;
     private boolean canCreate = true;
@@ -66,16 +68,16 @@ public class RopeArrowEntity extends AbstractArrow implements ILikeRopes {
 
         if (!hasCreated) { // if it hasnt made a rope yet
             if (canCreate) { // if it can make a rope at all
-                RopeFactory.RopeResult result = RopeFactory.tryCreateNewRope(serverLevel, firstDim, firstPos, secondPos, entity, styleId);
+                RopeFactory.RopeResult result = RopeFactory.tryCreateNewRope(serverLevel, firstDim, firstPos, secondPos, entity, styleKey);
 
                 if (!result.valid && shouldRopeDrop) { // if the result is invalid and the rope should drop
-                    createRopeDrop(serverLevel, secondPos, styleId);
+                    createRopeDrop(serverLevel, secondPos, styleKey);
                 } else {
                     hasCreated = true;
                     result.rope.setDrop(shouldRopeDrop); // will echo the arrow pickup conditions
                 }
             } else {
-                createRopeDrop(serverLevel, secondPos, styleId);
+                createRopeDrop(serverLevel, secondPos, styleKey);
             }
         }
     }
@@ -91,8 +93,8 @@ public class RopeArrowEntity extends AbstractArrow implements ILikeRopes {
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
 
-        if (styleId != null)
-            tag.put("style", TagUtils.writeResourceLocation(styleId));
+        if (styleKey != null)
+            tag.put("style", TagUtils.writeResourceKey(styleKey));
 
         if (firstPos != null)
             tag.put("firstPos", NbtUtils.writeBlockPos(firstPos));
@@ -107,7 +109,7 @@ public class RopeArrowEntity extends AbstractArrow implements ILikeRopes {
         super.readAdditionalSaveData(tag);
 
         if (tag.contains("style"))
-            styleId = TagUtils.readResourceLocation(tag.getCompound("style"));
+            styleKey = TagUtils.readResourceKey(tag.getCompound("style"));
 
         if (tag.contains("firstPos"))
             firstPos = NbtUtils.readBlockPos(tag.getCompound("firstPos"));
@@ -141,16 +143,16 @@ public class RopeArrowEntity extends AbstractArrow implements ILikeRopes {
         this.firstDim = dim;
     }
 
-    public void setStyle(ResourceLocation styleId) {
-        this.styleId = styleId;
+    public void setStyle(ResourceKey<RopeStyle> styleKey) {
+        this.styleKey = styleKey;
     }
 
     public void setInvalid() {
         this.canCreate = false;
     }
 
-    public ResourceLocation getStyle() {
-        return styleId;
+    public ResourceKey<RopeStyle> getStyle() {
+        return styleKey;
     }
 
 

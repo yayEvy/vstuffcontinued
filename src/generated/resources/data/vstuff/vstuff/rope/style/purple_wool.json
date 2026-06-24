@@ -1,0 +1,12 @@
+{
+  "categories": [
+    "vstuff:wool_styles"
+  ],
+  "name": "ropestyle.vstuff.purple_wool",
+  "rawName": "Purple Wool",
+  "renderer": "vstuff:normal",
+  "rendererParams": {
+    "scale": 0.5,
+    "texture": "minecraft:textures/block/purple_wool.png"
+  }
+}

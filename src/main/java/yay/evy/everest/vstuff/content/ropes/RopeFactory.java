@@ -3,15 +3,13 @@ package yay.evy.everest.vstuff.content.ropes;
 import kotlin.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.PacketDistributor;
-import yay.evy.everest.vstuff.content.ropes.packet.UpdateRopeStylePacket;
+import yay.evy.everest.vstuff.client.ClientRopeStyle;
 import yay.evy.everest.vstuff.content.ropes.util.IRopeActor;
-import yay.evy.everest.vstuff.index.VStuffPackets;
 import yay.evy.everest.vstuff.infrastructure.config.VStuffConfigs;
 import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
@@ -19,7 +17,7 @@ import yay.evy.everest.vstuff.internal.utility.*;
 import yay.evy.everest.vstuff.internal.utility.records.JointValues;
 import yay.evy.everest.vstuff.internal.utility.records.RopePosData;
 
-public class  RopeFactory {
+public class RopeFactory {
 
     public static class RopeResult {
         public final ReworkedRope rope;
@@ -41,14 +39,14 @@ public class  RopeFactory {
         }
     }
 
-    public static RopeResult tryCreateNewRope(ServerLevel level, ItemStack ropeItem, BlockPos blockPos0, BlockPos blockPos1, Entity player) {
+    public static RopeResult tryCreateNewRope(ServerLevel level, ItemStack ropeItem, BlockPos blockPos0, BlockPos blockPos1, Entity entity) {
         CompoundTag tag = ropeItem.getOrCreateTagElement("data");
         String originDimension = tag.getString("dim");
 
-        return tryCreateNewRope(level, originDimension, blockPos0, blockPos1, player, RopeStyle.getOrDefaultStyleId(ropeItem.getOrCreateTag()));
+        return tryCreateNewRope(level, originDimension, blockPos0, blockPos1, entity, RopeStyleManager.get(ropeItem.getOrCreateTag()));
     }
 
-    public static RopeResult tryCreateNewRope(ServerLevel level, String dim, BlockPos blockPos0, BlockPos blockPos1, Entity player, ResourceLocation style) {
+    public static RopeResult tryCreateNewRope(ServerLevel level, String dim, BlockPos blockPos0, BlockPos blockPos1, Entity entity, ResourceKey<RopeStyle> style) {
         Long ship0 = ShipUtils.getLoadedShipIdAtPos(level, blockPos0);
         Long ship1 = ShipUtils.getLoadedShipIdAtPos(level, blockPos1);
 
@@ -67,12 +65,12 @@ public class  RopeFactory {
                 ship1,
                 blockPos0,
                 blockPos1,
-                RopeStyleManager.returnOrFallback(style),
-                player
+                style,
+                entity
         ));
     }
 
-    public static ReworkedRope createNewRope(ServerLevel level, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1, ResourceLocation style, Entity player) {
+    public static ReworkedRope createNewRope(ServerLevel level, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1, ResourceKey<RopeStyle> style, Entity entity) {
         Pair<RopePosData, RopePosData> posDataPair = RopePosData.create(level, ship0, ship1, blockPos0, blockPos1);
         RopePosData posData0 = posDataPair.component1();
         RopePosData posData1 = posDataPair.component2();
@@ -87,21 +85,21 @@ public class  RopeFactory {
         ReworkedRope rope = new ReworkedRope(posData0, posData1, JointValues.withDefault(maxForce, maxForce, length), style);
 
         if (!rope.hasJoint) {
-            RopeManager.get(level).addRope(rope);
+            RopeManager.get(level).addRope(rope, ClientRopeStyle.fromStyle(rope.getStyle(level.registryAccess())));
 
             rope.attachActors(level);
 
-            if (player instanceof ServerPlayer serverPlayer) {
+            if (entity instanceof ServerPlayer serverPlayer) {
                 RopeManager.syncAllRopesToPlayer(serverPlayer);
             }
         }
         else
-            GTPAUtils.addRopeJoint(level, rope, player);
+            GTPAUtils.addRopeJoint(level, rope, entity);
 
         return rope;
     }
 
-    public static ReworkedRope reCreateNewRope(ServerLevel level, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1, ResourceLocation style, Entity player) {
+    public static ReworkedRope reCreateNewRope(ServerLevel level, Long ship0, Long ship1, BlockPos blockPos0, BlockPos blockPos1, ResourceKey<RopeStyle> style, Entity player) {
         Pair<RopePosData, RopePosData> posDataPair = RopePosData.create(level, ship0, ship1, blockPos0, blockPos1);
         RopePosData posData0 = posDataPair.component1();
         RopePosData posData1 = posDataPair.component2();
@@ -116,7 +114,7 @@ public class  RopeFactory {
         ReworkedRope rope = new ReworkedRope(posData0, posData1, JointValues.withDefault(maxForce, maxForce, length), style);
 
         if (!rope.hasJoint) {
-            RopeManager.get(level).addRope(rope);
+            RopeManager.get(level).addRope(rope, ClientRopeStyle.fromStyle(rope.getStyle(level.registryAccess())));
             rope.attachActors(level);
 
             if (player instanceof ServerPlayer serverPlayer) {
@@ -142,15 +140,6 @@ public class  RopeFactory {
         }
     }
 
-    public static void retypeRope(ServerLevel serverLevel, Integer ropeId, ResourceLocation newTypeId) {
-        ReworkedRope rope = RopeManager.get(serverLevel).getRope(ropeId);
-        if (rope == null) return;
-
-        rope.style = RopeStyleManager.get(newTypeId);
-
-        VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new UpdateRopeStylePacket(ropeId, rope.style.id()));
-    }
-
     public static CompoundTag ropeToTag(ReworkedRope rope) {
         CompoundTag ropeTag = new CompoundTag();
 
@@ -159,7 +148,7 @@ public class  RopeFactory {
         ropeTag.put("posData0", TagUtils.writePosData(rope.posData0));
         ropeTag.put("posData1", TagUtils.writePosData(rope.posData1));
         ropeTag.put("jointValues", TagUtils.writeJointValues(rope.jointValues));
-        ropeTag.put("style", TagUtils.writeResourceLocation(rope.style.id()));
+        ropeTag.put("style", TagUtils.writeResourceKey(rope.styleKey));
         ropeTag.putBoolean("drop", rope.hasDrop);
 
         return ropeTag;
@@ -170,7 +159,7 @@ public class  RopeFactory {
                 TagUtils.readPosData(ropeTag.getCompound("posData0")),
                 TagUtils.readPosData(ropeTag.getCompound("posData1")),
                 TagUtils.readJointValues(ropeTag.getCompound("jointValues")),
-                TagUtils.readResourceLocation(ropeTag.getCompound("style"))
+                TagUtils.readResourceKey(ropeTag.getCompound("style"))
         ).setRopeId(ropeTag.getInt("ropeId")).setDrop(ropeTag.getBoolean("drop"));
 
         if (ropeTag.getInt("jointId") != -1) {

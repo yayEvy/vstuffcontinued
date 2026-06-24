@@ -70,7 +70,7 @@ public class ShipAssemblyMixin {
                             end1 ? newShipId : rope.posData1.shipId(),
                             RopeUtils.containingBlockPos(newLocal0),
                             RopeUtils.containingBlockPos(newLocal1),
-                            rope.style.id(), null);
+                            rope.styleKey, null);
 
                 } catch (Exception e) {
                     VStuff.LOGGER.error("[VStuff] Failed to reattach rope {} after ship assembly: {}",

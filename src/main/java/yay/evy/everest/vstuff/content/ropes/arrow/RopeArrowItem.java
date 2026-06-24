@@ -6,7 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -26,6 +26,7 @@ import yay.evy.everest.vstuff.content.ropes.util.IRopeActor;
 import yay.evy.everest.vstuff.content.ropes.packet.OutlinePacket;
 import yay.evy.everest.vstuff.index.VStuffEntities;
 import yay.evy.everest.vstuff.index.VStuffPackets;
+import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 import yay.evy.everest.vstuff.internal.utility.TagUtils;
 
 public class RopeArrowItem extends ArrowItem implements ILikeRopes {
@@ -48,8 +49,8 @@ public class RopeArrowItem extends ArrowItem implements ILikeRopes {
             }
 
             if (stack.getTag().contains("style")) {
-                ResourceLocation styleId = TagUtils.readResourceLocation(stack.getTagElement("style"));
-                arrow.setStyle(styleId);
+                ResourceKey<RopeStyle> styleKey = TagUtils.readResourceKey(stack.getTagElement("style"));
+                arrow.setStyle(styleKey);
             }
         } else arrow.setInvalid();
 

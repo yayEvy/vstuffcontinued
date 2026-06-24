@@ -1,0 +1,12 @@
+{
+  "categories": [
+    "vstuff:wool_styles"
+  ],
+  "name": "ropestyle.vstuff.cyan_wool",
+  "rawName": "Cyan Wool",
+  "renderer": "vstuff:normal",
+  "rendererParams": {
+    "scale": 0.5,
+    "texture": "minecraft:textures/block/cyan_wool.png"
+  }
+}

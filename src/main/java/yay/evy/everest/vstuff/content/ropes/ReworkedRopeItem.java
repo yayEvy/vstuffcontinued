@@ -90,7 +90,7 @@ public class ReworkedRopeItem extends Item implements ILikeRopes {
         if (ropeResult.valid) {
             player.displayClientMessage(VStuff.translate("message.rope.created").withStyle(ChatFormatting.GREEN), true);
 
-            RopeUtils.playSound(serverLevel, clickedPos, ropeResult.rope.style.placeSound());
+            RopeUtils.playSound(serverLevel, clickedPos, ropeResult.rope.getStyle(serverLevel.registryAccess()).placeSound());
 
         } else {
             player.displayClientMessage(VStuff.translate(ropeResult.message).withStyle(ChatFormatting.RED), true);

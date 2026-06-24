@@ -1,0 +1,12 @@
+{
+  "categories": [
+    "vstuff:wool_styles"
+  ],
+  "name": "ropestyle.vstuff.yellow_wool",
+  "rawName": "Yellow Wool",
+  "renderer": "vstuff:normal",
+  "rendererParams": {
+    "scale": 0.5,
+    "texture": "minecraft:textures/block/yellow_wool.png"
+  }
+}

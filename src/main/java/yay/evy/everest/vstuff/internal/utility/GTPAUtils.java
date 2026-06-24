@@ -12,8 +12,10 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.client.ClientRopeStyle;
 import yay.evy.everest.vstuff.content.ropes.RopeManager;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
+import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashSet;
@@ -41,7 +43,7 @@ public class GTPAUtils {
                 return;
             }
 
-            RopeManager.get(level).addRope(rope);
+            RopeManager.get(level).addRope(rope, ClientRopeStyle.fromStyle(rope.getStyle(level.registryAccess())));
 
             rope.setJointId(jointId);
             JointUtils.removeMatchingJointsExcept(gtpa, distanceJoint, jointId);
@@ -68,7 +70,7 @@ public class GTPAUtils {
                 return;
             }
 
-            RopeManager.get(level).addRope(rope);
+            RopeManager.get(level).addRope(rope, ClientRopeStyle.fromStyle(rope.getStyle(level.registryAccess())));
 
             rope.setJointId(jointId);
             JointUtils.removeMatchingJointsExcept(gtpa, distanceJoint, jointId);

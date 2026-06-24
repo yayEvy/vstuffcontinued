@@ -1,12 +1,13 @@
 package yay.evy.everest.vstuff.content.ropes;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import org.valkyrienskies.core.internal.joints.*;
 import yay.evy.everest.vstuff.VStuff;
+import yay.evy.everest.vstuff.infrastructure.registry.VStuffRegistries;
 import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
-import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
 import yay.evy.everest.vstuff.internal.utility.*;
 import yay.evy.everest.vstuff.internal.utility.records.JointValues;
 import yay.evy.everest.vstuff.internal.utility.records.RopePosData;
@@ -21,15 +22,15 @@ public class ReworkedRope {
     public RopePosData posData0;
     public RopePosData posData1;
     public JointValues jointValues;
-    public RopeStyle style;
+    public ResourceKey<RopeStyle> styleKey;
     public final boolean hasJoint;
     public boolean hasDrop = true;
 
-    protected ReworkedRope(RopePosData posData0, RopePosData posData1, JointValues values, ResourceLocation style) {
+    protected ReworkedRope(RopePosData posData0, RopePosData posData1, JointValues values, ResourceKey<RopeStyle> styleKey) {
         this.posData0 = posData0;
         this.posData1 = posData1;
         this.jointValues = values;
-        this.style = RopeStyleManager.get(style);
+        this.styleKey = styleKey;
         this.hasJoint = !posData0.sameShip(posData1);
     }
 
@@ -97,6 +98,11 @@ public class ReworkedRope {
     public VSDistanceJoint makeJoint() {
         return this.jointValues.makeJoint(posData0.shipId(), posData0.localPos(), posData1.shipId(), posData1.localPos());
     }
+
+    public RopeStyle getStyle(RegistryAccess regAccess) {
+        return regAccess.registryOrThrow(VStuffRegistries.ROPE_STYLE).get(styleKey);
+    }
+
 
     public boolean hasTrackedJoint() {
         return this.jointId != null && this.jointId != -1;

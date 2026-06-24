@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
@@ -46,9 +47,9 @@ public class ClientRopeManager {
     private static final Map<Integer, Long> lastSeq0 = new ConcurrentHashMap<>();
     private static final Map<Integer, Long> lastSeq1 = new ConcurrentHashMap<>();
 
-    public record ClientRopeData(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, RopeStyle style) {
+    public record ClientRopeData(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, ClientRopeStyle style) {
 
-        public ClientRopeData(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, RopeStyle style) {
+        public ClientRopeData(Long ship0, Long ship1, Vector3d localPos0, Vector3d localPos1, double maxLength, ClientRopeStyle style) {
             this.ship0 = ship0;
             this.ship1 = ship1;
             this.localPos0 = new Vector3d(localPos0);
@@ -79,7 +80,7 @@ public class ClientRopeManager {
             return new ClientRopeData(ship0, ship1, localPos0, localPos1, newLength, style);
         }
 
-        public ClientRopeData withStyle(RopeStyle newStyle) {
+        public ClientRopeData withStyle(ClientRopeStyle newStyle) {
             return new ClientRopeData(ship0, ship1, localPos0, localPos1, maxLength, newStyle);
         }
 
@@ -89,12 +90,12 @@ public class ClientRopeManager {
         clientConstraints.computeIfPresent(ropeId, (k, ropeData) -> ropeData.withLength(length));
     }
 
-    public static void updateClientRopeStyle(Integer ropeId, RopeStyle style) {
+    public static void updateClientRopeStyle(Integer ropeId, ClientRopeStyle style) {
         clientConstraints.computeIfPresent(ropeId, (k, ropeData) -> ropeData.withStyle(style));
     }
 
     public static void addClientConstraint(Integer constraintId, Long shipA, Long shipB,
-                                           Vector3d localPosA, Vector3d localPosB, double maxLength, RopeStyle style) {
+                                           Vector3d localPosA, Vector3d localPosB, double maxLength, ClientRopeStyle style) {
         clientConstraints.put(constraintId, new ClientRopeData(shipA, shipB, localPosA, localPosB, maxLength, style));
     }
 
@@ -194,12 +195,7 @@ public class ClientRopeManager {
 
             if (startRelative.distance(endRelative) < 0.1) return false;
 
-            ResourceLocation ropeTypeId = ropeData.style().id();
-            RopeStyle ropeType = RopeStyleManager.get(ropeTypeId);
-            if (ropeType == null) return false;
-
-            IRopeRenderer renderer = RopeRendererTypes.getOrCreate(
-                    ropeTypeId, ropeType.rendererTypeId(), ropeType.rendererParams());
+            IRopeRenderer renderer = ropeData.style().createRenderer();
             if (renderer == null) return false;
 
             double actualLength = startPos.distance(endPos);
@@ -220,8 +216,8 @@ public class ClientRopeManager {
                     startRelative, endRelative,
                     prevStartRelativeAndEndRelative.getFirst(), prevStartRelativeAndEndRelative.getSecond(),
                     maxLength, actualLength, partialTick, level,
-                    new net.minecraft.core.BlockPos((int) Math.floor(startPos.x), (int) Math.floor(startPos.y), (int) Math.floor(startPos.z)),
-                    new net.minecraft.core.BlockPos((int) Math.floor(endPos.x), (int) Math.floor(endPos.y), (int) Math.floor(endPos.z))
+                    new BlockPos((int) Math.floor(startPos.x), (int) Math.floor(startPos.y), (int) Math.floor(startPos.z)),
+                    new BlockPos((int) Math.floor(endPos.x), (int) Math.floor(endPos.y), (int) Math.floor(endPos.z))
             );
 
             previousStartRelativeAndEndRelativeVectors.put(ropeId, new Pair<>(startRelative, endRelative));

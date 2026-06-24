@@ -1,5 +1,6 @@
 package yay.evy.everest.vstuff.content.ropes.phys_ropes;
 
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -8,6 +9,7 @@ import org.valkyrienskies.core.api.bodies.ServerVsBody;
 import org.valkyrienskies.core.api.bodies.properties.BodyInertia;
 import org.valkyrienskies.core.api.bodies.properties.BodyKinematics;
 import org.valkyrienskies.core.impl.bodies.properties.BodyKinematicsFactory;
+import org.valkyrienskies.core.impl.game.bodies.BodyInertiaDataImpl;
 import org.valkyrienskies.core.internal.game.StandaloneBodyCreateData;
 import org.valkyrienskies.core.internal.joints.VSDistanceJoint;
 import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
@@ -19,6 +21,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
 import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.client.ClientRopeManager;
+import yay.evy.everest.vstuff.client.ClientRopeStyle;
 import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 import yay.evy.everest.vstuff.internal.utility.GTPAUtils;
 import yay.evy.everest.vstuff.internal.utility.records.RopePosData;
@@ -40,14 +43,7 @@ public class PhysRopeFactory
 
     private static final AtomicInteger CLIENT_ROPE_ID_COUNTER = new AtomicInteger(100_000);
 
-    public static PhysRope createPhysRope(
-            ServerLevel level,
-            RopePosData posData0,
-            RopePosData posData1,
-            RopeStyle style,
-            Entity placer
-    )
-    {
+    public static PhysRope createPhysRope(ServerLevel level, RopePosData posData0, RopePosData posData1, ResourceKey<RopeStyle> style, Entity entity) {
         Vector3d worldStart = posData0.getWorldPos(level);
         Vector3d worldEnd   = posData1.getWorldPos(level);
 
@@ -58,25 +54,18 @@ public class PhysRopeFactory
             return null;
         }
 
-        VsiServerShipWorld shipWorld = (VsiServerShipWorld) VSGameUtilsKt.getShipObjectWorld(level);
-        if (shipWorld == null)
-        {
-            VStuff.LOGGER.error("PhysRopeFactory: VsiServerShipWorld is null.");
-            return null;
-        }
+        VsiServerShipWorld shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
 
         String dimId = ValkyrienSkies.getDimensionId(level);
         Long dimensionGroundBodyId = shipWorld.getDimensionToGroundBodyIdImmutable().get(dimId);
-        if (dimensionGroundBodyId == null)
-        {
+        if (dimensionGroundBodyId == null) {
             VStuff.LOGGER.error("PhysRopeFactory: ground body ID is null for dimension '{}' — aborting.", dimId);
             return null;
         }
 
         Long bodyId0 = resolveBodyId(shipWorld, posData0.getShipIdSafe(level), posData0, dimensionGroundBodyId);
         Long bodyId1 = resolveBodyId(shipWorld, posData1.getShipIdSafe(level), posData1, dimensionGroundBodyId);
-        if (bodyId0 == null || bodyId1 == null)
-        {
+        if (bodyId0 == null || bodyId1 == null) {
             VStuff.LOGGER.error("PhysRopeFactory: could not resolve body IDs for anchors, aborting.");
             return null;
         }
@@ -115,30 +104,16 @@ public class PhysRopeFactory
         }
         allBodyIds.add(bodyId1);
 
-        buildJointsAndFinalize(level, rope, allBodyIds, actualSegLen, placer, posData0, posData1, worldStart, worldEnd, dimensionGroundBodyId);
+        buildJointsAndFinalize(level, rope, allBodyIds, actualSegLen, entity, posData0, posData1, worldStart, worldEnd, dimensionGroundBodyId);
 
         return rope;
     }
 
-    public static PhysRope createPhysRopeAtPositions(
-            ServerLevel level,
-            RopePosData posData0,
-            RopePosData posData1,
-            RopeStyle style,
-            List<Vector3d> segmentPositions,
-            float actualSegLen,
-            Entity placer
-    )
-    {
+    public static PhysRope createPhysRopeAtPositions(ServerLevel level, RopePosData posData0, RopePosData posData1, ResourceKey<RopeStyle> style, List<Vector3d> segmentPositions, float actualSegLen, Entity entity) {
         Vector3d worldStart = posData0.getWorldPos(level);
         Vector3d worldEnd   = posData1.getWorldPos(level);
 
-        VsiServerShipWorld shipWorld = (VsiServerShipWorld) VSGameUtilsKt.getShipObjectWorld(level);
-        if (shipWorld == null)
-        {
-            VStuff.LOGGER.error("PhysRopeFactory: VsiServerShipWorld is null.");
-            return null;
-        }
+        VsiServerShipWorld shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
 
         String dimId = ValkyrienSkies.getDimensionId(level);
         Long dimensionGroundBodyId = shipWorld.getDimensionToGroundBodyIdImmutable().get(dimId);
@@ -174,24 +149,12 @@ public class PhysRopeFactory
         }
         allBodyIds.add(bodyId1);
 
-        buildJointsAndFinalize(level, rope, allBodyIds, actualSegLen, placer, posData0, posData1, worldStart, worldEnd, dimensionGroundBodyId);
+        buildJointsAndFinalize(level, rope, allBodyIds, actualSegLen, entity, posData0, posData1, worldStart, worldEnd, dimensionGroundBodyId);
 
         return rope;
     }
 
-    private static void buildJointsAndFinalize(
-            ServerLevel level,
-            PhysRope rope,
-            List<Long> allBodyIds,
-            float actualSegLen,
-            Entity placer,
-            RopePosData posData0,
-            RopePosData posData1,
-            Vector3d worldStart,
-            Vector3d worldEnd,
-            Long dimensionGroundBodyId
-    )
-    {
+    private static void buildJointsAndFinalize(ServerLevel level, PhysRope rope, List<Long> allBodyIds, float actualSegLen, Entity entity, RopePosData posData0, RopePosData posData1, Vector3d worldStart, Vector3d worldEnd, Long dimensionGroundBodyId) {
         Long bodyId0 = allBodyIds.get(0);
         Long bodyId1 = allBodyIds.get(allBodyIds.size() - 1);
 
@@ -223,26 +186,13 @@ public class PhysRopeFactory
         GameToPhysicsAdapter gtpa = GTPAUtils.getGTPA(level);
         AtomicInteger failed = new AtomicInteger(0);
 
-        addJointSequential(level, gtpa, rope, joints, 0, totalJoints, failed, allBodyIds, actualSegLen, placer);
+        addJointSequential(level, gtpa, rope, joints, 0, totalJoints, failed, allBodyIds, actualSegLen, entity);
     }
 
-    private static void addJointSequential(
-            ServerLevel level,
-            GameToPhysicsAdapter gtpa,
-            PhysRope rope,
-            List<VSDistanceJoint> joints,
-            int index,
-            int totalJoints,
-            AtomicInteger failed,
-            List<Long> allBodyIds,
-            float actualSegLen,
-            Entity placer
-    )
-    {
+    private static void addJointSequential(ServerLevel level, GameToPhysicsAdapter gtpa, PhysRope rope, List<VSDistanceJoint> joints, int index, int totalJoints, AtomicInteger failed, List<Long> allBodyIds, float actualSegLen, Entity placer) {
         if (failed.get() > 0) return;
 
-        gtpa.addJoint(joints.get(index), 6, jointId -> VSGameUtilsKt.executeOrSchedule(level, () ->
-        {
+        gtpa.addJoint(joints.get(index), 6, jointId -> VSGameUtilsKt.executeOrSchedule(level, () -> {
             if (failed.get() > 0) return;
 
             if (jointId == -1)
@@ -268,35 +218,26 @@ public class PhysRopeFactory
         }));
     }
 
-    private static Long resolveBodyId(VsiServerShipWorld shipWorld, Long shipId, RopePosData posData, Long groundBodyId)
-    {
-        if (posData.isWorld() || shipId == null)
-        {
-            return groundBodyId;
-        }
+    private static Long resolveBodyId(VsiServerShipWorld shipWorld, Long shipId, RopePosData posData, Long groundBodyId) {
+        if (posData.isWorld() || shipId == null) return groundBodyId;
+
         var ship = shipWorld.getAllShips().getById(shipId);
-        if (ship == null)
-        {
+        if (ship == null) {
             VStuff.LOGGER.warn("PhysRopeFactory: ship {} not found in world, falling back to ground body.", shipId);
             return groundBodyId;
         }
+
         Long bodyId = ship.getBodyId();
         return bodyId != null ? bodyId : groundBodyId;
     }
 
-    private static ServerVsBody createSegmentBody(VsiServerShipWorld shipWorld, String dimId, Vector3d worldPos)
-    {
+    private static ServerVsBody createSegmentBody(VsiServerShipWorld shipWorld, String dimId, Vector3d worldPos) {
         double r = SEGMENT_RADIUS;
         double m = SEGMENT_MASS;
         double I = 0.4 * m * r * r;
         Matrix3d inertiaTensor = new Matrix3d(I, 0, 0, 0, I, 0, 0, 0, I);
 
-        BodyInertia inertia = new BodyInertia()
-        {
-            @Override public Matrix3dc getInertiaTensor() { return inertiaTensor; }
-            @Override public Vector3dc getCenterOfMass()  { return new Vector3d(0, 0, 0); }
-            @Override public double getMass()             { return m; }
-        };
+        BodyInertia inertia = new BodyInertiaDataImpl(new Vector3d(), m, inertiaTensor);
 
         BodyKinematics kinematics = BodyKinematicsFactory.INSTANCE.create(
                 new Vector3d(0, 0, 0), new Vector3d(0, 0, 0),
@@ -312,44 +253,30 @@ public class PhysRopeFactory
                 false, -1, 0.5, 0.3, 0.0
         );
 
-        try
-        {
+        try {
             return shipWorld.createBody(createData);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             VStuff.LOGGER.error("PhysRopeFactory: failed to create segment body at {}: {}", worldPos, e.getMessage());
             return null;
         }
     }
 
-    private static void finalizeRope(
-            ServerLevel level,
-            PhysRope rope,
-            List<Long> allBodyIds,
-            float segmentLength,
-            Entity placer
-    )
-    {
-        VsiServerShipWorld shipWorld = (VsiServerShipWorld) VSGameUtilsKt.getShipObjectWorld(level);
+    private static void finalizeRope(ServerLevel level, PhysRope rope, List<Long> allBodyIds, float segmentLength, Entity entity) {
+        VsiServerShipWorld shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
         int totalJoints = allBodyIds.size() - 1;
 
-        for (int i = 0; i < totalJoints; i++)
-        {
+        for (int i = 0; i < totalJoints; i++) {
             Long bodyId0 = allBodyIds.get(i);
             Long bodyId1 = allBodyIds.get(i + 1);
 
             Vector3d lp0;
             Long renderShip0;
             boolean isDynamicEnd0;
-            if (i == 0)
-            {
+            if (i == 0) {
                 lp0 = rope.posData0.localPos();
                 renderShip0 = rope.posData0.shipId();
                 isDynamicEnd0 = false;
-            }
-            else
-            {
+            } else {
                 lp0 = getSegmentWorldPos(shipWorld, bodyId0);
                 renderShip0 = null;
                 isDynamicEnd0 = true;
@@ -358,14 +285,11 @@ public class PhysRopeFactory
             Vector3d lp1;
             Long renderShip1;
             boolean isDynamicEnd1;
-            if (i == totalJoints - 1)
-            {
+            if (i == totalJoints - 1) {
                 lp1 = rope.posData1.localPos();
                 renderShip1 = rope.posData1.shipId();
                 isDynamicEnd1 = false;
-            }
-            else
-            {
+            } else {
                 lp1 = getSegmentWorldPos(shipWorld, bodyId1);
                 renderShip1 = null;
                 isDynamicEnd1 = true;
@@ -377,15 +301,13 @@ public class PhysRopeFactory
             ClientRopeManager.addClientConstraint(
                     clientId, renderShip0, renderShip1,
                     lp0, lp1,
-                    segmentLength, rope.style
+                    segmentLength, ClientRopeStyle.fromStyle(rope.getStyle(level.registryAccess()))
             );
 
-            if (!isDynamicEnd0 && renderShip0 == null)
-            {
+            if (!isDynamicEnd0 && renderShip0 == null) {
                 ClientRopeManager.updateClientRopePositions(clientId, Long.MAX_VALUE, new Vector3d(lp0), new Vector3d(), null, null);
             }
-            if (!isDynamicEnd1 && renderShip1 == null)
-            {
+            if (!isDynamicEnd1 && renderShip1 == null) {
                 ClientRopeManager.updateClientRopePositions(clientId, Long.MAX_VALUE, null, null, new Vector3d(lp1), new Vector3d());
             }
         }
@@ -393,8 +315,7 @@ public class PhysRopeFactory
         rope.attach(level);
         PhysRopeManager.get(level).addPhysRope(rope);
 
-        if (placer instanceof ServerPlayer sp)
-        {
+        if (entity instanceof ServerPlayer sp) {
             PhysRopeManager.syncAllPhysRopesToPlayer(sp);
         }
 

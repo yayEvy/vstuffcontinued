@@ -3,11 +3,14 @@ package yay.evy.everest.vstuff.internal.utility;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
 import yay.evy.everest.vstuff.internal.utility.records.JointValues;
 import yay.evy.everest.vstuff.internal.utility.records.RopePosData;
+
+import java.util.Locale;
 
 public class TagUtils {
 
@@ -82,5 +85,26 @@ public class TagUtils {
 
     public static ResourceLocation readResourceLocation(CompoundTag tag) {
         return ResourceLocation.fromNamespaceAndPath(tag.getString("namespace"), tag.getString("path"));
+    }
+
+    public static <T> CompoundTag writeResourceKey(ResourceKey<T> key) {
+        CompoundTag tag = new CompoundTag();
+
+        tag.put("registry", writeResourceLocation(key.registry()));
+        tag.put("location", writeResourceLocation(key.location()));
+
+        return tag;
+    }
+
+    public static <T> ResourceKey<T> readResourceKey(CompoundTag tag) {
+        ResourceLocation registry = readResourceLocation(tag.getCompound("registry"));
+        ResourceLocation location = readResourceLocation(tag.getCompound("location"));
+
+        return ResourceKey.create(ResourceKey.createRegistryKey(registry), location);
+    }
+
+    public static String sanitizeFileName(String name) {
+        return name.toLowerCase(Locale.ROOT)
+                .replaceAll("[^a-z0-9_]", "_");
     }
 }

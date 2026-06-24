@@ -1,8 +1,0 @@
-{
-  "from_category": "vstuff:casing_styles",
-  "input": [
-    "create:railway_casing",
-    "create:sturdy_sheet"
-  ],
-  "result": "vstuff:train_casing"
-}
