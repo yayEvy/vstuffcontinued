@@ -15,6 +15,9 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Math;
+import org.joml.Vector3d;
+import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import com.simibubi.create.content.kinetics.fan.IAirCurrentSource;
 import com.simibubi.create.content.kinetics.fan.AirCurrent;
@@ -132,10 +135,29 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
 
 
     @SuppressWarnings("deprecation")
-    public void calculateObstruction(Level level, BlockPos pos, Direction forwardDirection){
-        for (emptyBlocks = 0; emptyBlocks < OBSTRUCTION_LENGTH; emptyBlocks++){
+    public void calculateObstruction(Level level, BlockPos pos, Direction forwardDirection)
+    {
+        if (!(level instanceof ServerLevel serverLevel)) return;
+
+        Ship ship = VSGameUtilsKt.getShipManagingPos(serverLevel, pos);
+
+        for (emptyBlocks = 0; emptyBlocks < OBSTRUCTION_LENGTH; emptyBlocks++)
+        {
             BlockPos checkPos = pos.relative(forwardDirection, emptyBlocks + 1);
-            BlockState state = level.getBlockState(checkPos);
+
+            BlockPos worldCheckPos;
+            if (ship != null)
+            {
+                Vector3d worldVec = VSGameUtilsKt.toWorldCoordinates(ship,
+                        checkPos.getX() + 0.5, checkPos.getY() + 0.5, checkPos.getZ() + 0.5);
+                worldCheckPos = BlockPos.containing(worldVec.x, worldVec.y, worldVec.z);
+            }
+            else
+            {
+                worldCheckPos = checkPos;
+            }
+
+            BlockState state = level.getBlockState(worldCheckPos);
             if (!(state.isAir() || !state.isSolid())) break;
         }
     }
