@@ -53,13 +53,17 @@ public class ThrusterForceApplier {
         worldForceDirection.normalize();
         worldForce.set(worldForceDirection).mul(thrust);
 
-
-
         Vector3dc linearVelocity = ship.getVelocity();
+
+        double velocityAlongThrust = linearVelocity.dot(worldForceDirection);
+        double targetVelocity = 2.0;
+        double velocityError = targetVelocity - velocityAlongThrust;
+        double dampingScale = java.lang.Math.max(0.0, java.lang.Math.min(1.0, velocityError / targetVelocity));
+        worldForce.mul(dampingScale);
+
         if (linearVelocity.lengthSquared() >= maxSpeed * maxSpeed) {
             double dot = worldForce.dot(linearVelocity);
             if (dot > 0) {
-
                 double forceLengthSq = worldForce.lengthSquared();
                 if (forceLengthSq > 1e-9) {
                     velocityDirection = velocityDirection.set(linearVelocity).normalize();

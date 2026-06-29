@@ -41,7 +41,7 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
 
     protected ThrusterData thrusterData;
     protected int emptyBlocks;
-
+    protected float smoothedObstructionEffect = 1.0f;
 
     private int currentTick = 0;
 
@@ -129,10 +129,10 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
 
     protected void addSpecificGoggleInfo(List<Component> tooltip, boolean isPlayerSneaking) {}
 
-    protected float calculateObstructionEffect() {
-        return (float) emptyBlocks / (float) OBSTRUCTION_LENGTH;
+    protected float calculateObstructionEffect()
+    {
+        return 0.25f + 0.75f * smoothedObstructionEffect;
     }
-
 
     @SuppressWarnings("deprecation")
     public void calculateObstruction(Level level, BlockPos pos, Direction forwardDirection)
@@ -160,6 +160,9 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
             BlockState state = level.getBlockState(worldCheckPos);
             if (!(state.isAir() || !state.isSolid())) break;
         }
+
+        float raw = 1.0f - ((float) emptyBlocks / (float) OBSTRUCTION_LENGTH);
+        smoothedObstructionEffect += (raw - smoothedObstructionEffect) * 0.1f;
     }
 
     @Override
@@ -198,6 +201,7 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
         compound.putInt("emptyBlocks", emptyBlocks);
         compound.putInt("currentTick", currentTick);
         compound.putFloat("thrust", thrusterData.getThrust());
+        compound.putFloat("smoothedObstruction", smoothedObstructionEffect);
 
     }
 
@@ -207,6 +211,7 @@ public class MechanicalThrusterBlockEntity extends KineticBlockEntity implements
         emptyBlocks = compound.getInt("emptyBlocks");
         currentTick = compound.getInt("currentTick");
         thrusterData.setThrust(compound.getFloat("thrust"));
+        smoothedObstructionEffect = compound.getFloat("smoothedObstruction");
     }
 
     @Override
