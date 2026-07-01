@@ -70,7 +70,7 @@ public class AttachmentUtils {
 
         LoadedServerShip ship = ShipUtils.getLoadedServerShipAtPos(serverLevel, pos);
 
-        VStuff.LOGGER.info("got attachment {}", attachmentClass);
+        //VStuff.LOGGER.info("got attachment {}", attachmentClass);
         return ship != null ? ship.getAttachment(attachmentClass) : null;
     }
 

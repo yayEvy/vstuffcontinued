@@ -22,17 +22,17 @@ public class VStuffCommands {
                         .then(Commands.argument("from", BlockPosArgument.blockPos())
                         .then(Commands.argument("to", BlockPosArgument.blockPos())
                         .then(Commands.argument("style", StringArgumentType.string())
-                                .requires( commandSourceStack -> commandSourceStack.hasPermission(2))
+                                .requires( commandSourceStack -> commandSourceStack.hasPermission(3))
                         .executes(CreateRopeCommand::createNewRope)))));
         /// todo create a RopeStylesArgument class for allowing this thing to make rope styles.
 
         vstuffCommand.then(Commands.literal("DeleteAllRopes")
-                .requires( commandSourceStack -> commandSourceStack.hasPermission(2))
+                .requires( commandSourceStack -> commandSourceStack.hasPermission(3))
                         .executes(DeleteAllRopesCommand::deleteCantaRopes));
 
         vstuffCommand.then(Commands.literal("DeleteRope")
                         .then(Commands.argument("RopeID", IntegerArgumentType.integer())
-                                .requires( commandSourceStack -> commandSourceStack.hasPermission(2))
+                                .requires( commandSourceStack -> commandSourceStack.hasPermission(3))
                         .executes(DeleteRopeCommand::deleteRope)));
 
 
