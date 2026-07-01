@@ -32,7 +32,7 @@ public class VStuffItems {
                 .stacksTo(64)
             )
             .tag(STYLING_AVAILABLE)
-            .model(AssetLookup.existingItemModel())
+            .defaultModel()
             .register();
 
     public static final ItemEntry<RopeArrowItem> ROPE_ARROW =
