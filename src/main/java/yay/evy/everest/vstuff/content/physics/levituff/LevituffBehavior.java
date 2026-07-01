@@ -37,9 +37,11 @@ public enum LevituffBehavior {
 
         final double velY = ship.getVelocity().y();
         final double forceDamping = VStuffConfigs.server().levituffForceDamping.get();
-        final double damping = -velY * mass * forceDamping;
 
         final double damping = -ship.getVelocity().y() * mass * VStuffConfigs.server().levituffForceDamping.get();
+
+        ship.applyInvariantForce(new Vector3d(0, (mass * liftMultiplier) + damping, 0));
+
     })
     ;
 

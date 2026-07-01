@@ -21,14 +21,15 @@ public class LevituffSoundPlayer {
 
     private static final Random RAND = new Random();
 
-    private int grindCooldown = randBetween(60, 120);
-    private int grindDuration = 0;
-    private boolean grindActive = false;
+    private static int grindCooldown = randBetween(60, 120);
+    private static int grindDuration = 0;
+    private static boolean grindActive = false;
+    private static long lastProcessedTick = -1L;
 
-    private int noteCooldown = randBetween(200, 400);
+    private static int noteCooldown = randBetween(200, 400);
 
-    private SoundEvent pendingNote = null;
-    private int pendingNoteDelay = 0;
+    private static SoundEvent pendingNote = null;
+    private static int pendingNoteDelay = 0;
 
     private BlockPos lastFoundPos = null;
 
@@ -57,6 +58,10 @@ public class LevituffSoundPlayer {
             return;
         }
 
+        long gameTime = level.getGameTime();
+        if (gameTime == lastProcessedTick) return;
+        lastProcessedTick = gameTime;
+
         tickGrind(level, pos);
         tickNotes(level, pos);
         tickPendingNote(level, pos);
@@ -66,28 +71,8 @@ public class LevituffSoundPlayer {
         if (scanCooldown-- > 0) return;
         scanCooldown = SCAN_INTERVAL;
 
-        lastFoundPos = findClosestLevituff(level, playerPos);
-        levituffNearby = lastFoundPos != null;
-    }
-
-    private static BlockPos findClosestLevituff(Level level, BlockPos center) {
-        int r = 16;
-        double closestDistSq = 256.0;
-        BlockPos closestPos = null;
-
-        for (BlockPos pos : BlockPos.betweenClosed(
-                center.offset(-r, -r, -r),
-                center.offset(r, r, r)
-        )) {
-            if (level.getBlockState(pos).is(VStuffBlocks.LEVITUFF.get())) {
-                double distSq = pos.distSqr(center);
-                if (distSq <= 256.0 && distSq < closestDistSq) {
-                    closestDistSq = distSq;
-                    closestPos = pos.immutable();
-                }
-            }
-        }
-        return closestPos;
+        lastFoundPos = playerPos;
+        levituffNearby = level.getBlockState(playerPos).is(VStuffBlocks.LEVITUFF.get());
     }
 
     private void tickGrind(Level level, BlockPos pos) {
