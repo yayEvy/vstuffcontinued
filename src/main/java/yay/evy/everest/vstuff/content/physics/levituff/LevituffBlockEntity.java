@@ -9,6 +9,7 @@ import yay.evy.everest.vstuff.content.physics.levituff.attachment.LevituffAttach
 import yay.evy.everest.vstuff.content.physics.levituff.sound.LevituffSoundPlayer;
 import yay.evy.everest.vstuff.internal.utility.AttachmentUtils;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class LevituffBlockEntity extends BlockEntity {
@@ -33,8 +34,19 @@ public class LevituffBlockEntity extends BlockEntity {
     public static void tick(Level level, BlockPos pos, LevituffBlockEntity be) {
         if (level.isClientSide) {
             AtomicInteger count = new AtomicInteger(1);
-            AttachmentUtils.getAttachment(level, pos, LevituffAttachment.class, a -> count.set(a.levituffBlocks.size()));
-            be.soundPlayer.tick(level, pos, count.get());
+            AtomicBoolean isLeader = new AtomicBoolean(true);
+            AttachmentUtils.getAttachment(level, pos, LevituffAttachment.class, a -> {
+                count.set(a.levituffBlocks.size());
+                long myPos = pos.asLong();
+                long minPos = a.levituffBlocks.stream()
+                        .mapToLong(v -> BlockPos.asLong((int) v.x, (int) v.y, (int) v.z))
+                        .min()
+                        .orElse(myPos);
+                isLeader.set(minPos == myPos);
+            });
+            if (isLeader.get()) {
+                be.soundPlayer.tick(level, pos, count.get());
+            }
         }
     }
 }
