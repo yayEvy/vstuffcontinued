@@ -10,7 +10,7 @@ public class VStuffCommands {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 
         LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("vstuff")
-                .requires(ctx -> ctx.hasPermission(2))
+                .requires(ctx -> ctx.hasPermission(3))
                         .then(CreateRopeCommand.register())
                         .then(DeleteRopesCommand.remove())
                         .then(DeleteRopesCommand.removeAll())
