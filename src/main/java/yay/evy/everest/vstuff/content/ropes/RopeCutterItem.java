@@ -8,9 +8,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import yay.evy.everest.vstuff.VStuff;
-import yay.evy.everest.vstuff.content.ropes.phys_ropes.PhysRope;
-import yay.evy.everest.vstuff.content.ropes.phys_ropes.PhysRopeFactory;
-import yay.evy.everest.vstuff.content.ropes.phys_ropes.PhysRopeManager;
+import yay.evy.everest.vstuff.content.ropes.phys_ropes.ReworkedPhysRope;
+import yay.evy.everest.vstuff.content.ropes.phys_ropes.ReworkedPhysRopeFactory;
 import yay.evy.everest.vstuff.content.ropes.util.ILikeRopes;
 import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 import yay.evy.everest.vstuff.internal.utility.RopeUtils;
@@ -27,10 +26,10 @@ public class RopeCutterItem extends Item implements ILikeRopes {
             return InteractionResultHolder.pass(itemStack);
         }
 
-        PhysRope physRope = RopeUtils.findPhysRope(serverLevel, player);
+        ReworkedPhysRope physRope = RopeUtils.findPhysRope(serverLevel, player);
         if (physRope != null) {
             try {
-                PhysRopeFactory.destroyPhysRope(serverLevel, physRope);
+                // doom and despair idfk
 
                 player.displayClientMessage(
                         VStuff.translate("message.rope.break"),

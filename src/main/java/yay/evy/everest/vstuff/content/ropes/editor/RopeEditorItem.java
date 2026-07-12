@@ -32,7 +32,7 @@ public class RopeEditorItem extends Item {
 
         //ScreenOpener.open(new RopeEditorScreen(RopeManager.getRope(ropeId)));
 
-        return InteractionResultHolder.success(stack);
+        return InteractionResultHolder.success(stack); // unimplemented feature of doom and despair
     }
 
     @Override

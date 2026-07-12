@@ -33,7 +33,7 @@ public class VStuffRenderTypes extends RenderType {
     }
 
     public static RenderType ropeRendererTranslucent(ResourceLocation texture) {
-        return create("rope_renderer_translucent",
+        return create("rope_renderer_translucent", // render type of doom and despair
                 DefaultVertexFormat.NEW_ENTITY,
                 VertexFormat.Mode.TRIANGLES,
                 256,

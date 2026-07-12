@@ -38,6 +38,10 @@ public record RopeStyle (
         SoundEvent placeSound,
         SoundEvent breakSound
 ) {
+    public IRopeRenderer createRenderer() {
+        return renderer.get().create(rendererParams);
+    }
+
     public static final Codec<RopeStyle> CODEC = RecordCodecBuilder.create(i -> i.group(
             CodecUtil.COMPONENT_TRANSLATABLE.fieldOf("name").forGetter(RopeStyle::name),
             Codec.STRING.fieldOf("rawName").forGetter(RopeStyle::rawName),
@@ -46,7 +50,7 @@ public record RopeStyle (
             CodecUtil.JSON_OBJECT.fieldOf("rendererParams").forGetter(RopeStyle::rendererParams),
             SoundEvent.DIRECT_CODEC.optionalFieldOf("placeSound", SoundEvents.WOOL_PLACE).forGetter(RopeStyle::placeSound),
             SoundEvent.DIRECT_CODEC.optionalFieldOf("breakSound", SoundEvents.WOOL_BREAK).forGetter(RopeStyle::breakSound)
-    ).apply(i, RopeStyle::new));
+    ).apply(i, RopeStyle::new)); // codec of doom and despair
 
     public static class Builder {
         private String rawName;

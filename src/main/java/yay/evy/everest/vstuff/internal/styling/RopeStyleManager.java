@@ -23,6 +23,7 @@ import java.util.*;
 
 public final class RopeStyleManager {
 
+    // linked hash map of doom and despair
     public static LinkedHashMap<RopeCategory, List<RopeStyle>> getCategoriesWithStyles(RegistryAccess regAccess) {
         Registry<RopeStyle> styleReg = regAccess.registryOrThrow(VStuffRegistries.ROPE_STYLE);
         Registry<RopeCategory> categoryReg = regAccess.registryOrThrow(VStuffRegistries.ROPE_CATEGORY);

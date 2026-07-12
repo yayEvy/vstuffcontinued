@@ -1,9 +1,12 @@
 package yay.evy.everest.vstuff.internal.utility;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import org.valkyrienskies.core.api.event.EventConsumer;
+import org.valkyrienskies.core.api.events.PhysTickEvent;
 import org.valkyrienskies.core.internal.joints.VSDistanceJoint;
 import org.valkyrienskies.core.internal.joints.VSJoint;
 import org.valkyrienskies.core.internal.joints.VSJointAndId;
@@ -20,6 +23,7 @@ import yay.evy.everest.vstuff.internal.styling.RopeStyleManager;
 import javax.annotation.Nullable;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class GTPAUtils {
 
@@ -28,6 +32,17 @@ public class GTPAUtils {
         return ValkyrienSkiesMod.getOrCreateGTPA(dimId);
     }
 
+    public static void delayedPhysTick(double delay, Consumer<PhysTickEvent> eventConsumer) {
+        final AtomicDouble d = new AtomicDouble(delay);
+        ValkyrienSkiesMod.getApi().getPhysTickEvent().on((event, listener) -> {
+            if (d.get() > 0) {
+                d.addAndGet(-1);
+            } else {
+                eventConsumer.accept(event);
+                listener.unregister();
+            }
+        });
+    }
 
     public static void addRopeJoint(ServerLevel level, ReworkedRope rope, Entity player) {
         VSDistanceJoint distanceJoint = (VSDistanceJoint) rope.makeJoint().serialized();

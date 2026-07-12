@@ -1,5 +1,7 @@
 package yay.evy.everest.vstuff.internal.utility;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
@@ -9,12 +11,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Vector3d;
+import org.valkyrienskies.core.api.bodies.ClientVsBody;
+import org.valkyrienskies.core.api.bodies.VsBody;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import yay.evy.everest.vstuff.client.ClientRopeManager;
-import yay.evy.everest.vstuff.content.ropes.phys_ropes.PhysRope;
-import yay.evy.everest.vstuff.content.ropes.phys_ropes.PhysRopeManager;
+import yay.evy.everest.vstuff.content.ropes.phys_ropes.ReworkedPhysRope;
+import yay.evy.everest.vstuff.content.ropes.phys_ropes.ReworkedPhysRopeManager;
 import yay.evy.everest.vstuff.content.ropes.util.IRopeActor;
 import yay.evy.everest.vstuff.content.ropes.RopeManager;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
@@ -83,6 +86,19 @@ public class RopeUtils {
         return new Vector3d(transformedPos.x, transformedPos.y, transformedPos.z);
     }
 
+    public static Vector3d getClientBodyPosition(ClientLevel level, Long bodyId) {
+        VsBody body = VSGameUtilsKt.getAllBodies(level).getById(bodyId);
+        if (body != null) {
+            return new Vector3d(((ClientVsBody) body).getRenderTransform().getPosition());
+        }
+        return null;
+    }
+
+    public static Vector3d getClientBodyPosition(Long bodyId) {
+        ClientLevel level = Minecraft.getInstance().level;
+        return level != null ? getClientBodyPosition(level, bodyId) : null;
+    }
+
     public static double getDistanceToRope(Vec3 eyePos, Vec3 lookVec, Vector3d ropeStart, Vector3d ropeEnd, double maxDistance) {
         Vec3 start = new Vec3(ropeStart.x, ropeStart.y, ropeStart.z);
         Vec3 end = new Vec3(ropeEnd.x, ropeEnd.y, ropeEnd.z);
@@ -146,35 +162,14 @@ public class RopeUtils {
         return rope == null ? null : rope.getRopeId();
     }
 
-    public static @Nullable ClientRopeManager.ClientRopeData findTargetedLeadClient(Level level, Player player) {
+    public static @Nullable ReworkedPhysRope findPhysRope(ServerLevel level, Player player) {
         Vec3 eyePos = player.getEyePosition();
         Vec3 lookVec = player.getViewVector(1.0f);
         double maxDistance = player.getBlockReach();
         double minDistance = Double.MAX_VALUE;
-        ClientRopeManager.ClientRopeData foundRope = null;
+        ReworkedPhysRope closest = null;
 
-        for (ClientRopeManager.ClientRopeData rope : ClientRopeManager.getClientConstraints().values()) {
-            Vector3d worldPosA = convertLocalToWorld(level, rope.localPos0(), rope.ship0());
-            Vector3d worldPosB = convertLocalToWorld(level, rope.localPos1(), rope.ship1());
-
-            double distance = getDistanceToRope(eyePos, lookVec, worldPosA, worldPosB, maxDistance);
-            if (distance < minDistance && distance <= 1.0) {
-                minDistance = distance;
-                foundRope = rope;
-            }
-        }
-
-        return foundRope;
-    }
-
-    public static @Nullable PhysRope findPhysRope(ServerLevel level, Player player) {
-        Vec3 eyePos = player.getEyePosition();
-        Vec3 lookVec = player.getViewVector(1.0f);
-        double maxDistance = player.getBlockReach();
-        double minDistance = Double.MAX_VALUE;
-        PhysRope closest = null;
-
-        for (PhysRope rope : PhysRopeManager.get(level).getAllRopes()) {
+        for (ReworkedPhysRope rope : ReworkedPhysRopeManager.get(level).getRopeList()) {
             Vector3d a = rope.posData0.getWorldPos(level);
             Vector3d b = rope.posData1.getWorldPos(level);
 

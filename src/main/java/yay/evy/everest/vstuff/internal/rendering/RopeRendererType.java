@@ -37,7 +37,10 @@ public final class RopeRendererType {
                     .orElseGet(() -> DataResult.error(() -> "Unregistered rope renderer"))
     );
 
-    public static final Codec<Holder<RopeRendererType>> CODEC = RegistryFileCodec.create(VStuffRegistries.ROPE_RENDERER_TYPE, LOC_CODEC);
+    public static final Codec<Holder<RopeRendererType>> CODEC = RegistryFileCodec.create(
+            VStuffRegistries.ROPE_RENDERER_TYPE,
+            LOC_CODEC
+    ); // codec of doom and despair
 
     public IRopeRenderer create(JsonObject params) {
         return factory.apply(params);

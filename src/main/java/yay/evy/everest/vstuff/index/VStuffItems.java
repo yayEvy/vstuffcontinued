@@ -2,7 +2,6 @@ package yay.evy.everest.vstuff.index;
 
 import com.simibubi.create.foundation.data.AssetLookup;
 import com.simibubi.create.foundation.data.CreateRegistrate;
-import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
@@ -12,7 +11,7 @@ import yay.evy.everest.vstuff.VStuff;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRopeItem;
 import yay.evy.everest.vstuff.content.ropes.RopeCutterItem;
 import yay.evy.everest.vstuff.content.ropes.arrow.RopeArrowItem;
-import yay.evy.everest.vstuff.content.ropes.phys_ropes.PhysRopeItem;
+import yay.evy.everest.vstuff.content.ropes.phys_ropes.ReworkedPhysRopeItem;
 import yay.evy.everest.vstuff.content.ships.assembly.ExpendableAssemblerItem;
 import yay.evy.everest.vstuff.content.physics.physgrabber.PhysGrabberItem;
 import yay.evy.everest.vstuff.content.ropes.editor.RopeEditorItem;
@@ -37,8 +36,8 @@ public class VStuffItems {
                     .model(AssetLookup.existingItemModel())
                     .register();
 
-    public static final ItemEntry<PhysRopeItem> PHYS_ROPE =
-            REGISTRATE.item("phys_rope", PhysRopeItem::new)
+    public static final ItemEntry<ReworkedPhysRopeItem> PHYS_ROPE =
+            REGISTRATE.item("phys_rope", ReworkedPhysRopeItem::new)
                     .properties(p -> p
                             .stacksTo(64)
                     )

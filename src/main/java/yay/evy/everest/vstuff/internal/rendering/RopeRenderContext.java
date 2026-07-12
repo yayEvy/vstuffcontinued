@@ -8,10 +8,9 @@ public record RopeRenderContext(
         Vector3d endRelative,
         Vector3d prevStartRelative,
         Vector3d prevEndRelative,
-        double maxLength,
         double actualLength,
         float partialTick,
         Level level,
         net.minecraft.core.BlockPos startBlockPos,
         net.minecraft.core.BlockPos endBlockPos
-) {}
+) {} // record class of doom and despair

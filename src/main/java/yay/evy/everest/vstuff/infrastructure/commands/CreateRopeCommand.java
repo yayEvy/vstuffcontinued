@@ -49,15 +49,4 @@ public class CreateRopeCommand {
                 )
             );
     }
-
-    public static final SuggestionProvider<CommandSourceStack> ROPE_STYLES =
-            (context, builder) -> {
-                RegistryAccess registryAccess = context.getSource().registryAccess();
-                Registry<RopeStyle> registry = registryAccess.registryOrThrow(VStuffRegistries.ROPE_STYLE);
-
-                return SharedSuggestionProvider.suggest(
-                        registry.keySet().stream().map(ResourceLocation::toString),
-                        builder
-                );
-            };
 }

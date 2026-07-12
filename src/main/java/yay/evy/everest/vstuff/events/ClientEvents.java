@@ -17,8 +17,6 @@ import yay.evy.everest.vstuff.content.physics.physgrabber.PhysGrabberClientHandl
 import yay.evy.everest.vstuff.content.ropes.styler.RopeStyleMenuHandler;
 import yay.evy.everest.vstuff.index.VStuffKeys;
 
-import static yay.evy.everest.vstuff.internal.utility.RopeUtils.findTargetedLeadClient;
-
 @EventBusSubscriber(modid = VStuff.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ClientEvents {
 

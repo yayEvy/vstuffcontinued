@@ -19,7 +19,7 @@ public class VStuffEntities {
     public static final EntityEntry<RopeArrowEntity> ROPE_ARROW =
         register("rope_arrow", RopeArrowEntity::new, () -> RopeArrowRenderer::new, MobCategory.MISC, 4, 20, true, false, RopeArrowEntity::build).register();
 
-    //todo use create registrate for entities
+    //todo create registrate of doom and despair
 
     /// I have done it, I am free, my shackles doth been removed! I am moving to nevada -Bry
 

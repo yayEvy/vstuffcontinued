@@ -15,12 +15,10 @@ import org.jetbrains.annotations.Nullable;
 import org.valkyrienskies.core.api.ships.PhysShip;
 import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.mod.api.BlockEntityPhysicsListener;
-import yay.evy.everest.vstuff.client.ClientRopeManager;
 import yay.evy.everest.vstuff.content.ropes.util.IRopeActor;
 import yay.evy.everest.vstuff.content.ropes.RopeManager;
 import yay.evy.everest.vstuff.content.ropes.ReworkedRope;
 import yay.evy.everest.vstuff.content.ropes.RopeFactory;
-import yay.evy.everest.vstuff.content.ropes.packet.UpdateRopeLengthPacket;
 import yay.evy.everest.vstuff.index.VStuffBlockEntities;
 import yay.evy.everest.vstuff.index.VStuffPackets;
 
@@ -103,7 +101,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         if (Math.abs(newLength - oldLength) < 0.0001f) return;
 
         rope.setJointLength(serverLevel, newLength);
-        VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new UpdateRopeLengthPacket(ropeId, rope.jointValues.maxLength()));
+        //VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new UpdateRopeLengthPacket(ropeId, rope.jointValues.maxLength()));
     }
 
     @Override public void setDimension(@NotNull String s) {}
@@ -112,7 +110,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);
 
-        boolean hasRope = ropeId != null && ClientRopeManager.getClientConstraints().containsKey(ropeId);
+        boolean hasRope = ropeId != null;
 
         tooltip.add(Component.literal(" "));
 
@@ -120,9 +118,6 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
             tooltip.add(Component.literal("Length: ")
                     .withStyle(ChatFormatting.AQUA)
-                    .append(Component.literal( String.format("%.1f", ClientRopeManager.getClientConstraints().get(ropeId).maxLength()) + " blocks")
-                            .withStyle(ChatFormatting.GRAY)
-                    )
             );
 
 
@@ -182,10 +177,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
                     ReworkedRope rope = RopeManager.get(serverLevel).getRope(this.ropeId);
                     if (rope != null) {
                         rope.setJointLength(serverLevel, savedLength);
-                        VStuffPackets.channel().send(
-                                PacketDistributor.ALL.noArg(),
-                                new UpdateRopeLengthPacket(ropeId, savedLength)
-                        );
+
                     }
                 });
             }

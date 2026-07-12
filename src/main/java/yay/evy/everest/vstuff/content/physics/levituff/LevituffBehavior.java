@@ -54,5 +54,6 @@ public enum LevituffBehavior {
 
     public void physTick(PhysLevel level, PhysShip ship, Set<Vector3d> levituffBlocks) {
         this.onPhysTick.accept(level, (PhysShipImpl) ship, levituffBlocks);
+        // triconsumer of doom and despair
     }
 }

@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import yay.evy.everest.vstuff.infrastructure.commands.debug.PhysRopeFactoryDebug;
 
 public class VStuffCommands {
 
@@ -15,6 +16,7 @@ public class VStuffCommands {
                         .then(DeleteRopesCommand.remove())
                         .then(DeleteRopesCommand.removeAll())
                         .then(FindRopeCommand.register())
+                        .then(PhysRopeFactoryDebug.register())
                 ;
 
         dispatcher.register(root);

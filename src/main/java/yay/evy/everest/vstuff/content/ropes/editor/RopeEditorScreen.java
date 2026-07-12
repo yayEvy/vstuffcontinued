@@ -14,7 +14,7 @@ public class RopeEditorScreen extends AbstractSimiScreen {
     ReworkedRope rope;
 
     @Override
-    protected void renderWindow(GuiGraphics guiGraphics, int i, int i1, float v) {
+    protected void renderWindow(GuiGraphics guiGraphics, int i, int i1, float v) { // window of doom and despair
 
     }
 }

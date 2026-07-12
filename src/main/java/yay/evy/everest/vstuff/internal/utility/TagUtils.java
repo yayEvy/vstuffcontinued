@@ -7,8 +7,10 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
+import yay.evy.everest.vstuff.internal.styling.data.RopeStyle;
 import yay.evy.everest.vstuff.internal.utility.records.JointValues;
 import yay.evy.everest.vstuff.internal.utility.records.RopePosData;
+import yay.evy.everest.vstuff.internal.utility.records.RopeSegment;
 
 import java.util.Locale;
 
@@ -101,6 +103,26 @@ public class TagUtils {
         ResourceLocation location = readResourceLocation(tag.getCompound("location"));
 
         return ResourceKey.create(ResourceKey.createRegistryKey(registry), location);
+    }
+
+    public static CompoundTag writeRopeSegment(RopeSegment segment) {
+        CompoundTag tag = new CompoundTag();
+
+        tag.putLong("id0", segment.id0() == null ? -1 : segment.id0());
+        tag.putLong("id1", segment.id1() == null ? -1 : segment.id1());
+        tag.put("pos0", writeVector3d(segment.pos0()));
+        tag.put("pos1", writeVector3d(segment.pos1()));
+
+        return tag;
+    }
+
+    public static RopeSegment readRopeSegment(CompoundTag tag) {
+        Long id0 = tag.getLong("id0") == -1 ? null : tag.getLong("id0");
+        Long id1 = tag.getLong("id1") == -1 ? null : tag.getLong("id1");
+        Vector3d pos0 = readVector3d(tag.getCompound("pos0"));
+        Vector3d pos1 = readVector3d(tag.getCompound("pos1"));
+
+        return new RopeSegment(id0, id1, pos0, pos1);
     }
 
     public static String sanitizeFileName(String name) {

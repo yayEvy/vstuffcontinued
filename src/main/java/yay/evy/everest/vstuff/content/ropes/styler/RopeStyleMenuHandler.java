@@ -32,7 +32,7 @@ public class RopeStyleMenuHandler {
             return;
         LocalPlayer player = mc.player;
         if (player == null)
-            return;
+            return; // null value of doom and despair
 
         if (!EntityUtils.isHolding(player, stack -> stack.is(VStuffItems.STYLING_AVAILABLE))) return;
 

@@ -49,8 +49,6 @@ public class NormalRopeRenderer implements IRopeRenderer {
         Vector3d prevUp = new Vector3d();
         Vector3d prevRight = right(prevOverallDirection, prevUp);
 
-
-
         if (prevRight.dot(right) < 0) right.mul(-1);
         right.lerp(prevRight, 1.0f - ORIENTATION_SMOOTH_FACTOR).normalize();
         up = new Vector3d();
@@ -95,8 +93,6 @@ public class NormalRopeRenderer implements IRopeRenderer {
                     startUp,
                     startRight
             );
-
-            // chickven
         }
     }
 

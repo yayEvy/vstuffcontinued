@@ -64,7 +64,8 @@ public class RopeStylerScreen extends AbstractSimiScreen {
         super.init();
         clearWidgets();
 
-        LinkedHashMap<RopeCategory, List<RopeStyle>> categoriesWithStyles = RopeStyleManager.getCategoriesWithStyles(player.level().registryAccess());
+        LinkedHashMap<RopeCategory, List<RopeStyle>> categoriesWithStyles = RopeStyleManager.getCategoriesWithStyles(
+                player.level().registryAccess()); // registry access of doom and despair
 
         List<RopeCategory> categories = categoriesWithStyles.keySet().stream().toList();
         List<Component> categoryComponentList = categories.stream().map(RopeCategory::name).toList();

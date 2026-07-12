@@ -38,7 +38,7 @@ public class OutlinePacket extends SimplePacketBase {
         return true;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @OnlyIn(Dist.CLIENT) // dist of doom and despair
     public void handleClient() {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level != null) {

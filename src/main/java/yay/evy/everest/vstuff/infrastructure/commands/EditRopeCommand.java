@@ -11,6 +11,7 @@ public class EditRopeCommand {
         return Commands.literal("edit")
                 .executes(ctx -> {
                     ctx.getSource().sendSuccess(() -> Component.literal("Not implemented"), false);
+                    // command of doom and despair
                     return 1;
                 });
     }
