@@ -171,9 +171,12 @@ dependencies {
     runtimeOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}"))
     implementation(fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}"))
 
-    implementation(jarJar("io.github.llamalad7:mixinextras-forge:${mixin_extras_version}"))
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:${mixin_extras_version}") {
+        jarJar.ranged(it, "[${mixin_extras_version},)")
+    })
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
 
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 configurations {
