@@ -1,0 +1,45 @@
+package dev.flarelog.vstuff.content.ropes.styler;
+
+import net.createmod.catnip.gui.ScreenOpener;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.level.GameType;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import dev.flarelog.vstuff.index.VStuffItems;
+import dev.flarelog.vstuff.index.VStuffKeys;
+import dev.flarelog.vstuff.internal.utility.EntityUtils;
+
+public class RopeStyleMenuHandler {
+
+    public static int COOLDOWN = 0;
+
+    @SubscribeEvent
+    public static void clientTick() {
+        if (COOLDOWN > 0 && !VStuffKeys.ROPE_MENU.isPressed())
+            COOLDOWN--;
+    }
+
+    @SubscribeEvent
+    public static void onKeyInput(int key, boolean pressed) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.gameMode == null || mc.gameMode.getPlayerMode() == GameType.SPECTATOR)
+            return;
+
+        if (key != VStuffKeys.ROPE_MENU.getBoundCode() || !pressed)
+            return;
+        if (COOLDOWN > 0)
+            return;
+        LocalPlayer player = mc.player;
+        if (player == null)
+            return; // null value of doom and despair
+
+        if (!EntityUtils.isHolding(player, stack -> stack.is(VStuffItems.STYLING_AVAILABLE))) return;
+
+        InteractionHand hand = EntityUtils.holdingInHand(player, stack -> stack.is(VStuffItems.STYLING_AVAILABLE));
+        if (hand == null) return;
+
+        ScreenOpener.open(new RopeStylerScreen(player));
+    }
+
+}
