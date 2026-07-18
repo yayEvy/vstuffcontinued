@@ -52,31 +52,6 @@ public class RopeCutterItem extends Item implements ILikeRopes {
             return InteractionResultHolder.pass(itemStack);
         }
 
-        ReworkedRope rope = RopeUtils.findRope(serverLevel, player);
-        if (rope == null) return InteractionResultHolder.pass(itemStack);
-
-        try {
-            RopeFactory.removeRope(serverLevel, rope.ropeId);
-
-            player.displayClientMessage(
-                    VStuff.translate("message.rope.break"),
-                    true
-            );
-
-            RopeStyle style = rope.getStyle(serverLevel.registryAccess());
-
-            RopeUtils.playSound(serverLevel, rope.posData0.blockPos(), style.breakSound());
-            RopeUtils.playSound(serverLevel, rope.posData1.blockPos(), style.breakSound());
-
-            if (!player.isCreative() && rope.hasDrop) {
-                itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
-                createRopeDrop(player, rope.styleKey);
-            }
-
-            return InteractionResultHolder.success(itemStack);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         return InteractionResultHolder.pass(itemStack);
     }

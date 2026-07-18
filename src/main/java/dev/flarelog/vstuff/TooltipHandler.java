@@ -67,7 +67,7 @@ public class TooltipHandler {
     }
 
     private static void populateModifiables() {
-        tooltipModifications.put(VStuffItems.ROPE.get(),
+        tooltipModifications.put(VStuffItems.PHYS_ROPE.get(),
                 (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
 
         tooltipModifications.put(VStuffItems.ROPE_CUTTER.get(),
@@ -76,13 +76,7 @@ public class TooltipHandler {
         tooltipModifications.put(VStuffItems.PHYS_GRABBER.get(),
                 (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
 
-        tooltipModifications.put(VStuffItems.ROPE_ARROW.get(),
-                (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
-
         tooltipModifications.put(VStuffItems.EXPENDABLE_ASSEMBLER.get(),
-                (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
-
-        tooltipModifications.put(VStuffBlocks.PULLEY_ANCHOR.asItem(),
                 (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
 
         tooltipModifications.put(VStuffBlocks.LEVITUFF.asItem(),

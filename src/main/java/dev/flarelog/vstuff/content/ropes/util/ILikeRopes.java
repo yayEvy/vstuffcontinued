@@ -34,7 +34,7 @@ public interface ILikeRopes {
     default void createRopeDrop(ServerLevel serverLevel, BlockPos pos, ResourceKey<RopeStyle> style) {
         Vector3d worldPos = RopeUtils.getWorldPos(serverLevel, pos);
 
-        ItemStack ropeStack = new ItemStack(VStuffItems.ROPE.get());
+        ItemStack ropeStack = new ItemStack(VStuffItems.PHYS_ROPE.get());
 
         addStyleToTag(ropeStack, style);
 
@@ -50,7 +50,7 @@ public interface ILikeRopes {
     }
 
     default void createRopeDrop(Player player, ResourceKey<RopeStyle> style) {
-        ItemStack ropeStack = new ItemStack(VStuffItems.ROPE.get());
+        ItemStack ropeStack = new ItemStack(VStuffItems.PHYS_ROPE.get());
 
         addStyleToTag(ropeStack, style);
 

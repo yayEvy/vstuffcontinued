@@ -24,7 +24,6 @@ public enum VStuffPackets {
 
     OUTLINE(OutlinePacket.class, OutlinePacket::new, PLAY_TO_CLIENT),
     PHYS_ROPE_ADD(AddPhysRopePacket.class, AddPhysRopePacket::new, PLAY_TO_CLIENT), // rahh
-    ROPE_ADD(AddRopePacket.class, AddRopePacket::new, PLAY_TO_CLIENT),
     ROPE_REMOVE(RemoveRopePacket.class, RemoveRopePacket::new, PLAY_TO_CLIENT),
     ROPE_CLEAR_ALL(ClearAllRopesPacket.class, ClearAllRopesPacket::new, PLAY_TO_CLIENT),
 

@@ -19,8 +19,6 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import dev.flarelog.vstuff.content.ropes.phys_ropes.ReworkedPhysRope;
 import dev.flarelog.vstuff.content.ropes.phys_ropes.ReworkedPhysRopeManager;
 import dev.flarelog.vstuff.content.ropes.util.IRopeActor;
-import dev.flarelog.vstuff.content.ropes.RopeManager;
-import dev.flarelog.vstuff.content.ropes.ReworkedRope;
 
 import javax.annotation.Nullable;
 
@@ -135,30 +133,8 @@ public class RopeUtils {
         return new Vector3d(worldPos);
     }
 
-    public static @Nullable ReworkedRope findRope(ServerLevel level, Player player) {
-        Vec3 eyePos = player.getEyePosition();
-        Vec3 lookVec = player.getViewVector(1.0f);
-        double maxDistance = player.getBlockReach();
-        double minDistance = Double.MAX_VALUE;
-        ReworkedRope foundRope = null;
-
-        for (ReworkedRope rope : RopeManager.get(level).getRopeList()) {
-
-            Vector3d worldPosA = convertLocalToWorld(level, rope.posData0.localPos(), rope.posData0.shipId());
-            Vector3d worldPosB = convertLocalToWorld(level, rope.posData1.localPos(), rope.posData1.shipId());
-
-            double distance = getDistanceToRope(eyePos, lookVec, worldPosA, worldPosB, maxDistance);
-            if (distance < minDistance && distance <= 1.0) {
-                minDistance = distance;
-                foundRope = rope;
-            }
-        }
-
-        return foundRope;
-    }
-
     public static @Nullable Integer findRopeId(ServerLevel level, Player player) {
-        ReworkedRope rope = findRope(level, player);
+        ReworkedPhysRope rope = findPhysRope(level, player);
         return rope == null ? null : rope.getRopeId();
     }
 

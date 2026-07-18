@@ -11,8 +11,6 @@ import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.content.physics.levituff.LevituffBlock;
 import dev.flarelog.vstuff.content.physics.levituff.RefinedLevituffBlock;
 import dev.flarelog.vstuff.content.ships.reactionwheel.ReactionWheelBlock;
-import dev.flarelog.vstuff.content.ropes.pulley.PhysPulleyBlock;
-import dev.flarelog.vstuff.content.ropes.pulley.PulleyAnchorBlock;
 import dev.flarelog.vstuff.content.ships.thrust.MechanicalThrusterBlock;
 import dev.flarelog.vstuff.infrastructure.config.VStress;
 
@@ -37,28 +35,6 @@ public class VStuffBlocks  {
                     .transform(VStress.setImpact(8))
                     .item()
                     .transform(customItemModel())
-                    .register();
-
-
-    public static final BlockEntry<PhysPulleyBlock> PHYS_PULLEY =
-            REGISTRATE.block("phys_pulley", PhysPulleyBlock::new)
-                    .initialProperties(AllBlocks.ANDESITE_ALLOY_BLOCK)
-                    .properties(BlockBehaviour.Properties::noOcclusion)
-                    .transform(axeOrPickaxe())
-                    .blockstate(BlockStateGen.horizontalBlockProvider(true))
-                    .transform(VStress.setImpact(4))
-                    .item()
-                    .transform(customItemModel())
-                    .register();
-
-
-    public static final BlockEntry<PulleyAnchorBlock> PULLEY_ANCHOR =
-            REGISTRATE.block("pulley_anchor", PulleyAnchorBlock::new)
-                    .initialProperties(AllBlocks.ZINC_BLOCK)
-                    .transform(pickaxeOnly())
-                    .blockstate(BlockStateGen.directionalBlockProvider(false))
-                    .item()
-                    .build()
                     .register();
 
 

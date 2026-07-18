@@ -27,8 +27,6 @@ public class VStuffWeightsProvider implements DataProvider {
         JsonArray jsonArray = new JsonArray();
 
         jsonArray.add(block(VStuffBlocks.MECHANICAL_THRUSTER.get(), 2000.0, 0.6));
-        jsonArray.add(block(VStuffBlocks.PHYS_PULLEY.get(), 2000.0, 0.6));
-        jsonArray.add(block(VStuffBlocks.PULLEY_ANCHOR.get(), 100.0, 0.2));
         jsonArray.add(block(VStuffBlocks.REACTION_WHEEL.get(), 2000.0, 0.6));
         jsonArray.add(block(VStuffBlocks.LEVITUFF.get(), 1600, 0.7));
 

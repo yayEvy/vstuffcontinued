@@ -13,9 +13,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3d;
 import dev.flarelog.vstuff.VStuff;
-import dev.flarelog.vstuff.content.ropes.ReworkedRope;
-import dev.flarelog.vstuff.content.ropes.RopeFactory;
-import dev.flarelog.vstuff.content.ropes.RopeManager;
 import dev.flarelog.vstuff.index.VStuffItems;
 import dev.flarelog.vstuff.infrastructure.commands.VStuffCommands;
 import dev.flarelog.vstuff.internal.styling.data.RopeStyle;
@@ -41,32 +38,12 @@ public class CommonEvents {
         Vector3d worldBreakPos = RopeUtils.getWorldPos(level, brokenPos);
         Map<Integer, ResourceKey<RopeStyle>> idsToRemove = new HashMap<>();
 
-        for (ReworkedRope rope : RopeManager.get(level).getRopeList())
-            if (rope.atBlockPos(brokenPos)) {
-                idsToRemove.put(rope.getRopeId(), rope.styleKey);
-            }
-
-        for (Map.Entry<Integer, ResourceKey<RopeStyle>> entry : idsToRemove.entrySet()) {
-            ItemStack ropeStack = new ItemStack(VStuffItems.ROPE.get());
-            ropeStack.getOrCreateTag().put("style", TagUtils.writeResourceKey(entry.getValue()));
-
-            ItemEntity droppedEntity = new ItemEntity(
-                    level,
-                    worldBreakPos.x,
-                    worldBreakPos.y,
-                    worldBreakPos.z,
-                    ropeStack
-            );
-
-            level.addFreshEntity(droppedEntity);
-
-            RopeFactory.removeRope(level, entry.getKey());
-        }
+        // todo reimplement
     }
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
-        RopeManager.syncAllRopesToPlayer(player);
+
     }
 
 // todo reimplement restyling n stuff
@@ -110,7 +87,6 @@ public class CommonEvents {
     @SubscribeEvent
     public static void onPlayerChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
-        RopeManager.syncAllRopesToPlayer(player);
     }
 
 }

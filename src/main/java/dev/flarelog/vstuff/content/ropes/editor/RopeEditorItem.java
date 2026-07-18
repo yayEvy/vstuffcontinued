@@ -1,5 +1,6 @@
 package dev.flarelog.vstuff.content.ropes.editor;
 
+import dev.flarelog.vstuff.content.ropes.phys_ropes.ReworkedPhysRope;
 import net.minecraft.ChatFormatting;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -9,7 +10,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import dev.flarelog.vstuff.VStuff;
-import dev.flarelog.vstuff.content.ropes.ReworkedRope;
 import dev.flarelog.vstuff.internal.utility.RopeUtils;
 
 public class RopeEditorItem extends Item {
@@ -22,14 +22,12 @@ public class RopeEditorItem extends Item {
         ItemStack stack = player.getItemInHand(usedHand);
         if (!(level instanceof ServerLevel serverLevel)) return InteractionResultHolder.pass(stack);
 
-        ReworkedRope rope = RopeUtils.findRope(serverLevel, player);
+        ReworkedPhysRope rope = RopeUtils.findPhysRope(serverLevel, player);
 
         if (rope == null) {
             player.displayClientMessage(VStuff.translate("rope.editor_not_found").withStyle(ChatFormatting.RED), true);
             return InteractionResultHolder.success(stack);
         }
-
-        //ScreenOpener.open(new RopeEditorScreen(RopeManager.getRope(ropeId)));
 
         return InteractionResultHolder.success(stack); // unimplemented feature of doom and despair
     }

@@ -45,7 +45,6 @@ public class VStuff {
         VStuffSounds.register(modEventBus);
         VStuffBlocks.register();
         VStuffItems.register();
-        VStuffEntities.register();
         VStuffCreativeModeTabs.register(modEventBus);
         VStuffBlockEntities.register();
         VStuffPackets.register();

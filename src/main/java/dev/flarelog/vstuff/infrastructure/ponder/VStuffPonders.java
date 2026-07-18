@@ -25,7 +25,6 @@ public class VStuffPonders implements PonderPlugin {
     public void registerScenes(PonderSceneRegistrationHelper<ResourceLocation> helper) {
         PonderSceneRegistrationHelper<ItemProviderEntry<?>> HELPER = helper.withKeyFunction(RegistryEntry::getId);
 
-        HELPER.addStoryBoard(VStuffBlocks.PHYS_PULLEY, "phys_pulley", PhysPulleyScenes::physPulley);
         HELPER.addStoryBoard(VStuffBlocks.MECHANICAL_THRUSTER, "mechanical_thruster", MechanicalThrusterScenes::mechanicalThruster);
         HELPER.addStoryBoard(VStuffBlocks.REACTION_WHEEL, "reaction_wheel", ReactionWheelScenes::reactionWheel);
     }

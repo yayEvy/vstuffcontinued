@@ -1,5 +1,7 @@
 package dev.flarelog.vstuff.internal.mixins;
 
+import dev.flarelog.vstuff.content.ropes.phys_ropes.ReworkedPhysRope;
+import dev.flarelog.vstuff.content.ropes.phys_ropes.ReworkedPhysRopeManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import org.joml.Vector3d;
@@ -10,9 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.mod.common.assembly.ShipAssembler;
 import dev.flarelog.vstuff.VStuff;
-import dev.flarelog.vstuff.content.ropes.RopeFactory;
-import dev.flarelog.vstuff.content.ropes.RopeManager;
-import dev.flarelog.vstuff.content.ropes.ReworkedRope;
 import dev.flarelog.vstuff.internal.utility.GTPAUtils;
 import dev.flarelog.vstuff.internal.utility.RopeUtils;
 
@@ -35,10 +34,10 @@ public class ShipAssemblyMixin {
         if (newShip == null) return;
 
         Long newShipId = newShip.getId();
-        RopeManager manager = RopeManager.get(level);
+        ReworkedPhysRopeManager manager = ReworkedPhysRopeManager.get(level);
 
-        List<ReworkedRope> affectedRopes = new ArrayList<>();
-        for (ReworkedRope rope : manager.getRopeList()) {
+        List<ReworkedPhysRope> affectedRopes = new ArrayList<>();
+        for (ReworkedPhysRope rope : manager.getRopeList()) {
             if (blocks.contains(rope.posData0.blockPos()) || blocks.contains(rope.posData1.blockPos()))
                 affectedRopes.add(rope);
         }
@@ -46,7 +45,7 @@ public class ShipAssemblyMixin {
         if (affectedRopes.isEmpty()) return;
 
         level.getServer().execute(() -> {
-            for (ReworkedRope rope : affectedRopes) {
+            for (ReworkedPhysRope rope : affectedRopes) {
                 try {
                     boolean end0 = blocks.contains(rope.posData0.blockPos());
                     boolean end1 = blocks.contains(rope.posData1.blockPos());
@@ -57,20 +56,7 @@ public class ShipAssemblyMixin {
                     Vector3d newLocal0 = end0 ? RopeUtils.worldToShipLocal(level, worldPos0, newShipId) : rope.posData0.localPos();
                     Vector3d newLocal1 = end1 ? RopeUtils.worldToShipLocal(level, worldPos1, newShipId) : rope.posData1.localPos();
 
-                    if (rope.hasJoint && rope.hasTrackedJoint())
-                        GTPAUtils.removeJoint(level, rope);
-                    else {
-                        rope.detachActors(level);
-                        manager.removeRope(rope.getRopeId());
-                    }
-
-                    RopeFactory.reCreateNewRope(
-                            level,
-                            end0 ? newShipId : rope.posData0.shipId(),
-                            end1 ? newShipId : rope.posData1.shipId(),
-                            RopeUtils.containingBlockPos(newLocal0),
-                            RopeUtils.containingBlockPos(newLocal1),
-                            rope.styleKey, null);
+                    // todo reimplement
 
                 } catch (Exception e) {
                     VStuff.LOGGER.error("[VStuff] Failed to reattach rope {} after ship assembly: {}",

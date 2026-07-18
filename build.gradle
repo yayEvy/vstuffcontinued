@@ -175,8 +175,6 @@ dependencies {
         jarJar.ranged(it, "[${mixin_extras_version},)")
     })
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
-
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 configurations {

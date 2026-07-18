@@ -37,7 +37,7 @@ public class PhysPulleyScenes {
                         Pointing.DOWN,
                         40
                 )
-                .withItem(new ItemStack(VStuffItems.ROPE.get()))
+                .withItem(new ItemStack(VStuffItems.PHYS_ROPE.get()))
                 .rightClick();
 
         scene.idle(90);
@@ -62,7 +62,7 @@ public class PhysPulleyScenes {
                         Pointing.DOWN,
                         40
                 )
-                .withItem(new ItemStack(VStuffItems.ROPE.get()))
+                .withItem(new ItemStack(VStuffItems.PHYS_ROPE.get()))
                 .rightClick();
 
         scene.idle(90);

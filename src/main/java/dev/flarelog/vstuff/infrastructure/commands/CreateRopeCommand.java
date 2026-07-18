@@ -9,7 +9,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import dev.flarelog.vstuff.content.ropes.RopeFactory;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
 import dev.flarelog.vstuff.internal.styling.RopeStyleManager;
 import dev.flarelog.vstuff.internal.styling.data.RopeStyle;
@@ -36,7 +35,7 @@ public class CreateRopeCommand {
                             ResourceKey<?> uncheckedStyle = ctx.getArgument("style", ResourceKey.class);
                             ResourceKey<RopeStyle> style = uncheckedStyle.cast(VStuffRegistries.ROPE_STYLE).orElse(RopeStyleManager.DEFAULT_KEY);
 
-                            RopeFactory.createNewRope(serverLevel, ship0, ship1, pos0, pos1, style, user);
+                            // todo reimplement
 
                             return 1;
                         })

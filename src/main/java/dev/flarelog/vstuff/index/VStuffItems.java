@@ -8,9 +8,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import dev.flarelog.vstuff.VStuff;
-import dev.flarelog.vstuff.content.ropes.ReworkedRopeItem;
 import dev.flarelog.vstuff.content.ropes.RopeCutterItem;
-import dev.flarelog.vstuff.content.ropes.arrow.RopeArrowItem;
 import dev.flarelog.vstuff.content.ropes.phys_ropes.ReworkedPhysRopeItem;
 import dev.flarelog.vstuff.content.ships.assembly.ExpendableAssemblerItem;
 import dev.flarelog.vstuff.content.physics.physgrabber.PhysGrabberItem;
@@ -27,15 +25,6 @@ public class VStuffItems {
 
     public static final TagKey<Item> STYLING_AVAILABLE = TagKey.create(Registries.ITEM, VStuff.asResource("styling_available"));
 
-    public static final ItemEntry<ReworkedRopeItem> ROPE =
-            REGISTRATE.item("rope", ReworkedRopeItem::new)
-                    .properties(p -> p
-                            .stacksTo(64)
-                    )
-                    .tag(STYLING_AVAILABLE)
-                    .model(AssetLookup.existingItemModel())
-                    .register();
-
     public static final ItemEntry<ReworkedPhysRopeItem> PHYS_ROPE =
             REGISTRATE.item("phys_rope", ReworkedPhysRopeItem::new)
                     .properties(p -> p
@@ -43,15 +32,6 @@ public class VStuffItems {
                     )
                     .tag(STYLING_AVAILABLE)
                     .model(AssetLookup.existingItemModel())
-                    .register();
-
-    public static final ItemEntry<RopeArrowItem> ROPE_ARROW =
-            REGISTRATE.item("rope_arrow", RopeArrowItem::new)
-                    .properties(p -> p
-                            .stacksTo(64)
-                    )
-                    .tag(STYLING_AVAILABLE)
-                    .defaultModel()
                     .register();
 
     public static final ItemEntry<RopeCutterItem> ROPE_CUTTER =
