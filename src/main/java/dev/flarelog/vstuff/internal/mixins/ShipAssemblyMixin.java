@@ -1,7 +1,7 @@
 package dev.flarelog.vstuff.internal.mixins;
 
-import dev.flarelog.vstuff.content.ropes.phys_ropes.ReworkedPhysRope;
-import dev.flarelog.vstuff.content.ropes.phys_ropes.ReworkedPhysRopeManager;
+import dev.flarelog.vstuff.content.ropes.Rope;
+import dev.flarelog.vstuff.content.ropes.RopeManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import org.joml.Vector3d;
@@ -12,8 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.mod.common.assembly.ShipAssembler;
 import dev.flarelog.vstuff.VStuff;
-import dev.flarelog.vstuff.internal.utility.GTPAUtils;
-import dev.flarelog.vstuff.internal.utility.RopeUtils;
+import dev.flarelog.vstuff.content.ropes.util.RopeUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,10 +33,10 @@ public class ShipAssemblyMixin {
         if (newShip == null) return;
 
         Long newShipId = newShip.getId();
-        ReworkedPhysRopeManager manager = ReworkedPhysRopeManager.get(level);
+        RopeManager manager = RopeManager.get(level);
 
-        List<ReworkedPhysRope> affectedRopes = new ArrayList<>();
-        for (ReworkedPhysRope rope : manager.getRopeList()) {
+        List<Rope> affectedRopes = new ArrayList<>();
+        for (Rope rope : manager.getRopeList()) {
             if (blocks.contains(rope.posData0.blockPos()) || blocks.contains(rope.posData1.blockPos()))
                 affectedRopes.add(rope);
         }
@@ -45,16 +44,16 @@ public class ShipAssemblyMixin {
         if (affectedRopes.isEmpty()) return;
 
         level.getServer().execute(() -> {
-            for (ReworkedPhysRope rope : affectedRopes) {
+            for (Rope rope : affectedRopes) {
                 try {
                     boolean end0 = blocks.contains(rope.posData0.blockPos());
                     boolean end1 = blocks.contains(rope.posData1.blockPos());
 
-                    Vector3d worldPos0 = RopeUtils.getWorldPos(level, rope.posData0.blockPos(), rope.posData0.shipId());
-                    Vector3d worldPos1 = RopeUtils.getWorldPos(level, rope.posData1.blockPos(), rope.posData1.shipId());
+                    Vector3d worldPos0 = RopeUtil.getWorldPos(level, rope.posData0.blockPos(), rope.posData0.shipId());
+                    Vector3d worldPos1 = RopeUtil.getWorldPos(level, rope.posData1.blockPos(), rope.posData1.shipId());
 
-                    Vector3d newLocal0 = end0 ? RopeUtils.worldToShipLocal(level, worldPos0, newShipId) : rope.posData0.localPos();
-                    Vector3d newLocal1 = end1 ? RopeUtils.worldToShipLocal(level, worldPos1, newShipId) : rope.posData1.localPos();
+                    Vector3d newLocal0 = end0 ? RopeUtil.worldToShipLocal(level, worldPos0, newShipId) : rope.posData0.localPos();
+                    Vector3d newLocal1 = end1 ? RopeUtil.worldToShipLocal(level, worldPos1, newShipId) : rope.posData1.localPos();
 
                     // todo reimplement
 

@@ -25,7 +25,7 @@ public class VStuffCreativeModeTabs {
     public static final RegistryObject<CreativeModeTab> VSTUFF_MAIN = CREATIVE_TAB_REGISTER.register("main",
             () -> CreativeModeTab.builder()
                     .title(Component.translatable("creativetabs.main"))
-                    .icon(VStuffItems.PHYS_ROPE::asStack)
+                    .icon(VStuffItems.ROPE::asStack)
                     .displayItems(new MainDisplayItemsGen())
                     .build());
 

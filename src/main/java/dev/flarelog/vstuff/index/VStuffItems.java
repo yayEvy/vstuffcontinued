@@ -9,8 +9,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.content.ropes.RopeCutterItem;
-import dev.flarelog.vstuff.content.ropes.phys_ropes.ReworkedPhysRopeItem;
-import dev.flarelog.vstuff.content.ships.assembly.ExpendableAssemblerItem;
+import dev.flarelog.vstuff.content.ropes.RopeItem;
+import dev.flarelog.vstuff.content.physics.ships.assembly.ExpendableAssemblerItem;
 import dev.flarelog.vstuff.content.physics.physgrabber.PhysGrabberItem;
 import dev.flarelog.vstuff.content.ropes.editor.RopeEditorItem;
 
@@ -25,8 +25,8 @@ public class VStuffItems {
 
     public static final TagKey<Item> STYLING_AVAILABLE = TagKey.create(Registries.ITEM, VStuff.asResource("styling_available"));
 
-    public static final ItemEntry<ReworkedPhysRopeItem> PHYS_ROPE =
-            REGISTRATE.item("phys_rope", ReworkedPhysRopeItem::new)
+    public static final ItemEntry<RopeItem> ROPE =
+            REGISTRATE.item("rope", RopeItem::new)
                     .properties(p -> p
                             .stacksTo(64)
                     )

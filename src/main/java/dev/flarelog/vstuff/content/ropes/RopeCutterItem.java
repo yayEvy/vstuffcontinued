@@ -8,10 +8,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import dev.flarelog.vstuff.VStuff;
-import dev.flarelog.vstuff.content.ropes.phys_ropes.ReworkedPhysRope;
 import dev.flarelog.vstuff.content.ropes.util.ILikeRopes;
-import dev.flarelog.vstuff.internal.styling.data.RopeStyle;
-import dev.flarelog.vstuff.internal.utility.RopeUtils;
+import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
+import dev.flarelog.vstuff.content.ropes.util.RopeUtil;
 
 public class RopeCutterItem extends Item implements ILikeRopes {
     public RopeCutterItem(Properties pProperties) {
@@ -25,7 +24,7 @@ public class RopeCutterItem extends Item implements ILikeRopes {
             return InteractionResultHolder.pass(itemStack);
         }
 
-        ReworkedPhysRope physRope = RopeUtils.findPhysRope(serverLevel, player);
+        Rope physRope = RopeUtil.findPhysRope(serverLevel, player);
         if (physRope != null) {
             try {
                 // doom and despair idfk
@@ -37,8 +36,8 @@ public class RopeCutterItem extends Item implements ILikeRopes {
 
                 RopeStyle style = physRope.getStyle(serverLevel.registryAccess());
 
-                RopeUtils.playSound(serverLevel, physRope.posData0.blockPos(), style.breakSound());
-                RopeUtils.playSound(serverLevel, physRope.posData1.blockPos(), style.breakSound());
+                RopeUtil.playSound(serverLevel, physRope.posData0.blockPos(), style.breakSound());
+                RopeUtil.playSound(serverLevel, physRope.posData1.blockPos(), style.breakSound());
 
                 if (!player.isCreative()) {
                     itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));

@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
+import dev.flarelog.vstuff.content.physics.VSUtil;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 
 import net.minecraft.core.BlockPos;
@@ -19,7 +20,7 @@ public class AttachmentUtils {
     public static <A extends ShipPhysicsListener> A getOrCreateAttachment(Level level, BlockPos pos, Class<A> attachmentClass, Supplier<A> factory) {
         if (!(level instanceof ServerLevel serverLevel)) return null;
 
-        LoadedServerShip ship = ShipUtils.getLoadedServerShipAtPos(serverLevel, pos);
+        LoadedServerShip ship = VSUtil.getLoadedServerShipAtPos(serverLevel, pos);
 
         return ship != null ? ship.getOrPutAttachment(attachmentClass, factory) : null;
     }
@@ -67,7 +68,7 @@ public class AttachmentUtils {
     public static <A extends ShipPhysicsListener> A getAttachment(Level level, BlockPos pos, Class<A> attachmentClass) {
         if (!(level instanceof ServerLevel serverLevel)) return null;
 
-        LoadedServerShip ship = ShipUtils.getLoadedServerShipAtPos(serverLevel, pos);
+        LoadedServerShip ship = VSUtil.getLoadedServerShipAtPos(serverLevel, pos);
 
         //VStuff.LOGGER.info("got attachment {}", attachmentClass);
         return ship != null ? ship.getAttachment(attachmentClass) : null;
@@ -116,7 +117,7 @@ public class AttachmentUtils {
     public static <A extends ShipPhysicsListener> void removeAttachment(Level level, BlockPos pos, Class<A> attachmentClass) {
         if (!(level instanceof ServerLevel serverLevel)) return;
 
-        LoadedServerShip ship = ShipUtils.getLoadedServerShipAtPos(serverLevel, pos);
+        LoadedServerShip ship = VSUtil.getLoadedServerShipAtPos(serverLevel, pos);
 
         if (ship != null) ship.removeAttachment(attachmentClass);
     }

@@ -10,11 +10,11 @@ import net.minecraft.world.phys.Vec3;
 import org.valkyrienskies.core.api.ships.LoadedShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
-import dev.flarelog.vstuff.content.physics.physgrabber.packet.GrabPacket;
-import dev.flarelog.vstuff.content.physics.physgrabber.packet.ReleasePacket;
-import dev.flarelog.vstuff.content.physics.physgrabber.packet.UpdatePacket;
+import dev.flarelog.vstuff.network.packets.phys_grabber.GrabPacket;
+import dev.flarelog.vstuff.network.packets.phys_grabber.ReleasePacket;
+import dev.flarelog.vstuff.network.packets.phys_grabber.UpdatePacket;
 import dev.flarelog.vstuff.index.VStuffSounds;
-import dev.flarelog.vstuff.index.VStuffPackets;
+import dev.flarelog.vstuff.network.VStuffPackets;
 
 
 public class PhysGrabberClientHandler{

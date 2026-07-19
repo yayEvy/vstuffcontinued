@@ -5,8 +5,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DataPackRegistryEvent;
 import org.jetbrains.annotations.ApiStatus;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
-import dev.flarelog.vstuff.internal.styling.data.RopeCategory;
-import dev.flarelog.vstuff.internal.styling.data.RopeStyle;
+import dev.flarelog.vstuff.content.ropes.style.RopeCategory;
+import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModEvents {

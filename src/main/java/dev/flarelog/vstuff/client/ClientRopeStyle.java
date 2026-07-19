@@ -6,7 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
 import dev.flarelog.vstuff.internal.rendering.IRopeRenderer;
 import dev.flarelog.vstuff.internal.rendering.RopeRendererType;
-import dev.flarelog.vstuff.internal.styling.data.RopeStyle;
+import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 import dev.flarelog.vstuff.internal.utility.CodecUtil;
 
 public record ClientRopeStyle(Holder<RopeRendererType> renderer, JsonObject rendererParams) {

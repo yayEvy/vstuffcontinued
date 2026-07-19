@@ -1,6 +1,6 @@
 package dev.flarelog.vstuff.content.ropes.editor;
 
-import dev.flarelog.vstuff.content.ropes.phys_ropes.ReworkedPhysRope;
+import dev.flarelog.vstuff.content.ropes.Rope;
 import net.minecraft.ChatFormatting;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -10,7 +10,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import dev.flarelog.vstuff.VStuff;
-import dev.flarelog.vstuff.internal.utility.RopeUtils;
+import dev.flarelog.vstuff.content.ropes.util.RopeUtil;
 
 public class RopeEditorItem extends Item {
     public RopeEditorItem(Properties pProperties) {
@@ -22,7 +22,7 @@ public class RopeEditorItem extends Item {
         ItemStack stack = player.getItemInHand(usedHand);
         if (!(level instanceof ServerLevel serverLevel)) return InteractionResultHolder.pass(stack);
 
-        ReworkedPhysRope rope = RopeUtils.findPhysRope(serverLevel, player);
+        Rope rope = RopeUtil.findPhysRope(serverLevel, player);
 
         if (rope == null) {
             player.displayClientMessage(VStuff.translate("rope.editor_not_found").withStyle(ChatFormatting.RED), true);

@@ -67,7 +67,7 @@ public class TooltipHandler {
     }
 
     private static void populateModifiables() {
-        tooltipModifications.put(VStuffItems.PHYS_ROPE.get(),
+        tooltipModifications.put(VStuffItems.ROPE.get(),
                 (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
 
         tooltipModifications.put(VStuffItems.ROPE_CUTTER.get(),

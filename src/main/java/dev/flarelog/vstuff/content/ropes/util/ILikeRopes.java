@@ -11,9 +11,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Vector3d;
 import dev.flarelog.vstuff.index.VStuffItems;
-import dev.flarelog.vstuff.internal.styling.RopeStyleManager;
-import dev.flarelog.vstuff.internal.styling.data.RopeStyle;
-import dev.flarelog.vstuff.internal.utility.RopeUtils;
+import dev.flarelog.vstuff.content.ropes.style.RopeStyleManager;
+import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 import dev.flarelog.vstuff.internal.utility.TagUtils;
 
 public interface ILikeRopes {
@@ -32,9 +31,9 @@ public interface ILikeRopes {
     }
 
     default void createRopeDrop(ServerLevel serverLevel, BlockPos pos, ResourceKey<RopeStyle> style) {
-        Vector3d worldPos = RopeUtils.getWorldPos(serverLevel, pos);
+        Vector3d worldPos = RopeUtil.getWorldPos(serverLevel, pos);
 
-        ItemStack ropeStack = new ItemStack(VStuffItems.PHYS_ROPE.get());
+        ItemStack ropeStack = new ItemStack(VStuffItems.ROPE.get());
 
         addStyleToTag(ropeStack, style);
 
@@ -50,7 +49,7 @@ public interface ILikeRopes {
     }
 
     default void createRopeDrop(Player player, ResourceKey<RopeStyle> style) {
-        ItemStack ropeStack = new ItemStack(VStuffItems.PHYS_ROPE.get());
+        ItemStack ropeStack = new ItemStack(VStuffItems.ROPE.get());
 
         addStyleToTag(ropeStack, style);
 

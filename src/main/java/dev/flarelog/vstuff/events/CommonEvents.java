@@ -4,8 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.BlockEvent;
@@ -13,11 +11,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3d;
 import dev.flarelog.vstuff.VStuff;
-import dev.flarelog.vstuff.index.VStuffItems;
 import dev.flarelog.vstuff.infrastructure.commands.VStuffCommands;
-import dev.flarelog.vstuff.internal.styling.data.RopeStyle;
-import dev.flarelog.vstuff.internal.utility.RopeUtils;
-import dev.flarelog.vstuff.internal.utility.TagUtils;
+import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
+import dev.flarelog.vstuff.content.ropes.util.RopeUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +31,7 @@ public class CommonEvents {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
 
         BlockPos brokenPos = event.getPos();
-        Vector3d worldBreakPos = RopeUtils.getWorldPos(level, brokenPos);
+        Vector3d worldBreakPos = RopeUtil.getWorldPos(level, brokenPos);
         Map<Integer, ResourceKey<RopeStyle>> idsToRemove = new HashMap<>();
 
         // todo reimplement

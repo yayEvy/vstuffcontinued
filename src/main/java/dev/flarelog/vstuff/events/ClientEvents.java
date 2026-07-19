@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.content.physics.physgrabber.PhysGrabberClientHandler;
-import dev.flarelog.vstuff.content.ropes.styler.RopeStyleMenuHandler;
+import dev.flarelog.vstuff.content.ropes.style.RopeStyleMenuHandler;
 import dev.flarelog.vstuff.index.VStuffKeys;
 
 @EventBusSubscriber(modid = VStuff.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)

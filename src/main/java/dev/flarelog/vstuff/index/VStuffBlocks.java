@@ -10,8 +10,8 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.content.physics.levituff.LevituffBlock;
 import dev.flarelog.vstuff.content.physics.levituff.RefinedLevituffBlock;
-import dev.flarelog.vstuff.content.ships.reactionwheel.ReactionWheelBlock;
-import dev.flarelog.vstuff.content.ships.thrust.MechanicalThrusterBlock;
+import dev.flarelog.vstuff.content.physics.ships.reactionwheel.ReactionWheelBlock;
+import dev.flarelog.vstuff.content.physics.ships.thrust.MechanicalThrusterBlock;
 import dev.flarelog.vstuff.infrastructure.config.VStress;
 
 import static com.simibubi.create.foundation.data.ModelGen.customItemModel;

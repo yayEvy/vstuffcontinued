@@ -6,13 +6,13 @@ import net.minecraft.sounds.SoundEvents;
 import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
 import dev.flarelog.vstuff.internal.rendering.RendererParamHelper;
-import dev.flarelog.vstuff.internal.styling.data.RopeStyle;
+import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 
 import java.util.Map;
 
-import static dev.flarelog.vstuff.internal.styling.RopeStyleManager.DYE_COLORS;
-import static dev.flarelog.vstuff.internal.styling.RopeStyleManager.WOOLS;
-import static dev.flarelog.vstuff.internal.styling.data.RopeStyle.Builder;
+import static dev.flarelog.vstuff.content.ropes.style.RopeStyleManager.DYE_COLORS;
+import static dev.flarelog.vstuff.content.ropes.style.RopeStyleManager.WOOLS;
+import static dev.flarelog.vstuff.content.ropes.style.RopeStyle.Builder;
 import static dev.flarelog.vstuff.internal.utility.TagUtils.sanitizeFileName;
 
 public class VStuffRopeStyles {

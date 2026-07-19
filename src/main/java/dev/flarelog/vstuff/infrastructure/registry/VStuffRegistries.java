@@ -4,8 +4,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.internal.rendering.RopeRendererType;
-import dev.flarelog.vstuff.internal.styling.data.RopeCategory;
-import dev.flarelog.vstuff.internal.styling.data.RopeStyle;
+import dev.flarelog.vstuff.content.ropes.style.RopeCategory;
+import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 
 public class VStuffRegistries {
 

@@ -1,6 +1,7 @@
 package dev.flarelog.vstuff.infrastructure.commands;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import dev.flarelog.vstuff.content.physics.VSUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceKeyArgument;
@@ -10,9 +11,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
-import dev.flarelog.vstuff.internal.styling.RopeStyleManager;
-import dev.flarelog.vstuff.internal.styling.data.RopeStyle;
-import dev.flarelog.vstuff.internal.utility.ShipUtils;
+import dev.flarelog.vstuff.content.ropes.style.RopeStyleManager;
+import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 
 public class CreateRopeCommand {
 
@@ -27,8 +27,8 @@ public class CreateRopeCommand {
                             BlockPos pos0 = BlockPosArgument.getBlockPos(ctx, "pos0");
                             BlockPos pos1 = BlockPosArgument.getBlockPos(ctx, "pos1");
 
-                            Long ship0 = ShipUtils.getShipIdAtPos(serverLevel, pos0);
-                            Long ship1 = ShipUtils.getShipIdAtPos(serverLevel, pos1);
+                            Long ship0 = VSUtil.getShipIdAtPos(serverLevel, pos0);
+                            Long ship1 = VSUtil.getShipIdAtPos(serverLevel, pos1);
 
                             Entity user = ctx.getSource().getEntity();
 

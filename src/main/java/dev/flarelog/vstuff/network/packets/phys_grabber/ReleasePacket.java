@@ -1,0 +1,30 @@
+package dev.flarelog.vstuff.network.packets.phys_grabber;
+
+import com.simibubi.create.foundation.networking.SimplePacketBase;
+import dev.flarelog.vstuff.content.physics.physgrabber.GrabberHandler;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
+
+public class ReleasePacket extends SimplePacketBase {
+
+    private long shipId;
+
+    public ReleasePacket(long shipId) {
+        this.shipId = shipId;
+    }
+
+    public ReleasePacket(FriendlyByteBuf buffer) {
+        this.shipId = buffer.readLong();
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buffer) {
+        buffer.writeLong(shipId);
+    }
+
+    @Override
+    public boolean handle(NetworkEvent.Context context) {
+        context.enqueueWork(() -> GrabberHandler.handleRelease(context.getSender(), shipId));
+        return true;
+    }
+}

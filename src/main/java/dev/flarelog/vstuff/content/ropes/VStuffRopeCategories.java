@@ -4,7 +4,7 @@ import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
-import dev.flarelog.vstuff.internal.styling.data.RopeCategory;
+import dev.flarelog.vstuff.content.ropes.style.RopeCategory;
 
 public class VStuffRopeCategories {
 

@@ -6,12 +6,12 @@ import com.tterrag.registrate.util.entry.BlockEntityEntry;
 import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.content.physics.levituff.LevituffBlockEntity;
 import dev.flarelog.vstuff.content.physics.levituff.RefinedLevituffBlockEntity;
-import dev.flarelog.vstuff.content.ships.reactionwheel.ReactionWheelBlockEntity;
-import dev.flarelog.vstuff.content.ships.reactionwheel.ReactionWheelRenderer;
-import dev.flarelog.vstuff.content.ships.reactionwheel.ReactionWheelVisual;
-import dev.flarelog.vstuff.content.ships.thrust.MechanicalThrusterBlockEntity;
-import dev.flarelog.vstuff.content.ships.thrust.MechanicalThrusterRenderer;
-import dev.flarelog.vstuff.content.ships.thrust.MechanicalThrusterVisual;
+import dev.flarelog.vstuff.content.physics.ships.reactionwheel.ReactionWheelBlockEntity;
+import dev.flarelog.vstuff.content.physics.ships.reactionwheel.ReactionWheelRenderer;
+import dev.flarelog.vstuff.content.physics.ships.reactionwheel.ReactionWheelVisual;
+import dev.flarelog.vstuff.content.physics.ships.thrust.MechanicalThrusterBlockEntity;
+import dev.flarelog.vstuff.content.physics.ships.thrust.MechanicalThrusterRenderer;
+import dev.flarelog.vstuff.content.physics.ships.thrust.MechanicalThrusterVisual;
 
 public class VStuffBlockEntities {
 

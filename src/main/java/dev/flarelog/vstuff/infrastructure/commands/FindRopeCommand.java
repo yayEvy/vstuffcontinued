@@ -6,7 +6,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import dev.flarelog.vstuff.internal.utility.RopeUtils;
+import dev.flarelog.vstuff.content.ropes.util.RopeUtil;
 
 public class FindRopeCommand {
 
@@ -16,7 +16,7 @@ public class FindRopeCommand {
                     ServerLevel level = ctx.getSource().getLevel();
                     ServerPlayer player = ctx.getSource().getPlayerOrException();
 
-                    Integer id = RopeUtils.findRopeId(level, player);
+                    Integer id = RopeUtil.findRopeId(level, player);
 
                     if (id == null) {
                         ctx.getSource().sendFailure(Component.literal("No rope found"));

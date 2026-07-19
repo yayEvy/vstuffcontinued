@@ -2,14 +2,13 @@ package dev.flarelog.vstuff.infrastructure.commands;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
-import dev.flarelog.vstuff.content.ropes.phys_ropes.ReworkedPhysRopeFactory;
-import dev.flarelog.vstuff.content.ropes.phys_ropes.ReworkedPhysRopeManager;
+import dev.flarelog.vstuff.content.ropes.RopeManager;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
-import dev.flarelog.vstuff.internal.utility.RopeUtils;
+import dev.flarelog.vstuff.content.ropes.util.RopeUtil;
 
 public class DeleteRopesCommand {
 
@@ -18,7 +17,7 @@ public class DeleteRopesCommand {
                 .executes(ctx -> {
                     ServerLevel level = ctx.getSource().getLevel();
 
-                    ReworkedPhysRopeManager manager = ReworkedPhysRopeManager.get(level);
+                    RopeManager manager = RopeManager.get(level);
 
                     int removed = 0;
 
@@ -39,16 +38,16 @@ public class DeleteRopesCommand {
                             int toRemove = IntegerArgumentType.getInteger(ctx, "id");
 
                             ServerLevel level = ctx.getSource().getLevel();
-                            ReworkedPhysRopeManager manager = ReworkedPhysRopeManager.get(level);
+                            RopeManager manager = RopeManager.get(level);
 
                             return r(ctx.getSource(), manager, toRemove);
                         })
                 ).executes(ctx -> {
                     ServerLevel level = ctx.getSource().getLevel();
                     Player player = ctx.getSource().getPlayerOrException();
-                    ReworkedPhysRopeManager manager = ReworkedPhysRopeManager.get(level);
+                    RopeManager manager = RopeManager.get(level);
 
-                    Integer toRemove = RopeUtils.findRopeId(level, player);
+                    Integer toRemove = RopeUtil.findRopeId(level, player);
 
                     if (toRemove == null) {
                         ctx.getSource().sendFailure(Component.literal("No rope found"));
@@ -59,7 +58,7 @@ public class DeleteRopesCommand {
                 });
     }
 
-    private static int r(CommandSourceStack sourceStack, ReworkedPhysRopeManager manager, int toRemove) {
+    private static int r(CommandSourceStack sourceStack, RopeManager manager, int toRemove) {
         if (!manager.hasRope(toRemove)) {
             sourceStack.sendFailure(Component.literal("Could not find rope with id " + toRemove + "."));
             return 0;

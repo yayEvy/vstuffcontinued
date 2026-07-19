@@ -7,7 +7,7 @@ import net.createmod.ponder.api.scene.SceneBuildingUtil;
 import net.createmod.ponder.api.scene.Selection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import dev.flarelog.vstuff.content.ships.reactionwheel.ReactionWheelBlock;
+import dev.flarelog.vstuff.content.physics.ships.reactionwheel.ReactionWheelBlock;
 
 public class ReactionWheelScenes {
 
