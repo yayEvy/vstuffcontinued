@@ -1,6 +1,9 @@
 package dev.flarelog.vstuff.content.ropes.util;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.flarelog.vstuff.content.physics.VSUtil;
+import dev.flarelog.vstuff.internal.utility.CodecUtil;
 import kotlin.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -13,6 +16,16 @@ import javax.annotation.Nullable;
 import static dev.flarelog.vstuff.content.ropes.util.RopeUtil.getLocalPos;
 
 public record RopePosData(@Nullable Long shipId, BlockPos blockPos, Vector3d localPos, boolean isWorld) {
+
+    public static final Codec<RopePosData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.LONG.fieldOf("shipId").forGetter(pos -> pos.shipId() == null ? -1L : pos.shipId()),
+            BlockPos.CODEC.fieldOf("blockPos").forGetter(RopePosData::blockPos),
+            CodecUtil.VECTOR3D.fieldOf("localPos").forGetter(RopePosData::localPos)
+    ).apply(instance, (shipId, blockPos, localPos) -> {
+        Long sid = shipId == -1L ? null : shipId;
+        return new RopePosData(sid, blockPos, localPos, sid == null);
+    }));
+
     public static RopePosData create(ServerLevel level, Long id, BlockPos pos) {
         if (VSUtil.getGroundBodyId(level).equals(id)) {
             VStuff.LOGGER.warn("RopePosData received actual id for ground body identifier instead of null (expected value), correcting");

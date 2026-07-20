@@ -5,6 +5,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -30,6 +32,15 @@ public record RopeStyle (
         SoundEvent placeSound,
         SoundEvent breakSound
 ) {
+
+    public static Tag keyToTag(ResourceKey<RopeStyle> style) {
+        return CodecUtil.encodeToTag(style, ResourceKey.codec(VStuffRegistries.ROPE_STYLE));
+    }
+
+    public static ResourceKey<RopeStyle> tagToKey(Tag tag) {
+        return CodecUtil.decodeFromTag(tag, ResourceKey.codec(VStuffRegistries.ROPE_STYLE));
+    }
+
     public IRopeRenderer createRenderer() {
         return renderer.get().create(rendererParams);
     }

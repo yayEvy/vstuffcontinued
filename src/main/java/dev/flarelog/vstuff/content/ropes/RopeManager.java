@@ -1,5 +1,6 @@
 package dev.flarelog.vstuff.content.ropes;
 
+import dev.flarelog.vstuff.internal.utility.CodecUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -37,7 +38,8 @@ public class RopeManager extends SavedData {
 
         ListTag ropeList = tag.getList("ropes", Tag.TAG_COMPOUND);
         for (Tag ropeTag : ropeList) {
-            Rope rope = RopeFactory.ropeFromTag((CompoundTag) ropeTag);
+
+            Rope rope = CodecUtil.decodeFromTag(ropeTag, Rope.CODEC);
 
             data.ropes.put(rope.ropeId, rope);
         }
@@ -50,7 +52,7 @@ public class RopeManager extends SavedData {
     public @NotNull CompoundTag save(@NotNull CompoundTag tag) {
         ListTag ropeList = new ListTag();
         for (Map.Entry<Integer, Rope> entry : ropes.entrySet()) {
-            ropeList.add(RopeFactory.ropeToTag(entry.getValue()));
+            ropeList.add(CodecUtil.encodeToTag(entry.getValue(), Rope.CODEC));
         }
         tag.put("ropes", ropeList);
         return tag;

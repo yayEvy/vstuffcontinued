@@ -1,5 +1,7 @@
 package dev.flarelog.vstuff.content.ropes.util;
 
+import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
+import dev.flarelog.vstuff.internal.utility.CodecUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -19,7 +21,7 @@ public interface ILikeRopes {
     default void resetTag(ItemStack stack) {
         ResourceKey<RopeStyle> lastStyle = null;
         if (stack.getTag().contains("style")) {
-            lastStyle = TagUtils.readResourceKey(stack.getTagElement("style"));
+            lastStyle = RopeStyle.tagToKey(stack.getTagElement("style"));
         }
 
         stack.setTag(null);
@@ -61,12 +63,12 @@ public interface ILikeRopes {
     }
 
     default void addStyleToTag(ItemStack stack, ResourceKey<RopeStyle> style) {
-        stack.getOrCreateTag().put("style", TagUtils.writeResourceKey(style));
+        stack.getOrCreateTag().put("style", RopeStyle.keyToTag(style));
     }
 
     default Component getNameWithStyle(Item item, ItemStack stack) {
         if (stack.getTagElement("style") == null) addStyleToTag(stack, RopeStyleManager.DEFAULT_KEY);
-        ResourceLocation location = TagUtils.readResourceKey(stack.getTagElement("style")).location();
+        ResourceLocation location = RopeStyle.tagToKey(stack.getTagElement("style")).location();
         return Component.translatable(item.getDescriptionId(stack))
                 .append(" (")
                 .append(Component.translatable("ropestyle." + location.getNamespace() + "." + location.getPath())) // this should always be the correct translation key

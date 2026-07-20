@@ -248,47 +248,4 @@ public class RopeFactory {
     public static void removeRope(Rope rope) {
 
     }
-
-    public static CompoundTag ropeToTag(Rope rope) {
-        CompoundTag ropeTag = new CompoundTag();
-
-        ropeTag.putInt("ropeId", rope.ropeId);
-        ropeTag.put("posData0", TagUtils.writePosData(rope.posData0));
-        ropeTag.put("posData1", TagUtils.writePosData(rope.posData1));
-        ropeTag.put("style", TagUtils.writeResourceKey(rope.styleKey));
-        ListTag segmentsTag = new ListTag();
-        for (RopeSegment segment : rope.segments) {
-            segmentsTag.add(TagUtils.writeRopeSegment(segment));
-        }
-
-        ropeTag.put("segments", segmentsTag);
-
-        ropeTag.putIntArray("jointIds", rope.jointIds);
-
-        return ropeTag;
-    }
-
-    public static Rope ropeFromTag(CompoundTag ropeTag) {
-        ListTag segmentsTag = ropeTag.getList("segments", Tag.TAG_COMPOUND);
-        List<RopeSegment> segments = new ArrayList<>();
-        for (Tag segmentTag : segmentsTag)
-            segments.add(TagUtils.readRopeSegment((CompoundTag) segmentTag));
-
-        Rope rope = new Rope(
-                TagUtils.readPosData(ropeTag.getCompound("posData0")),
-                TagUtils.readPosData(ropeTag.getCompound("posData1")),
-                TagUtils.readResourceKey(ropeTag.getCompound("style")),
-                segments
-        ).setRopeId(ropeTag.getInt("ropeId"));
-
-        LinkedList<Integer> jointIds = new LinkedList<>();
-        for (int jointId : ropeTag.getIntArray("jointIds")) {
-            jointIds.add(jointId);
-        }
-
-        rope.setJointIds(jointIds);
-
-        return rope;
-    }
-
 }

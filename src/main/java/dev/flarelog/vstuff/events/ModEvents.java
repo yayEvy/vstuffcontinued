@@ -1,5 +1,6 @@
 package dev.flarelog.vstuff.events;
 
+import dev.flarelog.vstuff.content.ropes.type.RopeType;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DataPackRegistryEvent;
@@ -14,6 +15,12 @@ public class ModEvents {
     @ApiStatus.Internal
     @SubscribeEvent
     public static void registerDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
+        event.dataPackRegistry(
+                VStuffRegistries.ROPE_TYPE,
+                RopeType.CODEC,
+                RopeType.CODEC
+        );
+
         event.dataPackRegistry(
                 VStuffRegistries.ROPE_STYLE,
                 RopeStyle.CODEC,

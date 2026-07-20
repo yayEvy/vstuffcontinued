@@ -1,7 +1,7 @@
 package dev.flarelog.vstuff.internal.utility;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
 import com.mojang.serialization.codecs.PrimitiveCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -13,7 +13,7 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import org.joml.Vector3d;
 import dev.flarelog.vstuff.VStuff;
 
-import java.util.Optional;
+import java.util.*;
 
 public class CodecUtil {
 
@@ -42,16 +42,72 @@ public class CodecUtil {
             Codec.DOUBLE.fieldOf("z").forGetter(Vector3d::z)
     ).apply(i, Vector3d::new));
 
-    public static <T> void encodeToTag(CompoundTag tag, String name, Codec<T> codec, T object) {
-        codec.encodeStart(NbtOps.INSTANCE, object)
-                .resultOrPartial(VStuff.LOGGER::error)
-                .ifPresent(encoded -> tag.put(name, encoded));
+    public static <T> Tag encodeToTag(T object, Codec<T> codec) {
+        return codec.encodeStart(NbtOps.INSTANCE, object)
+                .getOrThrow(false ,VStuff.LOGGER::error);
     }
 
-    public static <T> Optional<T> decodeFromTag(CompoundTag tag, String name, Codec<T> codec) {
-        Tag object = tag.get(name);
-        return codec.parse(NbtOps.INSTANCE, object)
-                .resultOrPartial(VStuff.LOGGER::error);
+    public static <T> T decodeFromTag(Tag tag, Codec<T> codec) {
+        return codec.parse(NbtOps.INSTANCE, tag)
+                .getOrThrow(false ,VStuff.LOGGER::error);
     }
 
+
+    /**
+     * Codec that works with almost anything :trollface:
+     **/
+    public static final Codec<Object> ANY_CODEC = new Codec<>() {
+        @Override
+        public <T> DataResult<Pair<Object, T>> decode(DynamicOps<T> ops, T input) {
+            return JSON_ELEMENT.decode(ops, input)
+                    .map(pair -> pair.mapFirst(CodecUtil::fromJson));
+        }
+
+        @Override
+        public <T> DataResult<T> encode(Object input, DynamicOps<T> ops, T prefix) {
+            return JSON_ELEMENT.encode(toJson(input), ops, prefix);
+        }
+    };
+
+    public static final Codec<Map<String, Object>> ANY_MAP_CODEC = Codec.unboundedMap(Codec.STRING, ANY_CODEC);
+
+
+    private static Object fromJson(JsonElement el) {
+        if (el == null || el.isJsonNull()) return null;
+        if (el.isJsonObject()) {
+            Map<String, Object> map = new LinkedHashMap<>();
+            for (Map.Entry<String, JsonElement> e : el.getAsJsonObject().entrySet()) {
+                map.put(e.getKey(), fromJson(e.getValue()));
+            }
+            return map;
+        }
+        if (el.isJsonArray()) {
+            List<Object> list = new ArrayList<>();
+            for (JsonElement e : el.getAsJsonArray()) list.add(fromJson(e));
+            return list;
+        }
+        JsonPrimitive prim = el.getAsJsonPrimitive();
+        if (prim.isBoolean()) return prim.getAsBoolean();
+        if (prim.isNumber()) return prim.getAsNumber();
+        return prim.getAsString();
+    }
+
+    private static JsonElement toJson(Object value) {
+        if (value == null) return JsonNull.INSTANCE;
+        if (value instanceof Map<?, ?> map) {
+            JsonObject obj = new JsonObject();
+            for (Map.Entry<?, ?> e : map.entrySet()) {
+                obj.add(String.valueOf(e.getKey()), toJson(e.getValue()));
+            }
+            return obj;
+        }
+        if (value instanceof Iterable<?> iterable) {
+            JsonArray arr = new JsonArray();
+            for (Object o : iterable) arr.add(toJson(o));
+            return arr;
+        }
+        if (value instanceof Boolean b) return new JsonPrimitive(b);
+        if (value instanceof Number n) return new JsonPrimitive(n);
+        return new JsonPrimitive(String.valueOf(value));
+    }
 }
