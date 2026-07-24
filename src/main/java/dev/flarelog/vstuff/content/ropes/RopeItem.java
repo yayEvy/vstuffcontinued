@@ -1,10 +1,14 @@
 package dev.flarelog.vstuff.content.ropes;
 
+import dev.flarelog.vstuff.content.ropes.type.RopeType;
+import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -105,5 +109,10 @@ public class RopeItem extends Item implements ILikeRopes {
     @Override
     public boolean isFoil(ItemStack stack) {
         return isItemFoil(stack);
+    }
+
+    @Override
+    public ResourceKey<RopeType> getType() {
+        return ResourceKey.create(VStuffRegistries.ROPE_TYPE, VStuff.asResource("normal"));
     }
 }

@@ -14,14 +14,14 @@ import static dev.flarelog.vstuff.content.ropes.RopeFactory.*;
 public class VStuffRopeTypes {
     public static void bootstrap(BootstapContext<RopeType> ctx) {
         register(ctx, "normal", new RopeType(
-                new DistanceJointParams.Builder()
+                DistanceJointParams.builder()
                         .maxForceTorque(new VSJointMaxForceTorque(JOINT_MAX_FORCE_TORQUE, JOINT_MAX_FORCE_TORQUE))
                         .minDistance(0f)
                         .tolerance(JOINT_TOLERANCE)
                         .stiffness(JOINT_STIFFNESS)
                         .damping(JOINT_DAMPING)
                         .build(),
-                new DistanceJointParams.Builder()
+                DistanceJointParams.builder()
                         .maxForceTorque(new VSJointMaxForceTorque(JOINT_MAX_FORCE_TORQUE, JOINT_MAX_FORCE_TORQUE))
                         .minDistance(0f)
                         .tolerance(JOINT_TOLERANCE)

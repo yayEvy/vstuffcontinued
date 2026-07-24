@@ -48,7 +48,7 @@ public record RopeType(Map<String, Object> endJoint, Map<String, Object> connect
         map.put("shipId1", shipId1);
         map.put("pose1", pose1);
         map.put("maxDistance", maxDistance); // for distance joint
-        map.put("restLength", maxDistance);  // for sping joint
+//        map.put("restLength", maxDistance);  // for sping joint
         return ValkyrienSkiesMod.getVsCore().getStringMapper().convertValue(map, VSJoint.class);
     }
 }

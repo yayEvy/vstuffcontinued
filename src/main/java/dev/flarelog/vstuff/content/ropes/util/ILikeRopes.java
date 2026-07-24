@@ -1,5 +1,6 @@
 package dev.flarelog.vstuff.content.ropes.util;
 
+import dev.flarelog.vstuff.content.ropes.type.RopeType;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
 import dev.flarelog.vstuff.internal.utility.CodecUtil;
 import net.minecraft.core.BlockPos;
@@ -78,4 +79,6 @@ public interface ILikeRopes {
     default boolean isItemFoil(ItemStack stack) {
         return stack.hasTag() && stack.getTag().contains("data");
     }
+
+    ResourceKey<RopeType> getType();
 }

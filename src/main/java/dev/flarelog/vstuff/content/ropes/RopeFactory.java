@@ -2,6 +2,9 @@
 package dev.flarelog.vstuff.content.ropes;
 
 import dev.flarelog.vstuff.content.physics.VSUtil;
+import dev.flarelog.vstuff.content.ropes.type.RopeType;
+import dev.flarelog.vstuff.content.ropes.util.ILikeRopes;
+import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
 import kotlin.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -103,11 +106,11 @@ public class RopeFactory {
         PhysRopeContext ctx = new PhysRopeContext(level, posData0, posData1, dimId);
 
         return PhysRopeResult.validResult(createNewRope(
-                ctx, RopeStyleManager.get(ropeItem.getOrCreateTag())
+                ctx, RopeStyleManager.get(ropeItem.getOrCreateTag()), ((ILikeRopes) ropeItem.getItem()).getType()
         ));
     }
 
-    public static Rope createNewRope(PhysRopeContext ctx, ResourceKey<RopeStyle> style) {
+    public static Rope createNewRope(PhysRopeContext ctx, ResourceKey<RopeStyle> style, ResourceKey<RopeType> type) {
         RopePosData posData0 = ctx.posData0;
         RopePosData posData1 = ctx.posData1;
         ServerLevel level = ctx.level;
@@ -129,9 +132,9 @@ public class RopeFactory {
         double spacing = totalDistance / segmentCount;
 
         List<RopeSegment> segments = createSegmentBodies(ctx, segmentCount, spawnStart, spawnEnd);
-        List<VSDistanceJoint> joints = makeJoints(segments, spacing);
+        List<VSJoint> joints = makeJoints(segments, spacing, type, level);
 
-        Rope physRope = new Rope(ctx.posData0, ctx.posData1, style, segments);
+        Rope physRope = new Rope(ctx.posData0, ctx.posData1, type, style, segments);
 
         createJoints(ctx.level, physRope, joints);
 
@@ -193,19 +196,38 @@ public class RopeFactory {
         );
     }
 
-    private static List<VSDistanceJoint> makeJoints(List<RopeSegment> segments, double spacing) {
-        List<VSDistanceJoint> joints = new ArrayList<>();
+    private static List<VSJoint> makeJoints(List<RopeSegment> segments, double spacing, ResourceKey<RopeType> typeKey, ServerLevel level) {
+        List<VSJoint> joints = new ArrayList<>();
         float maxLength = (float) (spacing * (1 + SAG_FACTOR));
 
+        RopeType type = level.registryAccess().registryOrThrow(VStuffRegistries.ROPE_TYPE).get(typeKey);
+        RopeSegment first = segments.remove(0);
+        RopeSegment last = segments.remove(segments.size() - 1);
+
+        if (type == null) {
+            throw new RuntimeException("WTF NULL ROPE TYPE??!!??? MEOW!! MEOW!! MEOW!!");
+        }
+        VSJoint firstJoint = type.getEndJointWith(first.id0(),
+                new VSJointPose(first.pos0(), new Quaterniond()),
+                first.id1(),
+                new VSJointPose(first.pos1(), new Quaterniond()),
+                maxLength).serialized();
+
+        joints.add(firstJoint);
+
+        VSJoint lastJoint = type.getEndJointWith(last.id0(),
+                new VSJointPose(last.pos0(), new Quaterniond()),
+                last.id1(),
+                new VSJointPose(last.pos1(), new Quaterniond()),
+                maxLength).serialized();
+
+        joints.add(lastJoint);
+
         for (RopeSegment segment : segments) {
-            VSDistanceJoint joint = new VSDistanceJoint(
+            VSJoint joint = type.getConnectingPhysBodyJointWith(
                     segment.id0(), new VSJointPose(segment.pos0(), new Quaterniond()),
                     segment.id1(), new VSJointPose(segment.pos1(), new Quaterniond()),
-                    new VSJointMaxForceTorque(JOINT_MAX_FORCE_TORQUE, JOINT_MAX_FORCE_TORQUE),
-                    VSJoint.DEFAULT_COMPLIANCE,
-                    0f,
-                    maxLength,
-                    JOINT_TOLERANCE, JOINT_STIFFNESS, JOINT_DAMPING
+                    maxLength
             );
             joint.setShouldBeSerialized(true);
 
@@ -215,14 +237,14 @@ public class RopeFactory {
         return joints;
     }
 
-    private static void createJoints(ServerLevel level, Rope rope, List<VSDistanceJoint> joints) {
+    private static void createJoints(ServerLevel level, Rope rope, List<VSJoint> joints) {
         rope.jointIds = new ArrayList<>();
         GameToPhysicsAdapter gtpa = getGTPA(level);
 
         AtomicInteger remaining = new AtomicInteger(joints.size());
         AtomicBoolean failed = new AtomicBoolean();
 
-        for (VSDistanceJoint joint : joints) {
+        for (VSJoint joint : joints) {
             gtpa.addJoint(joint, 5, id -> { // consumer lambda of doom and despair
                 if (id == -1) {
                     LOGGER.warn("Invalid joint id received when creating phys rope!");
