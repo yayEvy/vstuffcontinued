@@ -43,13 +43,13 @@ public class CodecUtil {
     ).apply(i, Vector3d::new));
 
     public static <T> Tag encodeToTag(T object, Codec<T> codec) {
-        return codec.encodeStart(NbtOps.INSTANCE, object)
-                .getOrThrow(false ,VStuff.LOGGER::error);
+        return object != null ? codec.encodeStart(NbtOps.INSTANCE, object)
+                .getOrThrow(false ,VStuff.LOGGER::error) : null;
     }
 
     public static <T> T decodeFromTag(Tag tag, Codec<T> codec) {
-        return codec.parse(NbtOps.INSTANCE, tag)
-                .getOrThrow(false ,VStuff.LOGGER::error);
+        return tag != null ? codec.parse(NbtOps.INSTANCE, tag)
+                .getOrThrow(false ,VStuff.LOGGER::error) : null;
     }
 
 

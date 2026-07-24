@@ -38,7 +38,7 @@ public record RopeStyle (
     }
 
     public static ResourceKey<RopeStyle> tagToKey(Tag tag) {
-        return CodecUtil.decodeFromTag(tag, ResourceKey.codec(VStuffRegistries.ROPE_STYLE));
+        return tag != null ? CodecUtil.decodeFromTag(tag, ResourceKey.codec(VStuffRegistries.ROPE_STYLE)) : RopeStyleManager.DEFAULT_KEY;
     }
 
     public IRopeRenderer createRenderer() {
