@@ -23,11 +23,12 @@ public class Rope {
             Codec.INT.fieldOf("ropeId").forGetter(rope -> rope.ropeId),
             RopePosData.CODEC.fieldOf("posData0").forGetter(rope -> rope.posData0),
             RopePosData.CODEC.fieldOf("posData1").forGetter(rope -> rope.posData1),
+            ResourceKey.codec(VStuffRegistries.ROPE_TYPE).fieldOf("type").forGetter(rope -> rope.typeKey),
             ResourceKey.codec(VStuffRegistries.ROPE_STYLE).fieldOf("style").forGetter(rope -> rope.styleKey),
             RopeSegment.CODEC.listOf().fieldOf("segments").forGetter(rope -> rope.segments),
             Codec.INT.listOf().fieldOf("jointIds").forGetter(rope -> new ArrayList<>(rope.getJointIds()))
-    ).apply(instance, (ropeId, posData0, posData1, styleKey, segments, jointIds) -> {
-        Rope rope = new Rope(posData0, posData1, styleKey, segments).setRopeId(ropeId);
+    ).apply(instance, (ropeId, posData0, posData1, typeKey, styleKey, segments, jointIds) -> {
+        Rope rope = new Rope(posData0, posData1, typeKey, styleKey, segments).setRopeId(ropeId);
         rope.setJointIds(new LinkedList<>(jointIds));
         return rope;
     }));

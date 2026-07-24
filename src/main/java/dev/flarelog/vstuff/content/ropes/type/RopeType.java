@@ -33,20 +33,22 @@ public record RopeType(Map<String, Object> endJoint, Map<String, Object> connect
             Codec.BOOL.fieldOf("doTheVodiesCollideWithEachOther").forGetter(RopeType::doTheVodiesCollideWithEachOther)
     ).apply(instance, RopeType::new));
 
-    public VSJoint getEndJointWith(long shipId0, VSJointPose pose0, long shipId1, VSJointPose pose1){
-        return getWith(endJoint, shipId0, pose0, shipId1, pose1);
+    public VSJoint getEndJointWith(long shipId0, VSJointPose pose0, long shipId1, VSJointPose pose1, Float maxDistance){
+        return getWith(endJoint, shipId0, pose0, shipId1, pose1, maxDistance);
     }
 
-    public VSJoint getConnectingPhysBodyJointWith(long shipId0, VSJointPose pose0, long shipId1, VSJointPose pose1){
-        return getWith(connectingPhysBodyJoint, shipId0, pose0, shipId1, pose1);
+    public VSJoint getConnectingPhysBodyJointWith(long shipId0, VSJointPose pose0, long shipId1, VSJointPose pose1, Float maxDistance){
+        return getWith(connectingPhysBodyJoint, shipId0, pose0, shipId1, pose1, maxDistance);
     }
 
-    private VSJoint getWith(Map<String, Object> value, long shipId0, VSJointPose pose0, long shipId1, VSJointPose pose1){
+    private VSJoint getWith(Map<String, Object> value, long shipId0, VSJointPose pose0, long shipId1, VSJointPose pose1, Float maxDistance){
         Map<String, Object> map = new HashMap<>(value);
         map.put("shipId0", shipId0);
         map.put("pose0", pose0);
         map.put("shipId1", shipId1);
         map.put("pose1", pose1);
+        map.put("maxDistance", maxDistance); // for distance joint
+        map.put("restLength", maxDistance);  // for sping joint
         return ValkyrienSkiesMod.getVsCore().getStringMapper().convertValue(map, VSJoint.class);
     }
 }

@@ -39,7 +39,7 @@ public record RopeSegment(@Nullable Long id0, @Nullable Long id1, Vector3d pos0,
             idFrom -> idFrom == null ? -1L : idFrom
     );
 
-    private static final Codec<RopeSegment> CODEC = RecordCodecBuilder.create(i -> i.group( // codec of doom and despair part 2
+    public static final Codec<RopeSegment> CODEC = RecordCodecBuilder.create(i -> i.group( // codec of doom and despair part 2
             ID.fieldOf("id0").forGetter(RopeSegment::id0),
             ID.fieldOf("id1").forGetter(RopeSegment::id1),
             CodecUtil.VECTOR3D.fieldOf("pos0").forGetter(RopeSegment::pos0),
