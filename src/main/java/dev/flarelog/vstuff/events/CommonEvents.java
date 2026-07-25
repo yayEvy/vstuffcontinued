@@ -1,7 +1,6 @@
 package dev.flarelog.vstuff.events;
 
-import dev.flarelog.vstuff.content.physics.VSUtil;
-import dev.flarelog.vstuff.content.physics.ships.nail.NailItem;
+import dev.flarelog.vstuff.content.physics.ships.nails.NailItem;
 import dev.flarelog.vstuff.internal.utility.FixedConstraintUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
@@ -10,7 +9,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -20,9 +18,6 @@ import dev.flarelog.vstuff.infrastructure.commands.VStuffCommands;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 import dev.flarelog.vstuff.content.ropes.util.RopeUtil;
 import org.valkyrienskies.core.api.ships.ServerShip;
-import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.mod.api.ValkyrienSkies;
-import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import org.valkyrienskies.mod.common.assembly.ShipAssembler;
 
 import java.util.HashMap;
@@ -108,15 +103,10 @@ public class CommonEvents {
 
         if (blockToBeNailedTo != null) {
             if (level instanceof ServerLevel serverLevel) {
-                System.out.println("ASSEMBLING " + blockToBePhysd);
-
-                System.out.println(ValkyrienSkies.getShipById(level,VSUtil.getLoadedShipIdAtPos(level, blockToBeNailedTo)).getTransform().getRotation());
 
                 ServerShip ship = ShipAssembler.assembleToShip(serverLevel, Set.of(blockToBePhysd), 1);
                 FixedConstraintUtils.createFixedConstraint(serverLevel, blockToBeNailedTo, ship, NailItem.coolDirection);
-
-
-            } else System.out.println("Level: " + level + " isnt serverlevel");
+            }
 
         }
     }
