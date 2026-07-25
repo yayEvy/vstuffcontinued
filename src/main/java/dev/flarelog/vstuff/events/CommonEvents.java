@@ -1,5 +1,6 @@
 package dev.flarelog.vstuff.events;
 
+import dev.flarelog.vstuff.content.physics.VSUtil;
 import dev.flarelog.vstuff.content.physics.ships.nail.NailItem;
 import dev.flarelog.vstuff.internal.utility.FixedConstraintUtils;
 import net.minecraft.core.BlockPos;
@@ -109,8 +110,9 @@ public class CommonEvents {
             if (level instanceof ServerLevel serverLevel) {
                 System.out.println("ASSEMBLING " + blockToBePhysd);
 
+                System.out.println(ValkyrienSkies.getShipById(level,VSUtil.getLoadedShipIdAtPos(level, blockToBeNailedTo)).getTransform().getRotation());
+
                 ServerShip ship = ShipAssembler.assembleToShip(serverLevel, Set.of(blockToBePhysd), 1);
-                //Thread.sleep(11);
                 FixedConstraintUtils.createFixedConstraint(serverLevel, blockToBeNailedTo, ship, NailItem.coolDirection);
 
 
