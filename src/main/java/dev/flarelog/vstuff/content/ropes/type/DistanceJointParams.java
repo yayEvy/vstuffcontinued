@@ -18,4 +18,5 @@ public class DistanceJointParams {
     private final Float tolerance;
     private final Float stiffness;
     private final Float damping;
+    private final String type = "distance";
 }

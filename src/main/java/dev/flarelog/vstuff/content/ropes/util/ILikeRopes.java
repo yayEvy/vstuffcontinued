@@ -1,8 +1,5 @@
 package dev.flarelog.vstuff.content.ropes.util;
 
-import dev.flarelog.vstuff.content.ropes.type.RopeType;
-import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
-import dev.flarelog.vstuff.internal.utility.CodecUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -16,7 +13,6 @@ import org.joml.Vector3d;
 import dev.flarelog.vstuff.index.VStuffItems;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyleManager;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
-import dev.flarelog.vstuff.internal.utility.TagUtils;
 
 public interface ILikeRopes {
     default void resetTag(ItemStack stack) {
@@ -80,5 +76,4 @@ public interface ILikeRopes {
         return stack.hasTag() && stack.getTag().contains("data");
     }
 
-    ResourceKey<RopeType> getType();
 }

@@ -1,7 +1,5 @@
 package dev.flarelog.vstuff.content.ropes;
 
-import dev.flarelog.vstuff.content.ropes.type.RopeType;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -57,8 +55,4 @@ public class RopeCutterItem extends Item implements ILikeRopes {
         return InteractionResultHolder.pass(itemStack);
     }
 
-    @Override
-    public ResourceKey<RopeType> getType() {
-        return null;
-    }
 }

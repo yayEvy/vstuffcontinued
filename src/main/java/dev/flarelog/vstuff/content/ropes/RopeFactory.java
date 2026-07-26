@@ -86,7 +86,7 @@ public class RopeFactory {
 
     public record PhysRopeContext(ServerLevel level, RopePosData posData0, RopePosData posData1, String dimId) {}
 
-    public static PhysRopeResult tryCreateNewRope(ServerLevel level, ItemStack ropeItem, BlockPos blockPos0, BlockPos blockPos1, Entity entity) {
+    public static PhysRopeResult tryCreateNewRope(ServerLevel level, ItemStack ropeItem, BlockPos blockPos0, BlockPos blockPos1, ResourceKey<RopeType> ropeType, ResourceKey<RopeStyle> ropeStyle, Entity entity) {
         String dimId = ropeItem.getOrCreateTagElement("data").getString("dim");
 
         Long ship0 = VSUtil.getLoadedShipIdAtPos(level, blockPos0);
@@ -106,7 +106,7 @@ public class RopeFactory {
         PhysRopeContext ctx = new PhysRopeContext(level, posData0, posData1, dimId);
 
         return PhysRopeResult.validResult(createNewRope(
-                ctx, RopeStyleManager.get(ropeItem.getOrCreateTag()), ((ILikeRopes) ropeItem.getItem()).getType()
+                ctx, ropeStyle, ropeType
         ));
     }
 

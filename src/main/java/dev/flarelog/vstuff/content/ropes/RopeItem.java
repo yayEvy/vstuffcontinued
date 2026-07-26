@@ -1,6 +1,6 @@
 package dev.flarelog.vstuff.content.ropes;
 
-import dev.flarelog.vstuff.content.ropes.type.RopeType;
+import dev.flarelog.vstuff.content.ropes.style.RopeStyleManager;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -8,7 +8,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -78,7 +77,7 @@ public class RopeItem extends Item implements ILikeRopes {
             return InteractionResult.SUCCESS;
         }
 
-        RopeFactory.PhysRopeResult ropeResult = RopeFactory.tryCreateNewRope(serverLevel, heldItem, firstClickedPos, clickedPos, player);
+        RopeFactory.PhysRopeResult ropeResult = RopeFactory.tryCreateNewRope(serverLevel, heldItem, firstClickedPos, clickedPos, ResourceKey.create(VStuffRegistries.ROPE_TYPE, VStuff.asResource("normal")), RopeStyleManager.get(heldItem.getOrCreateTag()), player);
 
 
         if (ropeResult.valid) {
@@ -111,8 +110,4 @@ public class RopeItem extends Item implements ILikeRopes {
         return isItemFoil(stack);
     }
 
-    @Override
-    public ResourceKey<RopeType> getType() {
-        return ResourceKey.create(VStuffRegistries.ROPE_TYPE, VStuff.asResource("normal"));
-    }
 }
