@@ -199,8 +199,12 @@ public class RopeFactory {
     private static List<VSJoint> makeJoints(List<RopeSegment> segments, double spacing, ResourceKey<RopeType> typeKey, ServerLevel level) {
         List<VSJoint> joints = new ArrayList<>();
         float maxLength = (float) (spacing * (1 + SAG_FACTOR));
-
-        RopeType type = level.registryAccess().registryOrThrow(VStuffRegistries.ROPE_TYPE).get(typeKey);
+        RopeType type = null;
+        if (typeKey.location().getNamespace().equals("vstuff") && typeKey.location().getPath().equals("debug")) {
+            
+        } else {
+            type = level.registryAccess().registryOrThrow(VStuffRegistries.ROPE_TYPE).get(typeKey);
+        }
         RopeSegment first = segments.remove(0);
         RopeSegment last = segments.remove(segments.size() - 1);
 
