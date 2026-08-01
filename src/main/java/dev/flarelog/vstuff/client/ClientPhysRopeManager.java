@@ -2,6 +2,8 @@ package dev.flarelog.vstuff.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
+import dev.flarelog.vstuff.content.ropes.type.RopeType;
+import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -28,20 +30,17 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ClientPhysRopeManager {
+    @Getter
     private static final Map<Integer, ClientPhysRope> clientConstraints = new ConcurrentHashMap<>();
     private static final Map<Integer, Pair<Vector3d,Vector3d>> prevStartEndRelativeVectors = new ConcurrentHashMap<>();
 
-    public static void addClientConstraint(Integer id, Vector3d pos0, Vector3d pos1, List<RopeSegment> segments, ResourceKey<RopeStyle> style) {
-        clientConstraints.put(id, new ClientPhysRope(id, pos0, pos1, segments, style));
+    public static void addClientConstraint(Integer id, Vector3d pos0, Vector3d pos1, List<RopeSegment> segments, ResourceKey<RopeStyle> style, RopeType type) {
+        clientConstraints.put(id, new ClientPhysRope(id, pos0, pos1, segments, style, type));
     }
 
     public static void removeClientConstraint(Integer constraintId) {
         if (constraintId == null) return;
         clientConstraints.remove(constraintId);
-    }
-
-    public static Map<Integer, ClientPhysRope> getClientConstraints() {
-        return clientConstraints;
     }
 
     public static void clearAllClientConstraints() {

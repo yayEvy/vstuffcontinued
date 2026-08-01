@@ -4,11 +4,11 @@ import com.mojang.datafixers.util.Pair;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 import dev.flarelog.vstuff.content.ropes.type.RopeType;
 import dev.flarelog.vstuff.content.ropes.util.LocalPosAndBodyId;
-import dev.flarelog.vstuff.content.ropes.util.RopePosData;
 import dev.flarelog.vstuff.content.ropes.util.RopeSegment;
 import dev.flarelog.vstuff.infrastructure.config.VStuffConfigs;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import org.apache.logging.log4j.LogManager;
@@ -56,7 +56,15 @@ public class NewRopeFactory {
 
     public static final Logger LOGGER = LogManager.getLogger("VStuffRopeFactory");
 
-    public static RopeResult createRope(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1, RopeType type, RopeStyle style) {
+    public static RopeResult tryCreateRope(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1, ResourceKey<RopeType> type, ResourceKey<RopeStyle> style) {
+        return tryCreateRope(
+                level, data0, data1,
+                level.registryAccess().registryOrThrow(VStuffRegistries.ROPE_TYPE).get(type),
+                style
+        );
+    }
+
+    public static RopeResult tryCreateRope(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1, RopeType type, ResourceKey<RopeStyle> style) {
         float length = (float) data0.getWorldPos(level).distance(data1.getWorldPos(level)) + 0.5f;
 
         if (length > VStuffConfigs.server().ropeMaxLength.get())
@@ -64,16 +72,19 @@ public class NewRopeFactory {
 
         RopeContext ctx = new RopeContext(level, data0, data1);
 
-        return RopeResult.validResult(createNewRope(
+        return RopeResult.validResult(createRope(
                 ctx, style, type
         ));
     }
 
-    public static Rope createNewRope(RopeContext ctx, RopeStyle style, RopeType type) {
+    public static Rope createRope(RopeContext ctx, ResourceKey<RopeStyle> styleKey, RopeType type) {
         LocalPosAndBodyId first = ctx.data0();
         LocalPosAndBodyId second = ctx.data1();
 
         ServerLevel level = ctx.level();
+
+        Registry<RopeType> typeRegistry = level.registryAccess().registryOrThrow(VStuffRegistries.ROPE_TYPE);
+        Registry<RopeStyle> styleRegistry = level.registryAccess().registryOrThrow(VStuffRegistries.ROPE_STYLE);
 
         Vector3d worldStart = first.getWorldPos(level);
         Vector3d worldEnd = second.getWorldPos(level);
@@ -92,9 +103,9 @@ public class NewRopeFactory {
         double spacing = totalDistance / segmentCount;
 
         List<RopeSegment> segments = createSegmentBodies(ctx, segmentCount, spawnStart, spawnEnd);
-        List<VSJoint> joints = makeJoints(segments, spacing, type, level);
+        List<VSJoint> joints = makeJoints(segments, spacing, type);
 
-        Rope physRope = new Rope(ctx.data0(), ctx.data1(), type, style, segments);
+        Rope physRope = new Rope(ctx.data0(), ctx.data1(), type, styleKey, segments);
 
         createJoints(ctx.level, physRope, joints);
 
@@ -103,12 +114,12 @@ public class NewRopeFactory {
         return physRope;
     }
 
-    public static List<RopeSegment> createSegmentBodies(RopeFactory.PhysRopeContext ctx, int segmentCount, Vector3d spawnStart, Vector3d spawnEnd) {
+    public static List<RopeSegment> createSegmentBodies(RopeContext ctx, int segmentCount, Vector3d spawnStart, Vector3d spawnEnd) {
         List<RopeSegment> segments = new ArrayList<>();
         Vector3d step = new Vector3d(spawnEnd).sub(spawnStart).div(segmentCount);
 
-        Long lastId = ctx.posData0.shipId();
-        Vector3d lastPos = ctx.posData0.localPos();
+        Long lastId = ctx.data0.id();
+        Vector3d lastPos = ctx.data0.pos();
 
         for (int i = 0; i < segmentCount - 1; i++) {
             Vector3d bodyPos = new Vector3d(spawnStart).add(new Vector3d(step).mul(i + 1));
@@ -124,7 +135,7 @@ public class NewRopeFactory {
             }
         }
 
-        segments.add(new RopeSegment(lastId, ctx.posData1.shipId(), lastPos, ctx.posData1.localPos()));
+        segments.add(new RopeSegment(lastId, ctx.data1.id(), lastPos, ctx.data1.pos()));
 
         return segments;
     }
@@ -219,6 +230,16 @@ public class NewRopeFactory {
                 }
             });
         }
+    }
+
+    // todo implement
+    private static void discardRope(Rope rope) {
+
+    }
+
+    // todo implement
+    public static void removeRope(Rope rope) {
+
     }
 
 

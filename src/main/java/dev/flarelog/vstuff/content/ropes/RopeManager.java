@@ -39,7 +39,7 @@ public class RopeManager extends SavedData {
         ListTag ropeList = tag.getList("ropes", Tag.TAG_COMPOUND);
         for (Tag ropeTag : ropeList) {
 
-            Rope rope = CodecUtil.decodeFromTag(ropeTag, Rope.CODEC);
+            Rope rope = CodecUtil.decodeFromTag(ropeTag, Rope.FULL_CODEC);
 
             data.ropes.put(rope.ropeId, rope);
         }
@@ -52,7 +52,7 @@ public class RopeManager extends SavedData {
     public @NotNull CompoundTag save(@NotNull CompoundTag tag) {
         ListTag ropeList = new ListTag();
         for (Map.Entry<Integer, Rope> entry : ropes.entrySet()) {
-            ropeList.add(CodecUtil.encodeToTag(entry.getValue(), Rope.CODEC));
+            ropeList.add(CodecUtil.encodeToTag(entry.getValue(), Rope.FULL_CODEC));
         }
         tag.put("ropes", ropeList);
         return tag;

@@ -11,6 +11,7 @@ import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.content.ropes.util.ILikeRopes;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 import dev.flarelog.vstuff.content.ropes.util.RopeUtil;
+import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 public class RopeCutterItem extends Item implements ILikeRopes {
     public RopeCutterItem(Properties pProperties) {
@@ -36,8 +37,8 @@ public class RopeCutterItem extends Item implements ILikeRopes {
 
                 RopeStyle style = physRope.getStyle(serverLevel.registryAccess());
 
-                RopeUtil.playSound(serverLevel, physRope.posData0.blockPos(), style.breakSound());
-                RopeUtil.playSound(serverLevel, physRope.posData1.blockPos(), style.breakSound());
+                RopeUtil.playSound(serverLevel, VectorConversionsMCKt.toBlockPos(physRope.posData0.getWorldPos(serverLevel).get()), style.breakSound());
+                RopeUtil.playSound(serverLevel, physRope.posData1, style.breakSound());
 
                 if (!player.isCreative()) {
                     itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));

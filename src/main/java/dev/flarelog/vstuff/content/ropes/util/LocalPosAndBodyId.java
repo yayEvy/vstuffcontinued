@@ -1,6 +1,9 @@
 package dev.flarelog.vstuff.content.ropes.util;
 
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import dev.flarelog.vstuff.internal.utility.CodecUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
@@ -12,11 +15,25 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 public record LocalPosAndBodyId(@NotNull Vector3d pos, @Nullable Long id) {
 
+    public static final Codec<LocalPosAndBodyId> CODEC = RecordCodecBuilder.create(instance ->
+            instance.group(
+                    CodecUtil.VECTOR3D.fieldOf("pos").forGetter(LocalPosAndBodyId::pos),
+                    Codec.LONG.optionalFieldOf("id")
+                            .xmap(opt -> opt.orElse(null), Optional::ofNullable)
+                            .forGetter(LocalPosAndBodyId::id)
+            ).apply(instance, LocalPosAndBodyId::new)
+    );
+
     public LocalPosAndBodyId(@NotNull Vector3d pos, ServerLevel level) {
         this(pos, getId(pos, level));
+    }
+
+    public static LocalPosAndBodyId from(BlockPos pos, ServerLevel level) {
+        return new LocalPosAndBodyId(VectorConversionsMCKt.toJOMLD(pos), level);
     }
 
     public static Pair<LocalPosAndBodyId, LocalPosAndBodyId> create(ServerLevel level, BlockPos pos0, BlockPos pos1) {
