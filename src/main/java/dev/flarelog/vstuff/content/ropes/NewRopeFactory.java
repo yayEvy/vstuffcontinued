@@ -1,21 +1,19 @@
-
 package dev.flarelog.vstuff.content.ropes;
 
-import dev.flarelog.vstuff.content.physics.VSUtil;
+import com.mojang.datafixers.util.Pair;
+import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 import dev.flarelog.vstuff.content.ropes.type.RopeType;
-import dev.flarelog.vstuff.content.ropes.util.ILikeRopes;
+import dev.flarelog.vstuff.content.ropes.util.LocalPosAndBodyId;
+import dev.flarelog.vstuff.content.ropes.util.RopePosData;
+import dev.flarelog.vstuff.content.ropes.util.RopeSegment;
+import dev.flarelog.vstuff.infrastructure.config.VStuffConfigs;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
-import kotlin.Pair;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.item.ItemStack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3d;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
@@ -24,32 +22,26 @@ import org.valkyrienskies.core.api.bodies.VsBodyCreateData;
 import org.valkyrienskies.core.api.bodies.VsBodyDefaults;
 import org.valkyrienskies.core.api.bodies.shape.BodyShapeData;
 import org.valkyrienskies.core.api.bodies.shape.SphereBodyShapeData;
+import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.impl.bodies.properties.BodyKinematicsImpl;
 import org.valkyrienskies.core.impl.bodies.properties.BodyTransformImpl;
 import org.valkyrienskies.core.impl.game.bodies.BodyInertiaDataImpl;
-import org.valkyrienskies.core.internal.joints.VSDistanceJoint;
 import org.valkyrienskies.core.internal.joints.VSJoint;
-import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
 import org.valkyrienskies.core.internal.joints.VSJointPose;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
-import dev.flarelog.vstuff.infrastructure.config.VStuffConfigs;
-import dev.flarelog.vstuff.content.ropes.style.RopeStyleManager;
-import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
-import dev.flarelog.vstuff.content.ropes.util.RopeUtil;
-import dev.flarelog.vstuff.internal.utility.TagUtils;
-import dev.flarelog.vstuff.content.ropes.util.RopePosData;
-import dev.flarelog.vstuff.content.ropes.util.RopeSegment;
+import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static dev.flarelog.vstuff.content.physics.VSUtil.getGTPA;
 
-public class RopeFactory {
+public class NewRopeFactory {
 
     public static float SEGMENT_LENGTH = 0.8f;
     public static double SEGMENT_RADIUS = 0.125;
@@ -62,61 +54,29 @@ public class RopeFactory {
     private static final float ANCHOR_OFFSET = 0.1f;
     public static double SAG_FACTOR = 0.08; // higher = more sag
 
-    public static final Logger LOGGER = LogManager.getLogger("PhysRopeFactory");
+    public static final Logger LOGGER = LogManager.getLogger("VStuffRopeFactory");
 
-    public static class PhysRopeResult {
-        public final Rope rope;
-        public final boolean valid;
-        public final String message;
+    public static RopeResult createRope(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1, RopeType type, RopeStyle style) {
+        float length = (float) data0.getWorldPos(level).distance(data1.getWorldPos(level)) + 0.5f;
 
-        protected PhysRopeResult(Rope rope, boolean valid, String message) {
-            this.rope = rope;
-            this.valid = valid;
-            this.message = message;
-        }
-
-        public static PhysRopeResult withMessage(String message) {
-            return new PhysRopeResult(null, false, message);
-        }
-
-        public static PhysRopeResult validResult(Rope rope) {
-            return new PhysRopeResult(rope, true, null);
-        }
-    }
-
-    public record PhysRopeContext(ServerLevel level, RopePosData posData0, RopePosData posData1, String dimId) {}
-
-    public static PhysRopeResult tryCreateNewRope(ServerLevel level, ItemStack ropeItem, BlockPos blockPos0, BlockPos blockPos1, ResourceKey<RopeType> ropeType, ResourceKey<RopeStyle> ropeStyle, Entity entity) {
-        String dimId = ropeItem.getOrCreateTagElement("data").getString("dim");
-
-        Long ship0 = VSUtil.getLoadedShipIdAtPos(level, blockPos0);
-        Long ship1 = VSUtil.getLoadedShipIdAtPos(level, blockPos1);
-
-        float length = (float) RopeUtil.getWorldPos(level, blockPos0, ship0).distance(RopeUtil.getWorldPos(level, blockPos1, ship1)) + 0.5f;
-
-        if (!dimId.equals(level.dimension().location().toString()))
-            return PhysRopeResult.withMessage("message.rope.interdimensional_fail");
         if (length > VStuffConfigs.server().ropeMaxLength.get())
-            return PhysRopeResult.withMessage("message.rope.too_long");
+            return RopeResult.withMessage("message.rope.too_long");
 
-        Pair<RopePosData, RopePosData> posDataPair = RopePosData.create(level, ship0, ship1, blockPos0, blockPos1);
-        RopePosData posData0 = posDataPair.component1();
-        RopePosData posData1 = posDataPair.component2();
+        RopeContext ctx = new RopeContext(level, data0, data1);
 
-        PhysRopeContext ctx = new PhysRopeContext(level, posData0, posData1, dimId);
-
-        return PhysRopeResult.validResult(createNewRope(
-                ctx, ropeStyle, ropeType
+        return RopeResult.validResult(createNewRope(
+                ctx, style, type
         ));
     }
 
-    public static Rope createNewRope(PhysRopeContext ctx, ResourceKey<RopeStyle> style, ResourceKey<RopeType> type) {
-        RopePosData posData0 = ctx.posData0;
-        RopePosData posData1 = ctx.posData1;
-        ServerLevel level = ctx.level;
+    public static Rope createNewRope(RopeContext ctx, RopeStyle style, RopeType type) {
+        LocalPosAndBodyId first = ctx.data0();
+        LocalPosAndBodyId second = ctx.data1();
 
-        Vector3d worldStart = posData0.getWorldPos(level);
-        Vector3d worldEnd = posData1.getWorldPos(level);
+        ServerLevel level = ctx.level();
+
+        Vector3d worldStart = first.getWorldPos(level);
+        Vector3d worldEnd = second.getWorldPos(level);
 
         if (worldStart.distance(worldEnd) < 0.01) {
             LOGGER.warn("Attachment points are too close, stopping phys rope creation.");
@@ -134,7 +94,7 @@ public class RopeFactory {
         List<RopeSegment> segments = createSegmentBodies(ctx, segmentCount, spawnStart, spawnEnd);
         List<VSJoint> joints = makeJoints(segments, spacing, type, level);
 
-        Rope physRope = new Rope(ctx.posData0, ctx.posData1, type, style, segments);
+        Rope physRope = new Rope(ctx.data0(), ctx.data1(), type, style, segments);
 
         createJoints(ctx.level, physRope, joints);
 
@@ -143,7 +103,7 @@ public class RopeFactory {
         return physRope;
     }
 
-    private static List<RopeSegment> createSegmentBodies(PhysRopeContext ctx, int segmentCount, Vector3d spawnStart, Vector3d spawnEnd) {
+    public static List<RopeSegment> createSegmentBodies(RopeFactory.PhysRopeContext ctx, int segmentCount, Vector3d spawnStart, Vector3d spawnEnd) {
         List<RopeSegment> segments = new ArrayList<>();
         Vector3d step = new Vector3d(spawnEnd).sub(spawnStart).div(segmentCount);
 
@@ -184,8 +144,8 @@ public class RopeFactory {
         BodyShapeData shapeData = new SphereBodyShapeData(SEGMENT_RADIUS);
 
         return new VsBodyCreateData(
-            VSGameUtilsKt.getDimensionId(level),
-            new BodyInertiaDataImpl(shapeData.getAabb().center(new Vector3d()), SEGMENT_MASS, new Matrix3d()),
+                VSGameUtilsKt.getDimensionId(level),
+                new BodyInertiaDataImpl(shapeData.getAabb().center(new Vector3d()), SEGMENT_MASS, new Matrix3d()),
                 new BodyKinematicsImpl(new Vector3d(), new Vector3d(), new BodyTransformImpl(new Vector3d(pos), new Quaterniond(), new Vector3d(1), new Vector3d())),
                 shapeData,
                 false,
@@ -196,11 +156,9 @@ public class RopeFactory {
         );
     }
 
-    private static List<VSJoint> makeJoints(List<RopeSegment> segments, double spacing, ResourceKey<RopeType> typeKey, ServerLevel level) {
+    private static List<VSJoint> makeJoints(List<RopeSegment> segments, double spacing, RopeType type) {
         List<VSJoint> joints = new ArrayList<>();
         float maxLength = (float) (spacing * (1 + SAG_FACTOR));
-
-        RopeType type = level.registryAccess().registryOrThrow(VStuffRegistries.ROPE_TYPE).get(typeKey);
 
         RopeSegment first = segments.remove(0);
         RopeSegment last = segments.remove(segments.size() - 1);
@@ -208,6 +166,7 @@ public class RopeFactory {
         if (type == null) {
             throw new RuntimeException("WTF NULL ROPE TYPE??!!??? MEOW!! MEOW!! MEOW!!");
         }
+
         VSJoint firstJoint = type.getEndJointWith(first.id0(),
                 new VSJointPose(first.pos0(), new Quaterniond()),
                 first.id1(),
@@ -262,13 +221,9 @@ public class RopeFactory {
         }
     }
 
-    // todo implement
-    private static void discardRope(Rope rope) {
 
-    }
 
-    // todo implement
-    public static void removeRope(Rope rope) {
+    public record RopeContext(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1) {}
 
-    }
+
 }

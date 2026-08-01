@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceKey;
 import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
-import dev.flarelog.vstuff.content.ropes.util.RopePosData;
+import dev.flarelog.vstuff.content.ropes.util.LocalPosAndBodyId;
 import dev.flarelog.vstuff.content.ropes.util.RopeSegment;
 
 import java.util.ArrayList;
@@ -21,8 +21,8 @@ public class Rope {
 
     public static final Codec<Rope> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.INT.fieldOf("ropeId").forGetter(rope -> rope.ropeId),
-            RopePosData.CODEC.fieldOf("posData0").forGetter(rope -> rope.posData0),
-            RopePosData.CODEC.fieldOf("posData1").forGetter(rope -> rope.posData1),
+            LocalPosAndBodyId.CODEC.fieldOf("posData0").forGetter(rope -> rope.posData0),
+            LocalPosAndBodyId.CODEC.fieldOf("posData1").forGetter(rope -> rope.posData1),
             ResourceKey.codec(VStuffRegistries.ROPE_TYPE).fieldOf("type").forGetter(rope -> rope.typeKey),
             ResourceKey.codec(VStuffRegistries.ROPE_STYLE).fieldOf("style").forGetter(rope -> rope.styleKey),
             RopeSegment.CODEC.listOf().fieldOf("segments").forGetter(rope -> rope.segments),
@@ -34,14 +34,14 @@ public class Rope {
     }));
 
     Integer ropeId;
-    public RopePosData posData0;
-    public RopePosData posData1;
+    public LocalPosAndBodyId posData0;
+    public LocalPosAndBodyId posData1;
     public ResourceKey<RopeType> typeKey;
     public ResourceKey<RopeStyle> styleKey;
     List<Integer> jointIds;
     public List<RopeSegment> segments;
 
-    protected Rope(RopePosData posData0, RopePosData posData1, ResourceKey<RopeType> typeKey, ResourceKey<RopeStyle> styleKey, List<RopeSegment> segments) {
+    protected Rope(LocalPosAndBodyId posData0, LocalPosAndBodyId posData1, ResourceKey<RopeType> typeKey, ResourceKey<RopeStyle> styleKey, List<RopeSegment> segments) {
         this.posData0 = posData0;
         this.posData1 = posData1;
         this.styleKey = styleKey;
