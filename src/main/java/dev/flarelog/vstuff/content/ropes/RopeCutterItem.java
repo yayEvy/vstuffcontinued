@@ -37,8 +37,8 @@ public class RopeCutterItem extends Item implements ILikeRopes {
 
                 RopeStyle style = physRope.getStyle(serverLevel.registryAccess());
 
-                RopeUtil.playSound(serverLevel, VectorConversionsMCKt.toBlockPos(physRope.posData0.getWorldPos(serverLevel).get()), style.breakSound());
-                RopeUtil.playSound(serverLevel, physRope.posData1, style.breakSound());
+                RopeUtil.playSound(serverLevel, RopeUtil.containingBlockPos(physRope.posData0.getWorldPos(serverLevel)), style.breakSound());
+                RopeUtil.playSound(serverLevel, RopeUtil.containingBlockPos(physRope.posData1.getWorldPos(serverLevel)), style.breakSound());
 
                 if (!player.isCreative()) {
                     itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));

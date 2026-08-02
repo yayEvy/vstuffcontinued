@@ -58,4 +58,8 @@ public record LocalPosAndBodyId(@NotNull Vector3d pos, @Nullable Long id) {
         return body.getKinematics().getTransform().getToWorld().transformPosition(pos);
     }
 
+    public BlockPos blockPos() {
+        return BlockPos.containing(this.pos().x(), this.pos().y(), this.pos().z());
+    }
+
 }
