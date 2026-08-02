@@ -1,6 +1,8 @@
 package dev.flarelog.vstuff.network.packets.rope;
 
 import com.simibubi.create.foundation.networking.SimplePacketBase;
+import dev.flarelog.vstuff.internal.utility.CodecUtil;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraftforge.api.distmarker.Dist;
@@ -37,7 +39,7 @@ public class AddRopePacket extends SimplePacketBase {
     }
 
     public AddRopePacket(FriendlyByteBuf buffer) {
-        this.rope = buffer.readJsonWithCodec(Rope.FULL_CODEC);
+        this.rope = CodecUtil.decodeFromTag(buffer.readNbt(), Rope.FULL_CODEC);
 //        this.id = buffer.readInt();
 //        this.pos0 = readVector3d(buffer);
 //        this.pos1 = readVector3d(buffer);
@@ -51,7 +53,7 @@ public class AddRopePacket extends SimplePacketBase {
 
     @Override
     public void write(FriendlyByteBuf buffer) {
-        buffer.writeJsonWithCodec(Rope.FULL_CODEC, rope);
+        buffer.writeNbt((CompoundTag) CodecUtil.encodeToTag(rope, Rope.FULL_CODEC));
 //        buffer.writeInt(id);
 //        writeVector3d(buffer, pos0);
 //        writeVector3d(buffer, pos1);

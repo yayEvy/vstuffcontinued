@@ -28,9 +28,24 @@ public record LocalPosAndBodyId(@NotNull Vector3d pos, @Nullable Long id) {
             ).apply(instance, LocalPosAndBodyId::new)
     );
 
-    public LocalPosAndBodyId(@NotNull Vector3d pos, ServerLevel level) {
-        this(pos, getId(pos, level));
+    public LocalPosAndBodyId(@NotNull Vector3d worldPos, ServerLevel level) {
+        this(resolve(worldPos, level));
     }
+
+    private LocalPosAndBodyId(Resolved resolved) {
+        this(resolved.localPos, resolved.shipId);
+    }
+
+    private static Resolved resolve(Vector3d worldPos, ServerLevel level) {
+        Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPos);
+        if (ship == null) return new Resolved(worldPos, null);
+
+        Vector3d localPos = new Vector3d();
+        ship.getTransform().getWorldToShip().transformPosition(worldPos, localPos);
+        return new Resolved(localPos, ship.getBodyId());
+    }
+
+    private record Resolved(Vector3d localPos, Long shipId) {}
 
     public static LocalPosAndBodyId from(BlockPos pos, ServerLevel level) {
         return new LocalPosAndBodyId(VectorConversionsMCKt.toJOMLD(pos), level);
