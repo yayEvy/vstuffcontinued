@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.bodies.ServerVsBody;
 import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.core.api.world.ServerShipWorld;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
@@ -29,23 +30,8 @@ public record LocalPosAndBodyId(@NotNull Vector3d pos, @Nullable Long id) {
     );
 
     public LocalPosAndBodyId(@NotNull Vector3d worldPos, ServerLevel level) {
-        this(resolve(worldPos, level));
+        this(worldPos, getId(worldPos, level));
     }
-
-    private LocalPosAndBodyId(Resolved resolved) {
-        this(resolved.localPos, resolved.shipId);
-    }
-
-    private static Resolved resolve(Vector3d worldPos, ServerLevel level) {
-        Ship ship = VSGameUtilsKt.getShipManagingPos(level, worldPos);
-        if (ship == null) return new Resolved(worldPos, null);
-
-        Vector3d localPos = new Vector3d();
-        ship.getTransform().getWorldToShip().transformPosition(worldPos, localPos);
-        return new Resolved(localPos, ship.getBodyId());
-    }
-
-    private record Resolved(Vector3d localPos, Long shipId) {}
 
     public static LocalPosAndBodyId from(BlockPos pos, ServerLevel level) {
         return new LocalPosAndBodyId(VectorConversionsMCKt.toJOMLD(pos), level);
@@ -69,7 +55,10 @@ public record LocalPosAndBodyId(@NotNull Vector3d pos, @Nullable Long id) {
 
     public Vector3d getWorldPos(ServerLevel level) {
         if (this.id() == null) return pos;
-        ServerVsBody body = ValkyrienSkies.api().getServerShipWorld(level.getServer()).getAllBodies().getById(this.id());
+        ServerShipWorld shipWorld = ValkyrienSkies.api().getServerShipWorld(level.getServer());
+        if (shipWorld == null) return pos;
+        ServerVsBody body = shipWorld.getAllBodies().getById(this.id());
+        if (body == null) return pos;
         return body.getKinematics().getTransform().getToWorld().transformPosition(pos);
     }
 
