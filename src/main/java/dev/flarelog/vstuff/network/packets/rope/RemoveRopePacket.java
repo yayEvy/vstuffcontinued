@@ -26,7 +26,7 @@ public class RemoveRopePacket extends SimplePacketBase {
 
     @Override
     public boolean handle(NetworkEvent.Context context) {
-//        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPhysRopeManager.removeClientConstraint(ropeId)));
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPhysRopeManager.removeClientConstraint(ropeId)));
         return true;
     }
 }

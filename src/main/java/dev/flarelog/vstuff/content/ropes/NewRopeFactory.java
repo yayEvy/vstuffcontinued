@@ -1,19 +1,16 @@
 package dev.flarelog.vstuff.content.ropes;
 
-import com.mojang.datafixers.util.Pair;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 import dev.flarelog.vstuff.content.ropes.type.RopeType;
 import dev.flarelog.vstuff.content.ropes.util.LocalPosAndBodyId;
 import dev.flarelog.vstuff.content.ropes.util.RopeSegment;
 import dev.flarelog.vstuff.infrastructure.config.VStuffConfigs;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3d;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
@@ -22,18 +19,14 @@ import org.valkyrienskies.core.api.bodies.VsBodyCreateData;
 import org.valkyrienskies.core.api.bodies.VsBodyDefaults;
 import org.valkyrienskies.core.api.bodies.shape.BodyShapeData;
 import org.valkyrienskies.core.api.bodies.shape.SphereBodyShapeData;
-import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.impl.bodies.properties.BodyKinematicsImpl;
 import org.valkyrienskies.core.impl.bodies.properties.BodyTransformImpl;
 import org.valkyrienskies.core.impl.game.bodies.BodyInertiaDataImpl;
 import org.valkyrienskies.core.internal.joints.VSJoint;
 import org.valkyrienskies.core.internal.joints.VSJointPose;
-import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
-import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -103,7 +96,7 @@ public class NewRopeFactory {
         double spacing = totalDistance / segmentCount;
 
         List<RopeSegment> segments = createSegmentBodies(ctx, segmentCount, spawnStart, spawnEnd);
-        List<VSJoint> joints = makeJoints(segments, spacing, type);
+        List<VSJoint> joints = makeJoints(new ArrayList<>(segments), spacing, type);
 
         Rope physRope = new Rope(ctx.data0(), ctx.data1(), type, styleKey, segments);
 
@@ -226,23 +219,16 @@ public class NewRopeFactory {
 
                 if (remaining.decrementAndGet() == 0 && failed.get()) {
                     LOGGER.info("Failed was true after all joints have been created, discarding phys rope.");
-                    discardRope(rope);
+                    removeAndCleanupRope(rope, level);
                 }
             });
         }
     }
 
-    // todo implement
-    private static void discardRope(Rope rope) {
-
+    public static void removeAndCleanupRope(Rope rope, ServerLevel level) {
+        rope.cleanup(level);
+        RopeManager.get(level).removeRope(rope.getRopeId());
     }
-
-    // todo implement
-    public static void removeRope(Rope rope) {
-
-    }
-
-
 
     public record RopeContext(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1) {}
 

@@ -1,5 +1,8 @@
 package dev.flarelog.vstuff.content.ropes;
 
+import dev.flarelog.vstuff.client.ClientRopeStyle;
+import dev.flarelog.vstuff.content.ropes.style.RopeStyleManager;
+import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
 import dev.flarelog.vstuff.internal.utility.CodecUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -107,7 +110,7 @@ public class RopeManager extends SavedData {
 
 
         for (Rope rope : manager.getRopeList()) {
-            //VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new AddRopePacket(rope, ClientRopeStyle.fromStyle(RopeStyleManager.resolveStyle(rope.styleKey, player.level().registryAccess()))));
+            VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new AddRopePacket(rope));
         }
     }
 }

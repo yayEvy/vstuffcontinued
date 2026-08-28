@@ -2,6 +2,7 @@ package dev.flarelog.vstuff.content.ropes;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import dev.flarelog.vstuff.content.physics.VSUtil;
 import dev.flarelog.vstuff.content.ropes.type.RopeType;
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
@@ -12,7 +13,15 @@ import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 import dev.flarelog.vstuff.content.ropes.util.LocalPosAndBodyId;
 import dev.flarelog.vstuff.content.ropes.util.RopeSegment;
+import net.minecraft.server.level.ServerLevel;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
+import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.core.internal.ships.VsiQueryableShipData;
+import org.valkyrienskies.core.internal.world.VsiServerShipWorld;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 import java.util.ArrayList;
@@ -21,20 +30,6 @@ import java.util.List;
 import java.util.Objects;
 
 public class Rope {
-
-    public static final Codec<Rope> NETWORK_CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.INT.fieldOf("ropeId").forGetter(rope -> rope.ropeId),
-            LocalPosAndBodyId.CODEC.fieldOf("posData0").forGetter(rope -> rope.posData0),
-            LocalPosAndBodyId.CODEC.fieldOf("posData1").forGetter(rope -> rope.posData1),
-            ResourceKey.codec(VStuffRegistries.ROPE_STYLE).fieldOf("style").forGetter(rope -> rope.styleKey),
-            RopeSegment.CODEC.listOf().fieldOf("segments").forGetter(rope -> rope.segments),
-            Codec.INT.listOf().fieldOf("jointIds").forGetter(rope -> new ArrayList<>(rope.getJointIds()))
-    ).apply(instance, (ropeId, posData0, posData1, styleKey, segments, jointIds) -> {
-        Rope rope = new Rope(posData0, posData1, null, styleKey, segments).setRopeId(ropeId);
-        rope.setJointIds(new LinkedList<>(jointIds));
-        return rope;
-    }));
-
     public static final Codec<Rope> FULL_CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.INT.fieldOf("ropeId").forGetter(rope -> rope.ropeId),
             LocalPosAndBodyId.CODEC.fieldOf("posData0").forGetter(rope -> rope.posData0),
@@ -89,6 +84,39 @@ public class Rope {
 
     public RopeStyle getStyle(RegistryAccess regAccess) {
         return regAccess.registryOrThrow(VStuffRegistries.ROPE_STYLE).get(styleKey);
+    }
+
+    public void cleanup(ServerLevel level) {
+        VsiServerShipWorld shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
+
+        for (Integer joint : jointIds) {
+            VSUtil.getGTPA(level).removeJoint(joint);
+        }
+
+        for (int i = 0; i < segments.size() - 1; i++) {
+            Long bodyId = segments.get(i).id1();
+            if (bodyId != null) {
+                shipWorld.deleteBody(shipWorld.getAllBodies().getById(bodyId));
+            }
+        }
+        this.segments.clear();
+        this.jointIds.clear();
+    }
+
+    public boolean isWorldToWorld() {
+        return this.posData0.id() == null && this.posData1.id() == null;
+    }
+
+    public boolean isAttachedToShip(ServerLevel level) {
+        VsiQueryableShipData<Ship> allShips = VSGameUtilsKt.getAllShips(level);
+        return allShips.contains(this.posData0.id()) || allShips.contains(this.posData1.id());
+    }
+
+    public boolean isAttachedToBlockPos(@NotNull BlockPos pos, @NotNull ServerLevel level) {
+        if (pos.equals(this.posData0.blockPos(level))) {
+            return true;
+        }
+        return pos.equals(this.posData1.blockPos(level));
     }
 
 }

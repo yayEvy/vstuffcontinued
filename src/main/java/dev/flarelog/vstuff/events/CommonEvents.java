@@ -1,5 +1,8 @@
 package dev.flarelog.vstuff.events;
 
+import dev.flarelog.vstuff.content.ropes.NewRopeFactory;
+import dev.flarelog.vstuff.content.ropes.Rope;
+import dev.flarelog.vstuff.content.ropes.RopeManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -15,6 +18,7 @@ import dev.flarelog.vstuff.infrastructure.commands.VStuffCommands;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 import dev.flarelog.vstuff.content.ropes.util.RopeUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,12 +38,16 @@ public class CommonEvents {
         Vector3d worldBreakPos = RopeUtil.getWorldPos(level, brokenPos);
         Map<Integer, ResourceKey<RopeStyle>> idsToRemove = new HashMap<>();
 
-        // todo reimplement
+        for (Rope rope : new ArrayList<>(RopeManager.get(level).getRopeList())) {
+            if (rope.isAttachedToBlockPos(brokenPos, level)) {
+                NewRopeFactory.removeAndCleanupRope(rope, level);
+            }
+        }
     }
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
-
+        RopeManager.syncAllRopesToPlayer(player);
     }
 
 // todo reimplement restyling n stuff
@@ -83,6 +91,7 @@ public class CommonEvents {
     @SubscribeEvent
     public static void onPlayerChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        RopeManager.syncAllRopesToPlayer(player);
     }
 
 }
