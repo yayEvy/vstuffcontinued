@@ -16,7 +16,10 @@ import dev.flarelog.vstuff.content.ropes.util.RopeSegment;
 import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
+import org.valkyrienskies.core.api.bodies.ServerVsBody;
+import org.valkyrienskies.core.api.bodies.VsBody;
 import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.core.impl.game.bodies.QueryableVsBodyDataImpl;
 import org.valkyrienskies.core.internal.ships.VsiQueryableShipData;
 import org.valkyrienskies.core.internal.world.VsiServerShipWorld;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
@@ -92,13 +95,17 @@ public class Rope {
         for (Integer joint : jointIds) {
             VSUtil.getGTPA(level).removeJoint(joint);
         }
-
-        for (int i = 0; i < segments.size() - 1; i++) {
-            Long bodyId = segments.get(i).id1();
-            if (bodyId != null) {
-                shipWorld.deleteBody(shipWorld.getAllBodies().getById(bodyId));
-            }
-        }
+// commented out cuz no work rn
+//        todo:fix
+//        for (int i = 0; i < segments.size() - 1; i++) {
+//            Long bodyId = segments.get(i).id1();
+//            if (bodyId != null) {
+//                ServerVsBody body = shipWorld.getAllBodies().getById(bodyId);
+//                if (body != null && shipWorld.getAllBodies().contains(body)) {
+//                    shipWorld.deleteBody(body);
+//                }
+//            }
+//        }
         this.segments.clear();
         this.jointIds.clear();
     }
@@ -113,6 +120,7 @@ public class Rope {
     }
 
     public boolean isAttachedToBlockPos(@NotNull BlockPos pos, @NotNull ServerLevel level) {
+        VStuff.LOGGER.warn("{} {} {}", pos, this.posData0.blockPos(level), this.posData1.blockPos(level));
         if (pos.equals(this.posData0.blockPos(level))) {
             return true;
         }

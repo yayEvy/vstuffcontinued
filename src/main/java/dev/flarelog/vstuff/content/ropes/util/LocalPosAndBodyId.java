@@ -11,6 +11,8 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.bodies.ServerVsBody;
+import org.valkyrienskies.core.api.ships.QueryableShipData;
+import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.api.world.ServerShipWorld;
 import org.valkyrienskies.core.internal.ships.VsiQueryableShipData;
@@ -19,6 +21,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.Optional;
 
 public record LocalPosAndBodyId(@NotNull Vector3d pos, @Nullable Long id) {
@@ -72,14 +75,14 @@ public record LocalPosAndBodyId(@NotNull Vector3d pos, @Nullable Long id) {
     }
 
     public @Nullable BlockPos blockPos(ServerLevel level) {
-        if (this.isShip(level)) {
+        if (this.isWorld() || this.isShip(level) ) {
             return BlockPos.containing(this.pos().x(), this.pos().y(), this.pos().z());
         }
         return null;
     }
 
     public boolean isShip(Level level) {
-        VsiQueryableShipData<Ship> allShips = VSGameUtilsKt.getAllShips(level);
-        return allShips.contains(this.id());
+        QueryableShipData<Ship> allShips = Objects.requireNonNull(ValkyrienSkies.api().getShipWorld(level)).getAllShips();
+        return allShips.getById(this.id()) != null;
     }
 }

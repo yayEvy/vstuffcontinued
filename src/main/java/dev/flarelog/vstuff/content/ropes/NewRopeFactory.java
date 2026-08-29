@@ -1,5 +1,6 @@
 package dev.flarelog.vstuff.content.ropes;
 
+import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 import dev.flarelog.vstuff.content.ropes.type.RopeType;
 import dev.flarelog.vstuff.content.ropes.util.LocalPosAndBodyId;
@@ -15,6 +16,7 @@ import org.joml.Matrix3d;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.bodies.ServerVsBody;
+import org.valkyrienskies.core.api.bodies.VsBody;
 import org.valkyrienskies.core.api.bodies.VsBodyCreateData;
 import org.valkyrienskies.core.api.bodies.VsBodyDefaults;
 import org.valkyrienskies.core.api.bodies.shape.BodyShapeData;
@@ -22,6 +24,7 @@ import org.valkyrienskies.core.api.bodies.shape.SphereBodyShapeData;
 import org.valkyrienskies.core.impl.bodies.properties.BodyKinematicsImpl;
 import org.valkyrienskies.core.impl.bodies.properties.BodyTransformImpl;
 import org.valkyrienskies.core.impl.game.bodies.BodyInertiaDataImpl;
+import org.valkyrienskies.core.impl.game.bodies.QueryableVsBodyDataImpl;
 import org.valkyrienskies.core.internal.joints.VSJoint;
 import org.valkyrienskies.core.internal.joints.VSJointPose;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -226,8 +229,9 @@ public class NewRopeFactory {
     }
 
     public static void removeAndCleanupRope(Rope rope, ServerLevel level) {
-        rope.cleanup(level);
+        LOGGER.warn("Cleanup rope {}", rope.getRopeId());
         RopeManager.get(level).removeRope(rope.getRopeId());
+        rope.cleanup(level);
     }
 
     public record RopeContext(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1) {}

@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3d;
@@ -30,7 +31,7 @@ public class CommonEvents {
         VStuffCommands.register(event.getDispatcher());
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onBlockBreak(BlockEvent.BreakEvent event) {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
 
@@ -40,6 +41,7 @@ public class CommonEvents {
 
         for (Rope rope : new ArrayList<>(RopeManager.get(level).getRopeList())) {
             if (rope.isAttachedToBlockPos(brokenPos, level)) {
+                VStuff.LOGGER.warn("detach {}", rope.getRopeId());
                 NewRopeFactory.removeAndCleanupRope(rope, level);
             }
         }
