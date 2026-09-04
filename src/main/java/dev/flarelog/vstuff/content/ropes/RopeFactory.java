@@ -1,6 +1,5 @@
 package dev.flarelog.vstuff.content.ropes;
 
-import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 import dev.flarelog.vstuff.content.ropes.type.RopeType;
 import dev.flarelog.vstuff.content.ropes.util.LocalPosAndBodyId;
@@ -16,7 +15,6 @@ import org.joml.Matrix3d;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.bodies.ServerVsBody;
-import org.valkyrienskies.core.api.bodies.VsBody;
 import org.valkyrienskies.core.api.bodies.VsBodyCreateData;
 import org.valkyrienskies.core.api.bodies.VsBodyDefaults;
 import org.valkyrienskies.core.api.bodies.shape.BodyShapeData;
@@ -24,7 +22,6 @@ import org.valkyrienskies.core.api.bodies.shape.SphereBodyShapeData;
 import org.valkyrienskies.core.impl.bodies.properties.BodyKinematicsImpl;
 import org.valkyrienskies.core.impl.bodies.properties.BodyTransformImpl;
 import org.valkyrienskies.core.impl.game.bodies.BodyInertiaDataImpl;
-import org.valkyrienskies.core.impl.game.bodies.QueryableVsBodyDataImpl;
 import org.valkyrienskies.core.internal.joints.VSJoint;
 import org.valkyrienskies.core.internal.joints.VSJointPose;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -37,7 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static dev.flarelog.vstuff.content.physics.VSUtil.getGTPA;
 
-public class NewRopeFactory {
+public class RopeFactory {
 
     public static float SEGMENT_LENGTH = 0.8f;
     public static double SEGMENT_RADIUS = 0.125;
@@ -78,9 +75,6 @@ public class NewRopeFactory {
         LocalPosAndBodyId second = ctx.data1();
 
         ServerLevel level = ctx.level();
-
-        Registry<RopeType> typeRegistry = level.registryAccess().registryOrThrow(VStuffRegistries.ROPE_TYPE);
-        Registry<RopeStyle> styleRegistry = level.registryAccess().registryOrThrow(VStuffRegistries.ROPE_STYLE);
 
         Vector3d worldStart = first.getWorldPos(level);
         Vector3d worldEnd = second.getWorldPos(level);
@@ -124,14 +118,14 @@ public class NewRopeFactory {
                 Long id = body.getId();
                 Vector3d pos = new Vector3d();
 
-                segments.add(new RopeSegment(lastId, id, lastPos, pos));
+                segments.add(new RopeSegment(new LocalPosAndBodyId(lastPos ,lastId), new LocalPosAndBodyId(pos, id)));
 
                 lastId = id;
                 lastPos = pos;
             }
         }
 
-        segments.add(new RopeSegment(lastId, ctx.data1.id(), lastPos, ctx.data1.pos()));
+        segments.add(new RopeSegment(new LocalPosAndBodyId(lastPos ,lastId) , new LocalPosAndBodyId(ctx.data1.pos(), ctx.data1.id())));
 
         return segments;
     }
@@ -174,26 +168,26 @@ public class NewRopeFactory {
             throw new RuntimeException("WTF NULL ROPE TYPE??!!??? MEOW!! MEOW!! MEOW!!");
         }
 
-        VSJoint firstJoint = type.getEndJointWith(first.id0(),
-                new VSJointPose(first.pos0(), new Quaterniond()),
-                first.id1(),
-                new VSJointPose(first.pos1(), new Quaterniond()),
+        VSJoint firstJoint = type.getEndJointWith(first.pos0().id(),
+                new VSJointPose(first.pos0().pos(), new Quaterniond()),
+                first.pos1().id(),
+                new VSJointPose(first.pos1().pos(), new Quaterniond()),
                 maxLength).serialized();
 
         joints.add(firstJoint);
 
-        VSJoint lastJoint = type.getEndJointWith(last.id0(),
-                new VSJointPose(last.pos0(), new Quaterniond()),
-                last.id1(),
-                new VSJointPose(last.pos1(), new Quaterniond()),
+        VSJoint lastJoint = type.getEndJointWith(last.pos0().id(),
+                new VSJointPose(last.pos0().pos(), new Quaterniond()),
+                last.pos1().id(),
+                new VSJointPose(last.pos1().pos(), new Quaterniond()),
                 maxLength).serialized();
 
         joints.add(lastJoint);
 
         for (RopeSegment segment : segments) {
             VSJoint joint = type.getConnectingPhysBodyJointWith(
-                    segment.id0(), new VSJointPose(segment.pos0(), new Quaterniond()),
-                    segment.id1(), new VSJointPose(segment.pos1(), new Quaterniond()),
+                    segment.pos0().id(), new VSJointPose(segment.pos0().pos(), new Quaterniond()),
+                    segment.pos1().id(), new VSJointPose(segment.pos1().pos(), new Quaterniond()),
                     maxLength
             );
             joint.setShouldBeSerialized(true);

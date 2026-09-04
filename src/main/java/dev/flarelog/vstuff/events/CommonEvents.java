@@ -1,6 +1,6 @@
 package dev.flarelog.vstuff.events;
 
-import dev.flarelog.vstuff.content.ropes.NewRopeFactory;
+import dev.flarelog.vstuff.content.ropes.RopeFactory;
 import dev.flarelog.vstuff.content.ropes.Rope;
 import dev.flarelog.vstuff.content.ropes.RopeManager;
 import net.minecraft.core.BlockPos;
@@ -42,7 +42,7 @@ public class CommonEvents {
         for (Rope rope : new ArrayList<>(RopeManager.get(level).getRopeList())) {
             if (rope.isAttachedToBlockPos(brokenPos, level)) {
                 VStuff.LOGGER.warn("detach {}", rope.getRopeId());
-                NewRopeFactory.removeAndCleanupRope(rope, level);
+                RopeFactory.removeAndCleanupRope(rope, level);
             }
         }
     }

@@ -97,15 +97,19 @@ public class Rope {
         }
 // commented out cuz no work rn
 //        todo:fix
-//        for (int i = 0; i < segments.size() - 1; i++) {
-//            Long bodyId = segments.get(i).id1();
-//            if (bodyId != null) {
-//                ServerVsBody body = shipWorld.getAllBodies().getById(bodyId);
-//                if (body != null && shipWorld.getAllBodies().contains(body)) {
-//                    shipWorld.deleteBody(body);
-//                }
-//            }
-//        }
+        for (int i = 0; i < segments.size() - 1; i++) {
+            Long bodyId = segments.get(i).id1();
+            if (bodyId != null) {
+                ServerVsBody body = shipWorld.getAllBodies().getById(bodyId);
+                if (body != null && shipWorld.getAllBodies().contains(body)) {
+                    try {
+                        shipWorld.deleteBody(body);
+                    } catch (Exception e) {
+                        RopeFactory.LOGGER.warn("Error deleting vsbody with id {}: {}", bodyId, e.getMessage());
+                    }
+                }
+            }
+        }
         this.segments.clear();
         this.jointIds.clear();
     }

@@ -100,8 +100,8 @@ public class ClientPhysRopeManager {
 
             for (RopeSegment seg : rope.segments()) {
 
-                Vector3d startPos = seg.pos0(level);
-                Vector3d endPos = seg.pos1(level);
+                Vector3d startPos = seg.getRenderPos0(level);
+                Vector3d endPos = seg.getRenderPos1(level);
 
                 if (VSGameUtilsKt.isBlockInShipyard(level, startPos.x, startPos.y, startPos.z)) return false;
                 if (VSGameUtilsKt.isBlockInShipyard(level, endPos.x, endPos.y, endPos.z)) return false;
