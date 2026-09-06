@@ -3,6 +3,7 @@ package dev.flarelog.vstuff.events;
 import dev.flarelog.vstuff.content.ropes.RopeFactory;
 import dev.flarelog.vstuff.content.ropes.Rope;
 import dev.flarelog.vstuff.content.ropes.RopeManager;
+import dev.flarelog.vstuff.internal.utility.PositionUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -17,7 +18,6 @@ import org.joml.Vector3d;
 import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.infrastructure.commands.VStuffCommands;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
-import dev.flarelog.vstuff.content.ropes.util.RopeUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +36,7 @@ public class CommonEvents {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
 
         BlockPos brokenPos = event.getPos();
-        Vector3d worldBreakPos = RopeUtil.getWorldPos(level, brokenPos);
+        Vector3d worldBreakPos = PositionUtils.getWorldPos(level, brokenPos);
         Map<Integer, ResourceKey<RopeStyle>> idsToRemove = new HashMap<>();
 
         for (Rope rope : new ArrayList<>(RopeManager.get(level).getRopeList())) {
