@@ -8,6 +8,7 @@ import dev.flarelog.vstuff.infrastructure.config.VStuffConfigs;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,6 +49,12 @@ public class RopeFactory {
     public static double SAG_FACTOR = 0.08; // higher = more sag
 
     public static final Logger LOGGER = LogManager.getLogger("VStuffRopeFactory");
+
+    public static RopeResult tryCreateRope(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1, ResourceKey<RopeType> type, ResourceKey<RopeStyle> style, ResourceLocation dimId) {
+        if (!dimId.equals(level.dimension().location()))
+            return RopeResult.withMessage("message.rope.interdimensional_fail");
+        return tryCreateRope(level, data0, data1, type, style);
+    }
 
     public static RopeResult tryCreateRope(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1, ResourceKey<RopeType> type, ResourceKey<RopeStyle> style) {
         return tryCreateRope(
