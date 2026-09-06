@@ -1,5 +1,6 @@
 package dev.flarelog.vstuff.infrastructure.data.provider;
 
+import dev.flarelog.vstuff.content.ropes.VStuffRopeTypes;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
@@ -23,6 +24,7 @@ public class VStuffDatapackEntriesProvider extends DatapackBuiltinEntriesProvide
             .add(Registries.CONFIGURED_FEATURE, VStuffConfiguredFeatures::bootstrap)
             .add(Registries.PLACED_FEATURE, VStuffPlacedFeatures::bootstrap)
             .add(ForgeRegistries.Keys.BIOME_MODIFIERS, VStuffBiomeModifiers::bootstrap)
+            .add(VStuffRegistries.ROPE_TYPE, VStuffRopeTypes::bootstrap)
             .add(VStuffRegistries.ROPE_STYLE, VStuffRopeStyles::bootstrap)
             .add(VStuffRegistries.ROPE_CATEGORY, VStuffRopeCategories::bootstrap);
 

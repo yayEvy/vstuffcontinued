@@ -1,10 +1,15 @@
 package dev.flarelog.vstuff.content.ropes;
 
+import dev.flarelog.vstuff.content.ropes.style.RopeStyleManager;
+import dev.flarelog.vstuff.content.ropes.util.LocalPosAndBodyId;
+import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -18,11 +23,10 @@ import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.network.packets.misc.OutlinePacket;
-import dev.flarelog.vstuff.content.ropes.util.ILikeRopes;
 import dev.flarelog.vstuff.network.VStuffPackets;
 import dev.flarelog.vstuff.content.ropes.util.RopeUtil;
 
-public class RopeItem extends Item implements ILikeRopes {
+public class RopeItem extends Item {
 
     public RopeItem(Properties properties) {
         super(properties);
@@ -61,7 +65,7 @@ public class RopeItem extends Item implements ILikeRopes {
 
         } else if (player.isShiftKeyDown()) {
             player.displayClientMessage(VStuff.translate("message.rope.reset").withStyle(ChatFormatting.GREEN), true);
-            resetTag(heldItem);
+            RopeUtil.resetTag(heldItem);
             return InteractionResult.SUCCESS;
         }
 
@@ -70,11 +74,13 @@ public class RopeItem extends Item implements ILikeRopes {
 
         if (clickedPos.equals(firstClickedPos)) {
             player.displayClientMessage(VStuff.translate("message.rope.reset").withStyle(ChatFormatting.GREEN), true);
-            resetTag(heldItem);
+            RopeUtil.resetTag(heldItem);
             return InteractionResult.SUCCESS;
         }
 
-        RopeFactory.PhysRopeResult ropeResult = RopeFactory.tryCreateNewRope(serverLevel, heldItem, firstClickedPos, clickedPos, player);
+        ResourceLocation dimId = ResourceLocation.parse(tag.getString("dim"));
+
+        RopeResult ropeResult = RopeFactory.tryCreateRope(serverLevel, LocalPosAndBodyId.from(firstClickedPos, serverLevel),  LocalPosAndBodyId.from(clickedPos, serverLevel), ResourceKey.create(VStuffRegistries.ROPE_TYPE, VStuff.asResource("normal")), RopeStyleManager.get(heldItem.getOrCreateTag()), dimId);
 
 
         if (ropeResult.valid) {
@@ -92,18 +98,19 @@ public class RopeItem extends Item implements ILikeRopes {
             return InteractionResult.SUCCESS;
         }
 
-        resetTag(heldItem);
+        RopeUtil.resetTag(heldItem);
 
         return InteractionResult.SUCCESS;
     }
 
     @Override
     public @NotNull Component getName(@NotNull ItemStack stack) {
-        return getNameWithStyle(this, stack);
+        return RopeUtil.getRopeItemNameWithStyle(this, stack);
     }
 
     @Override
     public boolean isFoil(ItemStack stack) {
-        return isItemFoil(stack);
+        return stack.hasTag() && stack.getTag().contains("data");
     }
+
 }

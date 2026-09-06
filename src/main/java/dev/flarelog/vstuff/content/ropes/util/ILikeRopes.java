@@ -1,5 +1,6 @@
 package dev.flarelog.vstuff.content.ropes.util;
 
+import dev.flarelog.vstuff.internal.utility.PositionUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -13,13 +14,12 @@ import org.joml.Vector3d;
 import dev.flarelog.vstuff.index.VStuffItems;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyleManager;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
-import dev.flarelog.vstuff.internal.utility.TagUtils;
 
 public interface ILikeRopes {
     default void resetTag(ItemStack stack) {
         ResourceKey<RopeStyle> lastStyle = null;
         if (stack.getTag().contains("style")) {
-            lastStyle = TagUtils.readResourceKey(stack.getTagElement("style"));
+            lastStyle = RopeStyle.tagToKey(stack.getTagElement("style"));
         }
 
         stack.setTag(null);
@@ -31,7 +31,7 @@ public interface ILikeRopes {
     }
 
     default void createRopeDrop(ServerLevel serverLevel, BlockPos pos, ResourceKey<RopeStyle> style) {
-        Vector3d worldPos = RopeUtil.getWorldPos(serverLevel, pos);
+        Vector3d worldPos = PositionUtils.getWorldPos(serverLevel, pos);
 
         ItemStack ropeStack = new ItemStack(VStuffItems.ROPE.get());
 
@@ -61,12 +61,12 @@ public interface ILikeRopes {
     }
 
     default void addStyleToTag(ItemStack stack, ResourceKey<RopeStyle> style) {
-        stack.getOrCreateTag().put("style", TagUtils.writeResourceKey(style));
+        stack.getOrCreateTag().put("style", RopeStyle.keyToTag(style));
     }
 
     default Component getNameWithStyle(Item item, ItemStack stack) {
         if (stack.getTagElement("style") == null) addStyleToTag(stack, RopeStyleManager.DEFAULT_KEY);
-        ResourceLocation location = TagUtils.readResourceKey(stack.getTagElement("style")).location();
+        ResourceLocation location = RopeStyle.tagToKey(stack.getTagElement("style")).location();
         return Component.translatable(item.getDescriptionId(stack))
                 .append(" (")
                 .append(Component.translatable("ropestyle." + location.getNamespace() + "." + location.getPath())) // this should always be the correct translation key
@@ -76,4 +76,5 @@ public interface ILikeRopes {
     default boolean isItemFoil(ItemStack stack) {
         return stack.hasTag() && stack.getTag().contains("data");
     }
+
 }
