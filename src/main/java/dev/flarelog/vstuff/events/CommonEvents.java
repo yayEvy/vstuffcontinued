@@ -1,5 +1,6 @@
 package dev.flarelog.vstuff.events;
 
+import dev.flarelog.vstuff.content.physics.ships.nails.Nail;
 import dev.flarelog.vstuff.content.physics.ships.nails.NailItem;
 import dev.flarelog.vstuff.internal.utility.FixedConstraintUtils;
 import net.minecraft.core.BlockPos;
@@ -98,6 +99,7 @@ public class CommonEvents {
 
         BlockPos blockToBePhysd = event.getPos();                          //the yapper that becomes a ship / gets constrained to other block
         BlockPos blockToBeNailedTo = NailItem.posMap.get(blockToBePhysd);  // the yapper that is/isnt a ship and gets the other block nailed to it
+        Nail nail = Nail.grabThatNailOerThereSonny(blockToBeNailedTo);     // certified nail lovers
 
         NailItem.posMap.remove(blockToBePhysd);
 
@@ -105,7 +107,7 @@ public class CommonEvents {
             if (level instanceof ServerLevel serverLevel) {
 
                 ServerShip ship = ShipAssembler.assembleToShip(serverLevel, Set.of(blockToBePhysd), 1);
-                FixedConstraintUtils.createFixedConstraint(serverLevel, blockToBeNailedTo, ship, NailItem.coolDirection);
+                FixedConstraintUtils.createFixedConstraint(serverLevel, blockToBeNailedTo, ship, nail);
             }
 
         }

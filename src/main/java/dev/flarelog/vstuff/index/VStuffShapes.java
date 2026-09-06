@@ -19,6 +19,9 @@ public class VStuffShapes {
         MECHANICAL_THRUSTER = shape(0,0,0,16,16,16) // ill do these later im just tired
                 .forDirectional(),
 
+        NAIL = shape(0,0,0,16,16,16) //
+            .forDirectional(),
+
         PHYS_PULLEY = shape(0, 0, 0, 16, 16, 16)
                 .forDirectional(),
 

@@ -4,6 +4,8 @@ import com.simibubi.create.AllBlocks;
 import com.simibubi.create.foundation.data.BlockStateGen;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.BlockEntry;
+import dev.flarelog.vstuff.content.physics.ships.nails.NailBlock;
+import dev.flarelog.vstuff.content.physics.ships.nails.NailItem;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 
@@ -13,6 +15,7 @@ import dev.flarelog.vstuff.content.physics.levituff.RefinedLevituffBlock;
 import dev.flarelog.vstuff.content.physics.ships.reactionwheel.ReactionWheelBlock;
 import dev.flarelog.vstuff.content.physics.ships.thrust.MechanicalThrusterBlock;
 import dev.flarelog.vstuff.infrastructure.config.VStress;
+import net.minecraft.world.level.block.state.BlockState;
 
 import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
 import static com.simibubi.create.foundation.data.TagGen.axeOrPickaxe;
@@ -35,6 +38,19 @@ public class VStuffBlocks  {
                     .transform(VStress.setImpact(8))
                     .item()
                     .transform(customItemModel())
+                    .register();
+
+    public static final BlockEntry<NailBlock> NAIL_BLOCK =
+            REGISTRATE.block("nail_block", NailBlock::new)
+                    .initialProperties(AllBlocks.ANDESITE_ALLOY_BLOCK)
+                    .properties(BlockBehaviour.Properties::noOcclusion)
+                    .blockstate((ctx, provider)
+                            ->   provider.simpleBlock(ctx.getEntry(),
+                            provider.models().getExistingFile(provider.modLoc("block/nail_block"))))
+
+                    .transform(axeOrPickaxe())
+                    .item(NailItem::new)
+                    .build()
                     .register();
 
 

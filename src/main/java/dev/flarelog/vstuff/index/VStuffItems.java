@@ -3,7 +3,6 @@ package dev.flarelog.vstuff.index;
 import com.simibubi.create.foundation.data.AssetLookup;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.ItemEntry;
-import dev.flarelog.vstuff.content.physics.ships.nails.NailItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -61,14 +60,14 @@ public class VStuffItems {
                     )
                     .defaultModel()
                     .register();
-    public static final ItemEntry<NailItem> NAIL =
-            REGISTRATE.item("nail", NailItem::new)
-                    .properties(p -> p
-                            .stacksTo(64)
-                    )
-                    .tag(STYLING_AVAILABLE)
-                    .model(AssetLookup.existingItemModel())
-                    .register();
+//    public static final ItemEntry<NailItem> NAIL =
+//            REGISTRATE.item("nail", NailItem::new)
+//                    .properties(p -> p
+//                            .stacksTo(64)
+//                    )
+//                    .tag(STYLING_AVAILABLE)
+//                    .model(AssetLookup.existingItemModel())
+//                    .register();
 
     public static final ItemEntry<RopeEditorItem> CREATIVE_ROPE_EDITOR =
             REGISTRATE.item("creative_rope_editor", RopeEditorItem::new)

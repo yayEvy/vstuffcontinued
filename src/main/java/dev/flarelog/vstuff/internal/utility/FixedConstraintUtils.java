@@ -1,8 +1,7 @@
 package dev.flarelog.vstuff.internal.utility;
 
-import dev.flarelog.vstuff.content.physics.VSUtil;
-import dev.flarelog.vstuff.content.physics.ships.nails.NailItem;
-import dev.flarelog.vstuff.content.ropes.util.RopeUtil;
+
+import dev.flarelog.vstuff.content.physics.ships.nails.Nail;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -17,16 +16,17 @@ import org.valkyrienskies.mod.api.ValkyrienSkies;
 
 public class FixedConstraintUtils {
 
-    public static void createFixedConstraint(Level level, BlockPos posOne, Ship ship2, Direction direction){
+    public static void createFixedConstraint(Level level, BlockPos posOne, Ship ship2, Nail nail){
 
         VSJointPose pose1;
         VSFixedJoint joint =null;
-        Long ship1ID = VSUtil.getLoadedShipIdAtPos(level, posOne);
+        Long ship1ID = VSUtils.getLoadedShipIdAtPos(level, posOne);
 
        Vector3d ikThisIsGoofyButIdcRnTbl = new Vector3d(posOne.getCenter().toVector3f());
-       Vector3d worldsPos = ikThisIsGoofyButIdcRnTbl.add(getOffset(direction));
 
-        VSJointPose pose2 = new VSJointPose(ship2.getShipAABB().center(new Vector3d()),getRotationOffset(direction, NailItem.rotation).normalize().mul(ship2.getTransform().getRotation()));
+       Vector3d worldsPos = ikThisIsGoofyButIdcRnTbl.add(getOffset(nail.direction));
+
+        VSJointPose pose2 = new VSJointPose(ship2.getShipAABB().center(new Vector3d()),getRotationOffset(nail.direction, nail.rotation).normalize().mul(ship2.getTransform().getRotation()));
 
         if (ship1ID == null) {
 
@@ -36,14 +36,14 @@ public class FixedConstraintUtils {
 
         if (ship1ID != null) {
 
-            Ship ship = ValkyrienSkies.getShipById(level, VSUtil.getLoadedShipIdAtPos(level, posOne));
-            pose1 = new VSJointPose(RopeUtil.getLocalPos(level, posOne).add(getOffset(direction)), ship.getTransform().getRotation());
+            Ship ship = ValkyrienSkies.getShipById(level, VSUtils.getLoadedShipIdAtPos(level, posOne));
+            pose1 = new VSJointPose(VSUtils.getLocalPos(level, posOne).add(getOffset(nail.direction)), ship.getTransform().getRotation());
             joint = new VSFixedJoint(ship.getId(), pose1, ship2.getId(), pose2, null, VSJoint.DEFAULT_COMPLIANCE );
 
         }
 
         if (level instanceof ServerLevel serverLevel){
-        VSUtil.getGTPA(serverLevel).addJoint(joint, 8,(id) -> {});
+        VSUtils.getGTPA(serverLevel).addJoint(joint, 8,(id) -> {});
             joint.serialized();
     }}
 
