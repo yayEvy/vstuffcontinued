@@ -1,17 +1,25 @@
 package dev.flarelog.vstuff.content.physics.ships.nails;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.Lombok;
+import lombok.extern.java.Log;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Nail {
+public  class Nail {
+
+
     public Double rotation = 0.0;
     public Direction direction;
     public BlockPos initialPos;
     public Integer id;
     public static Integer nextNail = 0;
+
 
     public static Map<Integer, Nail> nails = new HashMap<>();
 
@@ -21,6 +29,7 @@ public class Nail {
         this.direction = direction;
         this.initialPos = initialPos;
         this.id = id;
+
     }
 
     public static Nail newNail(Double rotation, Direction direction, BlockPos initialPos){

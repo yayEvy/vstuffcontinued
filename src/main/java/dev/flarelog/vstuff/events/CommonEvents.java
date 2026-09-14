@@ -106,8 +106,8 @@ public class CommonEvents {
         if (blockToBeNailedTo != null) {
             if (level instanceof ServerLevel serverLevel) {
 
-                ServerShip ship = ShipAssembler.assembleToShip(serverLevel, Set.of(blockToBePhysd), 1);
-                FixedConstraintUtils.createFixedConstraint(serverLevel, blockToBeNailedTo, ship, nail);
+                //ServerShip ship = ShipAssembler.assembleToShip(serverLevel, Set.of(blockToBePhysd), 1);
+               // FixedConstraintUtils.createFixedConstraint(serverLevel, blockToBeNailedTo, ship, nail);
             }
 
         }

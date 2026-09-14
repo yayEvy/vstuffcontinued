@@ -14,6 +14,8 @@ import org.valkyrienskies.core.internal.joints.VSJoint;
 import org.valkyrienskies.core.internal.joints.VSJointPose;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
 
+import java.util.Objects;
+
 public class FixedConstraintUtils {
 
     public static void createFixedConstraint(Level level, BlockPos posOne, Ship ship2, Nail nail){
@@ -26,7 +28,8 @@ public class FixedConstraintUtils {
 
        Vector3d worldsPos = ikThisIsGoofyButIdcRnTbl.add(getOffset(nail.direction));
 
-        VSJointPose pose2 = new VSJointPose(ship2.getShipAABB().center(new Vector3d()),getRotationOffset(nail.direction, nail.rotation).normalize().mul(ship2.getTransform().getRotation()));
+
+        VSJointPose pose2 = new VSJointPose(ship2.getWorldAABB().center(new Vector3d()),getRotationOffset(nail.direction, nail.rotation).normalize().mul(ship2.getTransform().getRotation()));
 
         if (ship1ID == null) {
 

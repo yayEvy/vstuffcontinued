@@ -10,6 +10,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.block.state.BlockState;
+import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.mod.common.assembly.ShipAssembler;
 
@@ -56,14 +58,16 @@ public class NailItem extends BlockItem {
         if (context.getLevel() instanceof ServerLevel serverLevel) {
 
             try {
-                Thread.sleep(1000);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
             ServerShip ship = ShipAssembler.assembleToShip(serverLevel, Set.of(nextPos), 1);
-            FixedConstraintUtils.createFixedConstraint(serverLevel, clickedPos, ship, nail);
+            System.out.println("pos: " + nextPos);
+            System.out.println("pos center: " + nextPos.getCenter());
+            System.out.println("ship aabb: " + ship.getShipAABB());
+           // FixedConstraintUtils.createFixedConstraint(serverLevel, clickedPos, ship, nail);
         }
-
 
 
         return InteractionResult.PASS;
@@ -108,6 +112,8 @@ public class NailItem extends BlockItem {
 //
 //        return InteractionResult.PASS;
 //    }
+
+
 
     public Nail getNail(Integer id) {
         return nails.get(id);
