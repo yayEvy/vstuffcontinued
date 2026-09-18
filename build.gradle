@@ -73,7 +73,7 @@ minecraft {
 
         client {
             property 'forge.enabledGameTestNamespaces', mod_id
-            jvmArgs '-Dforge.logging.markers=REGISTRIES'
+            jvmArgs '-Dforge.logging.markers=REGISTRIES -Xmx4G'
             property("mixin.env.refMapRemappingFile", "${projectDir}/build/createSrgToMcp/output.srg")
         }
 
@@ -174,7 +174,13 @@ dependencies {
     implementation(jarJar("io.github.llamalad7:mixinextras-forge:${mixin_extras_version}") {
         jarJar.ranged(it, "[${mixin_extras_version},)")
     })
+
+    compileOnly("org.projectlombok:lombok:1.18.46")
+    annotationProcessor("org.projectlombok:lombok:1.18.46")
+
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
+
+    runtimeOnly(fg.deobf("maven.modrinth:spark:1.10.53-forge"))
 }
 
 configurations {

@@ -28,5 +28,4 @@ public record RopeCategory(
     ).apply(i, RopeCategory::new));
 
     public static final Codec<Holder<RopeCategory>> CODEC = RegistryFileCodec.create(VStuffRegistries.ROPE_CATEGORY, DIRECT_CODEC);
-
 }
