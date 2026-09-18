@@ -35,10 +35,10 @@ public record RopeSegment(@NotNull LocalPosAndBodyId pos0, @NotNull LocalPosAndB
         return shipOrBody.getRenderTransform().getToWorld().transformPosition(pos, new Vector3d());
     }
 
-    private static final Codec<Long> ID = Codec.LONG.xmap(
-            idTo -> idTo,
-            idFrom -> idFrom == null ? -1L : idFrom
-    );
+//    private static final Codec<Long> ID = Codec.LONG.xmap(
+//            idTo -> idTo,
+//            idFrom -> idFrom == null ? -1L : idFrom
+//    );
 
 //    public static final Codec<RopeSegment> CODEC = RecordCodecBuilder.create(i -> i.group( // codec of doom and despair part 2
 //            ID.fieldOf("id0").forGetter(RopeSegment::id0),

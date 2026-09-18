@@ -189,8 +189,6 @@ public class RopeFactory {
                 new VSJointPose(last.pos1().pos(), new Quaterniond()),
                 maxLength).serialized();
 
-        joints.add(lastJoint);
-
         for (RopeSegment segment : segments) {
             VSJoint joint = type.getConnectingPhysBodyJointWith(
                     segment.pos0().id(), new VSJointPose(segment.pos0().pos(), new Quaterniond()),
@@ -201,6 +199,8 @@ public class RopeFactory {
 
             joints.add(joint);
         }
+
+        joints.add(lastJoint);
 
         return joints;
     }
