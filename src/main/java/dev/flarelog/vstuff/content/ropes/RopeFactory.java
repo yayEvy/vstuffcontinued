@@ -213,7 +213,7 @@ public class RopeFactory {
         AtomicBoolean failed = new AtomicBoolean();
 
         for (VSJoint joint : joints) {
-            gtpa.addJoint(joint, 5, id -> { // consumer lambda of doom and despair
+            gtpa.addJoint(joint, 15, id -> { // consumer lambda of doom and despair
                 if (id == -1) {
                     LOGGER.warn("Invalid joint id received when creating phys rope!");
                     failed.set(true);
@@ -223,7 +223,7 @@ public class RopeFactory {
 
                 if (remaining.decrementAndGet() == 0 && failed.get()) {
                     LOGGER.info("Failed was true after all joints have been created, discarding phys rope.");
-                    removeAndCleanupRope(rope, level);
+                     level.getServer().execute(() -> removeAndCleanupRope(rope, level));
                 }
             });
         }
