@@ -2,17 +2,29 @@ package dev.flarelog.vstuff.content.ropes.util;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.FriendlyByteBuf;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.bodies.ClientVsBody;
+import org.valkyrienskies.core.internal.joints.VSJoint;
 import org.valkyrienskies.core.internal.world.VsiClientShipWorld;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import dev.flarelog.vstuff.internal.utility.CodecUtil;
 
-public record RopeSegment(@NotNull LocalPosAndBodyId pos0, @NotNull LocalPosAndBodyId pos1) {
+@RequiredArgsConstructor
+@Accessors(fluent = true)
+public class RopeSegment {
+
+    @Getter private final @NotNull LocalPosAndBodyId pos0;
+    @Getter private final @NotNull LocalPosAndBodyId pos1;
+
+    @Setter @Getter private VSJoint joint;
 
     private static final Long NOID = -1L;
 
