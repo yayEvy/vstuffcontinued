@@ -7,6 +7,7 @@ import dev.flarelog.vstuff.content.ropes.util.LocalPosAndBodyId;
 import dev.flarelog.vstuff.content.ropes.util.RopeSegment;
 import dev.flarelog.vstuff.infrastructure.config.VStuffConfigs;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
+import dev.flarelog.vstuff.internal.utility.JointScheduler;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -105,6 +106,7 @@ public class RopeFactory {
 
         Rope physRope = new Rope(ctx.data0(), ctx.data1(), type, styleKey, segments);
 
+        JointScheduler.schedule(physRope, ctx.level());
 //        createJoints(ctx.level, physRope, joints);
 
         RopeManager.get(level).addRope(physRope);
@@ -227,7 +229,7 @@ public class RopeFactory {
 
                 if (remaining.decrementAndGet() == 0 && failed.get()) {
                     LOGGER.info("Failed was true after all joints have been created, discarding phys rope.");
-                     level.getServer().execute(() -> removeAndCleanupRope(rope, level));
+                     removeAndCleanupRope(rope, level);
                 }
             });
         }
@@ -235,8 +237,10 @@ public class RopeFactory {
 
     public static void removeAndCleanupRope(Rope rope, ServerLevel level) {
         LOGGER.warn("Cleanup rope {}", rope.getRopeId());
-        RopeManager.get(level).removeRope(rope.getRopeId());
-        rope.cleanup(level);
+        level.getServer().execute(() -> {
+            RopeManager.get(level).removeRope(rope.getRopeId());
+            rope.cleanup(level);
+        });
     }
 
     public record RopeContext(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1) {}

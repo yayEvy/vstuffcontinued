@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.flarelog.vstuff.content.physics.VSUtil;
 import dev.flarelog.vstuff.content.ropes.type.RopeType;
 import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
@@ -24,7 +25,6 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,18 +39,19 @@ public class Rope {
             Codec.INT.listOf().fieldOf("jointIds").forGetter(rope -> new ArrayList<>(rope.getJointIds()))
     ).apply(instance, (ropeId, posData0, posData1, type, styleKey, segments, jointIds) -> {
         Rope rope = new Rope(posData0, posData1, type, styleKey, segments).setRopeId(ropeId);
-        rope.setJointIds(new LinkedList<>(jointIds));
+        rope.setJointIds(new ArrayList<>(jointIds));
         return rope;
     }));
 
-    @Getter
-    Integer ropeId;
+    @Getter Integer ropeId;
+
     public LocalPosAndBodyId posData0;
     public LocalPosAndBodyId posData1;
+
     public RopeType type;
     public ResourceKey<RopeStyle> styleKey;
-    @Getter
-    List<Integer> jointIds;
+
+    @Setter @Getter List<Integer> jointIds;
     public List<RopeSegment> segments;
 
     protected Rope(LocalPosAndBodyId posData0, LocalPosAndBodyId posData1, RopeType type, ResourceKey<RopeStyle> styleKey, List<RopeSegment> segments) {
@@ -59,11 +60,6 @@ public class Rope {
         this.styleKey = styleKey;
         this.type = type;
         this.segments = segments;
-    }
-
-    public Rope setJointIds(LinkedList<Integer> jointIds) {
-        this.jointIds = jointIds;
-        return this;
     }
 
     public Rope setRopeId(Integer to) {
