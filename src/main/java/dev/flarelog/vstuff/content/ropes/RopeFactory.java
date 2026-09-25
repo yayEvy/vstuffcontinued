@@ -125,14 +125,14 @@ public class RopeFactory {
                 Long id = body.getId();
                 Vector3d pos = new Vector3d();
 
-                segments.add(new RopeSegment(new LocalPosAndBodyId(lastPos ,lastId), new LocalPosAndBodyId(pos, id)));
+                segments.add(new RopeSegment(lastId, id, lastPos, pos));
 
                 lastId = id;
                 lastPos = pos;
             }
         }
 
-        segments.add(new RopeSegment(new LocalPosAndBodyId(lastPos ,lastId) , new LocalPosAndBodyId(ctx.data1.pos(), ctx.data1.id())));
+        segments.add(new RopeSegment(lastId, ctx.data1.id(), lastPos, ctx.data1.pos()));
 
         return segments;
     }
@@ -175,24 +175,24 @@ public class RopeFactory {
             throw new RuntimeException("WTF NULL ROPE TYPE??!!??? MEOW!! MEOW!! MEOW!!");
         }
 
-        VSJoint firstJoint = type.getEndJointWith(first.pos0().id(),
-                new VSJointPose(first.pos0().pos(), new Quaterniond()),
-                first.pos1().id(),
-                new VSJointPose(first.pos1().pos(), new Quaterniond()),
+        VSJoint firstJoint = type.getEndJointWith(first.id0(),
+                new VSJointPose(first.pos0(), new Quaterniond()),
+                first.id1(),
+                new VSJointPose(first.pos1(), new Quaterniond()),
                 maxLength).serialized();
 
         joints.add(firstJoint);
 
-        VSJoint lastJoint = type.getEndJointWith(last.pos0().id(),
-                new VSJointPose(last.pos0().pos(), new Quaterniond()),
-                last.pos1().id(),
-                new VSJointPose(last.pos1().pos(), new Quaterniond()),
+        VSJoint lastJoint = type.getEndJointWith(last.id0(),
+                new VSJointPose(last.pos0(), new Quaterniond()),
+                last.id1(),
+                new VSJointPose(last.pos1(), new Quaterniond()),
                 maxLength).serialized();
 
         for (RopeSegment segment : segments) {
             VSJoint joint = type.getConnectingPhysBodyJointWith(
-                    segment.pos0().id(), new VSJointPose(segment.pos0().pos(), new Quaterniond()),
-                    segment.pos1().id(), new VSJointPose(segment.pos1().pos(), new Quaterniond()),
+                    segment.id0(), new VSJointPose(segment.pos0(), new Quaterniond()),
+                    segment.id1(), new VSJointPose(segment.pos1(), new Quaterniond()),
                     maxLength
             );
             joint.setShouldBeSerialized(true);
