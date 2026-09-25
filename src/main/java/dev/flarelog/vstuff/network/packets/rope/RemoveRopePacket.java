@@ -1,7 +1,10 @@
 package dev.flarelog.vstuff.network.packets.rope;
 
 import com.simibubi.create.foundation.networking.SimplePacketBase;
+import dev.flarelog.vstuff.client.ClientPhysRopeManager;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 
 public class RemoveRopePacket extends SimplePacketBase {
@@ -23,7 +26,7 @@ public class RemoveRopePacket extends SimplePacketBase {
 
     @Override
     public boolean handle(NetworkEvent.Context context) {
-        //context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientRopeManager.removeClientConstraint(ropeId)));
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPhysRopeManager.removeClientConstraint(ropeId)));
         return true;
     }
 }

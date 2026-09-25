@@ -1,5 +1,9 @@
 package dev.flarelog.vstuff.content.ropes;
 
+import dev.flarelog.vstuff.client.ClientRopeStyle;
+import dev.flarelog.vstuff.content.ropes.style.RopeStyleManager;
+import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
+import dev.flarelog.vstuff.internal.utility.CodecUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -37,7 +41,8 @@ public class RopeManager extends SavedData {
 
         ListTag ropeList = tag.getList("ropes", Tag.TAG_COMPOUND);
         for (Tag ropeTag : ropeList) {
-            Rope rope = RopeFactory.ropeFromTag((CompoundTag) ropeTag);
+
+            Rope rope = CodecUtil.decodeFromTag(ropeTag, Rope.FULL_CODEC);
 
             data.ropes.put(rope.ropeId, rope);
         }
@@ -50,7 +55,7 @@ public class RopeManager extends SavedData {
     public @NotNull CompoundTag save(@NotNull CompoundTag tag) {
         ListTag ropeList = new ListTag();
         for (Map.Entry<Integer, Rope> entry : ropes.entrySet()) {
-            ropeList.add(RopeFactory.ropeToTag(entry.getValue()));
+            ropeList.add(CodecUtil.encodeToTag(entry.getValue(), Rope.FULL_CODEC));
         }
         tag.put("ropes", ropeList);
         return tag;
@@ -105,7 +110,7 @@ public class RopeManager extends SavedData {
 
 
         for (Rope rope : manager.getRopeList()) {
-            //VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new AddRopePacket(rope, ClientRopeStyle.fromStyle(RopeStyleManager.resolveStyle(rope.styleKey, player.level().registryAccess()))));
+            VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new AddRopePacket(rope));
         }
     }
 }

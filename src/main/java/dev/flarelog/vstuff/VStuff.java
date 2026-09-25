@@ -3,6 +3,7 @@ package dev.flarelog.vstuff;
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import dev.flarelog.vstuff.index.*;
+import dev.flarelog.vstuff.internal.utility.JointScheduler;
 import dev.flarelog.vstuff.network.VStuffPackets;
 import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.network.chat.Component;
@@ -18,6 +19,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 import org.valkyrienskies.core.api.ships.ShipPhysicsListener;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import dev.flarelog.vstuff.content.physics.levituff.attachment.LevituffAttachment;
 import dev.flarelog.vstuff.content.physics.levituff.attachment.RefinedLevituffAttachment;
@@ -56,6 +58,8 @@ public class VStuff {
 
         modEventBus.addListener(VStuff::commonSetup);
         modEventBus.addListener(EventPriority.LOWEST, VStuffDatagen::gatherData);
+
+        ValkyrienSkies.api().getPhysTickEvent().on(JointScheduler::tick);
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> VStuffClient.initialize(modEventBus));
 
