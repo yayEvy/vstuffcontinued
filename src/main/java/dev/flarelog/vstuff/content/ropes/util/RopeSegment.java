@@ -1,5 +1,6 @@
 package dev.flarelog.vstuff.content.ropes.util;
 
+import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
@@ -24,7 +25,7 @@ public class RopeSegment {
     @Getter private final @NotNull LocalPosAndBodyId pos0;
     @Getter private final @NotNull LocalPosAndBodyId pos1;
 
-    @Setter @Getter private VSJoint joint;
+    @Setter @Getter private Either<Integer,VSJoint> joint;
 
     private static final Long NOID = -1L;
 

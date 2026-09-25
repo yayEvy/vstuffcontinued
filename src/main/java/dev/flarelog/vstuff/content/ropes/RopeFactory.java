@@ -1,5 +1,6 @@
 package dev.flarelog.vstuff.content.ropes;
 
+import com.mojang.datafixers.util.Either;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 import dev.flarelog.vstuff.content.ropes.type.RopeType;
 import dev.flarelog.vstuff.content.ropes.util.LocalPosAndBodyId;
@@ -100,11 +101,11 @@ public class RopeFactory {
         double spacing = totalDistance / segmentCount;
 
         List<RopeSegment> segments = createSegmentBodies(ctx, segmentCount, spawnStart, spawnEnd);
-        List<VSJoint> joints = makeJoints(new ArrayList<>(segments), spacing, type);
+        List<VSJoint> joints = makeJoints(segments, spacing, type);
 
         Rope physRope = new Rope(ctx.data0(), ctx.data1(), type, styleKey, segments);
 
-        createJoints(ctx.level, physRope, joints);
+//        createJoints(ctx.level, physRope, joints);
 
         RopeManager.get(level).addRope(physRope);
 
@@ -182,12 +183,14 @@ public class RopeFactory {
                 maxLength).serialized();
 
         joints.add(firstJoint);
+        first.joint(Either.right(firstJoint));
 
         VSJoint lastJoint = type.getEndJointWith(last.pos0().id(),
                 new VSJointPose(last.pos0().pos(), new Quaterniond()),
                 last.pos1().id(),
                 new VSJointPose(last.pos1().pos(), new Quaterniond()),
                 maxLength).serialized();
+        last.joint(Either.right(lastJoint));
 
         for (RopeSegment segment : segments) {
             VSJoint joint = type.getConnectingPhysBodyJointWith(
@@ -196,10 +199,11 @@ public class RopeFactory {
                     maxLength
             );
             joint.setShouldBeSerialized(true);
-
+            segment.joint(Either.right(joint));
             joints.add(joint);
         }
-
+        segments.add(0, first);
+        segments.add(last);
         joints.add(lastJoint);
 
         return joints;
