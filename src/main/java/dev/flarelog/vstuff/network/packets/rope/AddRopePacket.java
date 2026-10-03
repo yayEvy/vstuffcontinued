@@ -68,7 +68,7 @@ public class AddRopePacket extends SimplePacketBase {
         context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPhysRopeManager.addClientConstraint(id, pos0, pos1, segments, styleKey, null)));
 //        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPhysRopeManager.addClientConstraint(rope.getRopeId(), rope.posData0.pos(), rope.posData1.pos(), rope.segments, rope.styleKey, rope.type)));
 
-        return false;
+        return true;
     }
 
     private static Vector3d readVector3d(FriendlyByteBuf buf) {

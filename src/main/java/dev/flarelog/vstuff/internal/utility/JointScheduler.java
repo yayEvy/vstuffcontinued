@@ -57,14 +57,13 @@ public class JointScheduler {
                             segment.joint(Either.left(id));
                             // TODO: remove the need for this and store joint ids per segment
                             rope.getJointIds().add(id);
-                            return;
                         }
-                        failed.set(true);
                     });
                 }
             }
 
-            if (!failed.get()) {
+            boolean allResolved = rope.segments.stream().allMatch(s -> s.joint().left().isPresent());
+            if (allResolved) {
                 ropes.remove(rope);
                 continue;
             }
@@ -78,7 +77,7 @@ public class JointScheduler {
     }
 
     private static boolean bodiesExist(RopeSegment segment, PhysLevel level) {
-        return (segment.pos0().isWorld() || level.getBodyById(segment.pos0().id()) != null) && (segment.pos1().isWorld() || level.getBodyById(segment.pos1().id()) != null);
+        return (segment.id0() == null || level.getBodyById(segment.id0()) != null) && (segment.id1() == null || level.getBodyById(segment.id1()) != null);
     }
 
 

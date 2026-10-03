@@ -22,19 +22,21 @@ import dev.flarelog.vstuff.internal.utility.CodecUtil;
 @Accessors(fluent = true)
 public class RopeSegment {
 
-    @Getter private final @NotNull LocalPosAndBodyId pos0;
-    @Getter private final @NotNull LocalPosAndBodyId pos1;
+    @Getter private final @NotNull Vector3d pos0;
+    @Getter private final Long id0;
+    @Getter private final @NotNull Vector3d pos1;
+    @Getter private final Long id1;
 
     @Setter @Getter private Either<Integer,VSJoint> joint;
 
     private static final Long NOID = -1L;
 
     public Vector3d getRenderPos0(ClientLevel level) {
-        return getPos(level, pos0.id(), pos0.pos());
+        return getPos(level, id0, pos0);
     }
 
     public Vector3d getRenderPos1(ClientLevel level) {
-        return getPos(level, pos1.id(), pos1.pos());
+        return getPos(level, id1, pos1);
     }
 
     private Vector3d getPos(ClientLevel level, Long id, Vector3d pos) {
@@ -48,26 +50,32 @@ public class RopeSegment {
         return shipOrBody.getRenderTransform().getToWorld().transformPosition(pos, new Vector3d());
     }
 
-//    private static final Codec<Long> ID = Codec.LONG.xmap(
-//            idTo -> idTo,
-//            idFrom -> idFrom == null ? -1L : idFrom
-//    );
+    private static final Codec<Long> ID = Codec.LONG.xmap(
+            idTo -> idTo,
+            idFrom -> idFrom == null ? -1L : idFrom
+    );
 
-//    public static final Codec<RopeSegment> CODEC = RecordCodecBuilder.create(i -> i.group( // codec of doom and despair part 2
-//            ID.fieldOf("id0").forGetter(RopeSegment::id0),
-//            ID.fieldOf("id1").forGetter(RopeSegment::id1),
-//            CodecUtil.VECTOR3D.fieldOf("pos0").forGetter(RopeSegment::pos0),
-//            CodecUtil.VECTOR3D.fieldOf("pos1").forGetter(RopeSegment::pos1)
-//    ).apply(i, RopeSegment::new));
-
-    public static final Codec<RopeSegment> CODEC = RecordCodecBuilder.create(i -> i.group(
-            LocalPosAndBodyId.CODEC.fieldOf("pos0").forGetter(RopeSegment::pos0),
-            LocalPosAndBodyId.CODEC.fieldOf("pos1").forGetter(RopeSegment::pos1)
+    public static final Codec<RopeSegment> CODEC = RecordCodecBuilder.create(i -> i.group( // codec of doom and despair part 2
+            CodecUtil.VECTOR3D.fieldOf("pos0").forGetter(RopeSegment::pos0),
+            ID.fieldOf("id0").forGetter(RopeSegment::id0),
+            CodecUtil.VECTOR3D.fieldOf("pos1").forGetter(RopeSegment::pos1),
+            ID.fieldOf("id1").forGetter(RopeSegment::id1)
     ).apply(i, RopeSegment::new));
+
+//    public static final Codec<RopeSegment> CODEC = RecordCodecBuilder.create(i -> i.group(
+//            LocalPosAndBodyId.CODEC.fieldOf("pos0").forGetter(RopeSegment::pos0),
+//            LocalPosAndBodyId.CODEC.fieldOf("pos1").forGetter(RopeSegment::pos1)
+//    ).apply(i, RopeSegment::new));
 
 
     public static RopeSegment readJsonFromBuffer(FriendlyByteBuf buf) {
-        return buf.readJsonWithCodec(RopeSegment.CODEC);
+        RopeSegment segmentNonNull = buf.readJsonWithCodec(RopeSegment.CODEC);
+        return new RopeSegment(
+                segmentNonNull.pos0,
+                segmentNonNull.id0 == -1 ? null : segmentNonNull.id0,
+                segmentNonNull.pos1,
+                segmentNonNull.id1 == -1 ? null : segmentNonNull.id1
+        );
     }
 
     public static void writeJsonToBuffer(FriendlyByteBuf buf, RopeSegment segment) {
