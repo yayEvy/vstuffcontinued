@@ -9,7 +9,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -78,9 +77,7 @@ public class RopeItem extends Item {
             return InteractionResult.SUCCESS;
         }
 
-        ResourceLocation dimId = ResourceLocation.parse(tag.getString("dim"));
-
-        RopeResult ropeResult = RopeFactory.tryCreateRope(serverLevel, LocalPosAndBodyId.from(firstClickedPos, serverLevel),  LocalPosAndBodyId.from(clickedPos, serverLevel), ResourceKey.create(VStuffRegistries.ROPE_TYPE, VStuff.asResource("normal")), RopeStyleManager.get(heldItem.getOrCreateTag()), dimId);
+        RopeResult ropeResult = RopeFactory.tryCreateRope(serverLevel, LocalPosAndBodyId.from(firstClickedPos, serverLevel),  LocalPosAndBodyId.from(clickedPos, serverLevel), ResourceKey.create(VStuffRegistries.ROPE_TYPE, VStuff.asResource("normal")), RopeStyleManager.get(heldItem.getOrCreateTag()));
 
 
         if (ropeResult.valid) {
