@@ -22,10 +22,11 @@ import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.network.packets.misc.OutlinePacket;
+import dev.flarelog.vstuff.content.ropes.util.ILikeRopes;
 import dev.flarelog.vstuff.network.VStuffPackets;
 import dev.flarelog.vstuff.content.ropes.util.RopeUtil;
 
-public class RopeItem extends Item {
+public class RopeItem extends Item implements ILikeRopes {
 
     public RopeItem(Properties properties) {
         super(properties);
@@ -64,7 +65,7 @@ public class RopeItem extends Item {
 
         } else if (player.isShiftKeyDown()) {
             player.displayClientMessage(VStuff.translate("message.rope.reset").withStyle(ChatFormatting.GREEN), true);
-            RopeUtil.resetTag(heldItem);
+            resetTag(heldItem);
             return InteractionResult.SUCCESS;
         }
 
@@ -73,7 +74,7 @@ public class RopeItem extends Item {
 
         if (clickedPos.equals(firstClickedPos)) {
             player.displayClientMessage(VStuff.translate("message.rope.reset").withStyle(ChatFormatting.GREEN), true);
-            RopeUtil.resetTag(heldItem);
+            resetTag(heldItem);
             return InteractionResult.SUCCESS;
         }
 
@@ -95,19 +96,19 @@ public class RopeItem extends Item {
             return InteractionResult.SUCCESS;
         }
 
-        RopeUtil.resetTag(heldItem);
+        resetTag(heldItem);
 
         return InteractionResult.SUCCESS;
     }
 
     @Override
     public @NotNull Component getName(@NotNull ItemStack stack) {
-        return RopeUtil.getRopeItemNameWithStyle(this, stack);
+        return getNameWithStyle(this, stack);
     }
 
     @Override
     public boolean isFoil(ItemStack stack) {
-        return stack.hasTag() && stack.getTag().contains("data");
+        return isItemFoil(stack);
     }
 
 }

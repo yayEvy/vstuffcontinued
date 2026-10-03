@@ -1,6 +1,5 @@
 package dev.flarelog.vstuff.content.ropes.util;
 
-import dev.flarelog.vstuff.internal.utility.PositionUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -31,7 +30,7 @@ public interface ILikeRopes {
     }
 
     default void createRopeDrop(ServerLevel serverLevel, BlockPos pos, ResourceKey<RopeStyle> style) {
-        Vector3d worldPos = PositionUtils.getWorldPos(serverLevel, pos);
+        Vector3d worldPos = RopeUtil.getWorldPos(serverLevel, pos);
 
         ItemStack ropeStack = new ItemStack(VStuffItems.ROPE.get());
 
