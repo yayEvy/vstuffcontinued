@@ -1,0 +1,28 @@
+name: Compile and Upload Mod to Testers Channel
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK / Environment
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Compile Mod
+        run: ./gradlew build
+
+      - name: Send Mod to Discord
+        uses: bytelabs-software/discord-commit-notifications@v1
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          file-path: './build/reobfJar/output.jar'
+          embed-title: 'New Vstuff Test Build'
+          embed-color: '0x00ff00'
