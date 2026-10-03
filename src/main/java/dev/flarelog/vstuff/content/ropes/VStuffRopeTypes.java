@@ -1,6 +1,7 @@
 package dev.flarelog.vstuff.content.ropes;
 
 import dev.flarelog.vstuff.VStuff;
+import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 import dev.flarelog.vstuff.content.ropes.type.DistanceJointParams;
 import dev.flarelog.vstuff.content.ropes.type.RopeType;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
@@ -8,7 +9,7 @@ import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
 
-import static dev.flarelog.vstuff.content.ropes.RopeFactory.*;
+import static dev.flarelog.vstuff.content.ropes.NewRopeFactory.*;
 
 public class VStuffRopeTypes {
     public static void bootstrap(BootstapContext<RopeType> ctx) {
