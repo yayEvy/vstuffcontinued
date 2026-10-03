@@ -26,13 +26,10 @@ import java.util.Optional;
 
 public record LocalPosAndBodyId(@NotNull Vector3d pos, @Nullable Long id) {
 
-    public static final Codec<LocalPosAndBodyId> CODEC = RecordCodecBuilder.create(instance ->
-            instance.group(
+    public static final Codec<LocalPosAndBodyId> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                     CodecUtil.VECTOR3D.fieldOf("pos").forGetter(LocalPosAndBodyId::pos),
-                    Codec.LONG.optionalFieldOf("id")
-                            .xmap(opt -> opt.orElse(null), Optional::ofNullable)
-                            .forGetter(LocalPosAndBodyId::id)
-            ).apply(instance, LocalPosAndBodyId::new)
+                    Codec.LONG.fieldOf("id").forGetter(data -> data.id() == null ? -1L : data.id())
+            ).apply(instance, (pos, id) -> new LocalPosAndBodyId(pos, id == -1L ? null : id))
     );
 
     public LocalPosAndBodyId(@NotNull Vector3d shipPos, ServerLevel level) {
