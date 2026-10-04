@@ -1,6 +1,7 @@
 package dev.flarelog.vstuff.content.physics.ships.nails;
 
 
+import dev.flarelog.vstuff.index.VStuffBlocks;
 import dev.flarelog.vstuff.internal.utility.FixedConstraintUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -13,7 +14,13 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.ServerShip;
+import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
+import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import org.valkyrienskies.mod.common.assembly.ShipAssembler;
+import org.valkyrienskies.mod.common.item.ShipAssemblerItem;
+import org.valkyrienskies.mod.common.item.VSBlockItem;
+import org.valkyrienskies.mod.common.item.VSItem;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -58,15 +65,20 @@ public class NailItem extends BlockItem {
         if (context.getLevel() instanceof ServerLevel serverLevel) {
 
             try {
-                Thread.sleep(2000);
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            ServerShip ship = ShipAssembler.assembleToShip(serverLevel, Set.of(nextPos), 1);
-            System.out.println("pos: " + nextPos);
-            System.out.println("pos center: " + nextPos.getCenter());
-            System.out.println("ship aabb: " + ship.getShipAABB());
-           // FixedConstraintUtils.createFixedConstraint(serverLevel, clickedPos, ship, nail);
+
+            if (!serverLevel.isClientSide) {
+                // Ship ship = ShipAssembler.assembleToShip(serverLevel, Set.of(nextPos), 1);
+                //       System.out.println("pos: " + nextPos);
+                //       System.out.println("dir"+coolDirection);
+                //       System.out.println("pos center: " + nextPos.getCenter());
+                //  System.out.println("ship aabb: " + ship.getShipAABB());
+            }
+                // FixedConstraintUtils.createFixedConstraint(serverLevel, clickedPos, ship, nail);
+
         }
 
 
