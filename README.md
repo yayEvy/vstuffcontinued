@@ -21,7 +21,7 @@
 ## PLANNED for v4.0.0:
 - Phys Ropes! (Ropes that have collision and are made up of segments, rather than being a simple joint between two positions like the normal ropes are!)
 - Creative Rope Editor (Lowkey forgot we had this in dev :sob:)
-- Rope types (Elastic, rigid, neon, etc.)
+- Rope types (Elastic, rigid, neon, etc.) (wip)
 - Dynamic lighting for ropes, rope to world
 - Chains will get lantern chains (?) 
 - Rope outline stuff

@@ -56,7 +56,7 @@ public final class RopeStyleManager {
 
     public static ResourceKey<RopeStyle> get(CompoundTag tag) {
         if (!tag.contains("style", Tag.TAG_COMPOUND)) return DEFAULT_KEY;
-        return TagUtils.readResourceKey(tag.getCompound("style"));
+        return RopeStyle.tagToKey(tag.getCompound("style"));
     }
 
     public static void set(Player player, ResourceKey<RopeStyle> style) {
@@ -68,7 +68,7 @@ public final class RopeStyleManager {
     public static void set(ItemStack stack, ResourceKey<RopeStyle> style) {
         if (stack.isEmpty()) return;
         CompoundTag tag = stack.getOrCreateTag();
-        tag.put("style", TagUtils.writeResourceKey(style));
+        tag.put("style", RopeStyle.keyToTag(style));
     }
 
     public static final List<String> COLORS = List.of("Red", "Orange", "Yellow", "Lime", "Green", "Cyan",

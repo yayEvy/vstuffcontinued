@@ -1,5 +1,6 @@
 package dev.flarelog.vstuff.content.ropes;
 
+import dev.flarelog.vstuff.internal.utility.PositionUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -8,11 +9,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import dev.flarelog.vstuff.VStuff;
-import dev.flarelog.vstuff.content.ropes.util.ILikeRopes;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 import dev.flarelog.vstuff.content.ropes.util.RopeUtil;
 
-public class RopeCutterItem extends Item implements ILikeRopes {
+public class RopeCutterItem extends Item {
     public RopeCutterItem(Properties pProperties) {
         super(pProperties);
     }
@@ -36,12 +36,12 @@ public class RopeCutterItem extends Item implements ILikeRopes {
 
                 RopeStyle style = physRope.getStyle(serverLevel.registryAccess());
 
-                RopeUtil.playSound(serverLevel, physRope.posData0.blockPos(), style.breakSound());
-                RopeUtil.playSound(serverLevel, physRope.posData1.blockPos(), style.breakSound());
+                RopeUtil.playSound(serverLevel, PositionUtils.containingBlockPos(physRope.posData0.getWorldPos(serverLevel)), style.breakSound());
+                RopeUtil.playSound(serverLevel, PositionUtils.containingBlockPos(physRope.posData1.getWorldPos(serverLevel)), style.breakSound());
 
                 if (!player.isCreative()) {
                     itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
-                    createRopeDrop(player, physRope.styleKey);
+                    RopeUtil.createRopeDrop(player, physRope.styleKey);
                 }
 
                 return InteractionResultHolder.success(itemStack);
@@ -54,4 +54,5 @@ public class RopeCutterItem extends Item implements ILikeRopes {
 
         return InteractionResultHolder.pass(itemStack);
     }
+
 }
