@@ -1,17 +1,22 @@
 package dev.flarelog.vstuff.content.physics.ships.nails;
 
 
+import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.index.VStuffBlocks;
+import dev.flarelog.vstuff.index.VStuffSounds;
 import dev.flarelog.vstuff.internal.utility.FixedConstraintUtils;
 import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.util.ForgeSoundType;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
@@ -24,17 +29,38 @@ import org.valkyrienskies.mod.common.item.VSItem;
 
 import java.util.HashMap;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import static dev.flarelog.vstuff.content.physics.ships.nails.Nail.nails;
 
 
 public class NailItem extends BlockItem {
 
+    public static SoundEvent[] boxOfNailSounds = {
+            VStuffSounds.NAIL_1.get(),
+            VStuffSounds.NAIL_2.get(),
+            VStuffSounds.NAIL_3.get()
+    };
+
+
+
+    public static SoundEvent getRandomNailFromBox(){
+         return boxOfNailSounds[(int)( Util.getMillis() % boxOfNailSounds.length )];
+    }
+
+    public static Supplier<SoundEvent> boxSupplier = new Supplier<SoundEvent>() {
+        @Override
+        public SoundEvent get() {
+            return getRandomNailFromBox();
+        }
+    };
 
   public static HashMap<BlockPos,BlockPos> posMap= new HashMap<>();
   public static Direction coolDirection;
   public static BlockPos blockToBeNailedTo;
     public NailItem(NailBlock pBlock, Properties pProperties) { super(pBlock, pProperties); }
+
+
 
 
     @Override
@@ -65,25 +91,35 @@ public class NailItem extends BlockItem {
         if (context.getLevel() instanceof ServerLevel serverLevel) {
 
             try {
-                Thread.sleep(5000);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
 
-            if (!serverLevel.isClientSide) {
-                // Ship ship = ShipAssembler.assembleToShip(serverLevel, Set.of(nextPos), 1);
-                //       System.out.println("pos: " + nextPos);
-                //       System.out.println("dir"+coolDirection);
-                //       System.out.println("pos center: " + nextPos.getCenter());
-                //  System.out.println("ship aabb: " + ship.getShipAABB());
-            }
-                // FixedConstraintUtils.createFixedConstraint(serverLevel, clickedPos, ship, nail);
+
+                 Ship ship = ShipAssembler.assembleToShip(serverLevel, Set.of(nextPos), 1);
+
+                 FixedConstraintUtils.createFixedConstraint(serverLevel, clickedPos, ship, nail);
+
+            System.out.println(getRandomNailFromBox());
+
 
         }
 
 
         return InteractionResult.PASS;
     }
+
+    public static ForgeSoundType nailSoundType = new ForgeSoundType(
+            1.0f,
+            1.0f,
+            boxSupplier,
+            boxSupplier,
+            boxSupplier,
+            boxSupplier,
+            boxSupplier
+            );
+
 
 //    @Override
 //    public InteractionResult place(BlockPlaceContext context) {
@@ -132,5 +168,6 @@ public class NailItem extends BlockItem {
     }
 
 
-        }
+
+}
 

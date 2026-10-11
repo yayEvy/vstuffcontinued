@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
@@ -18,7 +19,7 @@ import java.util.Objects;
 
 public class FixedConstraintUtils {
 
-    public static void createFixedConstraint(Level level, BlockPos posOne, Ship ship2, Nail nail){
+    public static void createFixedConstraint(Level level, BlockPos posOne, @NotNull Ship ship2, @NotNull Nail nail){
 
         VSJointPose pose1;
         VSFixedJoint joint =null;
@@ -29,7 +30,7 @@ public class FixedConstraintUtils {
        Vector3d worldsPos = ikThisIsGoofyButIdcRnTbl.add(getOffset(nail.direction));
 
 
-        VSJointPose pose2 = new VSJointPose(ship2.getWorldAABB().center(new Vector3d()),getRotationOffset(nail.direction, nail.rotation).normalize().mul(ship2.getTransform().getRotation()));
+        VSJointPose pose2 = new VSJointPose(ship2.getShipAABB().center(new Vector3d()),getRotationOffset(nail.direction, nail.rotation).normalize().mul(ship2.getTransform().getRotation()));
 
         if (ship1ID == null) {
 
@@ -75,17 +76,6 @@ public static Quaterniond getRotationOffset(Direction direction, Double rotation
         case SOUTH -> new Quaterniond().rotateZ((Math.toRadians(rotation)));
     };
 
-
-
-//    return switch (direction) {
-//        case UP ->    new Quaterniond(0,rotation,0,0);
-//        case DOWN ->  new Quaterniond(0,-rotation,0,0);
-//        case WEST ->  new Quaterniond(-rotation,0,0,0);
-//        case EAST ->  new Quaterniond(rotation,0,0,0);
-//        case NORTH -> new Quaterniond(0,0,-rotation,0);
-//        case SOUTH -> new Quaterniond(0,0,rotation,0);
-//    };
-//
 
 }
 

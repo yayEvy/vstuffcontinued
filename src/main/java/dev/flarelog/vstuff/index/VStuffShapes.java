@@ -21,7 +21,13 @@ public class VStuffShapes {
 
 
 
-        NAIL = shape(0,0,0,16,16,16)//
+    NAIL = shape(3.0, 0.075, 4.0, 13.0, 2.5, 12.0)
+            .add(2.68, 0.025, 2.135, 4.68, 2.975, 8.635)
+            .add(2.68, 0.025, 7.365, 4.68, 2.975, 13.865)
+            .add(11.32, 0.025, 2.135, 13.32, 2.975, 8.635)
+            .add(11.32, 0.025, 7.365, 13.32, 2.975, 13.865)
+            .add(4.0, 0.0, 2.0, 12.0, 3.0, 4.0)
+            .add(4.0, 0.0, 12.0, 12.0, 3.0, 14.0)
             .forDirectional(),
 
         PHYS_PULLEY = shape(0, 0, 0, 16, 16, 16)
@@ -35,6 +41,7 @@ public class VStuffShapes {
     private static Builder shape(VoxelShape shape) {
         return new Builder(shape);
     }
+
 
     private static Builder shape(double x1, double y1, double z1, double x2, double y2, double z2) {
         return shape(cuboid(x1, y1, z1, x2, y2, z2));

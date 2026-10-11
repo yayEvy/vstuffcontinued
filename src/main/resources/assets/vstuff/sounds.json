@@ -44,5 +44,15 @@
   },
   "levituff_grind": {
     "sounds": [ { "name": "vstuff:levituff_grind", "stream": true } ]
+  },
+
+  "nail_1": {
+    "sounds": [ { "name": "vstuff:nail_1" } ]
+  },
+  "nail_2": {
+    "sounds": [ { "name": "vstuff:nail_2" } ]
+  },
+  "nail_3": {
+    "sounds": [ { "name": "vstuff:nail_3" } ]
   }
 }

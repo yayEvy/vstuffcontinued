@@ -8,12 +8,16 @@ import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.builders.ItemBuilder;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
+import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import dev.flarelog.vstuff.content.physics.ships.nails.NailBlock;
 import dev.flarelog.vstuff.content.physics.ships.nails.NailItem;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DirectionalBlock;
+import net.minecraft.world.level.block.EndRodBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import dev.flarelog.vstuff.VStuff;
@@ -27,11 +31,13 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ModelFile;
+import net.minecraftforge.common.util.ForgeSoundType;
 import org.valkyrienskies.core.internal.config.ConfigEntry;
 
 import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
 import static com.simibubi.create.foundation.data.TagGen.axeOrPickaxe;
 import static com.simibubi.create.foundation.data.TagGen.pickaxeOnly;
+import static dev.flarelog.vstuff.content.physics.ships.nails.NailItem.nailSoundType;
 
 public class VStuffBlocks  {
 
@@ -54,22 +60,44 @@ public class VStuffBlocks  {
 
     public static final BlockEntry<NailBlock> NAIL_BLOCK =
             REGISTRATE.block("nail_block", NailBlock::new)
-                    .initialProperties(AllBlocks.ANDESITE_ALLOY_BLOCK)
+                    .initialProperties(AllBlocks.ANALOG_LEVER)
                     .properties(BlockBehaviour.Properties::noOcclusion)
-//                    .blockstate((ctx, prov) -> {
-//                        ModelFile model = new ModelFile.UncheckedModelFile(prov.modLoc("block/nail_block"));
-//
-//
-//                        com.simibubi.create.AllBlocks
-//
-//                       prov.directionalBlock(ctx.get(), model);
-//
-//                    })
+                    .properties(properties -> properties.sound(nailSoundType))
+                    .blockstate((ctx, prov) -> {
 
-                    .blockstate((c, prov) -> {
                         ModelFile model = new ModelFile.UncheckedModelFile(prov.modLoc("block/nail_block"));
-                        prov.horizontalFaceBlock(c.get(), model);
+//
+                        // prov.horizontalBlock(ctx.get(),model);
+                       prov.directionalBlock(ctx.get(), model);
+
+//                        prov.getVariantBuilder(ctx.get()).forAllStates(state -> {
+//                            Direction facing = state.getValue(NailBlock.FACING);
+//                            int xRot = 0;
+//                            int yRot = 0;
+//
+//                            switch (facing) {
+//                                case DOWN  -> { xRot = 90;  yRot = 0;   } // Pointing Down
+//                                case UP    -> { xRot = -90; yRot = 0;   } // Pointing Up
+//                                case NORTH -> { xRot = 0;   yRot = 0;   } // Base position (0, 0)
+//                                case SOUTH -> { xRot = 0;   yRot = 180; } // Rotated 180 around Y
+//                                case WEST  -> { xRot = 0;   yRot = 270; } // Rotated 270 around Y
+//                                case EAST  -> { xRot = 0;   yRot = 90;  } // Rotated 90 around Y
+//                            }
+//
+//                            return ConfiguredModel.builder()
+//                                    .modelFile(model)
+//                                    .rotationX(xRot)
+//                                    .rotationY(yRot)
+//                                    .build();
+//                        });
                     })
+
+
+
+
+
+
+
                     .transform(axeOrPickaxe())
                     .item(NailItem::new)
                     .build()
