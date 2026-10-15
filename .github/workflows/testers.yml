@@ -41,13 +41,20 @@ jobs:
         echo "VS JAR URL: $JAR_LINK"
         echo "VS_JAR=$JAR_LINK" >> "$GITHUB_ENV"
 
-    - name: Send Mod to Discord
+    - name: Send build embed to Discord
+      uses: sarisia/actions-status-discord@v1
+      with:
+        webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        status: success
+        title: 'New Vstuff Test Build'
+        description: 'VS2 Jar used: [Download](${{ env.VS_JAR }})'
+        username: 'Test Blobber The Second'
+        avatar_url: 'https://cdn.modrinth.com/data/voOBl6iP/7a2aa3a8dcc706ad7f08f6fd5cf0a1b8a3adfae6_96.webp'
+
+    - name: Upload mod jar to Discord
       uses: tsickert/discord-webhook@v7.0.0
       with:
         webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
         filename: './build/reobfJar/output.jar'
-        embed-title: 'New Vstuff Test Build'
-        embed-description: 'VS2 Jar used: [Download](${{ env.VS_JAR }})'
-        embed-color: '5120926'
         username: 'Test Blobber The Second'
         avatar-url: 'https://cdn.modrinth.com/data/voOBl6iP/7a2aa3a8dcc706ad7f08f6fd5cf0a1b8a3adfae6_96.webp'
