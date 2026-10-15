@@ -44,13 +44,19 @@ public class ClientEvents {
             RopeStyleMenuHandler.onKeyInput(key, pressed);
         }
 
-        @SubscribeEvent
-        public static void onScone(InputEvent.MouseScrollingEvent event){
+    @SubscribeEvent
+    public static void onScone(InputEvent.MouseScrollingEvent event) {
+        Minecraft mc = Minecraft.getInstance();
+
+        if (mc.player == null || mc.screen != null)
+            return;
+
+        if (PhysGrabberClientHandler.isHoldingGrabber(mc.player)
+                && PhysGrabberClientHandler.isGrabbing()) {
             PhysGrabberClientHandler.changeDistance(event.getScrollDelta());
-           if (PhysGrabberClientHandler.isHoldingGrabber(Minecraft.getInstance().player) && PhysGrabberClientHandler.isGrabbing()) {
-               if (VStuffKeys.GRABBER_DISTANCE.isPressed()) event.cancel();
-           }
+            event.setCanceled(true);
         }
+    }
 
 //        @SubscribeEvent(priority = EventPriority.HIGHEST)
 //        public static void onPlayerRightClickItem(PlayerInteractEvent.RightClickItem event) { // fired when right-clicking air // icee
