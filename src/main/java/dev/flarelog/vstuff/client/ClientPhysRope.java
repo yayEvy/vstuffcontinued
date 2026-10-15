@@ -4,7 +4,7 @@ import dev.flarelog.vstuff.content.ropes.type.RopeType;
 import net.minecraft.resources.ResourceKey;
 import org.joml.Vector3d;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
-import dev.flarelog.vstuff.content.ropes.util.RopeSegment;
+import dev.flarelog.vstuff.content.ropes.data.RopeSegment;
 
 import java.util.List;
 

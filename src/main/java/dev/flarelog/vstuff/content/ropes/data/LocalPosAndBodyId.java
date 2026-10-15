@@ -1,4 +1,4 @@
-package dev.flarelog.vstuff.content.ropes.util;
+package dev.flarelog.vstuff.content.ropes.data;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
@@ -12,17 +12,14 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.bodies.ServerVsBody;
 import org.valkyrienskies.core.api.ships.QueryableShipData;
-import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.api.world.ServerShipWorld;
-import org.valkyrienskies.core.internal.ships.VsiQueryableShipData;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
-import java.util.Optional;
 
 public record LocalPosAndBodyId(@NotNull Vector3d pos, @Nullable Long id) {
 

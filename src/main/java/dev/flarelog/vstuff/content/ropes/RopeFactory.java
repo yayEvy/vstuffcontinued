@@ -1,10 +1,9 @@
 package dev.flarelog.vstuff.content.ropes;
 
-import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 import dev.flarelog.vstuff.content.ropes.type.RopeType;
-import dev.flarelog.vstuff.content.ropes.util.LocalPosAndBodyId;
-import dev.flarelog.vstuff.content.ropes.util.RopeSegment;
+import dev.flarelog.vstuff.content.ropes.data.LocalPosAndBodyId;
+import dev.flarelog.vstuff.content.ropes.data.RopeSegment;
 import dev.flarelog.vstuff.infrastructure.config.VStuffConfigs;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
 import net.minecraft.core.Registry;
@@ -17,7 +16,6 @@ import org.joml.Matrix3d;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.bodies.ServerVsBody;
-import org.valkyrienskies.core.api.bodies.VsBody;
 import org.valkyrienskies.core.api.bodies.VsBodyCreateData;
 import org.valkyrienskies.core.api.bodies.VsBodyDefaults;
 import org.valkyrienskies.core.api.bodies.shape.BodyShapeData;
@@ -25,7 +23,6 @@ import org.valkyrienskies.core.api.bodies.shape.SphereBodyShapeData;
 import org.valkyrienskies.core.impl.bodies.properties.BodyKinematicsImpl;
 import org.valkyrienskies.core.impl.bodies.properties.BodyTransformImpl;
 import org.valkyrienskies.core.impl.game.bodies.BodyInertiaDataImpl;
-import org.valkyrienskies.core.impl.game.bodies.QueryableVsBodyDataImpl;
 import org.valkyrienskies.core.internal.joints.VSJoint;
 import org.valkyrienskies.core.internal.joints.VSJointPose;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -38,7 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static dev.flarelog.vstuff.content.physics.VSUtil.getGTPA;
 
-public class NewRopeFactory {
+public class RopeFactory {
 
     public static float SEGMENT_LENGTH = 0.8f;
     public static double SEGMENT_RADIUS = 0.125;

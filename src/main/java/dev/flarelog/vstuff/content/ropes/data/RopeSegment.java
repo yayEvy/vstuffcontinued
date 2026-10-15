@@ -1,4 +1,4 @@
-package dev.flarelog.vstuff.content.ropes.util;
+package dev.flarelog.vstuff.content.ropes.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -8,7 +8,6 @@ import org.joml.Vector3d;
 import org.valkyrienskies.core.api.bodies.ClientVsBody;
 import org.valkyrienskies.core.internal.world.VsiClientShipWorld;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import dev.flarelog.vstuff.internal.utility.CodecUtil;
 
 public record RopeSegment(LocalPosAndBodyId pos0, LocalPosAndBodyId pos1) {
 

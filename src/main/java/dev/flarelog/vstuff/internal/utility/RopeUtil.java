@@ -1,12 +1,11 @@
-package dev.flarelog.vstuff.content.ropes.util;
+package dev.flarelog.vstuff.internal.utility;
 
-import dev.flarelog.vstuff.content.ropes.VStuffRopeStyles;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyleManager;
 import dev.flarelog.vstuff.index.VStuffItems;
-import dev.flarelog.vstuff.infrastructure.registry.VStuffBuiltInRegistries;
-import dev.flarelog.vstuff.internal.utility.PositionUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -62,8 +61,8 @@ public class RopeUtil {
 
     public static void resetTag(ItemStack stack) {
         ResourceKey<RopeStyle> lastStyle = null;
-        if (stack.getTag().contains("style")) {
-            lastStyle = RopeStyle.tagToKey(stack.getTagElement("style"));
+        if (stack.getOrCreateTag().contains("style", Tag.TAG_STRING)) {
+            lastStyle = RopeStyle.tagToKey(stack.getTag().get("style"));
         }
 
         stack.setTag(null);
@@ -75,8 +74,9 @@ public class RopeUtil {
     }
 
     public static Component getRopeItemNameWithStyle(Item item, ItemStack stack) {
-        if (stack.getTagElement("style") == null) addStyleToTag(stack, RopeStyleManager.DEFAULT_KEY);
-        ResourceLocation location = RopeStyle.tagToKey(stack.getTagElement("style")).location();
+        CompoundTag tag = stack.getOrCreateTag();
+        if (!tag.contains("style", Tag.TAG_STRING)) addStyleToTag(stack, RopeStyleManager.DEFAULT_KEY);
+        ResourceLocation location = RopeStyle.tagToKey(tag.get("style")).location();
         return Component.translatable(item.getDescriptionId(stack))
                 .append(" (")
                 .append(Component.translatable("ropestyle." + location.getNamespace() + "." + location.getPath())) // this should always be the correct translation key

@@ -4,19 +4,12 @@ import com.simibubi.create.foundation.networking.SimplePacketBase;
 import dev.flarelog.vstuff.internal.utility.CodecUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceKey;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 import org.joml.Vector3d;
 import dev.flarelog.vstuff.client.ClientPhysRopeManager;
 import dev.flarelog.vstuff.content.ropes.Rope;
-import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
-import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
-import dev.flarelog.vstuff.content.ropes.util.RopeSegment;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class AddRopePacket extends SimplePacketBase {
 

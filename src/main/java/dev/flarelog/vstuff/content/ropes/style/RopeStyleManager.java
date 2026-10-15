@@ -55,8 +55,8 @@ public final class RopeStyleManager {
     }
 
     public static ResourceKey<RopeStyle> get(CompoundTag tag) {
-        if (!tag.contains("style", Tag.TAG_COMPOUND)) return DEFAULT_KEY;
-        return RopeStyle.tagToKey(tag.getCompound("style"));
+        if (!tag.contains("style", Tag.TAG_STRING)) return DEFAULT_KEY;
+        return RopeStyle.tagToKey(tag.get("style"));
     }
 
     public static void set(Player player, ResourceKey<RopeStyle> style) {

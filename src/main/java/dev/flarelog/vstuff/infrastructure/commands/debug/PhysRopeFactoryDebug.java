@@ -3,7 +3,7 @@ package dev.flarelog.vstuff.infrastructure.commands.debug;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import dev.flarelog.vstuff.content.ropes.NewRopeFactory;
+import dev.flarelog.vstuff.content.ropes.RopeFactory;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -18,38 +18,38 @@ public class PhysRopeFactoryDebug {
     public static ArgumentBuilder<CommandSourceStack, ?> register() {
         return Commands.literal("factory")
                 .then(factoryValue(
-                        "length", () -> NewRopeFactory.SEGMENT_LENGTH,
-                        length -> NewRopeFactory.SEGMENT_LENGTH = length,
+                        "length", () -> RopeFactory.SEGMENT_LENGTH,
+                        length -> RopeFactory.SEGMENT_LENGTH = length,
                         0.8f, Float::parseFloat
                 ))
                 .then(factoryValue(
-                        "radius", () -> NewRopeFactory.SEGMENT_RADIUS,
-                        radius -> NewRopeFactory.SEGMENT_RADIUS = radius,
+                        "radius", () -> RopeFactory.SEGMENT_RADIUS,
+                        radius -> RopeFactory.SEGMENT_RADIUS = radius,
                         0.125, Double::parseDouble
                 ))
                 .then(factoryValue(
-                        "mass", () -> NewRopeFactory.SEGMENT_MASS,
-                        mass -> NewRopeFactory.SEGMENT_MASS = mass,
+                        "mass", () -> RopeFactory.SEGMENT_MASS,
+                        mass -> RopeFactory.SEGMENT_MASS = mass,
                         1.0, Double::parseDouble
                 ))
                 .then(factoryValue(
-                        "compliance", () -> NewRopeFactory.JOINT_COMPLIANCE,
-                        compliance -> NewRopeFactory.JOINT_COMPLIANCE = compliance,
+                        "compliance", () -> RopeFactory.JOINT_COMPLIANCE,
+                        compliance -> RopeFactory.JOINT_COMPLIANCE = compliance,
                         VSJoint.DEFAULT_COMPLIANCE, Double::parseDouble
                 ))
                 .then(factoryValue(
-                        "tolerance", () -> NewRopeFactory.JOINT_TOLERANCE,
-                        tolerance -> NewRopeFactory.JOINT_TOLERANCE = tolerance,
+                        "tolerance", () -> RopeFactory.JOINT_TOLERANCE,
+                        tolerance -> RopeFactory.JOINT_TOLERANCE = tolerance,
                         0.1f, Float::parseFloat
                 ))
                 .then(factoryValue(
-                        "stiffness", () -> NewRopeFactory.JOINT_STIFFNESS,
-                        stiffness -> NewRopeFactory.JOINT_STIFFNESS = stiffness,
+                        "stiffness", () -> RopeFactory.JOINT_STIFFNESS,
+                        stiffness -> RopeFactory.JOINT_STIFFNESS = stiffness,
                         1e8f, Float::parseFloat
                 ))
                 .then(factoryValue(
-                        "damping", () -> NewRopeFactory.JOINT_DAMPING,
-                        damping -> NewRopeFactory.JOINT_DAMPING = damping,
+                        "damping", () -> RopeFactory.JOINT_DAMPING,
+                        damping -> RopeFactory.JOINT_DAMPING = damping,
                         null, Float::parseFloat
                 ))
                 ;

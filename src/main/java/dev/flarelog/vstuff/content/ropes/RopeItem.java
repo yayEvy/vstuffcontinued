@@ -1,7 +1,7 @@
 package dev.flarelog.vstuff.content.ropes;
 
 import dev.flarelog.vstuff.content.ropes.style.RopeStyleManager;
-import dev.flarelog.vstuff.content.ropes.util.LocalPosAndBodyId;
+import dev.flarelog.vstuff.content.ropes.data.LocalPosAndBodyId;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.network.packets.misc.OutlinePacket;
 import dev.flarelog.vstuff.network.VStuffPackets;
-import dev.flarelog.vstuff.content.ropes.util.RopeUtil;
+import dev.flarelog.vstuff.internal.utility.RopeUtil;
 
 public class RopeItem extends Item {
 
@@ -80,7 +80,7 @@ public class RopeItem extends Item {
 
         ResourceLocation dimId = ResourceLocation.parse(tag.getString("dim"));
 
-        RopeResult ropeResult = NewRopeFactory.tryCreateRope(serverLevel, LocalPosAndBodyId.from(firstClickedPos, serverLevel),  LocalPosAndBodyId.from(clickedPos, serverLevel), ResourceKey.create(VStuffRegistries.ROPE_TYPE, VStuff.asResource("normal")), RopeStyleManager.get(heldItem.getOrCreateTag()), dimId);
+        RopeResult ropeResult = RopeFactory.tryCreateRope(serverLevel, LocalPosAndBodyId.from(firstClickedPos, serverLevel),  LocalPosAndBodyId.from(clickedPos, serverLevel), ResourceKey.create(VStuffRegistries.ROPE_TYPE, VStuff.asResource("normal")), RopeStyleManager.get(heldItem.getOrCreateTag()), dimId);
 
 
         if (ropeResult.valid) {

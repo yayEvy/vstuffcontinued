@@ -10,7 +10,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import dev.flarelog.vstuff.VStuff;
-import dev.flarelog.vstuff.content.ropes.util.RopeUtil;
+import dev.flarelog.vstuff.internal.utility.RopeUtil;
 
 public class RopeEditorItem extends Item {
     public RopeEditorItem(Properties pProperties) {

@@ -23,7 +23,7 @@ import dev.flarelog.vstuff.internal.rendering.IRopeRenderer;
 import dev.flarelog.vstuff.internal.rendering.RopeRenderContext;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 import dev.flarelog.vstuff.internal.utility.RopeRenderUtils;
-import dev.flarelog.vstuff.content.ropes.util.RopeSegment;
+import dev.flarelog.vstuff.content.ropes.data.RopeSegment;
 
 import java.util.List;
 import java.util.Map;

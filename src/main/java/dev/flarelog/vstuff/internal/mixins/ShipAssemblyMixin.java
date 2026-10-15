@@ -1,26 +1,13 @@
 package dev.flarelog.vstuff.internal.mixins;
 
-import dev.flarelog.vstuff.content.ropes.Rope;
-import dev.flarelog.vstuff.content.ropes.RopeManager;
-import dev.flarelog.vstuff.content.ropes.util.LocalPosAndBodyId;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import org.joml.Vector3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.valkyrienskies.core.api.ships.QueryableShipData;
-import org.valkyrienskies.core.api.ships.ServerShip;
-import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.assembly.ShipAssembler;
-import dev.flarelog.vstuff.VStuff;
-import dev.flarelog.vstuff.content.ropes.util.RopeUtil;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Mixin(ShipAssembler.class)
