@@ -56,7 +56,7 @@ public class RopeUtil {
     }
 
     public static void createRopeDrop(ServerLevel serverLevel, BlockPos pos) {
-        createRopeDrop(serverLevel, pos, null);
+        createRopeDrop(serverLevel, pos, RopeStyleManager.DEFAULT_KEY);
     }
 
     public static void resetTag(ItemStack stack) {
