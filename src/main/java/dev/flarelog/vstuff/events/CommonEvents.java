@@ -22,9 +22,6 @@ import org.joml.Vector3d;
 import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.infrastructure.commands.VStuffCommands;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
-import dev.flarelog.vstuff.content.ropes.util.RopeUtil;
-import org.valkyrienskies.core.api.ships.ServerShip;
-import org.valkyrienskies.mod.common.assembly.ShipAssembler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
