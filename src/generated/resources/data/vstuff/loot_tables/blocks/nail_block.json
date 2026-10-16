@@ -11,11 +11,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "vstuff:phys_pulley"
+          "name": "vstuff:nail_block"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "vstuff:blocks/phys_pulley"
+  "random_sequence": "vstuff:blocks/nail_block"
 }

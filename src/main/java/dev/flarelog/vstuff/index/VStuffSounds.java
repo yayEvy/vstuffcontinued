@@ -23,6 +23,12 @@ public class VStuffSounds {
     public static final RegistryObject<SoundEvent> LEVITUFF_A = evilSoundRegister("levituff_a");
     public static final RegistryObject<SoundEvent> LEVITUFF_C = evilSoundRegister("levituff_c");
 
+    // sounds to nail to
+    public static final RegistryObject<SoundEvent> NAIL_1 = evilSoundRegister("nail_1");
+    public static final RegistryObject<SoundEvent> NAIL_2 = evilSoundRegister("nail_2");
+    public static final RegistryObject<SoundEvent> NAIL_3 = evilSoundRegister("nail_3");
+
+
 
     private static RegistryObject<SoundEvent> evilSoundRegister(String name) {
         ResourceLocation id = ResourceLocation.fromNamespaceAndPath(VStuff.MOD_ID, name);

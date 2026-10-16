@@ -60,6 +60,14 @@ public class VStuffItems {
                     )
                     .defaultModel()
                     .register();
+//    public static final ItemEntry<NailItem> NAIL =
+//            REGISTRATE.item("nail", NailItem::new)
+//                    .properties(p -> p
+//                            .stacksTo(64)
+//                    )
+//                    .tag(STYLING_AVAILABLE)
+//                    .model(AssetLookup.existingItemModel())
+//                    .register();
 
     public static final ItemEntry<RopeEditorItem> CREATIVE_ROPE_EDITOR =
             REGISTRATE.item("creative_rope_editor", RopeEditorItem::new)
