@@ -1,13 +1,9 @@
-package dev.flarelog.vstuff.content.ropes.util;
+package dev.flarelog.vstuff.internal.utility;
 
 import dev.flarelog.vstuff.content.physics.VSUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -17,13 +13,8 @@ import org.valkyrienskies.core.api.bodies.VsBody;
 import org.valkyrienskies.core.api.ships.ClientShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import dev.flarelog.vstuff.content.ropes.Rope;
-import dev.flarelog.vstuff.content.ropes.RopeManager;
 
-import javax.annotation.Nullable;
-
-public class RopeUtil {
-
+public class PositionUtils {
     public static Vector3d getLocalPos(Level level, BlockPos pos) {
         Vector3d blockPos;
         try {
@@ -97,29 +88,6 @@ public class RopeUtil {
         return level != null ? getClientBodyPosition(level, bodyId) : null;
     }
 
-    public static double getDistanceToRope(Vec3 eyePos, Vec3 lookVec, Vector3d ropeStart, Vector3d ropeEnd, double maxDistance) {
-        Vec3 start = new Vec3(ropeStart.x, ropeStart.y, ropeStart.z);
-        Vec3 end = new Vec3(ropeEnd.x, ropeEnd.y, ropeEnd.z);
-        double minDistanceToRope = Double.MAX_VALUE;
-
-        for (double t = 0; t <= maxDistance; t += 0.5) {
-            Vec3 rayPoint = eyePos.add(lookVec.scale(t));
-            Vec3 ropeVec = end.subtract(start);
-            Vec3 startToRay = rayPoint.subtract(start);
-            double ropeLength = ropeVec.length();
-            if (ropeLength < 0.01) continue;
-
-            double projection = startToRay.dot(ropeVec) / (ropeLength * ropeLength);
-            projection = Math.max(0, Math.min(1, projection));
-
-            Vec3 closestPointOnRope = start.add(ropeVec.scale(projection));
-            double distanceToRope = rayPoint.distanceTo(closestPointOnRope);
-            minDistanceToRope = Math.min(minDistanceToRope, distanceToRope);
-        }
-
-        return minDistanceToRope;
-    }
-
     public static Vector3d worldToShipLocal(Level level, Vector3d worldPos, Long shipId) {
         if (shipId == null) return new Vector3d(worldPos);
 
@@ -131,42 +99,5 @@ public class RopeUtil {
         }
 
         return new Vector3d(worldPos);
-    }
-
-    public static @Nullable Integer findRopeId(ServerLevel level, Player player) {
-        Rope rope = findPhysRope(level, player);
-        return rope == null ? null : rope.getRopeId();
-    }
-
-    public static @Nullable Rope findPhysRope(ServerLevel level, Player player) {
-        Vec3 eyePos = player.getEyePosition();
-        Vec3 lookVec = player.getViewVector(1.0f);
-        double maxDistance = player.getBlockReach();
-        double minDistance = Double.MAX_VALUE;
-        Rope closest = null;
-
-        for (Rope rope : RopeManager.get(level).getRopeList()) {
-            Vector3d a = rope.posData0.getWorldPos(level);
-            Vector3d b = rope.posData1.getWorldPos(level);
-
-            double dist = getDistanceToRope(eyePos, lookVec, a, b, maxDistance);
-            if (dist < minDistance && dist <= 1.0) {
-                minDistance = dist;
-                closest = rope;
-            }
-        }
-
-        return closest;
-    }
-
-    public static void playSound(ServerLevel serverLevel, BlockPos pos, SoundEvent sound) {
-        serverLevel.playSound(
-                null,
-                pos,
-                sound,
-                SoundSource.PLAYERS,
-                1.0f,
-                1.0f
-        );
     }
 }

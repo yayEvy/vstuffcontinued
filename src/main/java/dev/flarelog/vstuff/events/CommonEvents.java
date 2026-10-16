@@ -1,5 +1,9 @@
 package dev.flarelog.vstuff.events;
 
+import dev.flarelog.vstuff.content.ropes.RopeFactory;
+import dev.flarelog.vstuff.content.ropes.Rope;
+import dev.flarelog.vstuff.content.ropes.RopeManager;
+import dev.flarelog.vstuff.internal.utility.PositionUtils;
 import dev.flarelog.vstuff.content.physics.ships.nails.Nail;
 import dev.flarelog.vstuff.content.physics.ships.nails.NailItem;
 import dev.flarelog.vstuff.internal.utility.FixedConstraintUtils;
@@ -11,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3d;
@@ -21,6 +26,7 @@ import dev.flarelog.vstuff.content.ropes.util.RopeUtil;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.mod.common.assembly.ShipAssembler;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -33,20 +39,25 @@ public class CommonEvents {
         VStuffCommands.register(event.getDispatcher());
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onBlockBreak(BlockEvent.BreakEvent event) {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
 
         BlockPos brokenPos = event.getPos();
-        Vector3d worldBreakPos = RopeUtil.getWorldPos(level, brokenPos);
+        Vector3d worldBreakPos = PositionUtils.getWorldPos(level, brokenPos);
         Map<Integer, ResourceKey<RopeStyle>> idsToRemove = new HashMap<>();
 
-        // todo reimplement
+        for (Rope rope : new ArrayList<>(RopeManager.get(level).getRopeList())) {
+            if (rope.isAttachedToBlockPos(brokenPos, level)) {
+                VStuff.LOGGER.warn("detach {}", rope.getRopeId());
+                RopeFactory.removeAndCleanupRope(rope, level);
+            }
+        }
     }
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
-
+        RopeManager.syncAllRopesToPlayer(player);
     }
 
 // todo reimplement restyling n stuff
@@ -90,6 +101,7 @@ public class CommonEvents {
     @SubscribeEvent
     public static void onPlayerChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        RopeManager.syncAllRopesToPlayer(player);
     }
 
     @SubscribeEvent

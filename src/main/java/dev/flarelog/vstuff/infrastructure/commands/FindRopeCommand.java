@@ -6,7 +6,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import dev.flarelog.vstuff.content.ropes.util.RopeUtil;
+import dev.flarelog.vstuff.internal.utility.RopeUtil;
 
 public class FindRopeCommand {
 

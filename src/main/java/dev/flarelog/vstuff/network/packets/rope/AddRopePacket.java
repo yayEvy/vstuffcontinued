@@ -1,66 +1,66 @@
 package dev.flarelog.vstuff.network.packets.rope;
 
 import com.simibubi.create.foundation.networking.SimplePacketBase;
+import dev.flarelog.vstuff.internal.utility.CodecUtil;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceKey;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 import org.joml.Vector3d;
 import dev.flarelog.vstuff.client.ClientPhysRopeManager;
 import dev.flarelog.vstuff.content.ropes.Rope;
-import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
-import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
-import dev.flarelog.vstuff.content.ropes.util.RopeSegment;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class AddRopePacket extends SimplePacketBase {
 
-    private Integer id;
-    private Vector3d pos0;
-    private Vector3d pos1;
-    private Integer segmentCount;
-    private List<RopeSegment> segments;
-    private ResourceKey<RopeStyle> styleKey;
+//    private Integer id;
+//    private Vector3d pos0;
+//    private Vector3d pos1;
+//    private Integer segmentCount;
+//    private List<RopeSegment> segments;
+//    private ResourceKey<RopeStyle> styleKey;
+    private Rope rope;
 
     public AddRopePacket(Rope rope) {
-        this.id = rope.getRopeId();
-        this.pos0 = rope.posData0.localPos();
-        this.pos1 = rope.posData1.localPos();
-        this.segmentCount = rope.segments.size();
-        this.segments = new ArrayList<>(rope.segments);
-        this.styleKey = rope.styleKey;
+//        this.id = rope.getRopeId();
+//        this.pos0 = rope.posData0.pos();
+//        this.pos1 = rope.posData1.pos();
+//        this.segmentCount = rope.segments.size();
+//        this.segments = new ArrayList<>(rope.segments);
+//        this.styleKey = rope.styleKey;
+        this.rope = rope;
     }
 
     public AddRopePacket(FriendlyByteBuf buffer) {
-        this.id = buffer.readInt();
-        this.pos0 = readVector3d(buffer);
-        this.pos1 = readVector3d(buffer);
-        this.segmentCount = buffer.readInt();
-        this.segments = new ArrayList<>();
-        for (int i = segmentCount; i > 0; i--) { // for loop of doom and despair
-            this.segments.add(RopeSegment.readJsonFromBuffer(buffer));
-        }
-        this.styleKey = buffer.readResourceKey(VStuffRegistries.ROPE_STYLE);
+        this.rope = CodecUtil.decodeFromTag(buffer.readAnySizeNbt(), Rope.FULL_CODEC);
+//        this.id = buffer.readInt();
+//        this.pos0 = readVector3d(buffer);
+//        this.pos1 = readVector3d(buffer);
+//        this.segmentCount = buffer.readInt();
+//        this.segments = new ArrayList<>();
+//        for (int i = segmentCount; i > 0; i--) { // for loop of doom and despair
+//            this.segments.add(RopeSegment.readJsonFromBuffer(buffer));
+//        }
+//        this.styleKey = buffer.readResourceKey(VStuffRegistries.ROPE_STYLE);
     }
 
     @Override
     public void write(FriendlyByteBuf buffer) {
-        buffer.writeInt(id);
-        writeVector3d(buffer, pos0);
-        writeVector3d(buffer, pos1);
-        buffer.writeInt(segmentCount);
-        for (RopeSegment segment : segments)
-            RopeSegment.writeJsonToBuffer(buffer, segment);
-        buffer.writeResourceKey(styleKey);
+        buffer.writeNbt((CompoundTag) CodecUtil.encodeToTag(rope, Rope.FULL_CODEC));
+//        buffer.writeInt(id);
+//        writeVector3d(buffer, pos0);
+//        writeVector3d(buffer, pos1);
+//        buffer.writeInt(segmentCount);
+//        for (RopeSegment segment : segments)
+//            RopeSegment.writeJsonToBuffer(buffer, segment);
+//        buffer.writeResourceKey(styleKey);
     }
 
     @Override
     public boolean handle(NetworkEvent.Context context) {
-        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPhysRopeManager.addClientConstraint(id, pos0, pos1, segments, styleKey)));
-        return false;
+//        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPhysRopeManager.addClientConstraint(id, pos0, pos1, segments, styleKey, null)));
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPhysRopeManager.addClientConstraint(rope.getRopeId(), rope.posData0.pos(), rope.posData1.pos(), rope.segments, rope.styleKey, rope.type)));
+        return true;
     }
 
     private static Vector3d readVector3d(FriendlyByteBuf buf) {
