@@ -32,6 +32,8 @@ public class CreateRopeCommand {
 
                             Entity user = ctx.getSource().getEntity();
 
+
+
                             ResourceKey<?> uncheckedStyle = ctx.getArgument("style", ResourceKey.class);
                             ResourceKey<RopeStyle> style = uncheckedStyle.cast(VStuffRegistries.ROPE_STYLE).orElse(RopeStyleManager.DEFAULT_KEY);
 

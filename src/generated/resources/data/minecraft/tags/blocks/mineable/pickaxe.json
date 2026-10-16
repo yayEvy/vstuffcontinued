@@ -1,6 +1,7 @@
 {
   "values": [
     "vstuff:mechanical_thruster",
+    "vstuff:nail_block",
     "vstuff:reaction_wheel",
     "vstuff:levituff",
     "vstuff:refined_levituff"

@@ -178,8 +178,8 @@ dependencies {
         jarJar.ranged(it, "[${mixin_extras_version},)")
     })
 
-    compileOnly("org.projectlombok:lombok:1.18.46")
-    annotationProcessor("org.projectlombok:lombok:1.18.46")
+    compileOnly("org.projectlombok:lombok:1.18.48")
+    annotationProcessor("org.projectlombok:lombok:1.18.48")
 
     runtimeOnly(fg.deobf("maven.modrinth:spark:1.10.53-forge"))
 }
