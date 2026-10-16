@@ -41,20 +41,45 @@ jobs:
         echo "VS JAR URL: $JAR_LINK"
         echo "VS_JAR=$JAR_LINK" >> "$GITHUB_ENV"
 
-    - name: Send build embed to Discord
-      uses: sarisia/actions-status-discord@v1
-      with:
-        webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        status: success
-        title: 'New Vstuff Test Build'
-        description: 'VS2 Jar used: [Download](${{ env.VS_JAR }})'
-        username: 'Test Blobber The Second'
-        avatar_url: 'https://cdn.modrinth.com/data/voOBl6iP/7a2aa3a8dcc706ad7f08f6fd5cf0a1b8a3adfae6_96.webp'
+    - name: Send Mod to Discord
+      env:
+        WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        COMMIT_SHA: ${{ github.sha }}
+        ACTOR: ${{ github.actor }}
+        REPO: ${{ github.repository }}
+        BRANCH: ${{ github.ref_name }}
+        SERVER_URL: ${{ github.server_url }}
+      run: |
+        SHORT_SHA="${COMMIT_SHA:0:7}"
+        COMMIT_MSG=$(git log -1 --pretty=%s)
+        COMMIT_URL="${SERVER_URL}/${REPO}/commit/${COMMIT_SHA}"
 
-    - name: Upload mod jar to Discord
-      uses: tsickert/discord-webhook@v7.0.0
-      with:
-        webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        filename: './build/reobfJar/output.jar'
-        username: 'Test Blobber The Second'
-        avatar-url: 'https://cdn.modrinth.com/data/voOBl6iP/7a2aa3a8dcc706ad7f08f6fd5cf0a1b8a3adfae6_96.webp'
+        jq -n \
+          --arg title "New Vstuff Test Build" \
+          --arg desc "**Commit:** [\`${SHORT_SHA}\`](${COMMIT_URL}) ${COMMIT_MSG}"$'\n'"**Author:** $(git log -1 --pretty=%an) \n Build Triggered by ${ACTOR}" \
+          --arg repo "$REPO" \
+          --arg branch "$BRANCH" \
+          --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+          '{
+            username: "Test Blobber The Second",
+            avatar_url: "https://cdn.modrinth.com/data/voOBl6iP/7a2aa3a8dcc706ad7f08f6fd5cf0a1b8a3adfae6_96.webp",
+            embeds: [{
+              title: $title,
+              description: $desc,
+              color: 5120926,
+              fields: [
+                { name: "Repository", value: $repo, inline: true },
+                { name: "Branch", value: $branch, inline: true }
+              ],
+              footer: {
+                text: "GitHub Actions",
+                icon_url: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+              },
+              timestamp: $ts
+            }]
+          }' > payload.json
+
+        curl -sS --fail \
+          -F "payload_json=<payload.json" \
+          -F "file=@./build/reobfJar/output.jar" \
+          "$WEBHOOK_URL"
