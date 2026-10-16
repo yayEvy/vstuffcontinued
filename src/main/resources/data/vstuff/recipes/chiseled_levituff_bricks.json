@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "vstuff:levituff"
+  },
+  "result": "vstuff:chiseled_levituff_bricks",
+  "count": 1
+}

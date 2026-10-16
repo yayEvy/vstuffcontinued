@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "side": "vstuff:block/chiseled_levituff",
+    "top": "vstuff:block/chiseled_levituff_top",
+    "bottom": "vstuff:block/chiseled_levituff_top"
+  }
+}
