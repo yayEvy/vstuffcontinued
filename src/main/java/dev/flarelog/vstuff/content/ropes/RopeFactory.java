@@ -1,5 +1,6 @@
 package dev.flarelog.vstuff.content.ropes;
 
+import com.mojang.datafixers.util.Either;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 import dev.flarelog.vstuff.content.ropes.type.RopeType;
 import dev.flarelog.vstuff.content.ropes.data.LocalPosAndBodyId;
@@ -30,6 +31,7 @@ import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -102,20 +104,20 @@ public class RopeFactory {
         int segmentCount = Math.max(1, (int) Math.round(totalDistance / SEGMENT_LENGTH));
         double spacing = totalDistance / segmentCount;
 
-        List<RopeSegment> segments = createSegmentBodies(ctx, segmentCount, spawnStart, spawnEnd);
-        List<VSJoint> joints = makeJoints(new ArrayList<>(segments), spacing, type);
+        CopyOnWriteArrayList<RopeSegment> segments = createSegmentBodies(ctx, segmentCount, spawnStart, spawnEnd);
+        List<VSJoint> joints = makeJoints(segments, spacing, type);
 
         Rope physRope = new Rope(ctx.data0(), ctx.data1(), type, styleKey, segments);
 
-        createJoints(ctx.level, physRope, joints);
+//        createJoints(ctx.level, physRope, joints);
 
-        RopeManager.get(level).addRope(physRope);
+        RopeManager.get(level).queue(physRope);
 
         return physRope;
     }
 
-    public static List<RopeSegment> createSegmentBodies(RopeContext ctx, int segmentCount, Vector3d spawnStart, Vector3d spawnEnd) {
-        List<RopeSegment> segments = new ArrayList<>();
+    public static CopyOnWriteArrayList<RopeSegment> createSegmentBodies(RopeContext ctx, int segmentCount, Vector3d spawnStart, Vector3d spawnEnd) {
+        CopyOnWriteArrayList<RopeSegment> segments = new CopyOnWriteArrayList<>();
         Vector3d step = new Vector3d(spawnEnd).sub(spawnStart).div(segmentCount);
 
         Long lastId = ctx.data0.id();
@@ -185,6 +187,7 @@ public class RopeFactory {
                 maxLength).serialized();
 
         joints.add(firstJoint);
+        first.joint(Either.right(firstJoint));
 
         VSJoint lastJoint = type.getEndJointWith(last.pos0().id(),
                 new VSJointPose(last.pos0().pos(), new Quaterniond()),
@@ -192,7 +195,7 @@ public class RopeFactory {
                 new VSJointPose(last.pos1().pos(), new Quaterniond()),
                 maxLength).serialized();
 
-        joints.add(lastJoint);
+
 
         for (RopeSegment segment : segments) {
             VSJoint joint = type.getConnectingPhysBodyJointWith(
@@ -203,7 +206,15 @@ public class RopeFactory {
             joint.setShouldBeSerialized(true);
 
             joints.add(joint);
+            segment.joint(Either.right(joint));
         }
+
+        joints.add(lastJoint);
+        last.joint(Either.right(lastJoint));
+
+        // Add ts back
+        segments.add(0, first);
+        segments.add(last);
 
         return joints;
     }

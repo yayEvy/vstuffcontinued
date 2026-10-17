@@ -1,6 +1,8 @@
 package dev.flarelog.vstuff.content.ropes;
 
+import com.mojang.logging.LogUtils;
 import dev.flarelog.vstuff.client.ClientRopeStyle;
+import dev.flarelog.vstuff.content.ropes.data.RopeSegment;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyleManager;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
 import dev.flarelog.vstuff.internal.utility.CodecUtil;
@@ -9,27 +11,41 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.network.packets.rope.AddRopePacket;
 import dev.flarelog.vstuff.network.packets.rope.ClearAllRopesPacket;
 import dev.flarelog.vstuff.network.packets.rope.RemoveRopePacket;
 import dev.flarelog.vstuff.network.VStuffPackets;
+import org.slf4j.Logger;
+import org.valkyrienskies.core.api.events.PhysTickEvent;
+import org.valkyrienskies.core.internal.joints.VSJoint;
+import org.valkyrienskies.core.internal.world.VsiPhysLevel;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static dev.flarelog.vstuff.content.physics.VSUtil.getGTPA;
+import static dev.flarelog.vstuff.content.ropes.RopeFactory.removeAndCleanupRope;
 
 public class RopeManager extends SavedData {
 
     private static final String DATA_NAME = "vstuff_phys_ropes";
+    public static final Logger LOGGER = LogUtils.getLogger();
 
-    private static int nextId = 0;
+    private static AtomicInteger nextId = new AtomicInteger(0);
 
-    public final Map<Integer, Rope> ropes = new HashMap<>();
+    private final ConcurrentHashMap<Integer, Rope> ropes = new ConcurrentHashMap<>();
+    private final Set<Rope> queued = ConcurrentHashMap.newKeySet();
 
     public static RopeManager get(ServerLevel level) {
         DimensionDataStorage storage = level.getDataStorage();
@@ -63,7 +79,7 @@ public class RopeManager extends SavedData {
 
 
     public void addRope(Rope rope) {
-        rope.setRopeId(nextId++);
+        rope.setRopeId(nextId.incrementAndGet());
 
         ropes.put(rope.ropeId, rope);
 
@@ -113,4 +129,53 @@ public class RopeManager extends SavedData {
             VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> player), new AddRopePacket(rope));
         }
     }
+
+    public void queue(Rope rope) {
+        this.queued.add(rope);
+    }
+
+    public void physTick(PhysTickEvent event) {
+        VsiPhysLevel level = (VsiPhysLevel) event.getWorld();
+
+        for (Rope rope : new HashSet<>(this.queued)) {
+            if (rope.allBodiesCreated(level)) {
+                createJoints(level, rope);
+                this.addRope(rope);
+                this.queued.remove(rope);
+            }
+        }
+    }
+
+    public static void physTicker(PhysTickEvent event) {
+        ServerLevel level = ServerLifecycleHooks.getCurrentServer().getLevel(VSGameUtilsKt.getResourceKey(event.getWorld().getDimension()));
+        if (level == null) return;
+        RopeManager manager = RopeManager.get(level);
+        manager.physTick(event);
+    }
+
+    private void createJoints(VsiPhysLevel level, Rope rope) {
+        rope.jointIds = new ArrayList<>();
+
+        for (RopeSegment segment : rope.getSegments()) {
+            VSJoint joint = segment.joint().right().orElseThrow();
+
+            int id = level.addJoint(joint);
+            if (id == -1) {
+                LOGGER.warn("Invalid joint id received when creating phys rope! Discarding it....");
+                this.cleanupRope(rope, level);
+            } else {
+                rope.jointIds.add(id);
+            }
+        }
+    }
+
+    private void cleanupRope(Rope rope, VsiPhysLevel level) {
+        this.ropes.remove(rope.ropeId);
+        for (RopeSegment segment : rope.getSegments()) {
+            if (segment.joint().left().isPresent()) {
+                level.removeJoint(segment.joint().left().get());
+            }
+        }
+    }
+
 }

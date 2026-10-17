@@ -59,7 +59,7 @@ public class AddRopePacket extends SimplePacketBase {
     @Override
     public boolean handle(NetworkEvent.Context context) {
 //        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPhysRopeManager.addClientConstraint(id, pos0, pos1, segments, styleKey, null)));
-        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPhysRopeManager.addClientConstraint(rope.getRopeId(), rope.posData0.pos(), rope.posData1.pos(), rope.segments, rope.styleKey, rope.type)));
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPhysRopeManager.addClientConstraint(rope.getRopeId(), rope.posData0.pos(), rope.posData1.pos(), rope.getSegments(), rope.styleKey, rope.type)));
         return true;
     }
 

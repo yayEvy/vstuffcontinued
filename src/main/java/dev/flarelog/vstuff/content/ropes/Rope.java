@@ -17,6 +17,7 @@ import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.core.internal.ships.VsiQueryableShipData;
 import org.valkyrienskies.core.internal.world.VsiServerShipWorld;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -26,33 +27,33 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+@Getter
 public class Rope {
     public static final Codec<Rope> FULL_CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.INT.fieldOf("ropeId").forGetter(rope -> rope.ropeId),
-            LocalPosAndBodyId.CODEC.fieldOf("posData0").forGetter(rope -> rope.posData0),
-            LocalPosAndBodyId.CODEC.fieldOf("posData1").forGetter(rope -> rope.posData1),
-            RopeType.CODEC.fieldOf("type").forGetter(rope -> rope.type),
-            ResourceKey.codec(VStuffRegistries.ROPE_STYLE).fieldOf("style").forGetter(rope -> rope.styleKey),
-            RopeSegment.CODEC.listOf().fieldOf("segments").forGetter(rope -> rope.segments),
+            Codec.INT.fieldOf("ropeId").forGetter(Rope::getRopeId),
+            LocalPosAndBodyId.CODEC.fieldOf("posData0").forGetter(Rope::getPosData0),
+            LocalPosAndBodyId.CODEC.fieldOf("posData1").forGetter(Rope::getPosData1),
+            RopeType.CODEC.fieldOf("type").forGetter(Rope::getType),
+            ResourceKey.codec(VStuffRegistries.ROPE_STYLE).fieldOf("style").forGetter(Rope::getStyleKey),
+            RopeSegment.CODEC.listOf().fieldOf("segments").forGetter(Rope::getSegments),
             Codec.INT.listOf().fieldOf("jointIds").forGetter(rope -> new ArrayList<>(rope.getJointIds()))
     ).apply(instance, (ropeId, posData0, posData1, type, styleKey, segments, jointIds) -> {
-        Rope rope = new Rope(posData0, posData1, type, styleKey, segments).setRopeId(ropeId);
+        Rope rope = new Rope(posData0, posData1, type, styleKey, new CopyOnWriteArrayList<>(segments)).setRopeId(ropeId);
         rope.setJointIds(new LinkedList<>(jointIds));
         return rope;
     }));
 
-    @Getter
     Integer ropeId;
     public LocalPosAndBodyId posData0;
     public LocalPosAndBodyId posData1;
     public RopeType type;
     public ResourceKey<RopeStyle> styleKey;
-    @Getter
     List<Integer> jointIds;
-    public List<RopeSegment> segments;
+    private CopyOnWriteArrayList<RopeSegment> segments;
 
-    protected Rope(LocalPosAndBodyId posData0, LocalPosAndBodyId posData1, RopeType type, ResourceKey<RopeStyle> styleKey, List<RopeSegment> segments) {
+    protected Rope(LocalPosAndBodyId posData0, LocalPosAndBodyId posData1, RopeType type, ResourceKey<RopeStyle> styleKey, CopyOnWriteArrayList<RopeSegment> segments) {
         this.posData0 = posData0;
         this.posData1 = posData1;
         this.styleKey = styleKey;
@@ -120,6 +121,31 @@ public class Rope {
             return true;
         }
         return pos.equals(this.posData1.blockPos(level));
+    }
+
+    public boolean allJointsCreated() {
+        for (RopeSegment segment : this.segments) {
+            if (segment.joint().left().isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean allBodiesCreated(PhysLevel level) {
+        for (RopeSegment segment : this.segments) {
+            if (!segment.pos0().isWorld()) {
+                if (level.getBodyById(segment.pos0().id()) == null) {
+                    return false;
+                }
+            }
+            if (!segment.pos1().isWorld()) {
+                if (level.getBodyById(segment.pos1().id()) == null) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
 }
