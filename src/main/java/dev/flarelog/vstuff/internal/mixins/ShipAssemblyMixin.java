@@ -42,8 +42,8 @@ public class ShipAssemblyMixin {
         List<RopeReattachment> affectedRopes = new ArrayList<>();
 
         for (Rope rope : manager.getRopeList()) {
-            BlockPos pos0 = rope.posData0.blockPos(level);
-            BlockPos pos1 = rope.posData1.blockPos(level);
+            BlockPos pos0 = rope.getPosData0().blockPos(level);
+            BlockPos pos1 = rope.getPosData1().blockPos(level);
 
             boolean end0 = blocks.contains(pos0);
             boolean end1 = blocks.contains(pos1);
@@ -51,8 +51,8 @@ public class ShipAssemblyMixin {
             if (!end0 && !end1)
                 continue;
 
-            Vector3d worldPos0 = rope.posData0.getWorldPos(level);
-            Vector3d worldPos1 = rope.posData1.getWorldPos(level);
+            Vector3d worldPos0 = rope.getPosData0().getWorldPos(level);
+            Vector3d worldPos1 = rope.getPosData1().getWorldPos(level);
 
             affectedRopes.add(new RopeReattachment(
                     rope,
@@ -80,7 +80,7 @@ public class ShipAssemblyMixin {
                             ),
                             newShipId
                     )
-                            : rope.posData0;
+                            : rope.getPosData0();
 
                     LocalPosAndBodyId data1 = attachment.end1()
                             ? new LocalPosAndBodyId(
@@ -91,10 +91,10 @@ public class ShipAssemblyMixin {
                             ),
                             newShipId
                     )
-                            : rope.posData1;
+                            : rope.getPosData1();
 
-                    var styleKey = rope.styleKey;
-                    var type = rope.type;
+                    var styleKey = rope.getStyleKey();
+                    var type = rope.getType();
 
                     RopeFactory.removeAndCleanupRope(rope, level);
 

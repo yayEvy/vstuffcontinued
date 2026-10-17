@@ -36,12 +36,12 @@ public class RopeCutterItem extends Item {
 
                 RopeStyle style = physRope.getStyle(serverLevel.registryAccess());
 
-                RopeUtil.playSound(serverLevel, PositionUtils.containingBlockPos(physRope.posData0.getWorldPos(serverLevel)), style.breakSound());
-                RopeUtil.playSound(serverLevel, PositionUtils.containingBlockPos(physRope.posData1.getWorldPos(serverLevel)), style.breakSound());
+                RopeUtil.playSound(serverLevel, PositionUtils.containingBlockPos(physRope.getPosData0().getWorldPos(serverLevel)), style.breakSound());
+                RopeUtil.playSound(serverLevel, PositionUtils.containingBlockPos(physRope.getPosData1().getWorldPos(serverLevel)), style.breakSound());
 
                 if (!player.isCreative()) {
                     itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
-                    RopeUtil.createRopeDrop(player, physRope.styleKey);
+                    RopeUtil.createRopeDrop(player, physRope.getStyleKey());
                 }
 
                 return InteractionResultHolder.success(itemStack);

@@ -23,6 +23,8 @@ import org.valkyrienskies.core.internal.world.VsiServerShipWorld;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -38,10 +40,10 @@ public class Rope {
     ).apply(instance, (ropeId, posData0, posData1, type, styleKey, segments) -> new Rope(posData0, posData1, type, styleKey, new CopyOnWriteArrayList<>(segments)).setRopeId(ropeId)));
 
     Integer ropeId;
-    public LocalPosAndBodyId posData0;
-    public LocalPosAndBodyId posData1;
-    public RopeType type;
-    public ResourceKey<RopeStyle> styleKey;
+    private final LocalPosAndBodyId posData0;
+    private final LocalPosAndBodyId posData1;
+    private final RopeType type;
+    private final ResourceKey<RopeStyle> styleKey;
     private final CopyOnWriteArrayList<RopeSegment> segments;
 
     protected Rope(LocalPosAndBodyId posData0, LocalPosAndBodyId posData1, RopeType type, ResourceKey<RopeStyle> styleKey, CopyOnWriteArrayList<RopeSegment> segments) {
@@ -133,6 +135,14 @@ public class Rope {
             }
         }
         return true;
+    }
+
+    public List<Long> getSegmentBodyIds() {
+        List<Long> ids = new ArrayList<>();
+        for (int i = 0; i < segments.size() - 1; i++) {
+            ids.add(segments.get(i).pos1().id());
+        }
+        return ids;
     }
 
 }
