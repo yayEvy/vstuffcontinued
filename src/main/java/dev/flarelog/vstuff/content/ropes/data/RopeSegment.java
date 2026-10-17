@@ -2,6 +2,7 @@ package dev.flarelog.vstuff.content.ropes.data;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.EitherCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +46,11 @@ public class RopeSegment {
 
     public static final Codec<RopeSegment> CODEC = RecordCodecBuilder.create(i -> i.group( // codec of doom and despair part 2
             LocalPosAndBodyId.CODEC.fieldOf("pos0").forGetter(RopeSegment::pos0),
-            LocalPosAndBodyId.CODEC.fieldOf("pos1").forGetter(RopeSegment::pos1)
-    ).apply(i, RopeSegment::new));
+            LocalPosAndBodyId.CODEC.fieldOf("pos1").forGetter(RopeSegment::pos1),
+            Codec.INT.fieldOf("joint").forGetter((seg) -> seg.joint().orThrow())
+    ).apply(i, (pos0,pos1,joint) -> {
+        RopeSegment segment = new RopeSegment(pos0, pos1);
+        segment.joint(Either.left(joint));
+        return segment;
+    }));
 }

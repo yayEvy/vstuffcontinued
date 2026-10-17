@@ -23,9 +23,6 @@ import org.valkyrienskies.core.internal.world.VsiServerShipWorld;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -37,21 +34,15 @@ public class Rope {
             LocalPosAndBodyId.CODEC.fieldOf("posData1").forGetter(Rope::getPosData1),
             RopeType.CODEC.fieldOf("type").forGetter(Rope::getType),
             ResourceKey.codec(VStuffRegistries.ROPE_STYLE).fieldOf("style").forGetter(Rope::getStyleKey),
-            RopeSegment.CODEC.listOf().fieldOf("segments").forGetter(Rope::getSegments),
-            Codec.INT.listOf().fieldOf("jointIds").forGetter(rope -> new ArrayList<>(rope.getJointIds()))
-    ).apply(instance, (ropeId, posData0, posData1, type, styleKey, segments, jointIds) -> {
-        Rope rope = new Rope(posData0, posData1, type, styleKey, new CopyOnWriteArrayList<>(segments)).setRopeId(ropeId);
-        rope.setJointIds(new LinkedList<>(jointIds));
-        return rope;
-    }));
+            RopeSegment.CODEC.listOf().fieldOf("segments").forGetter(Rope::getSegments)
+    ).apply(instance, (ropeId, posData0, posData1, type, styleKey, segments) -> new Rope(posData0, posData1, type, styleKey, new CopyOnWriteArrayList<>(segments)).setRopeId(ropeId)));
 
     Integer ropeId;
     public LocalPosAndBodyId posData0;
     public LocalPosAndBodyId posData1;
     public RopeType type;
     public ResourceKey<RopeStyle> styleKey;
-    List<Integer> jointIds;
-    private CopyOnWriteArrayList<RopeSegment> segments;
+    private final CopyOnWriteArrayList<RopeSegment> segments;
 
     protected Rope(LocalPosAndBodyId posData0, LocalPosAndBodyId posData1, RopeType type, ResourceKey<RopeStyle> styleKey, CopyOnWriteArrayList<RopeSegment> segments) {
         this.posData0 = posData0;
@@ -59,11 +50,6 @@ public class Rope {
         this.styleKey = styleKey;
         this.type = type;
         this.segments = segments;
-    }
-
-    public Rope setJointIds(LinkedList<Integer> jointIds) {
-        this.jointIds = jointIds;
-        return this;
     }
 
     public Rope setRopeId(Integer to) {
@@ -88,8 +74,10 @@ public class Rope {
     public void cleanup(ServerLevel level) {
         VsiServerShipWorld shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
 
-        for (Integer joint : jointIds) {
-            VSUtil.getGTPA(level).removeJoint(joint);
+        for (RopeSegment seg : this.getSegments()) {
+            if (seg.joint().left().isPresent()) {
+                VSUtil.getGTPA(level).removeJoint(seg.joint().left().get());
+            }
         }
 // commented out cuz no work rn
 //        todo:fix
@@ -103,7 +91,6 @@ public class Rope {
 //            }
 //        }
         this.segments.clear();
-        this.jointIds.clear();
     }
 
     public boolean isWorldToWorld() {

@@ -219,29 +219,29 @@ public class RopeFactory {
         return joints;
     }
 
-    private static void createJoints(ServerLevel level, Rope rope, List<VSJoint> joints) {
-        rope.jointIds = new ArrayList<>();
-        GameToPhysicsAdapter gtpa = getGTPA(level);
-
-        AtomicInteger remaining = new AtomicInteger(joints.size());
-        AtomicBoolean failed = new AtomicBoolean();
-
-        for (VSJoint joint : joints) {
-            gtpa.addJoint(joint, 5, id -> { // consumer lambda of doom and despair
-                if (id == -1) {
-                    LOGGER.warn("Invalid joint id received when creating phys rope!");
-                    failed.set(true);
-                } else {
-                    rope.jointIds.add(id);
-                }
-
-                if (remaining.decrementAndGet() == 0 && failed.get()) {
-                    LOGGER.info("Failed was true after all joints have been created, discarding phys rope.");
-                    removeAndCleanupRope(rope, level);
-                }
-            });
-        }
-    }
+//    private static void createJoints(ServerLevel level, Rope rope, List<VSJoint> joints) {
+//        rope.jointIds = new ArrayList<>();
+//        GameToPhysicsAdapter gtpa = getGTPA(level);
+//
+//        AtomicInteger remaining = new AtomicInteger(joints.size());
+//        AtomicBoolean failed = new AtomicBoolean();
+//
+//        for (VSJoint joint : joints) {
+//            gtpa.addJoint(joint, 5, id -> { // consumer lambda of doom and despair
+//                if (id == -1) {
+//                    LOGGER.warn("Invalid joint id received when creating phys rope!");
+//                    failed.set(true);
+//                } else {
+//                    rope.jointIds.add(id);
+//                }
+//
+//                if (remaining.decrementAndGet() == 0 && failed.get()) {
+//                    LOGGER.info("Failed was true after all joints have been created, discarding phys rope.");
+//                    removeAndCleanupRope(rope, level);
+//                }
+//            });
+//        }
+//    }
 
     public static void removeAndCleanupRope(Rope rope, ServerLevel level) {
         LOGGER.warn("Cleanup rope {}", rope.getRopeId());

@@ -1,5 +1,6 @@
 package dev.flarelog.vstuff.content.ropes;
 
+import com.mojang.datafixers.util.Either;
 import com.mojang.logging.LogUtils;
 import dev.flarelog.vstuff.client.ClientRopeStyle;
 import dev.flarelog.vstuff.content.ropes.data.RopeSegment;
@@ -139,8 +140,9 @@ public class RopeManager extends SavedData {
 
         for (Rope rope : new HashSet<>(this.queued)) {
             if (rope.allBodiesCreated(level)) {
-                createJoints(level, rope);
-                this.addRope(rope);
+                if (createJoints(level, rope)) {
+                    this.addRope(rope);
+                }
                 this.queued.remove(rope);
             }
         }
@@ -153,9 +155,7 @@ public class RopeManager extends SavedData {
         manager.physTick(event);
     }
 
-    private void createJoints(VsiPhysLevel level, Rope rope) {
-        rope.jointIds = new ArrayList<>();
-
+    private boolean createJoints(VsiPhysLevel level, Rope rope) {
         for (RopeSegment segment : rope.getSegments()) {
             VSJoint joint = segment.joint().right().orElseThrow();
 
@@ -163,10 +163,13 @@ public class RopeManager extends SavedData {
             if (id == -1) {
                 LOGGER.warn("Invalid joint id received when creating phys rope! Discarding it....");
                 this.cleanupRope(rope, level);
+                return false;
             } else {
-                rope.jointIds.add(id);
+                segment.joint(Either.left(id));
             }
         }
+
+        return true;
     }
 
     private void cleanupRope(Rope rope, VsiPhysLevel level) {

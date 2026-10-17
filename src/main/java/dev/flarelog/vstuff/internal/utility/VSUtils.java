@@ -5,6 +5,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.LoadedShip;
@@ -89,4 +90,12 @@ public class VSUtils {
         }
     }
 
+    public static @NotNull Vector3d worldToShipLocal(@NotNull ServerLevel level, Vector3d pos, Long ship) {
+        if (ship == null) return pos;
+
+        Ship shipObject = VSGameUtilsKt.getShipObjectWorld(level).getAllShips().getById(ship);
+        if (shipObject == null) return pos;
+
+        return shipObject.getTransform().getWorldToShip().transformPosition(pos, new Vector3d());
+    }
 }
