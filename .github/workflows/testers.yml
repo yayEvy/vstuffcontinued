@@ -52,17 +52,25 @@ jobs:
       run: |
         SHORT_SHA="${COMMIT_SHA:0:7}"
         COMMIT_MSG=$(git log -1 --pretty=%s)
+        AUTHOR=$(git log -1 --pretty=%an)
         COMMIT_URL="${SERVER_URL}/${REPO}/commit/${COMMIT_SHA}"
+        USERNAME="Test Blobber The Second"
+        AVATAR="https://cdn.modrinth.com/data/voOBl6iP/7a2aa3a8dcc706ad7f08f6fd5cf0a1b8a3adfae6_96.webp"
 
+        DESC="**Commit:** [\`${SHORT_SHA}\`](${COMMIT_URL}) ${COMMIT_MSG}"$'\n'"**Author:** ${AUTHOR}"$'\n'"**Build triggered by:** ${ACTOR} $'\n'"**VS2 Jar Used For Build:** [Download](${VS_JAR})""
+
+        # Message 1: the embed
         jq -n \
+          --arg username "$USERNAME" \
+          --arg avatar "$AVATAR" \
           --arg title "New Vstuff Test Build" \
-          --arg desc "**Commit:** [\`${SHORT_SHA}\`](${COMMIT_URL}) ${COMMIT_MSG}"$'\n'"**Author:** $(git log -1 --pretty=%an) \n Build Triggered by ${ACTOR}" \
+          --arg desc "$DESC" \
           --arg repo "$REPO" \
           --arg branch "$BRANCH" \
           --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
           '{
-            username: "Test Blobber The Second",
-            avatar_url: "https://cdn.modrinth.com/data/voOBl6iP/7a2aa3a8dcc706ad7f08f6fd5cf0a1b8a3adfae6_96.webp",
+            username: $username,
+            avatar_url: $avatar,
             embeds: [{
               title: $title,
               description: $desc,
@@ -80,6 +88,15 @@ jobs:
           }' > payload.json
 
         curl -sS --fail \
-          -F "payload_json=<payload.json" \
+          -H "Content-Type: application/json" \
+          -d @payload.json \
+          "$WEBHOOK_URL"
+
+        # Message 2: the jar, which shows up below the embed
+        jq -n --arg username "$USERNAME" --arg avatar "$AVATAR" \
+          '{username: $username, avatar_url: $avatar}' > file_payload.json
+
+        curl -sS --fail \
+          -F "payload_json=<file_payload.json" \
           -F "file=@./build/reobfJar/output.jar" \
           "$WEBHOOK_URL"
