@@ -41,11 +41,11 @@ public class RopeFactory {
 
     public static float SEGMENT_LENGTH = 0.8f;
     public static double SEGMENT_RADIUS = 0.125;
-    public static double SEGMENT_MASS = 1;
+    public static double SEGMENT_MASS = 50;
     public static double JOINT_COMPLIANCE = 1e4f;
-    public static Float JOINT_TOLERANCE = 1e3f;
+    public static Float JOINT_TOLERANCE = 1e4f;
     public static Float JOINT_STIFFNESS = 1e7f;
-    public static Float JOINT_DAMPING = 1e5f;
+    public static Float JOINT_DAMPING = 1e9f;
     public static float JOINT_MAX_FORCE_TORQUE = 1e1f;
     private static final float ANCHOR_OFFSET = 0.1f;
     public static double SAG_FACTOR = 0.08; // higher = more sag

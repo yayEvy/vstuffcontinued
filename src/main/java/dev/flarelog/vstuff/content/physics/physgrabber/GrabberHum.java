@@ -12,7 +12,7 @@ public class GrabberHum extends AbstractTickableSoundInstance {
     private final LoadedShip ship;
     private final Player player;
     private boolean isStopping = false;
-    private float fade = 1.0f;
+    private float fade = 2.0f;
 
     protected GrabberHum(SoundEvent sound, LoadedShip ship, Player player) {
         super(sound, SoundSource.PLAYERS, SoundInstance.createUnseededRandom());
@@ -20,7 +20,7 @@ public class GrabberHum extends AbstractTickableSoundInstance {
         this.player = player;
         this.looping = true;
         this.delay = 0;
-        this.volume = 0.4f;
+        this.volume = 0.3f;
         this.pitch = 0.6f;
     }
 

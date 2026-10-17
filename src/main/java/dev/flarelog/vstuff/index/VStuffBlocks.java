@@ -123,12 +123,51 @@ public class VStuffBlocks  {
                     .simpleItem()
                     .register();
 
+    public static final BlockEntry<LevituffBlock> LEVITUFF_BRICKS =
+            REGISTRATE.block("levituff_bricks", LevituffBlock::new)
+                    .initialProperties(() -> Blocks.TUFF)
+                    .transform(pickaxeOnly())
+                    .simpleItem()
+                    .register();
+
+    public static final BlockEntry<LevituffBlock> POLISHED_LEVITUFF =
+            REGISTRATE.block("polished_levituff", LevituffBlock::new)
+                    .initialProperties(() -> Blocks.TUFF)
+                    .transform(pickaxeOnly())
+                    .simpleItem()
+                    .register();
+
+    public static final BlockEntry<LevituffBlock> CHISELED_LEVITUFF =
+            REGISTRATE.block("chiseled_levituff", LevituffBlock::new)
+                    .initialProperties(() -> Blocks.TUFF)
+                    .transform(pickaxeOnly())
+                    .simpleItem()
+                    .register();
+
+    public static final BlockEntry<LevituffBlock> CHISELED_LEVITUFF_BRICKS =
+            REGISTRATE.block("chiseled_levituff_bricks", LevituffBlock::new)
+                    .initialProperties(() -> Blocks.TUFF)
+                    .transform(pickaxeOnly())
+                    .simpleItem()
+                    .register();
+
+
     public static final BlockEntry<RefinedLevituffBlock> REFINED_LEVITUFF =
             REGISTRATE.block("refined_levituff", RefinedLevituffBlock::new)
                     .initialProperties(AllBlocks.ANDESITE_ALLOY_BLOCK)
                     .transform(pickaxeOnly())
                     .simpleItem()
                     .register();
+
+    /*
+    public static final BlockEntry<HandleBlock> HANDLE =
+            REGISTRATE.block("handle", HandleBlock::new)
+                    .initialProperties(AllBlocks.ANDESITE_ALLOY_BLOCK)
+                    .transform(pickaxeOnly())
+                    .simpleItem()
+                    .register();
+
+     */
 
 
     public static <I extends BlockItem, P> NonNullFunction<ItemBuilder<I, P>, P> customItemModel() {
