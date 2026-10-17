@@ -59,6 +59,9 @@ public class RopeUtil {
         createRopeDrop(serverLevel, pos, RopeStyleManager.DEFAULT_KEY);
     }
 
+    /*
+    clears tag then puts the style back if there was one
+     */
     public static void resetTag(ItemStack stack) {
         ResourceKey<RopeStyle> lastStyle = null;
         if (stack.getOrCreateTag().contains("style", Tag.TAG_STRING)) {
@@ -70,7 +73,6 @@ public class RopeUtil {
         if (lastStyle != null) {
             addStyleToTag(stack, lastStyle);
         }
-        // clears tag then puts the style back if there was one
     }
 
     public static Component getRopeItemNameWithStyle(Item item, ItemStack stack) {
