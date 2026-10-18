@@ -57,6 +57,7 @@ public class NailBlock extends DirectionalBlock implements IWrenchable  {
 
     @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
+        System.out.println("wrenched" );
         return IWrenchable.super.onWrenched(state, context);
     }
 

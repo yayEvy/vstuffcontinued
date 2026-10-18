@@ -15,6 +15,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.util.ForgeSoundType;
 import org.joml.Vector3d;
@@ -66,12 +67,15 @@ public class NailItem extends BlockItem {
     @Override
     public InteractionResult useOn(UseOnContext context) {
 
-
         BlockPos clickedPos = context.getClickedPos();
+        Block block = context.getLevel().getBlockState(clickedPos).getBlock();
         coolDirection = context.getClickedFace();
         BlockPos nextPos = clickedPos.relative(coolDirection, 1);
         blockToBeNailedTo = clickedPos;
         Nail nail = Nail.grabThatNailOerThereSonny(clickedPos);
+
+
+        if (block instanceof NailBlock) return InteractionResult.PASS;
 
         if ( nail == null) {
             nail = Nail.newNail(0.0, coolDirection, clickedPos);
