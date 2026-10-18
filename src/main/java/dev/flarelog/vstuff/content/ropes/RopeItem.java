@@ -2,6 +2,7 @@ package dev.flarelog.vstuff.content.ropes;
 
 import dev.flarelog.vstuff.content.ropes.style.RopeStyleManager;
 import dev.flarelog.vstuff.content.ropes.data.LocalPosAndBodyId;
+import dev.flarelog.vstuff.content.ropes.util.IRopeActor;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -50,6 +51,15 @@ public class RopeItem extends Item {
         if (!isFoil(heldItem)) {
             if (player.isShiftKeyDown()) return InteractionResult.FAIL;
 
+            if (!IRopeActor.canAttach(state)) {
+                player.displayClientMessage(
+                        VStuff.translate("message.rope.actor_connected", blockName).withStyle(ChatFormatting.RED), true);
+                if (player instanceof ServerPlayer sp)
+                    VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> sp),
+                            new OutlinePacket(clickedPos, OutlinePacket.RED));
+                return InteractionResult.SUCCESS;
+            }
+
             player.displayClientMessage(VStuff.translate("message.rope.first", blockName), true);
 
             CompoundTag tag = heldItem.getOrCreateTagElement("data");
@@ -75,6 +85,15 @@ public class RopeItem extends Item {
         if (clickedPos.equals(firstClickedPos)) {
             player.displayClientMessage(VStuff.translate("message.rope.reset").withStyle(ChatFormatting.GREEN), true);
             RopeUtil.resetTag(heldItem);
+            return InteractionResult.SUCCESS;
+        }
+
+        if (!IRopeActor.canAttach(state)) {
+            player.displayClientMessage(
+                    VStuff.translate("message.rope.actor_connected", blockName).withStyle(ChatFormatting.RED), true);
+            if (player instanceof ServerPlayer sp)
+                VStuffPackets.channel().send(PacketDistributor.PLAYER.with(() -> sp),
+                        new OutlinePacket(clickedPos, OutlinePacket.RED));
             return InteractionResult.SUCCESS;
         }
 

@@ -39,7 +39,7 @@ public class Rope {
             RopeSegment.CODEC.listOf().fieldOf("segments").forGetter(Rope::getSegments)
     ).apply(instance, (ropeId, posData0, posData1, type, styleKey, segments) -> new Rope(posData0, posData1, type, styleKey, new CopyOnWriteArrayList<>(segments)).setRopeId(ropeId)));
 
-    Integer ropeId;
+    private Integer ropeId;
     private final LocalPosAndBodyId posData0;
     private final LocalPosAndBodyId posData1;
     private final RopeType type;

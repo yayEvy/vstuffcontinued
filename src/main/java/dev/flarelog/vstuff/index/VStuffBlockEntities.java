@@ -12,6 +12,10 @@ import dev.flarelog.vstuff.content.physics.ships.reactionwheel.ReactionWheelVisu
 import dev.flarelog.vstuff.content.physics.ships.thrust.MechanicalThrusterBlockEntity;
 import dev.flarelog.vstuff.content.physics.ships.thrust.MechanicalThrusterRenderer;
 import dev.flarelog.vstuff.content.physics.ships.thrust.MechanicalThrusterVisual;
+import dev.flarelog.vstuff.content.ropes.winch.PhysPulleyBlockEntity;
+import dev.flarelog.vstuff.content.ropes.winch.PhysPulleyRenderer;
+import dev.flarelog.vstuff.content.ropes.winch.PhysPulleyVisual;
+import dev.flarelog.vstuff.content.ropes.winch.PulleyAnchorBlockEntity;
 
 public class VStuffBlockEntities {
 
@@ -39,6 +43,18 @@ public class VStuffBlockEntities {
     public static final BlockEntityEntry<RefinedLevituffBlockEntity> REFINED_LEVITUFF_BE =
             REGISTRATE.blockEntity("refined_levituff", RefinedLevituffBlockEntity::new)
                     .validBlocks(VStuffBlocks.REFINED_LEVITUFF)
+                    .register();
+
+    public static final BlockEntityEntry<PhysPulleyBlockEntity> PHYS_PULLEY_BE =
+            REGISTRATE.blockEntity("phys_pulley", PhysPulleyBlockEntity::new)
+                    .visual(() -> PhysPulleyVisual::new, false)
+                    .validBlocks(VStuffBlocks.PHYS_PULLEY)
+                    .renderer(() -> PhysPulleyRenderer::new)
+                    .register();
+
+    public static final BlockEntityEntry<PulleyAnchorBlockEntity> PULLEY_ANCHOR_BE =
+            REGISTRATE.blockEntity("pulley_anchor", PulleyAnchorBlockEntity::new)
+                    .validBlocks(VStuffBlocks.PULLEY_ANCHOR)
                     .register();
 
     public static void register() {}

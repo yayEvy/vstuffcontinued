@@ -5,8 +5,10 @@ import com.mojang.logging.LogUtils;
 import dev.flarelog.vstuff.client.ClientRopeStyle;
 import dev.flarelog.vstuff.content.ropes.data.RopeSegment;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyleManager;
+import dev.flarelog.vstuff.content.ropes.util.IRopeActor;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
 import dev.flarelog.vstuff.internal.utility.CodecUtil;
+import lombok.RequiredArgsConstructor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -38,11 +40,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static dev.flarelog.vstuff.content.physics.VSUtil.getGTPA;
 import static dev.flarelog.vstuff.content.ropes.RopeFactory.removeAndCleanupRope;
 
+@RequiredArgsConstructor
 public class RopeManager extends SavedData {
 
     private static final String DATA_NAME = "vstuff_phys_ropes";
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String FORMAT_VERSION = "v1";
+
+    private final ServerLevel level;
 
     private final AtomicInteger nextId = new AtomicInteger(0);
 
@@ -51,18 +56,18 @@ public class RopeManager extends SavedData {
 
     public static RopeManager get(ServerLevel level) {
         DimensionDataStorage storage = level.getDataStorage();
-        return storage.computeIfAbsent(RopeManager::load, RopeManager::new, DATA_NAME);
+        return storage.computeIfAbsent((tag) -> RopeManager.load(tag, level), () -> new RopeManager(level), DATA_NAME);
     }
 
-    public static RopeManager load(CompoundTag tag) {
-        RopeManager data = new RopeManager();
+    public static RopeManager load(CompoundTag tag, ServerLevel level) {
+        RopeManager data = new RopeManager(level);
 
         ListTag ropeList = tag.getList("ropes", Tag.TAG_COMPOUND);
         for (Tag ropeTag : ropeList) {
 
             Rope rope = CodecUtil.decodeFromTag(ropeTag, Rope.FULL_CODEC);
 
-            data.ropes.put(rope.ropeId, rope);
+            data.ropes.put(rope.getRopeId(), rope);
         }
         data.nextId.set(tag.getInt("nextId"));
         VStuff.LOGGER.info("Loaded {} ropes from saved data. Format Version: {}", data.ropes.size(), tag.getString("formatVersion"));
@@ -85,9 +90,25 @@ public class RopeManager extends SavedData {
     private void addRope(Rope rope) {
         rope.setRopeId(nextId.incrementAndGet());
 
-        ropes.put(rope.ropeId, rope);
+        ropes.put(rope.getRopeId(), rope);
 
         VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new AddRopePacket(rope));
+
+        IRopeActor actor0 = IRopeActor.getAt(level, rope.getPosData0());
+        IRopeActor actor1 = IRopeActor.getAt(level, rope.getPosData1());
+        if (actor0 != null) {
+            if (!IRopeActor.canActorAttach(actor0.getActorBlockState())) {
+                RopeFactory.removeAndCleanupRope(rope, level);
+            }
+            actor0.connectRope(rope.getRopeId(), actor0.getActorBlockState(), level, actor0.getPos());
+        }
+
+        if (actor1 != null) {
+            if (!IRopeActor.canActorAttach(actor1.getActorBlockState())) {
+                RopeFactory.removeAndCleanupRope(rope, level);
+            }
+            actor1.connectRope(rope.getRopeId(), actor1.getActorBlockState(), level, actor1.getPos());
+        }
 
         setDirty();
     }
@@ -139,17 +160,17 @@ public class RopeManager extends SavedData {
     }
 
     public void physTick(PhysTickEvent event) {
-        VsiPhysLevel level = (VsiPhysLevel) event.getWorld();
+        VsiPhysLevel physLevel = (VsiPhysLevel) event.getWorld();
 
         for (Rope rope : new HashSet<>(this.queued)) {
-            if (rope.allBodiesCreated(level)) {
-                if (createJoints(level, rope)) {
+            if (rope.allBodiesCreated(physLevel)) {
+                if (createJoints(physLevel, rope)) {
 //                    if (!rope.getType().doTheVodiesCollideWithEachOther()) {
 //                        for (Long id : rope.getSegmentBodyIds()) {
-//                            level.getBodyById(id).
+//                            physLevel.getBodyById(id).
 //                        }
 //                    }
-                    this.addRope(rope);
+                    this.level.getServer().execute(() -> this.addRope(rope));
                 }
                 this.queued.remove(rope);
             }
@@ -182,7 +203,7 @@ public class RopeManager extends SavedData {
 
     private void cleanupRope(Rope rope, VsiPhysLevel level) {
         if (rope.getRopeId() != null) {
-            this.ropes.remove(rope.ropeId);
+            this.ropes.remove(rope.getRopeId());
         }
         for (RopeSegment segment : rope.getSegments()) {
             if (segment.joint().left().isPresent()) {

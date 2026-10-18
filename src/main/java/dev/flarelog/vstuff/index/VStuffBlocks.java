@@ -11,6 +11,8 @@ import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import dev.flarelog.vstuff.content.physics.ships.nails.NailBlock;
 import dev.flarelog.vstuff.content.physics.ships.nails.NailItem;
+import dev.flarelog.vstuff.content.ropes.winch.PhysPulleyBlock;
+import dev.flarelog.vstuff.content.ropes.winch.PulleyAnchorBlock;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
@@ -168,6 +170,27 @@ public class VStuffBlocks  {
                     .register();
 
      */
+
+    public static final BlockEntry<PhysPulleyBlock> PHYS_PULLEY =
+            REGISTRATE.block("phys_pulley", PhysPulleyBlock::new)
+                    .initialProperties(AllBlocks.ANDESITE_ALLOY_BLOCK)
+                    .properties(BlockBehaviour.Properties::noOcclusion)
+                    .transform(axeOrPickaxe())
+                    .blockstate(BlockStateGen.horizontalBlockProvider(true))
+                    .transform(VStress.setImpact(4))
+                    .item()
+                    .transform(customItemModel())
+                    .register();
+
+
+    public static final BlockEntry<PulleyAnchorBlock> PULLEY_ANCHOR =
+            REGISTRATE.block("pulley_anchor", PulleyAnchorBlock::new)
+                    .initialProperties(AllBlocks.ZINC_BLOCK)
+                    .transform(pickaxeOnly())
+                    .blockstate(BlockStateGen.directionalBlockProvider(false))
+                    .item()
+                    .build()
+                    .register();
 
 
     public static <I extends BlockItem, P> NonNullFunction<ItemBuilder<I, P>, P> customItemModel() {
