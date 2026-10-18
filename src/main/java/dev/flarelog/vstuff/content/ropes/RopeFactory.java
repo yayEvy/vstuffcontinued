@@ -114,7 +114,7 @@ public class RopeFactory {
         CopyOnWriteArrayList<RopeSegment> segments = createSegmentBodies(ctx, segmentCount, spawnStart, spawnEnd);
         makeJoints(segments, spacing, type);
 
-        Rope physRope = new Rope(ctx.data0(), ctx.data1(), type, styleKey, segments);
+        Rope physRope = new Rope(ctx.data0(), ctx.data1(), type, styleKey, segments, (float) ((spacing * 1 + SAG_FACTOR) * segmentCount));
 
         RopeManager.get(level).queue(physRope);
 
@@ -217,6 +217,10 @@ public class RopeFactory {
         segments.add(0, first);
         segments.add(last);
 
+    }
+
+    public static void removeAndCleanupRope(Integer ropeId, ServerLevel level) {
+        removeAndCleanupRope(RopeManager.get(level).getRope(ropeId), level);
     }
 
     public static void removeAndCleanupRope(Rope rope, ServerLevel level) {

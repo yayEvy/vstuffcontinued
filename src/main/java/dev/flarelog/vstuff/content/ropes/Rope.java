@@ -1,10 +1,12 @@
 package dev.flarelog.vstuff.content.ropes;
 
+import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.flarelog.vstuff.content.physics.VSUtil;
 import dev.flarelog.vstuff.content.ropes.type.RopeType;
 import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
@@ -15,10 +17,14 @@ import dev.flarelog.vstuff.content.ropes.data.LocalPosAndBodyId;
 import dev.flarelog.vstuff.content.ropes.data.RopeSegment;
 import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.api.world.PhysLevel;
+import org.valkyrienskies.core.internal.joints.VSJoint;
+import org.valkyrienskies.core.internal.joints.VSJointPose;
 import org.valkyrienskies.core.internal.ships.VsiQueryableShipData;
+import org.valkyrienskies.core.internal.world.VsiPhysLevel;
 import org.valkyrienskies.core.internal.world.VsiServerShipWorld;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
@@ -36,8 +42,9 @@ public class Rope {
             LocalPosAndBodyId.CODEC.fieldOf("posData1").forGetter(Rope::getPosData1),
             RopeType.CODEC.fieldOf("type").forGetter(Rope::getType),
             ResourceKey.codec(VStuffRegistries.ROPE_STYLE).fieldOf("style").forGetter(Rope::getStyleKey),
-            RopeSegment.CODEC.listOf().fieldOf("segments").forGetter(Rope::getSegments)
-    ).apply(instance, (ropeId, posData0, posData1, type, styleKey, segments) -> new Rope(posData0, posData1, type, styleKey, new CopyOnWriteArrayList<>(segments)).setRopeId(ropeId)));
+            RopeSegment.CODEC.listOf().fieldOf("segments").forGetter(Rope::getSegments),
+            Codec.FLOAT.fieldOf("length").forGetter(Rope::getLength)
+    ).apply(instance, Rope::new));
 
     private Integer ropeId;
     private final LocalPosAndBodyId posData0;
@@ -45,13 +52,22 @@ public class Rope {
     private final RopeType type;
     private final ResourceKey<RopeStyle> styleKey;
     private final CopyOnWriteArrayList<RopeSegment> segments;
+    private volatile float length;
+    @Setter
+    private boolean lengthDirty = false;
 
-    protected Rope(LocalPosAndBodyId posData0, LocalPosAndBodyId posData1, RopeType type, ResourceKey<RopeStyle> styleKey, CopyOnWriteArrayList<RopeSegment> segments) {
+    protected Rope(Integer ropeId, LocalPosAndBodyId posData0, LocalPosAndBodyId posData1, RopeType type, ResourceKey<RopeStyle> styleKey, List<RopeSegment> segments, float length) {
+         this(posData0, posData1, type, styleKey, new CopyOnWriteArrayList<>(segments), length);
+         this.setRopeId(ropeId);
+    }
+
+    protected Rope(LocalPosAndBodyId posData0, LocalPosAndBodyId posData1, RopeType type, ResourceKey<RopeStyle> styleKey, CopyOnWriteArrayList<RopeSegment> segments, float length) {
         this.posData0 = posData0;
         this.posData1 = posData1;
         this.styleKey = styleKey;
         this.type = type;
         this.segments = segments;
+        this.length = length;
     }
 
     public Rope setRopeId(Integer to) {
@@ -143,6 +159,46 @@ public class Rope {
             ids.add(segments.get(i).pos1().id());
         }
         return ids;
+    }
+
+    public void setLength(float length) {
+        if (length == this.length) return;
+        this.length = length;
+        this.setLengthDirty(true);
+    }
+
+    public void physTick(VsiPhysLevel level) {
+        if (!this.allJointsCreated()) return;
+        if (!this.isLengthDirty()) return;
+        float spacing = (float) (length / this.segments.size()); // actually spacing * (1+sag_factor) but whatever
+        RopeSegment first = this.segments.get(0);
+        RopeSegment last = this.segments.get(segments.size() - 1);
+
+        level.removeJoint(first.joint().orThrow());
+        VSJoint firstJoint = this.getType().getEndJointWith(first.pos0().id(),
+                new VSJointPose(first.pos0().pos(), new Quaterniond()),
+                first.pos1().id(),
+                new VSJointPose(first.pos1().pos(), new Quaterniond()),
+                spacing).serialized();
+
+        first.joint(Either.left(level.addJoint(firstJoint)));
+
+        for (RopeSegment segment : this.segments.subList(1, this.segments.size() - 1)) {
+            level.removeJoint(segment.joint().orThrow());
+            VSJoint joint = this.getType().getConnectingPhysBodyJointWith(
+                    segment.pos0().id(), new VSJointPose(segment.pos0().pos(), new Quaterniond()),
+                    segment.pos1().id(), new VSJointPose(segment.pos1().pos(), new Quaterniond()),
+                    spacing
+            ).serialized();
+            segment.joint(Either.left(level.addJoint(joint)));
+
+            VSJoint lastJoint = this.getType().getEndJointWith(last.pos0().id(),
+                    new VSJointPose(last.pos0().pos(), new Quaterniond()),
+                    last.pos1().id(),
+                    new VSJointPose(last.pos1().pos(), new Quaterniond()),
+                    spacing).serialized();
+            last.joint(Either.left(level.addJoint(lastJoint)));
+        }
     }
 
 }

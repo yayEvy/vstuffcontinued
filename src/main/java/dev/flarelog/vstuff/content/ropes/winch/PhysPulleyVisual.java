@@ -14,7 +14,7 @@ import dev.flarelog.vstuff.index.VStuffPartialModels;
 
 import java.util.function.Consumer;
 
-import static dev.flarelog.vstuff.content.ropes.pulley.PhysPulleyBlock.HORIZONTAL_FACING;
+import static dev.flarelog.vstuff.content.ropes.winch.PhysPulleyBlock.HORIZONTAL_FACING;
 
 public class PhysPulleyVisual extends ShaftVisual<PhysPulleyBlockEntity> implements SimpleTickableVisual {
 

@@ -11,7 +11,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
 import dev.flarelog.vstuff.index.VStuffPartialModels;
 
-import static dev.flarelog.vstuff.content.ropes.pulley.PhysPulleyBlock.HORIZONTAL_FACING;
+import static dev.flarelog.vstuff.content.ropes.winch.PhysPulleyBlock.HORIZONTAL_FACING;
 
 public class PhysPulleyRenderer extends ShaftRenderer<PhysPulleyBlockEntity> {
 

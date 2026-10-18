@@ -94,7 +94,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         }
 
         float ropeDelta = getSpeed() * 0.001f; // todo replace 0.001f with config value
-        float oldLength = rope.jointValues.maxLength();
+        float oldLength = rope.getLength();
 
         if (oldLength <= 1.0f && ropeDelta < 0f) return; // less than min and retracting
 
@@ -103,7 +103,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
         if (Math.abs(newLength - oldLength) < 0.0001f) return;
 
-        rope.setJointLength(serverLevel, newLength);
+        rope.setLength(newLength);
         //VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new UpdateRopeLengthPacket(ropeId, rope.jointValues.maxLength()));
     }
 
@@ -157,9 +157,9 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         tag.putInt("ropeId", Objects.requireNonNullElse(this.ropeId, -1));
 
         if (ropeId != null && level instanceof ServerLevel serverLevel) {
-            ReworkedRope rope = RopeManager.get(serverLevel).getRope(ropeId);
+            Rope rope = RopeManager.get(serverLevel).getRope(ropeId);
             if (rope != null) {
-                tag.putFloat("ropeLength", rope.jointValues.maxLength());
+                tag.putFloat("ropeLength", rope.getLength());
             }
         }
     }
@@ -177,9 +177,9 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
             float savedLength = tag.getFloat("ropeLength");
             if (level instanceof ServerLevel serverLevel) {
                 serverLevel.getServer().execute(() -> {
-                    ReworkedRope rope = RopeManager.get(serverLevel).getRope(this.ropeId);
+                    Rope rope = RopeManager.get(serverLevel).getRope(this.ropeId);
                     if (rope != null) {
-                        rope.setJointLength(serverLevel, savedLength);
+                        rope.setLength(savedLength);
 
                     }
                 });
@@ -211,7 +211,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
 
         if (ropeId == null) return;
 
-        RopeFactory.removeRope(serverLevel, ropeId);
+        RopeFactory.removeAndCleanupRope(ropeId, serverLevel);
     }
 
 

@@ -13,8 +13,8 @@ import net.minecraftforge.network.NetworkEvent;
 
 public class OutlinePacket extends SimplePacketBase {
 
-    private BlockPos pos;
-    private int color;
+    private final BlockPos pos;
+    private final int color;
 
     public OutlinePacket(BlockPos pos, int color) {
         this.pos = pos;

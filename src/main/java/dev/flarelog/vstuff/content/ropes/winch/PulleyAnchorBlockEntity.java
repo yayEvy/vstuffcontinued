@@ -8,12 +8,12 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import dev.flarelog.vstuff.content.ropes.util.IRopeActor;
 import dev.flarelog.vstuff.content.ropes.RopeManager;
-import dev.flarelog.vstuff.content.ropes.ReworkedRope;
+import dev.flarelog.vstuff.content.ropes.Rope;
 
 public class PulleyAnchorBlockEntity extends BlockEntity implements IRopeActor {
 
     private Integer ropeId = null;
-    private ReworkedRope rope = null;
+    private Rope rope = null;
 
     public PulleyAnchorBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);

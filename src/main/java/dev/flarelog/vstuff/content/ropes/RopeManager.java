@@ -162,6 +162,10 @@ public class RopeManager extends SavedData {
     public void physTick(PhysTickEvent event) {
         VsiPhysLevel physLevel = (VsiPhysLevel) event.getWorld();
 
+        for (Rope rope : this.ropes.values()) {
+            rope.physTick(physLevel);
+        }
+
         for (Rope rope : new HashSet<>(this.queued)) {
             if (rope.allBodiesCreated(physLevel)) {
                 if (createJoints(physLevel, rope)) {
