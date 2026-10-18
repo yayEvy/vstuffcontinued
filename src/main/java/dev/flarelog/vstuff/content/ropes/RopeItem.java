@@ -51,7 +51,7 @@ public class RopeItem extends Item {
         if (!isFoil(heldItem)) {
             if (player.isShiftKeyDown()) return InteractionResult.FAIL;
 
-            if (!IRopeActor.canAttach(state)) {
+            if (!IRopeActor.canAttach(serverLevel.getBlockEntity(clickedPos))) {
                 player.displayClientMessage(
                         VStuff.translate("message.rope.actor_connected", blockName).withStyle(ChatFormatting.RED), true);
                 if (player instanceof ServerPlayer sp)
@@ -88,7 +88,7 @@ public class RopeItem extends Item {
             return InteractionResult.SUCCESS;
         }
 
-        if (!IRopeActor.canAttach(state)) {
+        if (!IRopeActor.canAttach(serverLevel.getBlockEntity(clickedPos))) {
             player.displayClientMessage(
                     VStuff.translate("message.rope.actor_connected", blockName).withStyle(ChatFormatting.RED), true);
             if (player instanceof ServerPlayer sp)

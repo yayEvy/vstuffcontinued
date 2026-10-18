@@ -1,6 +1,7 @@
 package dev.flarelog.vstuff.content.ropes.winch;
 
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
+import dev.flarelog.vstuff.content.ropes.Rope;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -16,7 +17,6 @@ import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.mod.api.BlockEntityPhysicsListener;
 import dev.flarelog.vstuff.content.ropes.util.IRopeActor;
 import dev.flarelog.vstuff.content.ropes.RopeManager;
-import dev.flarelog.vstuff.content.ropes.ReworkedRope;
 import dev.flarelog.vstuff.content.ropes.RopeFactory;
 import dev.flarelog.vstuff.index.VStuffBlockEntities;
 
@@ -81,12 +81,12 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     private void tickPulley() {
         if (!(level instanceof ServerLevel serverLevel)) return;
 
-        if (IRopeActor.canActorAttach(this.getBlockState())) return;
+        if (this.canAttach()) return;
         if (ropeId == null) {
             return;
         }
 
-        ReworkedRope rope = RopeManager.get(serverLevel).getRope(this.ropeId);
+        Rope rope = RopeManager.get(serverLevel).getRope(this.ropeId);
 
         if (!RopeManager.get(serverLevel).hasRope(ropeId)) {
             removeRope(ropeId, getBlockState(), serverLevel, getBlockPos());

@@ -71,13 +71,13 @@ public class RopeFactory {
         IRopeActor actor0 = IRopeActor.getAt(level, data0);
         IRopeActor actor1 = IRopeActor.getAt(level, data1);
         if (actor0 != null) {
-            if (!IRopeActor.canAttach(actor0.getActorBlockState())) {
+            if (!actor0.canAttach()) {
                 return RopeResult.withMessage("vstuff.message.rope.actor_connected");
             }
         }
 
         if (actor1 != null) {
-            if (!IRopeActor.canAttach(actor1.getActorBlockState())) {
+            if (!actor1.canAttach()) {
                 return RopeResult.withMessage("vstuff.message.rope.actor_connected");
             }
         }

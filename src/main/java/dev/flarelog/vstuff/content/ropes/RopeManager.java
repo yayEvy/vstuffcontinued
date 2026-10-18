@@ -97,14 +97,14 @@ public class RopeManager extends SavedData {
         IRopeActor actor0 = IRopeActor.getAt(level, rope.getPosData0());
         IRopeActor actor1 = IRopeActor.getAt(level, rope.getPosData1());
         if (actor0 != null) {
-            if (!IRopeActor.canActorAttach(actor0.getActorBlockState())) {
+            if (!actor0.canAttach()) {
                 RopeFactory.removeAndCleanupRope(rope, level);
             }
             actor0.connectRope(rope.getRopeId(), actor0.getActorBlockState(), level, actor0.getPos());
         }
 
         if (actor1 != null) {
-            if (!IRopeActor.canActorAttach(actor1.getActorBlockState())) {
+            if (!actor1.canAttach()) {
                 RopeFactory.removeAndCleanupRope(rope, level);
             }
             actor1.connectRope(rope.getRopeId(), actor1.getActorBlockState(), level, actor1.getPos());
