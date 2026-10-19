@@ -41,6 +41,7 @@ public  class Nail {
 
 public static Nail grabThatNailOerThereSonny(BlockPos pos){
         for (Nail nail : nails.values()){
+            System.out.println("nail pos: " + nail.initialPos);
             if (nail.initialPos.equals(pos)) {
                 return nail; }
         }
@@ -48,6 +49,7 @@ public static Nail grabThatNailOerThereSonny(BlockPos pos){
 }
     public static Nail grabById(int id) {
         for (Nail nail : nails.values()) {
+            System.out.println(nail.id);
             if (nail.id.equals(id)) {
                 return nail;
             }

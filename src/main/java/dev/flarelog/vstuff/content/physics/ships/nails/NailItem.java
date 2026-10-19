@@ -94,6 +94,9 @@ public class NailItem extends BlockItem {
         super.useOn(context);
         if (context.getLevel() instanceof ServerLevel serverLevel) {
 
+            System.out.println("nail place ids: " + nail.id);
+            if (context.getLevel().getBlockState(nextPos).getBlock() instanceof NailBlock nailBlock) nailBlock.nailId = nail.id;
+
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
@@ -101,9 +104,10 @@ public class NailItem extends BlockItem {
             }
 
 
-                 Ship ship = ShipAssembler.assembleToShip(serverLevel, Set.of(nextPos), 1);
 
-                 FixedConstraintUtils.createFixedConstraint(serverLevel, clickedPos, ship, nail);
+                 Ship nailHead = ShipAssembler.assembleToShip(serverLevel, Set.of(nextPos), 1);
+
+                 FixedConstraintUtils.createFixedConstraint(serverLevel, clickedPos, nailHead, nail);
 
             System.out.println(getRandomNailFromBox());
 
