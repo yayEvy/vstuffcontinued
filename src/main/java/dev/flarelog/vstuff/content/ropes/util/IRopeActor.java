@@ -12,8 +12,8 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 public interface IRopeActor {
     BooleanProperty CONNECTED = BooleanProperty.create("connected");
 
-    void connectRope(Integer rope, BlockState state, Level level, BlockPos pos);
-    void removeRope(Integer ropeId, BlockState state, Level level, BlockPos pos);
+    void connectRope(Integer rope);
+    void removeRope(Integer ropeId);
     BlockState getActorBlockState();
     BlockPos getPos();
 

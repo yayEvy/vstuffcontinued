@@ -32,22 +32,23 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
     }
 
     @Override
-    public void connectRope(Integer ropeId, BlockState state, Level level, BlockPos pos) {
+    public void connectRope(Integer ropeId) {
         if (!(level instanceof ServerLevel serverLevel)) return;
         if (ropeId == null || !RopeManager.get(serverLevel).hasRope(ropeId)) return;
 
         this.ropeId = ropeId;
 
-        blockConnect(state, level, pos);
+        blockConnect(this.getActorBlockState(), level, this.getPos());
 
         setChanged();
     }
 
     @Override
-    public void removeRope(Integer ropeId, BlockState state, Level level, BlockPos pos) {
+    public void removeRope(Integer ropeId) {
         this.ropeId = null;
 
-        blockRemove(state, level, pos);
+        assert level != null;
+        blockRemove(this.getActorBlockState(), level, this.getPos());
 
         setChanged();
     }
@@ -89,7 +90,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         Rope rope = RopeManager.get(serverLevel).getRope(this.ropeId);
 
         if (!RopeManager.get(serverLevel).hasRope(ropeId)) {
-            removeRope(ropeId, getBlockState(), serverLevel, getBlockPos());
+            removeRope(ropeId);
             return;
         }
 
@@ -186,7 +187,7 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
             }
         }
 
-        connectRope(ropeId, getBlockState(), level, getBlockPos());
+        connectRope(ropeId);
     }
 
     @Override

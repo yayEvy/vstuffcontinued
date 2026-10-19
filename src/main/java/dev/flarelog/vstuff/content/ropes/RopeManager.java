@@ -99,22 +99,34 @@ public class RopeManager extends SavedData {
         if (actor0 != null) {
             if (!actor0.canAttach()) {
                 RopeFactory.removeAndCleanupRope(rope, level);
+                return;
             }
-            actor0.connectRope(rope.getRopeId(), actor0.getActorBlockState(), level, actor0.getPos());
+            actor0.connectRope(rope.getRopeId());
         }
 
         if (actor1 != null) {
             if (!actor1.canAttach()) {
                 RopeFactory.removeAndCleanupRope(rope, level);
+                return;
             }
-            actor1.connectRope(rope.getRopeId(), actor1.getActorBlockState(), level, actor1.getPos());
+            actor1.connectRope(rope.getRopeId());
         }
 
         setDirty();
     }
 
     public void removeRope(Integer id) {
-        ropes.remove(id);
+        Rope rope = ropes.remove(id);
+
+        IRopeActor actor0 = IRopeActor.getAt(level, rope.getPosData0());
+        IRopeActor actor1 = IRopeActor.getAt(level, rope.getPosData1());
+        if (actor0 != null) {
+            actor0.removeRope(id);
+        }
+
+        if (actor1 != null) {
+            actor1.removeRope(id);
+        }
 
         VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new RemoveRopePacket(id));
 

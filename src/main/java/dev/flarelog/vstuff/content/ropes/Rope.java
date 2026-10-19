@@ -168,9 +168,11 @@ public class Rope {
     }
 
     public void physTick(VsiPhysLevel level) {
-        if (!this.allJointsCreated()) return;
         if (!this.isLengthDirty()) return;
-        float spacing = (float) (length / this.segments.size()); // actually spacing * (1+sag_factor) but whatever
+        if (!this.allJointsCreated()) return;
+        
+        this.setLengthDirty(false);
+        float spacing = (length / this.segments.size()); // actually spacing * (1+sag_factor) but whatever
         RopeSegment first = this.segments.get(0);
         RopeSegment last = this.segments.get(segments.size() - 1);
 
@@ -191,14 +193,14 @@ public class Rope {
                     spacing
             ).serialized();
             segment.joint(Either.left(level.addJoint(joint)));
-
-            VSJoint lastJoint = this.getType().getEndJointWith(last.pos0().id(),
-                    new VSJointPose(last.pos0().pos(), new Quaterniond()),
-                    last.pos1().id(),
-                    new VSJointPose(last.pos1().pos(), new Quaterniond()),
-                    spacing).serialized();
-            last.joint(Either.left(level.addJoint(lastJoint)));
         }
+
+        VSJoint lastJoint = this.getType().getEndJointWith(last.pos0().id(),
+                new VSJointPose(last.pos0().pos(), new Quaterniond()),
+                last.pos1().id(),
+                new VSJointPose(last.pos1().pos(), new Quaterniond()),
+                spacing).serialized();
+        last.joint(Either.left(level.addJoint(lastJoint)));
     }
 
 }
