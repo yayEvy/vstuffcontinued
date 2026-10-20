@@ -92,8 +92,6 @@ public class RopeManager extends SavedData {
 
         ropes.put(rope.getRopeId(), rope);
 
-        VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new AddRopePacket(rope));
-
         IRopeActor actor0 = IRopeActor.getAt(level, rope.getPosData0());
         IRopeActor actor1 = IRopeActor.getAt(level, rope.getPosData1());
         if (actor0 != null) {
@@ -112,6 +110,7 @@ public class RopeManager extends SavedData {
             actor1.connectRope(rope.getRopeId());
         }
 
+        VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new AddRopePacket(rope));
         setDirty();
     }
 

@@ -36,10 +36,10 @@ public class CommonEvents {
         VStuffCommands.register(event.getDispatcher());
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onBlockBreak(BlockEvent.BreakEvent event) {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
-
+        if (event.isCanceled()) return;
         BlockPos brokenPos = event.getPos();
         Vector3d worldBreakPos = PositionUtils.getWorldPos(level, brokenPos);
         Map<Integer, ResourceKey<RopeStyle>> idsToRemove = new HashMap<>();
