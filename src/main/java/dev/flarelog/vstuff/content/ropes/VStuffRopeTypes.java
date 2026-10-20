@@ -17,6 +17,7 @@ public class VStuffRopeTypes {
                         .maxForceTorque(new VSJointMaxForceTorque(JOINT_MAX_FORCE_TORQUE, JOINT_MAX_FORCE_TORQUE))
                         .minDistance(0f)
                         .tolerance(JOINT_TOLERANCE)
+                        .compliance(JOINT_COMPLIANCE)
                         .stiffness(JOINT_STIFFNESS)
                         .damping(JOINT_DAMPING)
                         .build(),
@@ -24,6 +25,7 @@ public class VStuffRopeTypes {
                         .maxForceTorque(new VSJointMaxForceTorque(JOINT_MAX_FORCE_TORQUE, JOINT_MAX_FORCE_TORQUE))
                         .minDistance(0f)
                         .tolerance(JOINT_TOLERANCE)
+                        .compliance(JOINT_COMPLIANCE)
                         .stiffness(JOINT_STIFFNESS)
                         .damping(JOINT_DAMPING)
                         .build(),

@@ -1,7 +1,7 @@
 {
   "connectingPhysBodyJoint": {
     "type": "distance",
-    "compliance": 1.0E-10,
+    "compliance": 10000,
     "damping": 100000,
     "maxForceTorque": {
       "maxForce": 10,
@@ -14,7 +14,7 @@
   "doTheVodiesCollideWithEachOther": false,
   "endJoint": {
     "type": "distance",
-    "compliance": 1.0E-10,
+    "compliance": 10000,
     "damping": 100000,
     "maxForceTorque": {
       "maxForce": 10,
