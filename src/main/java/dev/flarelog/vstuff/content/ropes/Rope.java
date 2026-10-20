@@ -176,31 +176,28 @@ public class Rope {
         RopeSegment first = this.segments.get(0);
         RopeSegment last = this.segments.get(segments.size() - 1);
 
-        level.removeJoint(first.joint().orThrow());
         VSJoint firstJoint = this.getType().getEndJointWith(first.pos0().id(),
                 new VSJointPose(first.pos0().pos(), new Quaterniond()),
                 first.pos1().id(),
                 new VSJointPose(first.pos1().pos(), new Quaterniond()),
                 spacing).serialized();
-        first.joint(Either.left(level.addJoint(firstJoint)));
+        level.updateJoint(first.joint().orThrow(), firstJoint);
 
         for (RopeSegment segment : this.segments.subList(1, this.segments.size() - 1)) {
-            level.removeJoint(segment.joint().orThrow());
             VSJoint joint = this.getType().getConnectingPhysBodyJointWith(
                     segment.pos0().id(), new VSJointPose(segment.pos0().pos(), new Quaterniond()),
                     segment.pos1().id(), new VSJointPose(segment.pos1().pos(), new Quaterniond()),
                     spacing
             ).serialized();
-            segment.joint(Either.left(level.addJoint(joint)));
+            level.updateJoint(segment.joint().orThrow(), joint);
         }
 
-        level.removeJoint(last.joint().orThrow());
         VSJoint lastJoint = this.getType().getEndJointWith(last.pos0().id(),
                 new VSJointPose(last.pos0().pos(), new Quaterniond()),
                 last.pos1().id(),
                 new VSJointPose(last.pos1().pos(), new Quaterniond()),
                 spacing).serialized();
-        last.joint(Either.left(level.addJoint(lastJoint)));
+        level.updateJoint(last.joint().orThrow(), lastJoint);
     }
 
 }

@@ -27,7 +27,7 @@ public class VStuffRopeTypes {
                         .stiffness(JOINT_STIFFNESS)
                         .damping(JOINT_DAMPING)
                         .build(),
-                true
+                false
                 )
         );
     }

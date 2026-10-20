@@ -180,11 +180,13 @@ public class RopeManager extends SavedData {
         for (Rope rope : new HashSet<>(this.queued)) {
             if (rope.allBodiesCreated(physLevel)) {
                 if (createJoints(physLevel, rope)) {
-//                    if (!rope.getType().doTheVodiesCollideWithEachOther()) {
-//                        for (Long id : rope.getSegmentBodyIds()) {
-//                            physLevel.getBodyById(id).
-//                        }
-//                    }
+                    if (!rope.getType().doTheVodiesCollideWithEachOther()) {
+                        for (Long body : rope.getSegmentBodyIds()) {
+                            for (Long id : rope.getSegmentBodyIds()) {
+                                physLevel.disableCollisionBetween(body, id);
+                            }
+                        }
+                    }
                     this.level.getServer().execute(() -> this.addRope(rope));
                 }
                 this.queued.remove(rope);
