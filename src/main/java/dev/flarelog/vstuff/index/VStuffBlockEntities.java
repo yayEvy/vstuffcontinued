@@ -4,6 +4,7 @@ import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
 
 import dev.flarelog.vstuff.VStuff;
+import dev.flarelog.vstuff.content.physics.handle.HandlebarBlockEntity;
 import dev.flarelog.vstuff.content.physics.levituff.LevituffBlockEntity;
 import dev.flarelog.vstuff.content.physics.levituff.RefinedLevituffBlockEntity;
 import dev.flarelog.vstuff.content.physics.ships.reactionwheel.ReactionWheelBlockEntity;
@@ -40,6 +41,15 @@ public class VStuffBlockEntities {
             REGISTRATE.blockEntity("refined_levituff", RefinedLevituffBlockEntity::new)
                     .validBlocks(VStuffBlocks.REFINED_LEVITUFF)
                     .register();
+
+
+    public static final BlockEntityEntry<HandlebarBlockEntity> HANDLEBAR_BE =
+            REGISTRATE.blockEntity("handle", HandlebarBlockEntity::new)
+                    .validBlocks(VStuffBlocks.HANDLE)
+                    .register();
+
+
+
 
     public static void register() {}
 }

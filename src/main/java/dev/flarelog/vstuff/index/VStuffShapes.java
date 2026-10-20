@@ -21,6 +21,7 @@ public class VStuffShapes {
 
 
 
+
     NAIL = shape(3.0, 0.075, 4.0, 13.0, 2.5, 12.0)
             .add(2.68, 0.025, 2.135, 4.68, 2.975, 8.635)
             .add(2.68, 0.025, 7.365, 4.68, 2.975, 13.865)
@@ -37,6 +38,15 @@ public class VStuffShapes {
                 .add(3, 1, 3, 13, 2, 13)
                 .add(5, 2, 5, 11, 3, 11)
                 .forDirectional(Direction.UP);
+
+
+    public static final VoxelShaper HANDLE = shape(1, 0, 6.5, 4, 2, 9.5)
+            .add(8, 3, 7, 14.5, 5, 9)
+            .add(12.5, 2, 7, 14.5, 3, 9)
+            .add(12, 0, 6.5, 15, 2, 9.5)
+            .add(1.5, 2, 7, 3.5, 3, 9)
+            .add(1.5, 3, 7, 8, 5, 9)
+            .forDirectional();
 
     private static Builder shape(VoxelShape shape) {
         return new Builder(shape);

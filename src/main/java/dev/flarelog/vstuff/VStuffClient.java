@@ -1,5 +1,6 @@
 package dev.flarelog.vstuff;
 
+import dev.flarelog.vstuff.content.physics.handle.HandlebarItemModel;
 import net.createmod.ponder.foundation.PonderIndex;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -15,5 +16,6 @@ public class VStuffClient {
     private static void clientInit(final FMLClientSetupEvent event) {
         VStuffPartialModels.register();
         PonderIndex.addPlugin(new VStuffPonders());
+        event.enqueueWork(HandlebarItemModel::register);
     }
 }
