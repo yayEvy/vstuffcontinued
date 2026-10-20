@@ -42,8 +42,9 @@ public class RopeManager extends SavedData {
 
     private static final String DATA_NAME = "vstuff_phys_ropes";
     public static final Logger LOGGER = LogUtils.getLogger();
+    public static final String FORMAT_VERSION = "v1";
 
-    private static AtomicInteger nextId = new AtomicInteger(0);
+    private final AtomicInteger nextId = new AtomicInteger(0);
 
     private final ConcurrentHashMap<Integer, Rope> ropes = new ConcurrentHashMap<>();
     private final Set<Rope> queued = ConcurrentHashMap.newKeySet();
@@ -63,8 +64,8 @@ public class RopeManager extends SavedData {
 
             data.ropes.put(rope.ropeId, rope);
         }
-
-        VStuff.LOGGER.info("Loaded {} ropes from saved data.", data.ropes.size());
+        data.nextId.set(tag.getInt("nextId"));
+        VStuff.LOGGER.info("Loaded {} ropes from saved data. Format Version: {}", data.ropes.size(), tag.getString("formatVersion"));
         return data;
     }
 
@@ -75,11 +76,13 @@ public class RopeManager extends SavedData {
             ropeList.add(CodecUtil.encodeToTag(entry.getValue(), Rope.FULL_CODEC));
         }
         tag.put("ropes", ropeList);
+        tag.putInt("nextId", nextId.get());
+        tag.putString("formatVersion", FORMAT_VERSION);
         return tag;
     }
 
 
-    public void addRope(Rope rope) {
+    private void addRope(Rope rope) {
         rope.setRopeId(nextId.incrementAndGet());
 
         ropes.put(rope.ropeId, rope);
@@ -141,6 +144,11 @@ public class RopeManager extends SavedData {
         for (Rope rope : new HashSet<>(this.queued)) {
             if (rope.allBodiesCreated(level)) {
                 if (createJoints(level, rope)) {
+//                    if (!rope.getType().doTheVodiesCollideWithEachOther()) {
+//                        for (Long id : rope.getSegmentBodyIds()) {
+//                            level.getBodyById(id).
+//                        }
+//                    }
                     this.addRope(rope);
                 }
                 this.queued.remove(rope);
@@ -173,7 +181,9 @@ public class RopeManager extends SavedData {
     }
 
     private void cleanupRope(Rope rope, VsiPhysLevel level) {
-        this.ropes.remove(rope.ropeId);
+        if (rope.getRopeId() != null) {
+            this.ropes.remove(rope.ropeId);
+        }
         for (RopeSegment segment : rope.getSegments()) {
             if (segment.joint().left().isPresent()) {
                 level.removeJoint(segment.joint().left().get());

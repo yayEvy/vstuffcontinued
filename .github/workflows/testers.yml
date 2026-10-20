@@ -10,16 +10,16 @@ jobs:
       contents: read
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Set up JDK 17
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         java-version: '17'
         distribution: 'temurin'
 
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v4
+      uses: gradle/actions/setup-gradle@v6
 
     - name: Make gradlew executable
       run: chmod +x ./gradlew
@@ -27,19 +27,41 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
 
-    - name: Generate Artifact Link
+    - name: Compute build metadata
       run: |
         get_prop() { grep -E "^$1\s*=" gradle.properties | head -n1 | cut -d= -f2- | tr -d '[:space:]'; }
 
+        # VS2 jar link
         VS2_VER=$(get_prop vs2_version)
         VS2_HASH=$(get_prop vs2_hash)
         VERSION_STR="${VS2_VER}+${VS2_HASH:0:10}"
-
         BASE_URL="https://maven.valkyrienskies.org/org/valkyrienskies/valkyrienskies-120-forge"
         JAR_LINK="${BASE_URL}/${VERSION_STR}/valkyrienskies-120-forge-${VERSION_STR}.jar"
-
         echo "VS JAR URL: $JAR_LINK"
-        echo "VS_JAR=$JAR_LINK" >> "$GITHUB_ENV"
+
+        # Mod version + commit hash for the filename
+        MOD_VERSION=$(get_prop mod_version)
+        MOD_VERSION="${MOD_VERSION:-unknown}"
+        SHORT_SHA="${GITHUB_SHA:0:7}"
+        JAR_NAME="vstuff-${MOD_VERSION}-testbuild-${SHORT_SHA}.jar"
+        echo "Jar name: $JAR_NAME"
+
+        {
+          echo "VS_JAR=$JAR_LINK"
+          echo "JAR_NAME=$JAR_NAME"
+          echo "ARTIFACT_NAME=${JAR_NAME%.jar}"
+        } >> "$GITHUB_ENV"
+
+    - name: Rename jar
+      run: cp ./build/reobfJar/output.jar "./${JAR_NAME}"
+
+    - name: Upload jar as artifact
+      id: upload
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ env.ARTIFACT_NAME }}
+        path: ./${{ env.JAR_NAME }}
+        if-no-files-found: error
 
     - name: Send Mod to Discord
       env:
@@ -49,14 +71,17 @@ jobs:
         REPO: ${{ github.repository }}
         BRANCH: ${{ github.ref_name }}
         SERVER_URL: ${{ github.server_url }}
+        ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
       run: |
         SHORT_SHA="${COMMIT_SHA:0:7}"
         COMMIT_MSG=$(git log -1 --pretty=%s)
+        AUTHOR=$(git log -1 --pretty=%an)
         COMMIT_URL="${SERVER_URL}/${REPO}/commit/${COMMIT_SHA}"
 
+        DESC="**Commit:** [\`${SHORT_SHA}\`](${COMMIT_URL}) ${COMMIT_MSG}"$'\n'"**Author:** ${AUTHOR}"$'\n'"**Build triggered by:** ${ACTOR}"$'\n'"**VS2 Jar Used For Build:** [Download](${VS_JAR})"$'\n'"**Workflow Artifact:** [Download](${ARTIFACT_URL})"
+
         jq -n \
-          --arg title "New Vstuff Test Build" \
-          --arg desc "**Commit:** [\`${SHORT_SHA}\`](${COMMIT_URL}) ${COMMIT_MSG}"$'\n'"**Author:** $(git log -1 --pretty=%an) \n Build Triggered by ${ACTOR}" \
+          --arg desc "$DESC" \
           --arg repo "$REPO" \
           --arg branch "$BRANCH" \
           --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
@@ -64,7 +89,7 @@ jobs:
             username: "Test Blobber The Second",
             avatar_url: "https://cdn.modrinth.com/data/voOBl6iP/7a2aa3a8dcc706ad7f08f6fd5cf0a1b8a3adfae6_96.webp",
             embeds: [{
-              title: $title,
+              title: "New Vstuff Test Build",
               description: $desc,
               color: 5120926,
               fields: [
@@ -81,5 +106,5 @@ jobs:
 
         curl -sS --fail \
           -F "payload_json=<payload.json" \
-          -F "file=@./build/reobfJar/output.jar" \
+          -F "file=@./${JAR_NAME}" \
           "$WEBHOOK_URL"

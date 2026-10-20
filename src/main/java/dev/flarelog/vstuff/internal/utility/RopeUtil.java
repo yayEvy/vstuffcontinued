@@ -122,8 +122,8 @@ public class RopeUtil {
         Rope closest = null;
 
         for (Rope rope : RopeManager.get(level).getRopeList()) {
-            Vector3d a = rope.posData0.getWorldPos(level);
-            Vector3d b = rope.posData1.getWorldPos(level);
+            Vector3d a = rope.getPosData0().getWorldPos(level);
+            Vector3d b = rope.getPosData1().getWorldPos(level);
 
             double dist = getDistanceToRope(eyePos, lookVec, a, b, maxDistance);
             if (dist < minDistance && dist <= 1.0) {
