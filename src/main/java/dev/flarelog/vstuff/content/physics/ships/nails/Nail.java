@@ -46,7 +46,7 @@ public  class Nail {
 
     public static Nail grabThatNailOerThereSonny(BlockPos pos) {
         for (Nail nail : nails.values()) {
-            System.out.println("nail pos: " + nail.initialPos);
+//            System.out.println("nail pos: " + nail.initialPos);
             if (nail.initialPos.equals(pos)) {
                 return nail;
             }
@@ -58,11 +58,11 @@ public  class Nail {
         for (Nail nail : nails.values()){
 
             BlockPos regBlockPos = new BlockPos(pos.getX() + 1,pos.getY(),pos.getZ());
-            System.out.println("better head pos: " + regBlockPos);
-            System.out.println("head pos: " + nail.nailHeadPos);
+//            System.out.println("better head pos: " + regBlockPos);
+//            System.out.println("head pos: " + nail.nailHeadPos);
 
             if (nail.nailHeadPos.equals(regBlockPos)) {
-                System.out.println("True");
+//                System.out.println("True");
                 return nail; }
         }
         return null;
@@ -70,7 +70,7 @@ public  class Nail {
 
     public static Nail grabById(int id) {
         for (Nail nail : nails.values()) {
-            System.out.println(nail.id);
+//            System.out.println(nail.id);
             if (nail.id.equals(id)) {
                 return nail;
             }

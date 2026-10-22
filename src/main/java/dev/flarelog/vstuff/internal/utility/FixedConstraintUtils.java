@@ -75,7 +75,7 @@ public class FixedConstraintUtils {
         VSFixedJoint joint = makeFixedJoint(level, posOne, ship2, nail);
 
         if (level instanceof ServerLevel serverLevel){
-            VSUtils.getGTPA(serverLevel).addJoint(joint, 5,(id) -> {
+            VSUtils.getGTPA(serverLevel).addJoint(joint, 8,(id) -> {
                 JointAndId JnI = new JointAndId(id,dataFromJoint(joint));
                 nailToJoints.put(nail,JnI);
             });
@@ -87,12 +87,9 @@ public class FixedConstraintUtils {
     public static void updateFixedConstraintRotation(Level level, Nail nail){
 
         VSFixedJoint newJoint;
-        System.out.println("joint and ID : " + nailToJoints.get(nail));
 
         @Nullable VSFixedJoint oldJoint = getJointFromData(nailToJoints.get(nail).getJointData());
         Long id0 = oldJoint != null ? oldJoint.getShipId0() : null;
-        
-        System.out.println("old joint: " + oldJoint);
 
         nail.rotation = nail.rotation + 15.0;
 
@@ -119,7 +116,6 @@ public class FixedConstraintUtils {
 
         }
 
-
         VSJointAndId jointAndId = new VSJointAndId(nailToJoints.get(nail).getJointId(),newJoint);
     if (level instanceof ServerLevel serverLevel){
 
@@ -131,11 +127,6 @@ public class FixedConstraintUtils {
     private static @Nullable VSFixedJoint getJointFromData(JointData oldJointData) {
         VSJointPose p1 = new VSJointPose(oldJointData.getLocalFrame0().getPos(),oldJointData.getLocalFrame0().getRot());
         VSJointPose p2 = new VSJointPose(oldJointData.getLocalFrame1().getPos(), oldJointData.getLocalFrame1().getRot());
-//        VSJointMaxForceTorque forceTorque = new VSJointMaxForceTorque(
-//                (
-//                        oldJointData.getBreakForceTorque()).getMaxForce(),
-//                        oldJointData.getBreakForceTorque().getMaxTorque());
-     Long id0;
 
          if(oldJointData.getPhysicsBodyId0() != null) {
 
@@ -154,7 +145,7 @@ public class FixedConstraintUtils {
                     p1,
                     Objects.requireNonNull(oldJointData.getPhysicsBodyId1()).longValue(),
                     p2,
-                    new VSJointMaxForceTorque(0.0f,0.0f), // we dont use this but mfs in runtime want it
+                    new VSJointMaxForceTorque(0.0f,0.0f), // we dont use this either
                     oldJointData.getCompliance());
 
         }

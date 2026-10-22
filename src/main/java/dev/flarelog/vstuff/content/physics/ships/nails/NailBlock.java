@@ -71,44 +71,24 @@ public class NailBlock extends DirectionalBlock implements IWrenchable  {
 
     @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
-        System.out.println("wrenched");
-
-
-        Vector3d clickedPos = VSUtils.getWorldPos(context.getLevel(),context.getClickedPos());
-
-        Vector3d v3d = clickedPos.add(FixedConstraintUtils.getOffset(context.getClickedFace()));
-
-        BlockPos pos = new BlockPos((int) v3d.x , (int) v3d.y , (int) v3d.z );
-
-        Block block = context.getLevel().getBlockState(context.getClickedPos()).getBlock();
-
-
-        if (block instanceof NailBlock nailBlock) {
-            System.out.println("NAIL ID: "+nailBlock.nailId);
-            System.out.println("NailBlock's ID" + nailId);
-        }
 
             Nail nailButNotCool = Nail.nowBoyWhatDidISayAboutManHandlingThemThereNails(context.getClickedPos());
             Nail nail = Nail.grabById(nailButNotCool.id);
 
-            System.out.println("clicked position: " + context.getClickedPos());
-//            System.out.println(VSUtils.getWorldPos(context.getLevel(), ));
-            System.out.println(nail);
+            if (context.getLevel().isClientSide) {
+
+                if (nail == null) return IWrenchable.super.onWrenched(state, context);
 
 
-            if (nail.rotation + 7.5 > 360) {
-                nail.rotation = 0.0;
+                if (nail.rotation + 15 > 360) nail.rotation = 0.0;
+
+                nail.rotation += 15;
             }
 
-            nail.rotation += 7.5;
             context.getPlayer().displayClientMessage(Component.literal("Rotation updated to " + nail.rotation + " degrees").withStyle(ChatFormatting.GREEN), true);
 
-            System.out.println("level: " + context.getLevel());
-            System.out.println("nail: " + nail);
-            System.out.println("naid: " + nailId);
-
             updateFixedConstraintRotation(context.getLevel(), nail);
-      //  }
+
         return IWrenchable.super.onWrenched(state, context);
     }
 
@@ -116,9 +96,6 @@ public class NailBlock extends DirectionalBlock implements IWrenchable  {
     public void setPlacedBy(@NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState state, @Nullable LivingEntity placer, @NotNull ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
 
-
-        System.out.println("Block was placed! UUID is: " + randID);
-        System.out.println("nail id on place: "+ nailId);
         if (level instanceof ServerLevel serverLevel) {
 
 

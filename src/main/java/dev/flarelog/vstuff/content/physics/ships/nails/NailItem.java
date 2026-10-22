@@ -62,7 +62,7 @@ public class NailItem extends BlockItem {
   public static HashMap<BlockPos,BlockPos> posMap= new HashMap<>();
   public static Direction coolDirection;
   public static BlockPos blockToBeNailedTo;
-    public NailItem(NailBlock pBlock, Properties pProperties) { super(pBlock, pProperties); }
+  public NailItem(NailBlock pBlock, Properties pProperties) { super(pBlock, pProperties); }
 
 
 
@@ -70,64 +70,66 @@ public class NailItem extends BlockItem {
     @Override
     public InteractionResult useOn(UseOnContext context) {
 
-        BlockPos clickedPos = context.getClickedPos();
-        Block block = context.getLevel().getBlockState(clickedPos).getBlock();
-        coolDirection = context.getClickedFace();
-        BlockPos nextPos = clickedPos.relative(coolDirection, 1);
-        blockToBeNailedTo = clickedPos;
-        Nail nail = Nail.grabThatNailOerThereSonny(clickedPos);
+            BlockPos clickedPos = context.getClickedPos();
+            Block block = context.getLevel().getBlockState(clickedPos).getBlock();
+            coolDirection = context.getClickedFace();
+            BlockPos nextPos = clickedPos.relative(coolDirection, 1);
+            blockToBeNailedTo = clickedPos;
+            Nail nail = Nail.grabThatNailOerThereSonny(clickedPos);
 
 
             if (block instanceof NailBlock) return InteractionResult.PASS;
 
-        if ( nail == null) {
-            nail = Nail.newNail(0.0, coolDirection, clickedPos, nextPos);
-        }
-        posMap.put(nextPos,clickedPos);
+            if (nail == null) {
+                nail = Nail.newNail(0.0, coolDirection, clickedPos, nextPos);
+            }
+            posMap.put(nextPos, clickedPos);
 
-        if (Nail.grabThatNailOerThereSonny(clickedPos) != null && context.getPlayer().isShiftKeyDown()){
-            if (nail.rotation + 7.5 > 360){nail.rotation = 0.0;}
 
-            nail.rotation += 7.5;
-            context.getPlayer().displayClientMessage(Component.literal("Rotation set to " + nail.rotation + " degrees").withStyle(ChatFormatting.GREEN), true);
-            return InteractionResult.PASS;
-        }
-        nail.direction = coolDirection;
+            if (Nail.grabThatNailOerThereSonny(clickedPos) != null && context.getPlayer().isShiftKeyDown()) {
+
+                    if (nail.rotation + 7.5 > 360) {
+                        nail.rotation = 0.0;
+                    }
+
+                    nail.rotation += 7.5;
+
+                    context.getPlayer().displayClientMessage(Component.literal("Rotation set to " + nail.rotation + " degrees").withStyle(ChatFormatting.GREEN), true);
+                    return InteractionResult.PASS;
+
+            }
+            nail.direction = coolDirection;
+
 
         super.useOn(context);
         if (context.getLevel() instanceof ServerLevel serverLevel) {
 
-                System.out.println("nail place ids: " + nail.id);
-            if (context.getLevel().getBlockState(nextPos).getBlock() instanceof NailBlock nailBlock) {
-                System.out.println("grabbed! UUID is: " + nailBlock.randID);
-                System.out.println("true! + " + nailBlock.nailId + "and :" + nail.id);
-                nailBlock.nailId = nail.id;
-                System.out.println("now + " + nailBlock.nailId + "and :" + nail.id);
 
-                System.out.println("All nails: " + nails.keySet() + " : " + nails.values());
+                if (context.getLevel().getBlockState(nextPos).getBlock() instanceof NailBlock nailBlock) {
+
+                    nailBlock.nailId = nail.id;
 
 
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+//                try {
+//                    Thread.sleep(2000);
+//                } catch (InterruptedException e) {
+//                    throw new RuntimeException(e);
+//                }
 
 
                 Ship nailHead = ShipAssembler.assembleToShip(serverLevel, Set.of(nextPos), 1);
 
-                Vector3dc c = new Vector3d(nailHead.getTransform().getPositionInShip());
-                BlockPos pos = new BlockPos((int) c.x(), (int) c.y(), (int) c.z());
-                System.out.println("Pos Pos: " + pos);
+                    Vector3dc c = new Vector3d(nailHead.getTransform().getPositionInShip());
+                    BlockPos pos = new BlockPos((int) c.x(), (int) c.y(), (int) c.z());
 
-                nail.nailHeadPos = pos;
+                    nail.nailHeadPos = pos;
 
-                FixedConstraintUtils.createFixedConstraint(serverLevel, clickedPos, nailHead, nail);
+                    FixedConstraintUtils.createFixedConstraint(serverLevel, clickedPos, nailHead, nail);
 
-                System.out.println(getRandomNailFromBox());
+                    System.out.println(getRandomNailFromBox());
 
+                }
             }
-        }
 
 
         return InteractionResult.PASS;

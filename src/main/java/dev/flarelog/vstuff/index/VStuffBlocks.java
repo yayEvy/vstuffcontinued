@@ -75,19 +75,9 @@ public class VStuffBlocks  {
                     .blockstate((ctx, prov) -> {
 
                         ModelFile model = new ModelFile.UncheckedModelFile(prov.modLoc("block/nail_block"));
-//
-                        // prov.horizontalBlock(ctx.get(),model);
-                       prov.directionalBlock(ctx.get(), model);
-
+                        prov.directionalBlock(ctx.get(), model);
 
                     })
-
-
-
-
-
-
-
                     .transform(axeOrPickaxe())
                     .item(NailItem::new)
                     .build()
