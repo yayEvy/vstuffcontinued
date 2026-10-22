@@ -9,6 +9,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
@@ -19,6 +20,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.util.ForgeSoundType;
 import org.joml.Vector3d;
+import org.joml.Vector3dc;
+import org.joml.Vector3i;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
@@ -78,7 +81,7 @@ public class NailItem extends BlockItem {
         if (block instanceof NailBlock) return InteractionResult.PASS;
 
         if ( nail == null) {
-            nail = Nail.newNail(0.0, coolDirection, clickedPos);
+            nail = Nail.newNail(0.0, coolDirection, clickedPos, nextPos);
         }
         posMap.put(nextPos,clickedPos);
 
@@ -94,24 +97,36 @@ public class NailItem extends BlockItem {
         super.useOn(context);
         if (context.getLevel() instanceof ServerLevel serverLevel) {
 
-            System.out.println("nail place ids: " + nail.id);
-            if (context.getLevel().getBlockState(nextPos).getBlock() instanceof NailBlock nailBlock) nailBlock.nailId = nail.id;
+                System.out.println("nail place ids: " + nail.id);
+            if (context.getLevel().getBlockState(nextPos).getBlock() instanceof NailBlock nailBlock) {
+                System.out.println("grabbed! UUID is: " + nailBlock.randID);
+                System.out.println("true! + " + nailBlock.nailId + "and :" + nail.id);
+                nailBlock.nailId = nail.id;
+                System.out.println("now + " + nailBlock.nailId + "and :" + nail.id);
 
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                System.out.println("All nails: " + nails.keySet() + " : " + nails.values());
+
+
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
+
+                Ship nailHead = ShipAssembler.assembleToShip(serverLevel, Set.of(nextPos), 1);
+
+                Vector3dc c = new Vector3d(nailHead.getTransform().getPositionInShip());
+                BlockPos pos = new BlockPos((int) c.x(), (int) c.y(), (int) c.z());
+                System.out.println("Pos Pos: " + pos);
+
+                nail.nailHeadPos = pos;
+
+                FixedConstraintUtils.createFixedConstraint(serverLevel, clickedPos, nailHead, nail);
+
+                System.out.println(getRandomNailFromBox());
+
             }
-
-
-
-                 Ship nailHead = ShipAssembler.assembleToShip(serverLevel, Set.of(nextPos), 1);
-
-                 FixedConstraintUtils.createFixedConstraint(serverLevel, clickedPos, nailHead, nail);
-
-            System.out.println(getRandomNailFromBox());
-
-
         }
 
 

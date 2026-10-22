@@ -5,6 +5,8 @@ import com.simibubi.create.content.kinetics.base.DirectionalAxisKineticBlock;
 import dev.flarelog.vstuff.index.VStuffShapes;
 import dev.flarelog.vstuff.internal.utility.FixedConstraintUtils;
 import dev.flarelog.vstuff.internal.utility.VSUtils;
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -32,6 +34,7 @@ import net.minecraftforge.common.util.ForgeSoundType;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.core.impl.shadow.Fi;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import org.valkyrienskies.mod.common.assembly.ShipAssembler;
@@ -42,6 +45,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import static com.simibubi.create.content.redstone.nixieTube.DoubleFaceAttachedBlock.FACE;
 import static dev.flarelog.vstuff.internal.utility.FixedConstraintUtils.updateFixedConstraintRotation;
@@ -50,12 +54,13 @@ import static dev.flarelog.vstuff.internal.utility.FixedConstraintUtils.updateFi
 public class NailBlock extends DirectionalBlock implements IWrenchable  {
 
     public Integer nailId;
+    public Long ShipID;
+    public UUID randID = UUID.randomUUID();
 
-    public NailBlock(Properties pProperties) { super(pProperties);
+    public NailBlock(Properties pProperties) {
+        super(pProperties);
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
-
     }
-
 
     @Override
     @SuppressWarnings("deprecation")
@@ -78,12 +83,16 @@ public class NailBlock extends DirectionalBlock implements IWrenchable  {
         Block block = context.getLevel().getBlockState(context.getClickedPos()).getBlock();
 
 
-      //  if (block instanceof NailBlock nailBlock) {
+        if (block instanceof NailBlock nailBlock) {
+            System.out.println("NAIL ID: "+nailBlock.nailId);
+            System.out.println("NailBlock's ID" + nailId);
+        }
 
-            Nail nail = Nail.grabById(nailId);
+            Nail nailButNotCool = Nail.nowBoyWhatDidISayAboutManHandlingThemThereNails(context.getClickedPos());
+            Nail nail = Nail.grabById(nailButNotCool.id);
 
-            System.out.println(context.getClickedPos());
-            System.out.println(pos);
+            System.out.println("clicked position: " + context.getClickedPos());
+//            System.out.println(VSUtils.getWorldPos(context.getLevel(), ));
             System.out.println(nail);
 
 
@@ -107,7 +116,9 @@ public class NailBlock extends DirectionalBlock implements IWrenchable  {
     public void setPlacedBy(@NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState state, @Nullable LivingEntity placer, @NotNull ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
 
-        System.out.println("nail id on place: "+nailId);
+
+        System.out.println("Block was placed! UUID is: " + randID);
+        System.out.println("nail id on place: "+ nailId);
         if (level instanceof ServerLevel serverLevel) {
 
 
