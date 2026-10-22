@@ -79,26 +79,7 @@ public class VStuffBlocks  {
                         // prov.horizontalBlock(ctx.get(),model);
                        prov.directionalBlock(ctx.get(), model);
 
-//                        prov.getVariantBuilder(ctx.get()).forAllStates(state -> {
-//                            Direction facing = state.getValue(NailBlock.FACING);
-//                            int xRot = 0;
-//                            int yRot = 0;
-//
-//                            switch (facing) {
-//                                case DOWN  -> { xRot = 90;  yRot = 0;   } // Pointing Down
-//                                case UP    -> { xRot = -90; yRot = 0;   } // Pointing Up
-//                                case NORTH -> { xRot = 0;   yRot = 0;   } // Base position (0, 0)
-//                                case SOUTH -> { xRot = 0;   yRot = 180; } // Rotated 180 around Y
-//                                case WEST  -> { xRot = 0;   yRot = 270; } // Rotated 270 around Y
-//                                case EAST  -> { xRot = 0;   yRot = 90;  } // Rotated 90 around Y
-//                            }
-//
-//                            return ConfiguredModel.builder()
-//                                    .modelFile(model)
-//                                    .rotationX(xRot)
-//                                    .rotationY(yRot)
-//                                    .build();
-//                        });
+
                     })
 
 
