@@ -78,7 +78,7 @@ public class NailItem extends BlockItem {
         Nail nail = Nail.grabThatNailOerThereSonny(clickedPos);
 
 
-        if (block instanceof NailBlock) return InteractionResult.PASS;
+            if (block instanceof NailBlock) return InteractionResult.PASS;
 
         if ( nail == null) {
             nail = Nail.newNail(0.0, coolDirection, clickedPos, nextPos);
