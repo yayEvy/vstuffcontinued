@@ -1,0 +1,7 @@
+{
+  "parent": "vstuff:block/handlebar",
+  "textures": {
+    "0": "vstuff:block/handlebar/blue",
+    "particle": "vstuff:block/handlebar/blue"
+  }
+}

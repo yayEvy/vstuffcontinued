@@ -64,7 +64,7 @@ public class ExpendableAssemblerItem extends Item {
 
 
         } catch (Exception e) {
-            VStuff.LOGGER.error("Something Fucked Up - ExpendableAssemblerItem ", e);
+            VStuff.LOGGER.error("Something Fucked Up - ExpendableAssemblerItem (sus)", e);
             return InteractionResult.CONSUME;
         }
     }

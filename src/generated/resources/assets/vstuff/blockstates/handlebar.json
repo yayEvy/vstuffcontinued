@@ -1,0 +1,868 @@
+{
+  "variants": {
+    "color=black,facing=down,rotated=false": {
+      "model": "vstuff:block/handlebar_black",
+      "x": 180
+    },
+    "color=black,facing=down,rotated=true": {
+      "model": "vstuff:block/handlebar_black",
+      "x": 180,
+      "y": 90
+    },
+    "color=black,facing=east,rotated=false": {
+      "model": "vstuff:block/handlebar_black",
+      "x": 90,
+      "y": 90
+    },
+    "color=black,facing=east,rotated=true": {
+      "model": "vstuff:block/handlebar_black",
+      "x": 180,
+      "y": 90
+    },
+    "color=black,facing=north,rotated=false": {
+      "model": "vstuff:block/handlebar_black",
+      "x": 90
+    },
+    "color=black,facing=north,rotated=true": {
+      "model": "vstuff:block/handlebar_black",
+      "x": 180
+    },
+    "color=black,facing=south,rotated=false": {
+      "model": "vstuff:block/handlebar_black",
+      "x": 90,
+      "y": 180
+    },
+    "color=black,facing=south,rotated=true": {
+      "model": "vstuff:block/handlebar_black",
+      "x": 180,
+      "y": 180
+    },
+    "color=black,facing=up,rotated=false": {
+      "model": "vstuff:block/handlebar_black"
+    },
+    "color=black,facing=up,rotated=true": {
+      "model": "vstuff:block/handlebar_black",
+      "y": 90
+    },
+    "color=black,facing=west,rotated=false": {
+      "model": "vstuff:block/handlebar_black",
+      "x": 90,
+      "y": 270
+    },
+    "color=black,facing=west,rotated=true": {
+      "model": "vstuff:block/handlebar_black",
+      "x": 180,
+      "y": 270
+    },
+    "color=blue,facing=down,rotated=false": {
+      "model": "vstuff:block/handlebar_blue",
+      "x": 180
+    },
+    "color=blue,facing=down,rotated=true": {
+      "model": "vstuff:block/handlebar_blue",
+      "x": 180,
+      "y": 90
+    },
+    "color=blue,facing=east,rotated=false": {
+      "model": "vstuff:block/handlebar_blue",
+      "x": 90,
+      "y": 90
+    },
+    "color=blue,facing=east,rotated=true": {
+      "model": "vstuff:block/handlebar_blue",
+      "x": 180,
+      "y": 90
+    },
+    "color=blue,facing=north,rotated=false": {
+      "model": "vstuff:block/handlebar_blue",
+      "x": 90
+    },
+    "color=blue,facing=north,rotated=true": {
+      "model": "vstuff:block/handlebar_blue",
+      "x": 180
+    },
+    "color=blue,facing=south,rotated=false": {
+      "model": "vstuff:block/handlebar_blue",
+      "x": 90,
+      "y": 180
+    },
+    "color=blue,facing=south,rotated=true": {
+      "model": "vstuff:block/handlebar_blue",
+      "x": 180,
+      "y": 180
+    },
+    "color=blue,facing=up,rotated=false": {
+      "model": "vstuff:block/handlebar_blue"
+    },
+    "color=blue,facing=up,rotated=true": {
+      "model": "vstuff:block/handlebar_blue",
+      "y": 90
+    },
+    "color=blue,facing=west,rotated=false": {
+      "model": "vstuff:block/handlebar_blue",
+      "x": 90,
+      "y": 270
+    },
+    "color=blue,facing=west,rotated=true": {
+      "model": "vstuff:block/handlebar_blue",
+      "x": 180,
+      "y": 270
+    },
+    "color=brown,facing=down,rotated=false": {
+      "model": "vstuff:block/handlebar_brown",
+      "x": 180
+    },
+    "color=brown,facing=down,rotated=true": {
+      "model": "vstuff:block/handlebar_brown",
+      "x": 180,
+      "y": 90
+    },
+    "color=brown,facing=east,rotated=false": {
+      "model": "vstuff:block/handlebar_brown",
+      "x": 90,
+      "y": 90
+    },
+    "color=brown,facing=east,rotated=true": {
+      "model": "vstuff:block/handlebar_brown",
+      "x": 180,
+      "y": 90
+    },
+    "color=brown,facing=north,rotated=false": {
+      "model": "vstuff:block/handlebar_brown",
+      "x": 90
+    },
+    "color=brown,facing=north,rotated=true": {
+      "model": "vstuff:block/handlebar_brown",
+      "x": 180
+    },
+    "color=brown,facing=south,rotated=false": {
+      "model": "vstuff:block/handlebar_brown",
+      "x": 90,
+      "y": 180
+    },
+    "color=brown,facing=south,rotated=true": {
+      "model": "vstuff:block/handlebar_brown",
+      "x": 180,
+      "y": 180
+    },
+    "color=brown,facing=up,rotated=false": {
+      "model": "vstuff:block/handlebar_brown"
+    },
+    "color=brown,facing=up,rotated=true": {
+      "model": "vstuff:block/handlebar_brown",
+      "y": 90
+    },
+    "color=brown,facing=west,rotated=false": {
+      "model": "vstuff:block/handlebar_brown",
+      "x": 90,
+      "y": 270
+    },
+    "color=brown,facing=west,rotated=true": {
+      "model": "vstuff:block/handlebar_brown",
+      "x": 180,
+      "y": 270
+    },
+    "color=cyan,facing=down,rotated=false": {
+      "model": "vstuff:block/handlebar_cyan",
+      "x": 180
+    },
+    "color=cyan,facing=down,rotated=true": {
+      "model": "vstuff:block/handlebar_cyan",
+      "x": 180,
+      "y": 90
+    },
+    "color=cyan,facing=east,rotated=false": {
+      "model": "vstuff:block/handlebar_cyan",
+      "x": 90,
+      "y": 90
+    },
+    "color=cyan,facing=east,rotated=true": {
+      "model": "vstuff:block/handlebar_cyan",
+      "x": 180,
+      "y": 90
+    },
+    "color=cyan,facing=north,rotated=false": {
+      "model": "vstuff:block/handlebar_cyan",
+      "x": 90
+    },
+    "color=cyan,facing=north,rotated=true": {
+      "model": "vstuff:block/handlebar_cyan",
+      "x": 180
+    },
+    "color=cyan,facing=south,rotated=false": {
+      "model": "vstuff:block/handlebar_cyan",
+      "x": 90,
+      "y": 180
+    },
+    "color=cyan,facing=south,rotated=true": {
+      "model": "vstuff:block/handlebar_cyan",
+      "x": 180,
+      "y": 180
+    },
+    "color=cyan,facing=up,rotated=false": {
+      "model": "vstuff:block/handlebar_cyan"
+    },
+    "color=cyan,facing=up,rotated=true": {
+      "model": "vstuff:block/handlebar_cyan",
+      "y": 90
+    },
+    "color=cyan,facing=west,rotated=false": {
+      "model": "vstuff:block/handlebar_cyan",
+      "x": 90,
+      "y": 270
+    },
+    "color=cyan,facing=west,rotated=true": {
+      "model": "vstuff:block/handlebar_cyan",
+      "x": 180,
+      "y": 270
+    },
+    "color=gray,facing=down,rotated=false": {
+      "model": "vstuff:block/handlebar_gray",
+      "x": 180
+    },
+    "color=gray,facing=down,rotated=true": {
+      "model": "vstuff:block/handlebar_gray",
+      "x": 180,
+      "y": 90
+    },
+    "color=gray,facing=east,rotated=false": {
+      "model": "vstuff:block/handlebar_gray",
+      "x": 90,
+      "y": 90
+    },
+    "color=gray,facing=east,rotated=true": {
+      "model": "vstuff:block/handlebar_gray",
+      "x": 180,
+      "y": 90
+    },
+    "color=gray,facing=north,rotated=false": {
+      "model": "vstuff:block/handlebar_gray",
+      "x": 90
+    },
+    "color=gray,facing=north,rotated=true": {
+      "model": "vstuff:block/handlebar_gray",
+      "x": 180
+    },
+    "color=gray,facing=south,rotated=false": {
+      "model": "vstuff:block/handlebar_gray",
+      "x": 90,
+      "y": 180
+    },
+    "color=gray,facing=south,rotated=true": {
+      "model": "vstuff:block/handlebar_gray",
+      "x": 180,
+      "y": 180
+    },
+    "color=gray,facing=up,rotated=false": {
+      "model": "vstuff:block/handlebar_gray"
+    },
+    "color=gray,facing=up,rotated=true": {
+      "model": "vstuff:block/handlebar_gray",
+      "y": 90
+    },
+    "color=gray,facing=west,rotated=false": {
+      "model": "vstuff:block/handlebar_gray",
+      "x": 90,
+      "y": 270
+    },
+    "color=gray,facing=west,rotated=true": {
+      "model": "vstuff:block/handlebar_gray",
+      "x": 180,
+      "y": 270
+    },
+    "color=green,facing=down,rotated=false": {
+      "model": "vstuff:block/handlebar_green",
+      "x": 180
+    },
+    "color=green,facing=down,rotated=true": {
+      "model": "vstuff:block/handlebar_green",
+      "x": 180,
+      "y": 90
+    },
+    "color=green,facing=east,rotated=false": {
+      "model": "vstuff:block/handlebar_green",
+      "x": 90,
+      "y": 90
+    },
+    "color=green,facing=east,rotated=true": {
+      "model": "vstuff:block/handlebar_green",
+      "x": 180,
+      "y": 90
+    },
+    "color=green,facing=north,rotated=false": {
+      "model": "vstuff:block/handlebar_green",
+      "x": 90
+    },
+    "color=green,facing=north,rotated=true": {
+      "model": "vstuff:block/handlebar_green",
+      "x": 180
+    },
+    "color=green,facing=south,rotated=false": {
+      "model": "vstuff:block/handlebar_green",
+      "x": 90,
+      "y": 180
+    },
+    "color=green,facing=south,rotated=true": {
+      "model": "vstuff:block/handlebar_green",
+      "x": 180,
+      "y": 180
+    },
+    "color=green,facing=up,rotated=false": {
+      "model": "vstuff:block/handlebar_green"
+    },
+    "color=green,facing=up,rotated=true": {
+      "model": "vstuff:block/handlebar_green",
+      "y": 90
+    },
+    "color=green,facing=west,rotated=false": {
+      "model": "vstuff:block/handlebar_green",
+      "x": 90,
+      "y": 270
+    },
+    "color=green,facing=west,rotated=true": {
+      "model": "vstuff:block/handlebar_green",
+      "x": 180,
+      "y": 270
+    },
+    "color=light_blue,facing=down,rotated=false": {
+      "model": "vstuff:block/handlebar_light_blue",
+      "x": 180
+    },
+    "color=light_blue,facing=down,rotated=true": {
+      "model": "vstuff:block/handlebar_light_blue",
+      "x": 180,
+      "y": 90
+    },
+    "color=light_blue,facing=east,rotated=false": {
+      "model": "vstuff:block/handlebar_light_blue",
+      "x": 90,
+      "y": 90
+    },
+    "color=light_blue,facing=east,rotated=true": {
+      "model": "vstuff:block/handlebar_light_blue",
+      "x": 180,
+      "y": 90
+    },
+    "color=light_blue,facing=north,rotated=false": {
+      "model": "vstuff:block/handlebar_light_blue",
+      "x": 90
+    },
+    "color=light_blue,facing=north,rotated=true": {
+      "model": "vstuff:block/handlebar_light_blue",
+      "x": 180
+    },
+    "color=light_blue,facing=south,rotated=false": {
+      "model": "vstuff:block/handlebar_light_blue",
+      "x": 90,
+      "y": 180
+    },
+    "color=light_blue,facing=south,rotated=true": {
+      "model": "vstuff:block/handlebar_light_blue",
+      "x": 180,
+      "y": 180
+    },
+    "color=light_blue,facing=up,rotated=false": {
+      "model": "vstuff:block/handlebar_light_blue"
+    },
+    "color=light_blue,facing=up,rotated=true": {
+      "model": "vstuff:block/handlebar_light_blue",
+      "y": 90
+    },
+    "color=light_blue,facing=west,rotated=false": {
+      "model": "vstuff:block/handlebar_light_blue",
+      "x": 90,
+      "y": 270
+    },
+    "color=light_blue,facing=west,rotated=true": {
+      "model": "vstuff:block/handlebar_light_blue",
+      "x": 180,
+      "y": 270
+    },
+    "color=light_gray,facing=down,rotated=false": {
+      "model": "vstuff:block/handlebar_light_gray",
+      "x": 180
+    },
+    "color=light_gray,facing=down,rotated=true": {
+      "model": "vstuff:block/handlebar_light_gray",
+      "x": 180,
+      "y": 90
+    },
+    "color=light_gray,facing=east,rotated=false": {
+      "model": "vstuff:block/handlebar_light_gray",
+      "x": 90,
+      "y": 90
+    },
+    "color=light_gray,facing=east,rotated=true": {
+      "model": "vstuff:block/handlebar_light_gray",
+      "x": 180,
+      "y": 90
+    },
+    "color=light_gray,facing=north,rotated=false": {
+      "model": "vstuff:block/handlebar_light_gray",
+      "x": 90
+    },
+    "color=light_gray,facing=north,rotated=true": {
+      "model": "vstuff:block/handlebar_light_gray",
+      "x": 180
+    },
+    "color=light_gray,facing=south,rotated=false": {
+      "model": "vstuff:block/handlebar_light_gray",
+      "x": 90,
+      "y": 180
+    },
+    "color=light_gray,facing=south,rotated=true": {
+      "model": "vstuff:block/handlebar_light_gray",
+      "x": 180,
+      "y": 180
+    },
+    "color=light_gray,facing=up,rotated=false": {
+      "model": "vstuff:block/handlebar_light_gray"
+    },
+    "color=light_gray,facing=up,rotated=true": {
+      "model": "vstuff:block/handlebar_light_gray",
+      "y": 90
+    },
+    "color=light_gray,facing=west,rotated=false": {
+      "model": "vstuff:block/handlebar_light_gray",
+      "x": 90,
+      "y": 270
+    },
+    "color=light_gray,facing=west,rotated=true": {
+      "model": "vstuff:block/handlebar_light_gray",
+      "x": 180,
+      "y": 270
+    },
+    "color=lime,facing=down,rotated=false": {
+      "model": "vstuff:block/handlebar_lime",
+      "x": 180
+    },
+    "color=lime,facing=down,rotated=true": {
+      "model": "vstuff:block/handlebar_lime",
+      "x": 180,
+      "y": 90
+    },
+    "color=lime,facing=east,rotated=false": {
+      "model": "vstuff:block/handlebar_lime",
+      "x": 90,
+      "y": 90
+    },
+    "color=lime,facing=east,rotated=true": {
+      "model": "vstuff:block/handlebar_lime",
+      "x": 180,
+      "y": 90
+    },
+    "color=lime,facing=north,rotated=false": {
+      "model": "vstuff:block/handlebar_lime",
+      "x": 90
+    },
+    "color=lime,facing=north,rotated=true": {
+      "model": "vstuff:block/handlebar_lime",
+      "x": 180
+    },
+    "color=lime,facing=south,rotated=false": {
+      "model": "vstuff:block/handlebar_lime",
+      "x": 90,
+      "y": 180
+    },
+    "color=lime,facing=south,rotated=true": {
+      "model": "vstuff:block/handlebar_lime",
+      "x": 180,
+      "y": 180
+    },
+    "color=lime,facing=up,rotated=false": {
+      "model": "vstuff:block/handlebar_lime"
+    },
+    "color=lime,facing=up,rotated=true": {
+      "model": "vstuff:block/handlebar_lime",
+      "y": 90
+    },
+    "color=lime,facing=west,rotated=false": {
+      "model": "vstuff:block/handlebar_lime",
+      "x": 90,
+      "y": 270
+    },
+    "color=lime,facing=west,rotated=true": {
+      "model": "vstuff:block/handlebar_lime",
+      "x": 180,
+      "y": 270
+    },
+    "color=magenta,facing=down,rotated=false": {
+      "model": "vstuff:block/handlebar_magenta",
+      "x": 180
+    },
+    "color=magenta,facing=down,rotated=true": {
+      "model": "vstuff:block/handlebar_magenta",
+      "x": 180,
+      "y": 90
+    },
+    "color=magenta,facing=east,rotated=false": {
+      "model": "vstuff:block/handlebar_magenta",
+      "x": 90,
+      "y": 90
+    },
+    "color=magenta,facing=east,rotated=true": {
+      "model": "vstuff:block/handlebar_magenta",
+      "x": 180,
+      "y": 90
+    },
+    "color=magenta,facing=north,rotated=false": {
+      "model": "vstuff:block/handlebar_magenta",
+      "x": 90
+    },
+    "color=magenta,facing=north,rotated=true": {
+      "model": "vstuff:block/handlebar_magenta",
+      "x": 180
+    },
+    "color=magenta,facing=south,rotated=false": {
+      "model": "vstuff:block/handlebar_magenta",
+      "x": 90,
+      "y": 180
+    },
+    "color=magenta,facing=south,rotated=true": {
+      "model": "vstuff:block/handlebar_magenta",
+      "x": 180,
+      "y": 180
+    },
+    "color=magenta,facing=up,rotated=false": {
+      "model": "vstuff:block/handlebar_magenta"
+    },
+    "color=magenta,facing=up,rotated=true": {
+      "model": "vstuff:block/handlebar_magenta",
+      "y": 90
+    },
+    "color=magenta,facing=west,rotated=false": {
+      "model": "vstuff:block/handlebar_magenta",
+      "x": 90,
+      "y": 270
+    },
+    "color=magenta,facing=west,rotated=true": {
+      "model": "vstuff:block/handlebar_magenta",
+      "x": 180,
+      "y": 270
+    },
+    "color=orange,facing=down,rotated=false": {
+      "model": "vstuff:block/handlebar_orange",
+      "x": 180
+    },
+    "color=orange,facing=down,rotated=true": {
+      "model": "vstuff:block/handlebar_orange",
+      "x": 180,
+      "y": 90
+    },
+    "color=orange,facing=east,rotated=false": {
+      "model": "vstuff:block/handlebar_orange",
+      "x": 90,
+      "y": 90
+    },
+    "color=orange,facing=east,rotated=true": {
+      "model": "vstuff:block/handlebar_orange",
+      "x": 180,
+      "y": 90
+    },
+    "color=orange,facing=north,rotated=false": {
+      "model": "vstuff:block/handlebar_orange",
+      "x": 90
+    },
+    "color=orange,facing=north,rotated=true": {
+      "model": "vstuff:block/handlebar_orange",
+      "x": 180
+    },
+    "color=orange,facing=south,rotated=false": {
+      "model": "vstuff:block/handlebar_orange",
+      "x": 90,
+      "y": 180
+    },
+    "color=orange,facing=south,rotated=true": {
+      "model": "vstuff:block/handlebar_orange",
+      "x": 180,
+      "y": 180
+    },
+    "color=orange,facing=up,rotated=false": {
+      "model": "vstuff:block/handlebar_orange"
+    },
+    "color=orange,facing=up,rotated=true": {
+      "model": "vstuff:block/handlebar_orange",
+      "y": 90
+    },
+    "color=orange,facing=west,rotated=false": {
+      "model": "vstuff:block/handlebar_orange",
+      "x": 90,
+      "y": 270
+    },
+    "color=orange,facing=west,rotated=true": {
+      "model": "vstuff:block/handlebar_orange",
+      "x": 180,
+      "y": 270
+    },
+    "color=pink,facing=down,rotated=false": {
+      "model": "vstuff:block/handlebar_pink",
+      "x": 180
+    },
+    "color=pink,facing=down,rotated=true": {
+      "model": "vstuff:block/handlebar_pink",
+      "x": 180,
+      "y": 90
+    },
+    "color=pink,facing=east,rotated=false": {
+      "model": "vstuff:block/handlebar_pink",
+      "x": 90,
+      "y": 90
+    },
+    "color=pink,facing=east,rotated=true": {
+      "model": "vstuff:block/handlebar_pink",
+      "x": 180,
+      "y": 90
+    },
+    "color=pink,facing=north,rotated=false": {
+      "model": "vstuff:block/handlebar_pink",
+      "x": 90
+    },
+    "color=pink,facing=north,rotated=true": {
+      "model": "vstuff:block/handlebar_pink",
+      "x": 180
+    },
+    "color=pink,facing=south,rotated=false": {
+      "model": "vstuff:block/handlebar_pink",
+      "x": 90,
+      "y": 180
+    },
+    "color=pink,facing=south,rotated=true": {
+      "model": "vstuff:block/handlebar_pink",
+      "x": 180,
+      "y": 180
+    },
+    "color=pink,facing=up,rotated=false": {
+      "model": "vstuff:block/handlebar_pink"
+    },
+    "color=pink,facing=up,rotated=true": {
+      "model": "vstuff:block/handlebar_pink",
+      "y": 90
+    },
+    "color=pink,facing=west,rotated=false": {
+      "model": "vstuff:block/handlebar_pink",
+      "x": 90,
+      "y": 270
+    },
+    "color=pink,facing=west,rotated=true": {
+      "model": "vstuff:block/handlebar_pink",
+      "x": 180,
+      "y": 270
+    },
+    "color=purple,facing=down,rotated=false": {
+      "model": "vstuff:block/handlebar_purple",
+      "x": 180
+    },
+    "color=purple,facing=down,rotated=true": {
+      "model": "vstuff:block/handlebar_purple",
+      "x": 180,
+      "y": 90
+    },
+    "color=purple,facing=east,rotated=false": {
+      "model": "vstuff:block/handlebar_purple",
+      "x": 90,
+      "y": 90
+    },
+    "color=purple,facing=east,rotated=true": {
+      "model": "vstuff:block/handlebar_purple",
+      "x": 180,
+      "y": 90
+    },
+    "color=purple,facing=north,rotated=false": {
+      "model": "vstuff:block/handlebar_purple",
+      "x": 90
+    },
+    "color=purple,facing=north,rotated=true": {
+      "model": "vstuff:block/handlebar_purple",
+      "x": 180
+    },
+    "color=purple,facing=south,rotated=false": {
+      "model": "vstuff:block/handlebar_purple",
+      "x": 90,
+      "y": 180
+    },
+    "color=purple,facing=south,rotated=true": {
+      "model": "vstuff:block/handlebar_purple",
+      "x": 180,
+      "y": 180
+    },
+    "color=purple,facing=up,rotated=false": {
+      "model": "vstuff:block/handlebar_purple"
+    },
+    "color=purple,facing=up,rotated=true": {
+      "model": "vstuff:block/handlebar_purple",
+      "y": 90
+    },
+    "color=purple,facing=west,rotated=false": {
+      "model": "vstuff:block/handlebar_purple",
+      "x": 90,
+      "y": 270
+    },
+    "color=purple,facing=west,rotated=true": {
+      "model": "vstuff:block/handlebar_purple",
+      "x": 180,
+      "y": 270
+    },
+    "color=red,facing=down,rotated=false": {
+      "model": "vstuff:block/handlebar_red",
+      "x": 180
+    },
+    "color=red,facing=down,rotated=true": {
+      "model": "vstuff:block/handlebar_red",
+      "x": 180,
+      "y": 90
+    },
+    "color=red,facing=east,rotated=false": {
+      "model": "vstuff:block/handlebar_red",
+      "x": 90,
+      "y": 90
+    },
+    "color=red,facing=east,rotated=true": {
+      "model": "vstuff:block/handlebar_red",
+      "x": 180,
+      "y": 90
+    },
+    "color=red,facing=north,rotated=false": {
+      "model": "vstuff:block/handlebar_red",
+      "x": 90
+    },
+    "color=red,facing=north,rotated=true": {
+      "model": "vstuff:block/handlebar_red",
+      "x": 180
+    },
+    "color=red,facing=south,rotated=false": {
+      "model": "vstuff:block/handlebar_red",
+      "x": 90,
+      "y": 180
+    },
+    "color=red,facing=south,rotated=true": {
+      "model": "vstuff:block/handlebar_red",
+      "x": 180,
+      "y": 180
+    },
+    "color=red,facing=up,rotated=false": {
+      "model": "vstuff:block/handlebar_red"
+    },
+    "color=red,facing=up,rotated=true": {
+      "model": "vstuff:block/handlebar_red",
+      "y": 90
+    },
+    "color=red,facing=west,rotated=false": {
+      "model": "vstuff:block/handlebar_red",
+      "x": 90,
+      "y": 270
+    },
+    "color=red,facing=west,rotated=true": {
+      "model": "vstuff:block/handlebar_red",
+      "x": 180,
+      "y": 270
+    },
+    "color=white,facing=down,rotated=false": {
+      "model": "vstuff:block/handlebar_white",
+      "x": 180
+    },
+    "color=white,facing=down,rotated=true": {
+      "model": "vstuff:block/handlebar_white",
+      "x": 180,
+      "y": 90
+    },
+    "color=white,facing=east,rotated=false": {
+      "model": "vstuff:block/handlebar_white",
+      "x": 90,
+      "y": 90
+    },
+    "color=white,facing=east,rotated=true": {
+      "model": "vstuff:block/handlebar_white",
+      "x": 180,
+      "y": 90
+    },
+    "color=white,facing=north,rotated=false": {
+      "model": "vstuff:block/handlebar_white",
+      "x": 90
+    },
+    "color=white,facing=north,rotated=true": {
+      "model": "vstuff:block/handlebar_white",
+      "x": 180
+    },
+    "color=white,facing=south,rotated=false": {
+      "model": "vstuff:block/handlebar_white",
+      "x": 90,
+      "y": 180
+    },
+    "color=white,facing=south,rotated=true": {
+      "model": "vstuff:block/handlebar_white",
+      "x": 180,
+      "y": 180
+    },
+    "color=white,facing=up,rotated=false": {
+      "model": "vstuff:block/handlebar_white"
+    },
+    "color=white,facing=up,rotated=true": {
+      "model": "vstuff:block/handlebar_white",
+      "y": 90
+    },
+    "color=white,facing=west,rotated=false": {
+      "model": "vstuff:block/handlebar_white",
+      "x": 90,
+      "y": 270
+    },
+    "color=white,facing=west,rotated=true": {
+      "model": "vstuff:block/handlebar_white",
+      "x": 180,
+      "y": 270
+    },
+    "color=yellow,facing=down,rotated=false": {
+      "model": "vstuff:block/handlebar_yellow",
+      "x": 180
+    },
+    "color=yellow,facing=down,rotated=true": {
+      "model": "vstuff:block/handlebar_yellow",
+      "x": 180,
+      "y": 90
+    },
+    "color=yellow,facing=east,rotated=false": {
+      "model": "vstuff:block/handlebar_yellow",
+      "x": 90,
+      "y": 90
+    },
+    "color=yellow,facing=east,rotated=true": {
+      "model": "vstuff:block/handlebar_yellow",
+      "x": 180,
+      "y": 90
+    },
+    "color=yellow,facing=north,rotated=false": {
+      "model": "vstuff:block/handlebar_yellow",
+      "x": 90
+    },
+    "color=yellow,facing=north,rotated=true": {
+      "model": "vstuff:block/handlebar_yellow",
+      "x": 180
+    },
+    "color=yellow,facing=south,rotated=false": {
+      "model": "vstuff:block/handlebar_yellow",
+      "x": 90,
+      "y": 180
+    },
+    "color=yellow,facing=south,rotated=true": {
+      "model": "vstuff:block/handlebar_yellow",
+      "x": 180,
+      "y": 180
+    },
+    "color=yellow,facing=up,rotated=false": {
+      "model": "vstuff:block/handlebar_yellow"
+    },
+    "color=yellow,facing=up,rotated=true": {
+      "model": "vstuff:block/handlebar_yellow",
+      "y": 90
+    },
+    "color=yellow,facing=west,rotated=false": {
+      "model": "vstuff:block/handlebar_yellow",
+      "x": 90,
+      "y": 270
+    },
+    "color=yellow,facing=west,rotated=true": {
+      "model": "vstuff:block/handlebar_yellow",
+      "x": 180,
+      "y": 270
+    }
+  }
+}
