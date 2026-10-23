@@ -35,9 +35,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import static dev.flarelog.vstuff.content.ropes.util.IRopeActor.CONNECTED;
 
-public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysPulleyBlockEntity>, IWrenchable {
+public class WinchBlock extends HorizontalKineticBlock implements IBE<WinchBlockEntity>, IWrenchable {
 
-    public PhysPulleyBlock(Properties properties) {
+    public WinchBlock(Properties properties) {
         super(properties.strength(3.0f).requiresCorrectToolForDrops());
     }
     public static final BooleanProperty POWERED = BooleanProperty.create("powered");
@@ -120,13 +120,13 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
 
 
     @Override
-    public Class<PhysPulleyBlockEntity> getBlockEntityClass() {
-        return PhysPulleyBlockEntity.class;
+    public Class<WinchBlockEntity> getBlockEntityClass() {
+        return WinchBlockEntity.class;
     }
 
     @Override
-    public BlockEntityType<? extends PhysPulleyBlockEntity> getBlockEntityType() {
-        return VStuffBlockEntities.PHYS_PULLEY_BE.get();
+    public BlockEntityType<? extends WinchBlockEntity> getBlockEntityType() {
+        return VStuffBlockEntities.WINCH_BE.get();
     }
 
     @Override
@@ -140,7 +140,7 @@ public class PhysPulleyBlock extends HorizontalKineticBlock implements IBE<PhysP
         if (powered != wasPowered) {
             level.setBlock(pos, state.setValue(POWERED, powered), 3);
 
-            if (level.getBlockEntity(pos) instanceof PhysPulleyBlockEntity be) {
+            if (level.getBlockEntity(pos) instanceof WinchBlockEntity be) {
                 be.onRedstoneUpdate(powered);
             }
         }

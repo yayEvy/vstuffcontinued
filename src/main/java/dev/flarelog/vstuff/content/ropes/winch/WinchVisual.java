@@ -14,14 +14,14 @@ import dev.flarelog.vstuff.index.VStuffPartialModels;
 
 import java.util.function.Consumer;
 
-import static dev.flarelog.vstuff.content.ropes.winch.PhysPulleyBlock.HORIZONTAL_FACING;
+import static dev.flarelog.vstuff.content.ropes.winch.WinchBlock.HORIZONTAL_FACING;
 
-public class PhysPulleyVisual extends ShaftVisual<PhysPulleyBlockEntity> implements SimpleTickableVisual {
+public class WinchVisual extends ShaftVisual<WinchBlockEntity> implements SimpleTickableVisual {
 
     final Direction direction;
     final RotatingInstance coil;
 
-    public PhysPulleyVisual(VisualizationContext context, PhysPulleyBlockEntity blockEntity, float partialTick) {
+    public WinchVisual(VisualizationContext context, WinchBlockEntity blockEntity, float partialTick) {
         super(context, blockEntity, partialTick);
 
         direction = blockState.getValue(HORIZONTAL_FACING).getOpposite();

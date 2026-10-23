@@ -7,7 +7,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
@@ -23,11 +22,11 @@ import dev.flarelog.vstuff.index.VStuffBlockEntities;
 import java.util.List;
 import java.util.Objects;
 
-public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEntityPhysicsListener, IRopeActor {
+public class WinchBlockEntity extends KineticBlockEntity implements BlockEntityPhysicsListener, IRopeActor {
 
     private volatile Integer ropeId = null;
 
-    public PhysPulleyBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
+    public WinchBlockEntity(BlockEntityType<?> typeIn, BlockPos pos, BlockState state) {
         super(typeIn, pos, state);
     }
 
@@ -63,8 +62,8 @@ public class PhysPulleyBlockEntity extends KineticBlockEntity implements BlockEn
         return this.getBlockPos();
     }
 
-    public static PhysPulleyBlockEntity create(BlockPos pos, BlockState state) {
-        return new PhysPulleyBlockEntity(VStuffBlockEntities.PHYS_PULLEY_BE.get(), pos, state);
+    public static WinchBlockEntity create(BlockPos pos, BlockState state) {
+        return new WinchBlockEntity(VStuffBlockEntities.WINCH_BE.get(), pos, state);
     }
 
     @Override

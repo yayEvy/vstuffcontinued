@@ -1,25 +1,18 @@
 package dev.flarelog.vstuff.index;
 
 import com.simibubi.create.AllBlocks;
-import com.simibubi.create.content.redstone.analogLever.AnalogLeverBlock;
 import com.simibubi.create.foundation.data.AssetLookup;
 import com.simibubi.create.foundation.data.BlockStateGen;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.builders.ItemBuilder;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
-import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import dev.flarelog.vstuff.content.physics.ships.nails.NailBlock;
 import dev.flarelog.vstuff.content.physics.ships.nails.NailItem;
-import dev.flarelog.vstuff.content.ropes.winch.PhysPulleyBlock;
-import dev.flarelog.vstuff.content.ropes.winch.PulleyAnchorBlock;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import dev.flarelog.vstuff.content.ropes.winch.WinchBlock;
+import dev.flarelog.vstuff.content.ropes.winch.AnchorBlock;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.DirectionalBlock;
-import net.minecraft.world.level.block.EndRodBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import dev.flarelog.vstuff.VStuff;
@@ -28,13 +21,7 @@ import dev.flarelog.vstuff.content.physics.levituff.RefinedLevituffBlock;
 import dev.flarelog.vstuff.content.physics.ships.reactionwheel.ReactionWheelBlock;
 import dev.flarelog.vstuff.content.physics.ships.thrust.MechanicalThrusterBlock;
 import dev.flarelog.vstuff.infrastructure.config.VStress;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraftforge.client.model.generators.BlockModelBuilder;
-import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.common.util.ForgeSoundType;
-import org.valkyrienskies.core.internal.config.ConfigEntry;
 
 import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
 import static com.simibubi.create.foundation.data.TagGen.axeOrPickaxe;
@@ -171,8 +158,8 @@ public class VStuffBlocks  {
 
      */
 
-    public static final BlockEntry<PhysPulleyBlock> PHYS_PULLEY =
-            REGISTRATE.block("phys_pulley", PhysPulleyBlock::new)
+    public static final BlockEntry<WinchBlock> WINCH =
+            REGISTRATE.block("winch", WinchBlock::new)
                     .initialProperties(AllBlocks.ANDESITE_ALLOY_BLOCK)
                     .properties(BlockBehaviour.Properties::noOcclusion)
                     .transform(axeOrPickaxe())
@@ -183,8 +170,8 @@ public class VStuffBlocks  {
                     .register();
 
 
-    public static final BlockEntry<PulleyAnchorBlock> PULLEY_ANCHOR =
-            REGISTRATE.block("pulley_anchor", PulleyAnchorBlock::new)
+    public static final BlockEntry<AnchorBlock> ANCHOR =
+            REGISTRATE.block("anchor", AnchorBlock::new)
                     .initialProperties(AllBlocks.ZINC_BLOCK)
                     .transform(pickaxeOnly())
                     .blockstate(BlockStateGen.directionalBlockProvider(false))

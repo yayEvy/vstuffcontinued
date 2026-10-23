@@ -11,16 +11,16 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
 import dev.flarelog.vstuff.index.VStuffPartialModels;
 
-import static dev.flarelog.vstuff.content.ropes.winch.PhysPulleyBlock.HORIZONTAL_FACING;
+import static dev.flarelog.vstuff.content.ropes.winch.WinchBlock.HORIZONTAL_FACING;
 
-public class PhysPulleyRenderer extends ShaftRenderer<PhysPulleyBlockEntity> {
+public class WinchRenderer extends ShaftRenderer<WinchBlockEntity> {
 
-    public PhysPulleyRenderer(BlockEntityRendererProvider.Context context) {
+    public WinchRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
     }
 
     @Override
-    protected void renderSafe(PhysPulleyBlockEntity be, float partialTicks, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
+    protected void renderSafe(WinchBlockEntity be, float partialTicks, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
         Direction direction = be.getBlockState().getValue(HORIZONTAL_FACING);
         VertexConsumer vb = buffer.getBuffer(RenderType.cutoutMipped());
 

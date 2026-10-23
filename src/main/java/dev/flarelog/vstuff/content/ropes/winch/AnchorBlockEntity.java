@@ -2,7 +2,6 @@ package dev.flarelog.vstuff.content.ropes.winch;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -10,12 +9,12 @@ import dev.flarelog.vstuff.content.ropes.util.IRopeActor;
 import dev.flarelog.vstuff.content.ropes.RopeManager;
 import dev.flarelog.vstuff.content.ropes.Rope;
 
-public class PulleyAnchorBlockEntity extends BlockEntity implements IRopeActor {
+public class AnchorBlockEntity extends BlockEntity implements IRopeActor {
 
     private Integer ropeId = null;
     private Rope rope = null;
 
-    public PulleyAnchorBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
+    public AnchorBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
     }
 

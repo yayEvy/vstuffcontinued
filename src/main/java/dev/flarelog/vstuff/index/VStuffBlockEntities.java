@@ -12,10 +12,10 @@ import dev.flarelog.vstuff.content.physics.ships.reactionwheel.ReactionWheelVisu
 import dev.flarelog.vstuff.content.physics.ships.thrust.MechanicalThrusterBlockEntity;
 import dev.flarelog.vstuff.content.physics.ships.thrust.MechanicalThrusterRenderer;
 import dev.flarelog.vstuff.content.physics.ships.thrust.MechanicalThrusterVisual;
-import dev.flarelog.vstuff.content.ropes.winch.PhysPulleyBlockEntity;
-import dev.flarelog.vstuff.content.ropes.winch.PhysPulleyRenderer;
-import dev.flarelog.vstuff.content.ropes.winch.PhysPulleyVisual;
-import dev.flarelog.vstuff.content.ropes.winch.PulleyAnchorBlockEntity;
+import dev.flarelog.vstuff.content.ropes.winch.WinchBlockEntity;
+import dev.flarelog.vstuff.content.ropes.winch.WinchRenderer;
+import dev.flarelog.vstuff.content.ropes.winch.WinchVisual;
+import dev.flarelog.vstuff.content.ropes.winch.AnchorBlockEntity;
 
 public class VStuffBlockEntities {
 
@@ -45,16 +45,16 @@ public class VStuffBlockEntities {
                     .validBlocks(VStuffBlocks.REFINED_LEVITUFF)
                     .register();
 
-    public static final BlockEntityEntry<PhysPulleyBlockEntity> PHYS_PULLEY_BE =
-            REGISTRATE.blockEntity("phys_pulley", PhysPulleyBlockEntity::new)
-                    .visual(() -> PhysPulleyVisual::new, false)
-                    .validBlocks(VStuffBlocks.PHYS_PULLEY)
-                    .renderer(() -> PhysPulleyRenderer::new)
+    public static final BlockEntityEntry<WinchBlockEntity> WINCH_BE =
+            REGISTRATE.blockEntity("winch", WinchBlockEntity::new)
+                    .visual(() -> WinchVisual::new, false)
+                    .validBlocks(VStuffBlocks.WINCH)
+                    .renderer(() -> WinchRenderer::new)
                     .register();
 
-    public static final BlockEntityEntry<PulleyAnchorBlockEntity> PULLEY_ANCHOR_BE =
-            REGISTRATE.blockEntity("pulley_anchor", PulleyAnchorBlockEntity::new)
-                    .validBlocks(VStuffBlocks.PULLEY_ANCHOR)
+    public static final BlockEntityEntry<AnchorBlockEntity> ANCHOR_BE =
+            REGISTRATE.blockEntity("anchor", AnchorBlockEntity::new)
+                    .validBlocks(VStuffBlocks.ANCHOR)
                     .register();
 
     public static void register() {}
