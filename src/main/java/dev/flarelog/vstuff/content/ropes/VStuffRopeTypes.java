@@ -12,15 +12,7 @@ import static dev.flarelog.vstuff.content.ropes.RopeFactory.*;
 
 public class VStuffRopeTypes {
     public static void bootstrap(BootstapContext<RopeType> ctx) {
-        register(ctx, "normal", new RopeType(
-                DistanceJointParams.builder()
-                        .maxForceTorque(new VSJointMaxForceTorque(JOINT_MAX_FORCE_TORQUE, JOINT_MAX_FORCE_TORQUE))
-                        .minDistance(0f)
-                        .tolerance(JOINT_TOLERANCE)
-                        .compliance(JOINT_COMPLIANCE)
-                        .stiffness(JOINT_STIFFNESS)
-                        .damping(JOINT_DAMPING)
-                        .build(),
+        register(ctx, "normal", RopeType.create(
                 DistanceJointParams.builder()
                         .maxForceTorque(new VSJointMaxForceTorque(JOINT_MAX_FORCE_TORQUE, JOINT_MAX_FORCE_TORQUE))
                         .minDistance(0f)

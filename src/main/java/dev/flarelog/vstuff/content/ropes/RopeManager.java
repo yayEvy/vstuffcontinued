@@ -2,11 +2,8 @@ package dev.flarelog.vstuff.content.ropes;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.logging.LogUtils;
-import dev.flarelog.vstuff.client.ClientRopeStyle;
 import dev.flarelog.vstuff.content.ropes.data.RopeSegment;
-import dev.flarelog.vstuff.content.ropes.style.RopeStyleManager;
 import dev.flarelog.vstuff.content.ropes.util.IRopeActor;
-import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
 import dev.flarelog.vstuff.internal.utility.CodecUtil;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.nbt.CompoundTag;
@@ -14,7 +11,6 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.minecraftforge.network.PacketDistributor;
@@ -30,14 +26,11 @@ import org.valkyrienskies.core.api.events.PhysTickEvent;
 import org.valkyrienskies.core.internal.joints.VSJoint;
 import org.valkyrienskies.core.internal.world.VsiPhysLevel;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static dev.flarelog.vstuff.content.physics.VSUtil.getGTPA;
 import static dev.flarelog.vstuff.content.ropes.RopeFactory.removeAndCleanupRope;
 
 @RequiredArgsConstructor
@@ -180,7 +173,7 @@ public class RopeManager extends SavedData {
         for (Rope rope : new HashSet<>(this.queued)) {
             if (rope.allBodiesCreated(physLevel)) {
                 if (createJoints(physLevel, rope)) {
-                    if (!rope.getType().doTheVodiesCollideWithEachOther()) {
+                    if (!rope.getType().selfCollision()) {
                         for (Long body : rope.getSegmentBodyIds()) {
                             for (Long id : rope.getSegmentBodyIds()) {
                                 physLevel.disableCollisionBetween(body, id);
