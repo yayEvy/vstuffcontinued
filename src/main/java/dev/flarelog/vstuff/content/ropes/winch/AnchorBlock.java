@@ -43,7 +43,7 @@ public class AnchorBlock extends DirectionalBlock implements IBE<AnchorBlockEnti
     }
     @Override
     public @NotNull VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return VStuffShapes.PULLEY_ANCHOR.get(state.getValue(FACING));
+        return VStuffShapes.ANCHOR.get(state.getValue(FACING));
     }
 
     @Override

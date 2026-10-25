@@ -2,7 +2,7 @@ package dev.flarelog.vstuff.content.ropes.winch;
 
 import com.simibubi.create.AllItems;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
-import com.simibubi.create.content.kinetics.base.HorizontalKineticBlock;
+import com.simibubi.create.content.kinetics.base.DirectionalKineticBlock;
 import com.simibubi.create.foundation.block.IBE;
 
 import net.minecraft.core.BlockPos;
@@ -35,7 +35,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import static dev.flarelog.vstuff.content.ropes.util.IRopeActor.CONNECTED;
 
-public class WinchBlock extends HorizontalKineticBlock implements IBE<WinchBlockEntity>, IWrenchable {
+public class WinchBlock extends DirectionalKineticBlock implements IBE<WinchBlockEntity>, IWrenchable {
 
     public WinchBlock(Properties properties) {
         super(properties.strength(3.0f).requiresCorrectToolForDrops());
@@ -63,31 +63,26 @@ public class WinchBlock extends HorizontalKineticBlock implements IBE<WinchBlock
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction facing = context.getHorizontalDirection();
         return this.defaultBlockState()
-                .setValue(HORIZONTAL_FACING, facing)
+                .setValue(FACING, facing)
                 .setValue(POWERED, false)
                 .setValue(CONNECTED, false);
     }
 
     @Override
     public boolean hasShaftTowards(LevelReader world, BlockPos pos, BlockState state, Direction face) {
-        Direction facing = state.getValue(HORIZONTAL_FACING);
+        Direction facing = state.getValue(FACING);
         return face == facing.getClockWise() || face == facing.getCounterClockWise();
     }
 
     @Override
     public Direction.Axis getRotationAxis(BlockState state) {
-        Direction facing = state.getValue(HORIZONTAL_FACING);
+        Direction facing = state.getValue(FACING);
         return facing.getAxis() == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X;
     }
 
     @Override
     public SpeedLevel getMinimumRequiredSpeedLevel() {
         return SpeedLevel.SLOW;
-    }
-
-    @Override
-    public boolean hideStressImpact() {
-        return false;
     }
 
     @Override
@@ -109,7 +104,7 @@ public class WinchBlock extends HorizontalKineticBlock implements IBE<WinchBlock
     @Override
     @ParametersAreNonnullByDefault
     public @NotNull VoxelShape getShape(BlockState state, BlockGetter blockGetter, BlockPos blockPos, CollisionContext collisionContext) {
-        return VStuffShapes.PHYS_PULLEY.get(state.getValue(HORIZONTAL_FACING));
+        return VStuffShapes.WINCH.get(state.getValue(FACING));
     }
 
     @Override

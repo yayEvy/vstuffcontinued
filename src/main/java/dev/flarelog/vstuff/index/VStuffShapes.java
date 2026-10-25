@@ -14,42 +14,26 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class VStuffShapes {
 
-    public static final VoxelShaper
+    public static final VoxelShaper MECHANICAL_THRUSTER = Builder.withShape(0,0,0,16,16,16) // ill do these later im just tired
+            .forDirectional();
 
-        MECHANICAL_THRUSTER = shape(0,0,0,16,16,16) // ill do these later im just tired
-                .forDirectional(),
-
-
-
-    NAIL = shape(3.0, 0.075, 4.0, 13.0, 2.5, 12.0)
+    public static final VoxelShaper NAIL = Builder.withShape(3.0, 0.075, 4.0, 13.0, 2.5, 12.0)
             .add(2.68, 0.025, 2.135, 4.68, 2.975, 8.635)
             .add(2.68, 0.025, 7.365, 4.68, 2.975, 13.865)
             .add(11.32, 0.025, 2.135, 13.32, 2.975, 8.635)
             .add(11.32, 0.025, 7.365, 13.32, 2.975, 13.865)
             .add(4.0, 0.0, 2.0, 12.0, 3.0, 4.0)
             .add(4.0, 0.0, 12.0, 12.0, 3.0, 14.0)
-            .forDirectional(),
+            .forDirectional();
 
-        PHYS_PULLEY = shape(0, 0, 0, 16, 16, 16)
-                .forDirectional(),
+    public static final VoxelShaper WINCH = Builder.withShape(0, 0, 0, 16, 16, 16)
+            .forDirectional();
 
-        PULLEY_ANCHOR = shape(4, 0, 4, 12, 1, 12)
-                .add(3, 1, 3, 13, 2, 13)
-                .add(5, 2, 5, 11, 3, 11)
-                .forDirectional(Direction.UP);
+    public static final VoxelShaper ANCHOR = Builder.withShape(4, 0, 4, 12, 1, 12)
+            .add(3, 1, 3, 13, 2, 13)
+            .add(5, 2, 5, 11, 3, 11)
+            .forDirectional();
 
-    private static Builder shape(VoxelShape shape) {
-        return new Builder(shape);
-    }
-
-
-    private static Builder shape(double x1, double y1, double z1, double x2, double y2, double z2) {
-        return shape(cuboid(x1, y1, z1, x2, y2, z2));
-    }
-
-    private static VoxelShape cuboid(double x1, double y1, double z1, double x2, double y2, double z2) {
-        return Block.box(x1, y1, z1, x2, y2, z2);
-    }
 
     private static class Builder {
         VoxelShape shape;
@@ -58,18 +42,30 @@ public class VStuffShapes {
             this.shape = shape;
         }
 
+        private static Builder withShape(VoxelShape shape) {
+            return new Builder(shape);
+        }
+
+        private static Builder withShape(double x1, double y1, double z1, double x2, double y2, double z2) {
+            return withShape(makeCuboid(x1, y1, z1, x2, y2, z2));
+        }
+
+        private static VoxelShape makeCuboid(double x1, double y1, double z1, double x2, double y2, double z2) {
+            return Block.box(x1, y1, z1, x2, y2, z2);
+        }
+
         public Builder add(VoxelShape shape) {
             this.shape = Shapes.or(this.shape, shape);
             return this;
         }
 
         public Builder add(double x1, double y1, double z1, double x2, double y2, double z2) {
-            return add(cuboid(x1, y1, z1, x2, y2, z2));
+            return add(makeCuboid(x1, y1, z1, x2, y2, z2));
         }
 
         public Builder erase(double x1, double y1, double z1, double x2, double y2, double z2) {
             this.shape =
-                    Shapes.join(shape, cuboid(x1, y1, z1, x2, y2, z2), BooleanOp.ONLY_FIRST);
+                    Shapes.join(shape, makeCuboid(x1, y1, z1, x2, y2, z2), BooleanOp.ONLY_FIRST);
             return this;
         }
 

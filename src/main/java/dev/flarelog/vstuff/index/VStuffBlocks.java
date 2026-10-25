@@ -163,7 +163,7 @@ public class VStuffBlocks  {
                     .initialProperties(AllBlocks.ANDESITE_ALLOY_BLOCK)
                     .properties(BlockBehaviour.Properties::noOcclusion)
                     .transform(axeOrPickaxe())
-                    .blockstate(BlockStateGen.horizontalBlockProvider(true))
+                    .blockstate(BlockStateGen.directionalBlockProvider(true))
                     .transform(VStress.setImpact(4))
                     .item()
                     .transform(customItemModel())

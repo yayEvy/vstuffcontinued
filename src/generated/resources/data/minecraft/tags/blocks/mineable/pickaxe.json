@@ -9,7 +9,7 @@
     "vstuff:chiseled_levituff",
     "vstuff:chiseled_levituff_bricks",
     "vstuff:refined_levituff",
-    "vstuff:phys_pulley",
-    "vstuff:pulley_anchor"
+    "vstuff:winch",
+    "vstuff:anchor"
   ]
 }

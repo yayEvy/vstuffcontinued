@@ -11,11 +11,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "vstuff:pulley_anchor"
+          "name": "vstuff:winch"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "vstuff:blocks/pulley_anchor"
+  "random_sequence": "vstuff:blocks/winch"
 }

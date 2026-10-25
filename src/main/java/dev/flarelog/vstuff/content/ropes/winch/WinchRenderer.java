@@ -11,7 +11,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
 import dev.flarelog.vstuff.index.VStuffPartialModels;
 
-import static dev.flarelog.vstuff.content.ropes.winch.WinchBlock.HORIZONTAL_FACING;
+import static dev.flarelog.vstuff.content.ropes.winch.WinchBlock.FACING;
 
 public class WinchRenderer extends ShaftRenderer<WinchBlockEntity> {
 
@@ -21,10 +21,10 @@ public class WinchRenderer extends ShaftRenderer<WinchBlockEntity> {
 
     @Override
     protected void renderSafe(WinchBlockEntity be, float partialTicks, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
-        Direction direction = be.getBlockState().getValue(HORIZONTAL_FACING);
+        Direction direction = be.getBlockState().getValue(FACING);
         VertexConsumer vb = buffer.getBuffer(RenderType.cutoutMipped());
 
-        SuperByteBuffer coil = CachedBuffers.partialFacing(VStuffPartialModels.PULLEY_COIL, be.getBlockState(), direction);
+        SuperByteBuffer coil = CachedBuffers.partialFacing(VStuffPartialModels.WINCH_COIL, be.getBlockState(), direction);
 
         standardKineticRotationTransform(coil, be, light).renderInto(ms, vb);
     }
