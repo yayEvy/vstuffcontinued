@@ -1,0 +1,101 @@
+{
+  "parent": "vstuff:block/handlebar_gray",
+  "overrides": [
+    {
+      "model": "vstuff:block/handlebar_white",
+      "predicate": {
+        "vstuff:handlebar_color": 0.0
+      }
+    },
+    {
+      "model": "vstuff:block/handlebar_orange",
+      "predicate": {
+        "vstuff:handlebar_color": 0.0625
+      }
+    },
+    {
+      "model": "vstuff:block/handlebar_magenta",
+      "predicate": {
+        "vstuff:handlebar_color": 0.125
+      }
+    },
+    {
+      "model": "vstuff:block/handlebar_light_blue",
+      "predicate": {
+        "vstuff:handlebar_color": 0.1875
+      }
+    },
+    {
+      "model": "vstuff:block/handlebar_yellow",
+      "predicate": {
+        "vstuff:handlebar_color": 0.25
+      }
+    },
+    {
+      "model": "vstuff:block/handlebar_lime",
+      "predicate": {
+        "vstuff:handlebar_color": 0.3125
+      }
+    },
+    {
+      "model": "vstuff:block/handlebar_pink",
+      "predicate": {
+        "vstuff:handlebar_color": 0.375
+      }
+    },
+    {
+      "model": "vstuff:block/handlebar_gray",
+      "predicate": {
+        "vstuff:handlebar_color": 0.4375
+      }
+    },
+    {
+      "model": "vstuff:block/handlebar_light_gray",
+      "predicate": {
+        "vstuff:handlebar_color": 0.5
+      }
+    },
+    {
+      "model": "vstuff:block/handlebar_cyan",
+      "predicate": {
+        "vstuff:handlebar_color": 0.5625
+      }
+    },
+    {
+      "model": "vstuff:block/handlebar_purple",
+      "predicate": {
+        "vstuff:handlebar_color": 0.625
+      }
+    },
+    {
+      "model": "vstuff:block/handlebar_blue",
+      "predicate": {
+        "vstuff:handlebar_color": 0.6875
+      }
+    },
+    {
+      "model": "vstuff:block/handlebar_brown",
+      "predicate": {
+        "vstuff:handlebar_color": 0.75
+      }
+    },
+    {
+      "model": "vstuff:block/handlebar_green",
+      "predicate": {
+        "vstuff:handlebar_color": 0.8125
+      }
+    },
+    {
+      "model": "vstuff:block/handlebar_red",
+      "predicate": {
+        "vstuff:handlebar_color": 0.875
+      }
+    },
+    {
+      "model": "vstuff:block/handlebar_black",
+      "predicate": {
+        "vstuff:handlebar_color": 0.9375
+      }
+    }
+  ]
+}

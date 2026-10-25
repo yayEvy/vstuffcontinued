@@ -72,7 +72,12 @@ public class LevituffSoundPlayer {
         scanCooldown = SCAN_INTERVAL;
 
         lastFoundPos = playerPos;
-        levituffNearby = level.getBlockState(playerPos).is(VStuffBlocks.LEVITUFF.get());
+        levituffNearby = level.getBlockState(playerPos).is(VStuffBlocks.LEVITUFF.get())
+                || level.getBlockState(playerPos).is(VStuffBlocks.LEVITUFF_BRICKS.get())
+                || level.getBlockState(playerPos).is(VStuffBlocks.CHISELED_LEVITUFF.get())
+                || level.getBlockState(playerPos).is(VStuffBlocks.CHISELED_LEVITUFF_BRICKS.get())
+                || level.getBlockState(playerPos).is(VStuffBlocks.POLISHED_LEVITUFF.get())
+                || level.getBlockState(playerPos).is(VStuffBlocks.REFINED_LEVITUFF.get()); // not sure if this is ever gonna get finished, idr what it was even but sure wren
     }
 
     private void tickGrind(Level level, BlockPos pos) {

@@ -34,6 +34,18 @@ public class VStuffShapes {
             .add(5, 2, 5, 11, 3, 11)
             .forDirectional();
 
+    public static final VoxelShaper HANDLE = shape(1, 0, 6.5, 4, 2, 9.5)
+            .add(8, 3, 7, 14.5, 5, 9)
+            .add(12.5, 2, 7, 14.5, 3, 9)
+            .add(12, 0, 6.5, 15, 2, 9.5)
+            .add(1.5, 2, 7, 3.5, 3, 9)
+            .add(1.5, 3, 7, 8, 5, 9)
+            .forDirectional();
+
+    private static Builder shape(VoxelShape shape) {
+        return new Builder(shape);
+    }
+
 
     private static class Builder {
         VoxelShape shape;
