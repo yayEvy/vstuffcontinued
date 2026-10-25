@@ -7,15 +7,15 @@ import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.builders.ItemBuilder;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
-import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import dev.flarelog.vstuff.content.physics.handle.HandlebarBlock;
 import dev.flarelog.vstuff.content.physics.ships.nails.NailBlock;
 import dev.flarelog.vstuff.content.physics.ships.nails.NailItem;
 import dev.flarelog.vstuff.content.ropes.winch.WinchBlock;
 import dev.flarelog.vstuff.content.ropes.winch.AnchorBlock;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 
@@ -25,20 +25,16 @@ import dev.flarelog.vstuff.content.physics.levituff.RefinedLevituffBlock;
 import dev.flarelog.vstuff.content.physics.ships.reactionwheel.ReactionWheelBlock;
 import dev.flarelog.vstuff.content.physics.ships.thrust.MechanicalThrusterBlock;
 import dev.flarelog.vstuff.infrastructure.config.VStress;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.CopyBlockState;
 import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
-import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ModelFile;
 
-import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
 import static com.simibubi.create.foundation.data.TagGen.axeOrPickaxe;
 import static com.simibubi.create.foundation.data.TagGen.pickaxeOnly;
 import static dev.flarelog.vstuff.content.physics.ships.nails.NailItem.nailSoundType;
@@ -189,7 +185,7 @@ public class VStuffBlocks  {
                     .model((ctx, prov) -> {
                         ItemModelBuilder builder = prov.withExistingParent(ctx.getName(),
                                 prov.modLoc("block/handlebar_gray"));
-                        ResourceLocation colorPredicate = new ResourceLocation("vstuff", "handlebar_color");
+                        ResourceLocation colorPredicate = VStuff.asResource("handlebar_color");
                         for (DyeColor dye : DyeColor.values()) {
                             builder.override()
                                     .predicate(colorPredicate, dye.getId() / 16f)
