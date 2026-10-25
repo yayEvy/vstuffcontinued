@@ -1,8 +1,10 @@
 package dev.flarelog.vstuff.content.ropes.type;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.internal.utility.CodecUtil;
 import org.valkyrienskies.core.internal.joints.VSJoint;
 import org.valkyrienskies.core.internal.joints.VSJointPose;
@@ -12,7 +14,6 @@ import java.util.*;
 
 @SuppressWarnings("unused")
 public record RopeType(Map<String, Object> endJoint, Map<String, Object> connectingJoint, boolean selfCollision) {
-
 
     public static RopeType create(Object joint, boolean selfCollision) {
         return create(joint, joint, selfCollision);
@@ -51,6 +52,7 @@ public record RopeType(Map<String, Object> endJoint, Map<String, Object> connect
         map.put("pose1", pose1);
         map.put("maxDistance", maxDistance); // for distance joint
 //        map.put("restLength", maxDistance);  // for sping joint
-        return ValkyrienSkiesMod.getVsCore().getStringMapper().convertValue(map, VSJoint.class);
+        return VStuff.getOrCreateMapper().convertValue(map, VSJoint.class);
     }
+
 }

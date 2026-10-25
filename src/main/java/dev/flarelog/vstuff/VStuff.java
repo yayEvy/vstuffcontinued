@@ -1,8 +1,10 @@
 package dev.flarelog.vstuff;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import dev.flarelog.vstuff.content.ropes.RopeManager;
+import dev.flarelog.vstuff.content.ropes.type.BodyShapeDataMixin;
 import dev.flarelog.vstuff.index.*;
 import dev.flarelog.vstuff.network.VStuffPackets;
 import net.createmod.catnip.lang.LangBuilder;
@@ -18,6 +20,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
+import org.valkyrienskies.core.api.bodies.shape.BodyShapeData;
 import org.valkyrienskies.core.api.ships.ShipPhysicsListener;
 import org.valkyrienskies.mod.api.ValkyrienSkies;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
@@ -36,6 +39,8 @@ public class VStuff {
     public static final String MOD_ID = "vstuff";
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String NAME = "VStuff";
+
+    private static ObjectMapper MAPPER;
 
     private static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MOD_ID);
 
@@ -105,4 +110,14 @@ public class VStuff {
         Object[] args1 = LangBuilder.resolveBuilders(args);
         return Component.translatable(VStuff.MOD_ID + "." + key, args1);
     }
+
+    public static ObjectMapper getOrCreateMapper() {
+        if (MAPPER == null) {
+            ObjectMapper mapper = ValkyrienSkiesMod.getVsCore().getStringMapper().copy();
+            mapper.addMixIn(BodyShapeData.class, BodyShapeDataMixin.class);
+            MAPPER = mapper;
+        }
+        return MAPPER;
+    }
+
 }
