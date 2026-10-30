@@ -7,7 +7,6 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
 import com.mojang.serialization.codecs.PrimitiveCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
@@ -24,8 +23,8 @@ public class CodecUtil {
                 try {
                     String json = dynamic.asString().result()                                        // string form
                             .orElseGet(() -> {
-                                VStuff.LOGGER.info("object: ropetype");
-                                return dynamic.convert(JsonOps.INSTANCE).getValue().toString()
+                                VStuff.LOGGER.info("ObjectNode deserialize took path 2");
+                                return dynamic.convert(JsonOps.INSTANCE).getValue().toString();
                             });
                     JsonNode node = VStuff.getOrCreateMapper().readTree(json);
                     return node instanceof ObjectNode obj
