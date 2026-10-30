@@ -162,6 +162,8 @@ dependencies {
     implementation fg.deobf("org.valkyrienskies:valkyrienskies-120-forge:${vs2_version}+${vs2_hash.substring(0, 10)}")
 
     minecraftLibrary("org.apache.commons:commons-jexl3:3.7.1")
+    minecraftLibrary("org.mariuszgromada.math:MathParser.org-mXparser:6.1.2")
+
     implementation "org.joml:joml:1.10.5"
     implementation "com.fasterxml.jackson.core:jackson-annotations:2.13.3"
     implementation 'thedarkcolour:kotlinforforge:4.11.0'

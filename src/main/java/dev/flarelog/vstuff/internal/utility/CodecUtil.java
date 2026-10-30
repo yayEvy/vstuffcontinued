@@ -1,5 +1,7 @@
 package dev.flarelog.vstuff.internal.utility;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.*;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
@@ -17,6 +19,25 @@ import java.util.*;
 
 public class CodecUtil {
 
+    public static final Codec<ObjectNode> OBJECT_NODE = Codec.PASSTHROUGH.comapFlatMap(
+            dynamic -> {
+                try {
+                    String json = dynamic.asString().result()                                        // string form
+                            .orElseGet(() -> {
+                                VStuff.LOGGER.info("object: ropetype");
+                                return dynamic.convert(JsonOps.INSTANCE).getValue().toString()
+                            });
+                    JsonNode node = VStuff.getOrCreateMapper().readTree(json);
+                    return node instanceof ObjectNode obj
+                            ? DataResult.success(obj)
+                            : DataResult.error(() -> "Expected a JSON object");
+                } catch (Exception e) {
+                    return DataResult.error(() -> "Invalid joint json: " + e.getMessage());
+                }
+            },
+            node -> new Dynamic<>(JsonOps.INSTANCE, JsonParser.parseString(node.toString())));
+
+    
     public static PrimitiveCodec<Component> COMPONENT_TRANSLATABLE = new PrimitiveCodec<>() {
         @Override
         public <T> DataResult<Component> read(DynamicOps<T> dynamicOps, T t) {
