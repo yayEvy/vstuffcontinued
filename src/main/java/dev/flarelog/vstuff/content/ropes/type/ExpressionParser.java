@@ -31,7 +31,7 @@ public class ExpressionParser {
         if (node == null || node.isNull() || node.isMissingNode()) return node;
         
         if (node.isTextual()) {
-            return isNumeric(type.getRawClass()) ? toNumber(node) : node;
+            return isNumeric(type.getRawClass()) ? tryCalculateExpression(node) : node;
         }
         
         if (node.isArray() && (type.isCollectionLikeType() || type.isArrayType())) {
@@ -76,7 +76,7 @@ public class ExpressionParser {
                 || Number.class.isAssignableFrom(c);
     }
 
-    private static JsonNode toNumber(JsonNode textNode) {
+    private static JsonNode tryCalculateExpression(JsonNode textNode) {
         Expression exp = new Expression(textNode.asText());
         return exp.checkSyntax() ? JsonNodeFactory.instance.numberNode(exp.calculate()) : textNode;
     }
