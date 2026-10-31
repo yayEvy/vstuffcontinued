@@ -2,13 +2,13 @@ package dev.flarelog.vstuff.content.ropes;
 
 import com.mojang.datafixers.util.Either;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
+import dev.flarelog.vstuff.content.ropes.type.JointValuesContext;
 import dev.flarelog.vstuff.content.ropes.type.RopeType;
 import dev.flarelog.vstuff.content.ropes.data.LocalPosAndBodyId;
 import dev.flarelog.vstuff.content.ropes.data.RopeSegment;
 import dev.flarelog.vstuff.content.ropes.util.IRopeActor;
 import dev.flarelog.vstuff.infrastructure.config.VStuffConfigs;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -29,7 +29,6 @@ import org.valkyrienskies.core.internal.joints.VSJoint;
 import org.valkyrienskies.core.internal.joints.VSJointPose;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -38,11 +37,6 @@ public class RopeFactory {
     public static float SEGMENT_LENGTH = 0.8f;
     public static double SEGMENT_RADIUS = 0.125;
     public static double SEGMENT_MASS = 50;
-    public static double JOINT_COMPLIANCE = 1e4f;
-    public static Float JOINT_TOLERANCE = 1e3f;
-    public static Float JOINT_STIFFNESS = 1e7f;
-    public static Float JOINT_DAMPING = 1e5f;
-    public static float JOINT_MAX_FORCE_TORQUE = 1e1f;
     private static final float ANCHOR_OFFSET = 0.1f;
     public static double SAG_FACTOR = 0.08; // higher = more sag
 
@@ -112,7 +106,8 @@ public class RopeFactory {
         double spacing = totalDistance / segmentCount;
 
         CopyOnWriteArrayList<RopeSegment> segments = createSegmentBodies(ctx, segmentCount, spawnStart, spawnEnd);
-        makeJoints(segments, spacing, type);
+        JointValuesContext jointContext = JointValuesContext.create((float) (spacing * (1 + SAG_FACTOR)), segmentCount);
+        makeJoints(segments, type, jointContext);
 
         Rope physRope = new Rope(ctx.data0(), ctx.data1(), type, styleKey, segments, (float) (spacing * (1 + SAG_FACTOR) * segmentCount));
 
@@ -174,8 +169,8 @@ public class RopeFactory {
         );
     }
 
-    private static void makeJoints(List<RopeSegment> segments, double spacing, RopeType type) {
-        float maxLength = (float) (spacing * (1 + SAG_FACTOR));
+    private static void makeJoints(List<RopeSegment> segments, RopeType type, JointValuesContext jointContext) {
+//        float maxLength = (float) (spacing * (1 + SAG_FACTOR));
 
         RopeSegment first = segments.remove(0);
         RopeSegment last = segments.remove(segments.size() - 1);
@@ -188,7 +183,7 @@ public class RopeFactory {
                 new VSJointPose(first.pos0().pos(), new Quaterniond()),
                 first.pos1().id(),
                 new VSJointPose(first.pos1().pos(), new Quaterniond()),
-                maxLength).serialized();
+                jointContext).serialized();
 
         first.joint(Either.right(firstJoint));
 
@@ -196,15 +191,15 @@ public class RopeFactory {
                 new VSJointPose(last.pos0().pos(), new Quaterniond()),
                 last.pos1().id(),
                 new VSJointPose(last.pos1().pos(), new Quaterniond()),
-                maxLength).serialized();
+                jointContext).serialized();
 
 
 
         for (RopeSegment segment : segments) {
-            VSJoint joint = type.getConnectingPhysBodyJointWith(
+            VSJoint joint = type.getConnectingJointWith(
                     segment.pos0().id(), new VSJointPose(segment.pos0().pos(), new Quaterniond()),
                     segment.pos1().id(), new VSJointPose(segment.pos1().pos(), new Quaterniond()),
-                    maxLength
+                    jointContext
             );
             joint.setShouldBeSerialized(true);
 

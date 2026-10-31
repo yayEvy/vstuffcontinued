@@ -9,9 +9,6 @@ import dev.flarelog.vstuff.internal.utility.CodecUtil;
 import org.apache.commons.jexl3.MapContext;
 import org.valkyrienskies.core.internal.joints.VSJoint;
 import org.valkyrienskies.core.internal.joints.VSJointPose;
-import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
-
-import java.util.*;
 
 @SuppressWarnings("unused")
 public record RopeType(ObjectNode endJoint, ObjectNode connectingJoint, boolean selfCollision) {
@@ -43,21 +40,21 @@ public record RopeType(ObjectNode endJoint, ObjectNode connectingJoint, boolean 
         }
     }
 
-    public VSJoint getEndJointWith(Long shipId0, VSJointPose pose0, Long shipId1, VSJointPose pose1, Float maxDistance){
-        return getJointWith(endJoint, shipId0, pose0, shipId1, pose1, maxDistance);
+    public VSJoint getEndJointWith(Long shipId0, VSJointPose pose0, Long shipId1, VSJointPose pose1, JointValuesContext ctx){
+        return getJointWith(endJoint, shipId0, pose0, shipId1, pose1, ctx);
     }
 
-    public VSJoint getConnectingPhysBodyJointWith(Long shipId0, VSJointPose pose0, Long shipId1, VSJointPose pose1, Float maxDistance){
-        return getJointWith(connectingJoint, shipId0, pose0, shipId1, pose1, maxDistance);
+    public VSJoint getConnectingJointWith(Long shipId0, VSJointPose pose0, Long shipId1, VSJointPose pose1, JointValuesContext ctx){
+        return getJointWith(connectingJoint, shipId0, pose0, shipId1, pose1, ctx);
     }
 
-    private static VSJoint getJointWith(ObjectNode value, Long shipId0, VSJointPose pose0, Long shipId1, VSJointPose pose1, Float maxDistance){
-        ObjectNode tree = VStuff.getOrCreateMapper().valueToTree(value);
+    private static VSJoint getJointWith(ObjectNode value, Long shipId0, VSJointPose pose0, Long shipId1, VSJointPose pose1, JointValuesContext ctx){
+        ObjectNode tree = ExpressionParser.parseTree(value.deepCopy(), new MapContext(ctx.toMap()));
+
         tree.put("shipId0", shipId0);
         tree.set("pose0", VStuff.getOrCreateMapper().valueToTree(pose0));
         tree.put("shipId1", shipId1);
         tree.set("pose1", VStuff.getOrCreateMapper().valueToTree(pose1));
-        tree.put("maxDistance", maxDistance);
 
         return VStuff.getOrCreateMapper().convertValue(tree, VSJoint.class);
     }

@@ -1,9 +1,9 @@
 package dev.flarelog.vstuff.content.ropes;
 
-import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.flarelog.vstuff.content.physics.VSUtil;
+import dev.flarelog.vstuff.content.ropes.type.JointValuesContext;
 import dev.flarelog.vstuff.content.ropes.type.RopeType;
 import lombok.Getter;
 import lombok.Setter;
@@ -172,7 +172,9 @@ public class Rope {
         if (!this.allJointsCreated()) return;
 
         this.setLengthDirty(false);
-        float spacing = (length / this.segments.size()); // actually spacing * (1+sag_factor) but whatever
+
+        JointValuesContext jointContext = JointValuesContext.create(length, this.segments.size());
+
         RopeSegment first = this.segments.get(0);
         RopeSegment last = this.segments.get(segments.size() - 1);
 
@@ -180,14 +182,14 @@ public class Rope {
                 new VSJointPose(first.pos0().pos(), new Quaterniond()),
                 first.pos1().id(),
                 new VSJointPose(first.pos1().pos(), new Quaterniond()),
-                spacing).serialized();
+                jointContext).serialized();
         level.updateJoint(first.joint().orThrow(), firstJoint);
 
         for (RopeSegment segment : this.segments.subList(1, this.segments.size() - 1)) {
-            VSJoint joint = this.getType().getConnectingPhysBodyJointWith(
+            VSJoint joint = this.getType().getConnectingJointWith(
                     segment.pos0().id(), new VSJointPose(segment.pos0().pos(), new Quaterniond()),
                     segment.pos1().id(), new VSJointPose(segment.pos1().pos(), new Quaterniond()),
-                    spacing
+                    jointContext
             ).serialized();
             level.updateJoint(segment.joint().orThrow(), joint);
         }
@@ -196,7 +198,7 @@ public class Rope {
                 new VSJointPose(last.pos0().pos(), new Quaterniond()),
                 last.pos1().id(),
                 new VSJointPose(last.pos1().pos(), new Quaterniond()),
-                spacing).serialized();
+                jointContext).serialized();
         level.updateJoint(last.joint().orThrow(), lastJoint);
     }
 

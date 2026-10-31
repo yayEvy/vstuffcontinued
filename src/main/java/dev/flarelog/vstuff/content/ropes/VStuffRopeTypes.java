@@ -8,9 +8,13 @@ import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import org.valkyrienskies.core.internal.joints.VSJointMaxForceTorque;
 
-import static dev.flarelog.vstuff.content.ropes.RopeFactory.*;
-
 public class VStuffRopeTypes {
+    public static double JOINT_COMPLIANCE = 1e4f;
+    public static Float JOINT_TOLERANCE = 1e3f;
+    public static Float JOINT_STIFFNESS = 1e7f;
+    public static Float JOINT_DAMPING = 1e5f;
+    public static float JOINT_MAX_FORCE_TORQUE = 1e1f;
+
     public static void bootstrap(BootstapContext<RopeType> ctx) {
         register(ctx, "normal", RopeType.create(
                 DistanceJointParams.builder()
