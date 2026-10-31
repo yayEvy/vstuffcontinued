@@ -2,9 +2,11 @@ package dev.flarelog.vstuff.content.ropes.type;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.internal.utility.CodecUtil;
+import org.apache.commons.jexl3.MapContext;
 import org.valkyrienskies.core.internal.joints.VSJoint;
 import org.valkyrienskies.core.internal.joints.VSJointPose;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
@@ -19,11 +21,11 @@ public record RopeType(ObjectNode endJoint, ObjectNode connectingJoint, boolean 
     }
 
     public static RopeType create(Object endJoint, Object connectingJoint, boolean selfCollision) {
-        ObjectNode endJointTree = ValkyrienSkiesMod.getVsCore().getStringMapper()
-                .valueToTree(endJoint);
-        ObjectNode connectingJointTree = ValkyrienSkiesMod.getVsCore().getStringMapper()
-                .valueToTree(connectingJoint);
-        return new RopeType(endJointTree, connectingJointTree, selfCollision);
+        return new RopeType(
+                VStuff.getOrCreateMapper().valueToTree(endJoint),
+                VStuff.getOrCreateMapper().valueToTree(connectingJoint),
+                selfCollision
+        );
     }
 
     public static final Codec<RopeType> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -31,6 +33,15 @@ public record RopeType(ObjectNode endJoint, ObjectNode connectingJoint, boolean 
             CodecUtil.OBJECT_NODE.fieldOf("connectingJoint").forGetter(RopeType::connectingJoint),
             Codec.BOOL.fieldOf("selfCollision").forGetter(RopeType::selfCollision)
     ).apply(instance, RopeType::new));
+
+    private static DataResult<ObjectNode> validate(ObjectNode n) {
+        try {
+            ExpressionParser.parseTree(n.deepCopy(), new MapContext(JointValuesContext.SAMPLE.toMap()));
+            return DataResult.success(n);
+        } catch (RuntimeException e) {
+            return DataResult.error(() -> "Bad joint expression: " + e.getMessage());
+        }
+    }
 
     public VSJoint getEndJointWith(Long shipId0, VSJointPose pose0, Long shipId1, VSJointPose pose1, Float maxDistance){
         return getJointWith(endJoint, shipId0, pose0, shipId1, pose1, maxDistance);
