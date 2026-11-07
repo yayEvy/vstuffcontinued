@@ -6,10 +6,10 @@ import com.simibubi.create.foundation.render.AllInstanceTypes;
 import dev.engine_room.flywheel.api.instance.Instance;
 import dev.engine_room.flywheel.api.visualization.VisualizationContext;
 import dev.engine_room.flywheel.lib.model.Models;
+import dev.flarelog.vstuff.index.VStuffPartialModels;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
-import dev.flarelog.vstuff.index.VStuffPartialModels;
 
 import java.util.function.Consumer;
 
@@ -20,12 +20,20 @@ public class MechanicalThrusterVisual extends ShaftVisual<MechanicalThrusterBloc
     protected final RotatingInstance fan;
     final Direction facing;
 
-    public MechanicalThrusterVisual(VisualizationContext context, MechanicalThrusterBlockEntity blockEntity, float partialTick) {
+    public MechanicalThrusterVisual(
+            VisualizationContext context,
+            MechanicalThrusterBlockEntity blockEntity,
+            float partialTick
+    ) {
         super(context, blockEntity, partialTick);
 
         facing = blockState.getValue(FACING);
 
-        fan = instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(VStuffPartialModels.THRUSTER_FAN))
+        fan = instancerProvider()
+                .instancer(
+                        AllInstanceTypes.ROTATING,
+                        Models.partial(VStuffPartialModels.THRUSTER_FAN)
+                )
                 .createInstance()
                 .rotateToFace(Direction.NORTH, facing)
                 .setup(blockEntity, facing.getAxis())
@@ -36,10 +44,13 @@ public class MechanicalThrusterVisual extends ShaftVisual<MechanicalThrusterBloc
 
     private float getFanSpeed() {
         float speed = blockEntity.getSpeed() * 5;
+
         if (speed > 0)
             speed = Mth.clamp(speed, 80, 64 * 20);
+
         if (speed < 0)
             speed = Mth.clamp(speed, -64 * 20, -80);
+
         return speed;
     }
 
@@ -50,16 +61,22 @@ public class MechanicalThrusterVisual extends ShaftVisual<MechanicalThrusterBloc
     }
 
     @Override
-    public void updateLight(float pt) {
-        super.updateLight(pt);
+    public void updateLight(float partialTick) {
+        super.updateLight(partialTick);
+
         BlockPos front = pos.relative(facing);
         relight(front, fan);
     }
 
     @Override
-    public void update(float pt) {
-        super.update(pt);
-        fan.setup(blockEntity, facing.getAxis(), getFanSpeed()).setChanged();
+    public void update(float partialTick) {
+        super.update(partialTick);
+
+        fan.setup(
+                blockEntity,
+                facing.getAxis(),
+                getFanSpeed()
+        ).setChanged();
     }
 
     @Override
