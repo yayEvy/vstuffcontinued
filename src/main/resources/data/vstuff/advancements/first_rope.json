@@ -1,0 +1,22 @@
+{
+  "display": {
+    "icon": {
+      "item": "vstuff:rope"
+    },
+    "title": {
+      "text": "You could make a mod out of that!"
+    },
+    "description": {
+      "text": "You will think of a very creative name. How about VStuff?"
+    },
+    "frame" : "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "created_rope": {
+      "trigger": "minecraft:impossible"
+    }
+}
+}

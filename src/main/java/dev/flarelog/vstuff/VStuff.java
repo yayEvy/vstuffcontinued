@@ -3,6 +3,7 @@ package dev.flarelog.vstuff;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
+import dev.flarelog.vstuff.content.physics.levituff.LevituffBlockEntity;
 import dev.flarelog.vstuff.content.ropes.RopeManager;
 import dev.flarelog.vstuff.content.ropes.type.BodyShapeDataMixin;
 import dev.flarelog.vstuff.index.*;
@@ -60,6 +61,7 @@ public class VStuff {
 
         VStuffConfigs.register(modLoadingContext);
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register((LevituffBlockEntity.class));
 
         modEventBus.addListener(VStuff::commonSetup);
         modEventBus.addListener(EventPriority.LOWEST, VStuffDatagen::gatherData);
