@@ -5,7 +5,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.flarelog.vstuff.content.physics.VSUtil;
 import dev.flarelog.vstuff.content.ropes.type.JointValuesContext;
 import dev.flarelog.vstuff.content.ropes.type.RopeType;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.core.BlockPos;
@@ -20,6 +19,7 @@ import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
+import org.valkyrienskies.core.api.bodies.ServerVsBody;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.core.internal.joints.VSJoint;
@@ -36,7 +36,6 @@ import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
-@EqualsAndHashCode
 public class Rope {
     public static final Codec<Rope> FULL_CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.INT.fieldOf("ropeId").forGetter(Rope::getRopeId),
@@ -99,17 +98,15 @@ public class Rope {
                 VSUtil.getGTPA(level).removeJoint(seg.joint().left().get());
             }
         }
-// commented out cuz no work rn
-//        todo:fix
-//        for (int i = 0; i < segments.size() - 1; i++) {
-//            Long bodyId = segments.get(i).id1();
-//            if (bodyId != null) {
-//                ServerVsBody body = shipWorld.getAllBodies().getById(bodyId);
-//                if (body != null && shipWorld.getAllBodies().contains(body)) {
-//                    shipWorld.deleteBody(body);
-//                }
-//            }
-//        }
+
+        for (Long bodyId : this.getSegmentBodyIds()) {
+            if (bodyId != null) {
+                ServerVsBody body = shipWorld.getAllBodies().getById(bodyId);
+                if (body != null && shipWorld.getAllBodies().contains(body)) {
+                    shipWorld.deleteBody(body);
+                }
+            }
+        }
         this.segments.clear();
     }
 
@@ -174,8 +171,8 @@ public class Rope {
         if (!this.allJointsCreated()) return;
 
         this.setLengthDirty(false);
-
-        JointValuesContext jointContext = JointValuesContext.create(length, this.segments.size());
+        int n = this.segments.size();
+        JointValuesContext jointContext = JointValuesContext.create(length / n, n);
 
         RopeSegment first = this.segments.get(0);
         RopeSegment last = this.segments.get(segments.size() - 1);

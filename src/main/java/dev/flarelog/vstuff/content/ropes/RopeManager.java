@@ -30,6 +30,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -45,7 +46,7 @@ public class RopeManager extends SavedData {
     private final AtomicInteger nextId = new AtomicInteger(0);
 
     private final ConcurrentHashMap<Integer, Rope> ropes = new ConcurrentHashMap<>();
-    private final Set<Pair<Rope, Consumer<RopeResult>>> queued = ConcurrentHashMap.newKeySet();
+    private final List<Pair<Rope, Consumer<RopeResult>>> queued = new CopyOnWriteArrayList<>();
 
     public static RopeManager get(ServerLevel level) {
         DimensionDataStorage storage = level.getDataStorage();
@@ -90,6 +91,7 @@ public class RopeManager extends SavedData {
         if (actor0 != null) {
             if (!actor0.canAttach()) {
                 RopeFactory.removeAndCleanupRope(rope, level);
+                resultConsumer.accept(RopeResult.withMessage("vstuff.message.rope.actor_connected"));
                 return;
             }
             actor0.connectRope(rope.getRopeId());
@@ -98,6 +100,7 @@ public class RopeManager extends SavedData {
         if (actor1 != null) {
             if (!actor1.canAttach()) {
                 RopeFactory.removeAndCleanupRope(rope, level);
+                resultConsumer.accept(RopeResult.withMessage("vstuff.message.rope.actor_connected"));
                 return;
             }
             actor1.connectRope(rope.getRopeId());
@@ -171,6 +174,7 @@ public class RopeManager extends SavedData {
         }
 
         for (Pair<Rope, Consumer<RopeResult>> value : this.queued) {
+            int index = this.queued.indexOf(value);
             Rope rope = value.getFirst();
             Consumer<RopeResult> resultConsumer = value.getSecond();
             if (rope.allBodiesCreated(physLevel)) {
@@ -183,8 +187,10 @@ public class RopeManager extends SavedData {
                         }
                     }
                     this.level.getServer().execute(() -> this.addRope(rope, resultConsumer));
+                } else {
+                    resultConsumer.accept(RopeResult.withMessage("vstuff.message.rope.fail_unknown"));
                 }
-                this.queued.remove(rope);
+                this.queued.remove(index);
             }
         }
     }

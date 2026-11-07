@@ -41,8 +41,10 @@ public class RopeFactory {
     public static final Logger LOGGER = LogManager.getLogger("VStuffRopeFactory");
 
     public static void tryCreateRope(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1, ResourceKey<RopeType> type, ResourceKey<RopeStyle> style, Consumer<RopeResult> resultCallback, ResourceLocation dimId) {
-        if (!dimId.equals(level.dimension().location()))
+        if (!dimId.equals(level.dimension().location())) {
             resultCallback.accept(RopeResult.withMessage("message.rope.interdimensional_fail"));
+            return;
+        }
         tryCreateRope(level, data0, data1, type, style, resultCallback);
     }
 
@@ -58,20 +60,23 @@ public class RopeFactory {
     public static void tryCreateRope(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1, RopeType type, ResourceKey<RopeStyle> style, Consumer<RopeResult> resultCallback) {
         float length = (float) data0.getWorldPos(level).distance(data1.getWorldPos(level)) + 0.5f;
 
-        if (length > VStuffConfigs.server().ropeMaxLength.get())
+        if (length > VStuffConfigs.server().ropeMaxLength.get()) {
             resultCallback.accept(RopeResult.withMessage("message.rope.too_long"));
-
+            return;
+        }
         IRopeActor actor0 = IRopeActor.getAt(level, data0);
         IRopeActor actor1 = IRopeActor.getAt(level, data1);
         if (actor0 != null) {
             if (!actor0.canAttach()) {
                 resultCallback.accept(RopeResult.withMessage("vstuff.message.rope.actor_connected"));
+                return;
             }
         }
 
         if (actor1 != null) {
             if (!actor1.canAttach()) {
                  resultCallback.accept(RopeResult.withMessage("vstuff.message.rope.actor_connected"));
+                 return;
             }
         }
 

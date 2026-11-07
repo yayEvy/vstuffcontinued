@@ -19,7 +19,6 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 @Getter
 @Accessors(fluent = true)
-@EqualsAndHashCode
 @RequiredArgsConstructor
 public class RopeSegment {
     private final LocalPosAndBodyId pos0;
