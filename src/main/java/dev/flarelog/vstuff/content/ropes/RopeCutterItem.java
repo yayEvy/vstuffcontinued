@@ -25,34 +25,34 @@ public class RopeCutterItem extends Item {
         }
 
         Rope physRope = RopeUtil.findPhysRope(serverLevel, player);
-        if (physRope != null) {
-            try {
-                // doom and despair idfk
-
-                player.displayClientMessage(
-                        VStuff.translate("message.rope.break"),
-                        true
-                );
-
-                RopeStyle style = physRope.getStyle(serverLevel.registryAccess());
-
-                RopeUtil.playSound(serverLevel, PositionUtils.containingBlockPos(physRope.getPosData0().getWorldPos(serverLevel)), style.breakSound());
-                RopeUtil.playSound(serverLevel, PositionUtils.containingBlockPos(physRope.getPosData1().getWorldPos(serverLevel)), style.breakSound());
-
-                if (!player.isCreative()) {
-                    itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
-                    RopeUtil.createRopeDrop(player, physRope.getStyleKey());
-                }
-
-                return InteractionResultHolder.success(itemStack);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (physRope == null) {
             return InteractionResultHolder.pass(itemStack);
         }
 
+        try {
+            RopeStyle style = physRope.getStyle(serverLevel.registryAccess());
+            var pos0 = PositionUtils.containingBlockPos(physRope.getPosData0().getWorldPos(serverLevel));
+            var pos1 = PositionUtils.containingBlockPos(physRope.getPosData1().getWorldPos(serverLevel));
+            var styleKey = physRope.getStyleKey();
+            Integer ropeId = physRope.getRopeId();
 
-        return InteractionResultHolder.pass(itemStack);
+            physRope.cleanup(serverLevel);
+
+            RopeManager.get(serverLevel).removeRope(ropeId);
+
+            player.displayClientMessage(VStuff.translate("message.rope.break"), true);
+            RopeUtil.playSound(serverLevel, pos0, style.breakSound());
+            RopeUtil.playSound(serverLevel, pos1, style.breakSound());
+
+            if (!player.isCreative()) {
+                itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
+                RopeUtil.createRopeDrop(player, styleKey);
+            }
+
+            return InteractionResultHolder.success(itemStack);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return InteractionResultHolder.pass(itemStack);
+        }
     }
-
 }
