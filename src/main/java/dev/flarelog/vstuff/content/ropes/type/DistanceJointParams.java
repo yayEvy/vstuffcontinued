@@ -1,6 +1,7 @@
 package dev.flarelog.vstuff.content.ropes.type;
 
 import com.fasterxml.jackson.databind.ser.BeanSerializerBuilder;
+import com.mojang.datafixers.util.Either;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import org.valkyrienskies.core.internal.joints.VSJoint;
@@ -15,6 +16,7 @@ public class DistanceJointParams {
     @Builder.Default private final Double compliance = VSJoint.DEFAULT_COMPLIANCE;
 
     private final Float minDistance;
+    private final Either<Float, String> maxDistance;
     private final Float tolerance;
     private final Float stiffness;
     private final Float damping;

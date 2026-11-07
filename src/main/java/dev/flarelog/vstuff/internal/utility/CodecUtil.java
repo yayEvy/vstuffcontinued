@@ -21,11 +21,7 @@ public class CodecUtil {
     public static final Codec<ObjectNode> OBJECT_NODE = Codec.PASSTHROUGH.comapFlatMap(
             dynamic -> {
                 try {
-                    String json = dynamic.asString().result()                                        // string form
-                            .orElseGet(() -> {
-                                VStuff.LOGGER.info("ObjectNode deserialize took path 2");
-                                return dynamic.convert(JsonOps.INSTANCE).getValue().toString();
-                            });
+                    String json = dynamic.convert(JsonOps.INSTANCE).getValue().toString();
                     JsonNode node = VStuff.getOrCreateMapper().readTree(json);
                     return node instanceof ObjectNode obj
                             ? DataResult.success(obj)

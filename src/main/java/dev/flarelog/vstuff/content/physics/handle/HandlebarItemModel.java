@@ -1,5 +1,6 @@
 package dev.flarelog.vstuff.content.physics.handle;
 
+import dev.flarelog.vstuff.VStuff;
 import dev.flarelog.vstuff.index.VStuffBlocks;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
@@ -9,7 +10,7 @@ public class HandlebarItemModel {
     public static void register() {
         ItemProperties.register(
                 VStuffBlocks.HANDLE.get().asItem(),
-                new ResourceLocation("vstuff", "handlebar_color"),
+                VStuff.asResource("handlebar_color"),
                 (stack, level, entity, seed) -> {
                     var tag = stack.getTagElement("BlockStateTag");
                     if (tag == null || !tag.contains("color")) {

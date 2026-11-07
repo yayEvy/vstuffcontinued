@@ -5,6 +5,7 @@ import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import dev.flarelog.vstuff.content.ropes.RopeManager;
 import dev.flarelog.vstuff.content.ropes.type.BodyShapeDataMixin;
+import dev.flarelog.vstuff.content.ropes.type.EitherModule;
 import dev.flarelog.vstuff.index.*;
 import dev.flarelog.vstuff.network.VStuffPackets;
 import net.createmod.catnip.lang.LangBuilder;
@@ -115,7 +116,9 @@ public class VStuff {
         if (MAPPER == null) {
             ObjectMapper mapper = ValkyrienSkiesMod.getVsCore().getStringMapper().copy();
             mapper.addMixIn(BodyShapeData.class, BodyShapeDataMixin.class);
+            mapper.registerModule(new EitherModule());
             MAPPER = mapper;
+            VStuff.LOGGER.info("Vstuff mapper initialised. Modules list: {}", MAPPER.getRegisteredModuleIds());
         }
         return MAPPER;
     }

@@ -21,7 +21,6 @@ import org.valkyrienskies.core.api.bodies.ServerVsBody;
 import org.valkyrienskies.core.api.bodies.VsBodyCreateData;
 import org.valkyrienskies.core.api.bodies.VsBodyDefaults;
 import org.valkyrienskies.core.api.bodies.shape.BodyShapeData;
-import org.valkyrienskies.core.api.bodies.shape.SphereBodyShapeData;
 import org.valkyrienskies.core.impl.bodies.properties.BodyKinematicsImpl;
 import org.valkyrienskies.core.impl.bodies.properties.BodyTransformImpl;
 import org.valkyrienskies.core.impl.game.bodies.BodyInertiaDataImpl;
@@ -35,8 +34,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class RopeFactory {
 
     public static float SEGMENT_LENGTH = 0.8f;
-    public static double SEGMENT_RADIUS = 0.125;
-    public static double SEGMENT_MASS = 50;
     private static final float ANCHOR_OFFSET = 0.1f;
     public static double SAG_FACTOR = 0.08; // higher = more sag
 
@@ -105,7 +102,7 @@ public class RopeFactory {
         int segmentCount = Math.max(1, (int) Math.round(totalDistance / SEGMENT_LENGTH));
         double spacing = totalDistance / segmentCount;
 
-        CopyOnWriteArrayList<RopeSegment> segments = createSegmentBodies(ctx, segmentCount, spawnStart, spawnEnd);
+        CopyOnWriteArrayList<RopeSegment> segments = createSegmentBodies(ctx, segmentCount, spawnStart, spawnEnd, type);
         JointValuesContext jointContext = JointValuesContext.create((float) (spacing * (1 + SAG_FACTOR)), segmentCount);
         makeJoints(segments, type, jointContext);
 
@@ -116,7 +113,7 @@ public class RopeFactory {
         return physRope;
     }
 
-    public static CopyOnWriteArrayList<RopeSegment> createSegmentBodies(RopeContext ctx, int segmentCount, Vector3d spawnStart, Vector3d spawnEnd) {
+    public static CopyOnWriteArrayList<RopeSegment> createSegmentBodies(RopeContext ctx, int segmentCount, Vector3d spawnStart, Vector3d spawnEnd, RopeType type) {
         CopyOnWriteArrayList<RopeSegment> segments = new CopyOnWriteArrayList<>();
         Vector3d step = new Vector3d(spawnEnd).sub(spawnStart).div(segmentCount);
 
@@ -125,7 +122,7 @@ public class RopeFactory {
 
         for (int i = 0; i < segmentCount - 1; i++) {
             Vector3d bodyPos = new Vector3d(spawnStart).add(new Vector3d(step).mul(i + 1));
-            ServerVsBody body = createBody(ctx.level, bodyPos);
+            ServerVsBody body = createBody(ctx.level, bodyPos, type);
             if (body != null) {
                 Long id = body.getId();
                 Vector3d pos = new Vector3d();
@@ -142,8 +139,8 @@ public class RopeFactory {
         return segments;
     }
 
-    private static ServerVsBody createBody(ServerLevel level, Vector3d pos) {
-        VsBodyCreateData bodyCreateData = createRopeBodyData(level, pos);
+    private static ServerVsBody createBody(ServerLevel level, Vector3d pos, RopeType type) {
+        VsBodyCreateData bodyCreateData = createRopeBodyData(level, pos, type);
 
         try {
             return VSGameUtilsKt.getShipObjectWorld(level).createBody(bodyCreateData);
@@ -153,25 +150,25 @@ public class RopeFactory {
         }
     }
 
-    private static VsBodyCreateData createRopeBodyData(ServerLevel level, Vector3d pos) {
-        BodyShapeData shapeData = new SphereBodyShapeData(SEGMENT_RADIUS);
+    private static VsBodyCreateData createRopeBodyData(ServerLevel level, Vector3d pos, RopeType type) {
+        RopeType.BodyData data = type.bodyData();
+
+        BodyShapeData shapeData = data.getShape();
 
         return new VsBodyCreateData(
                 VSGameUtilsKt.getDimensionId(level),
-                new BodyInertiaDataImpl(shapeData.getAabb().center(new Vector3d()), SEGMENT_MASS, new Matrix3d()),
+                new BodyInertiaDataImpl(shapeData.getAabb().center(new Vector3d()), data.mass(), new Matrix3d()),
                 new BodyKinematicsImpl(new Vector3d(), new Vector3d(), new BodyTransformImpl(new Vector3d(pos), new Quaterniond(), new Vector3d(1), new Vector3d())),
                 shapeData,
                 false,
                 VsBodyDefaults.DEFAULT_COLLISION_MASK,
-                VsBodyDefaults.DEFAULT_STATIC_FRICTION_COEFFICIENT,
-                VsBodyDefaults.DEFAULT_DYNAMIC_FRICTION_COEFFICIENT,
-                VsBodyDefaults.DEFAULT_RESTITUTION_COEFFICIENT
+                data.staticFriction(),
+                data.dynamicFriction(),
+                data.restitution()
         );
     }
 
     private static void makeJoints(List<RopeSegment> segments, RopeType type, JointValuesContext jointContext) {
-//        float maxLength = (float) (spacing * (1 + SAG_FACTOR));
-
         RopeSegment first = segments.remove(0);
         RopeSegment last = segments.remove(segments.size() - 1);
 
