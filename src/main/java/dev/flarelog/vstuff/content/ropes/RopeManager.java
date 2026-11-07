@@ -1,6 +1,7 @@
 package dev.flarelog.vstuff.content.ropes;
 
 import com.mojang.datafixers.util.Either;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.logging.LogUtils;
 import dev.flarelog.vstuff.content.ropes.data.RopeSegment;
 import dev.flarelog.vstuff.content.ropes.util.IRopeActor;
@@ -30,8 +31,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static dev.flarelog.vstuff.content.ropes.RopeFactory.removeAndCleanupRope;
+import java.util.function.Consumer;
 
 @RequiredArgsConstructor
 public class RopeManager extends SavedData {
@@ -45,7 +45,7 @@ public class RopeManager extends SavedData {
     private final AtomicInteger nextId = new AtomicInteger(0);
 
     private final ConcurrentHashMap<Integer, Rope> ropes = new ConcurrentHashMap<>();
-    private final Set<Rope> queued = ConcurrentHashMap.newKeySet();
+    private final Set<Pair<Rope, Consumer<RopeResult>>> queued = ConcurrentHashMap.newKeySet();
 
     public static RopeManager get(ServerLevel level) {
         DimensionDataStorage storage = level.getDataStorage();
@@ -80,7 +80,7 @@ public class RopeManager extends SavedData {
     }
 
 
-    private void addRope(Rope rope) {
+    private void addRope(Rope rope, Consumer<RopeResult> resultConsumer) {
         rope.setRopeId(nextId.incrementAndGet());
 
         ropes.put(rope.getRopeId(), rope);
@@ -102,7 +102,7 @@ public class RopeManager extends SavedData {
             }
             actor1.connectRope(rope.getRopeId());
         }
-
+        resultConsumer.accept(RopeResult.validResult(rope));
         VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new AddRopePacket(rope));
         setDirty();
     }
@@ -159,8 +159,8 @@ public class RopeManager extends SavedData {
         }
     }
 
-    public void queue(Rope rope) {
-        this.queued.add(rope);
+    public void queue(Rope rope, Consumer<RopeResult> resultCallback) {
+        this.queued.add(new Pair<>(rope, resultCallback));
     }
 
     public void physTick(PhysTickEvent event) {
@@ -170,7 +170,9 @@ public class RopeManager extends SavedData {
             rope.physTick(physLevel);
         }
 
-        for (Rope rope : new HashSet<>(this.queued)) {
+        for (Pair<Rope, Consumer<RopeResult>> value : this.queued) {
+            Rope rope = value.getFirst();
+            Consumer<RopeResult> resultConsumer = value.getSecond();
             if (rope.allBodiesCreated(physLevel)) {
                 if (createJoints(physLevel, rope)) {
                     if (!rope.getType().selfCollision()) {
@@ -180,7 +182,7 @@ public class RopeManager extends SavedData {
                             }
                         }
                     }
-                    this.level.getServer().execute(() -> this.addRope(rope));
+                    this.level.getServer().execute(() -> this.addRope(rope, resultConsumer));
                 }
                 this.queued.remove(rope);
             }

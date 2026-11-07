@@ -30,6 +30,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 public class RopeFactory {
 
@@ -39,48 +40,47 @@ public class RopeFactory {
 
     public static final Logger LOGGER = LogManager.getLogger("VStuffRopeFactory");
 
-    public static RopeResult tryCreateRope(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1, ResourceKey<RopeType> type, ResourceKey<RopeStyle> style, ResourceLocation dimId) {
+    public static void tryCreateRope(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1, ResourceKey<RopeType> type, ResourceKey<RopeStyle> style, Consumer<RopeResult> resultCallback, ResourceLocation dimId) {
         if (!dimId.equals(level.dimension().location()))
-            return RopeResult.withMessage("message.rope.interdimensional_fail");
-        return tryCreateRope(level, data0, data1, type, style);
+            resultCallback.accept(RopeResult.withMessage("message.rope.interdimensional_fail"));
+        tryCreateRope(level, data0, data1, type, style, resultCallback);
     }
 
-    public static RopeResult tryCreateRope(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1, ResourceKey<RopeType> type, ResourceKey<RopeStyle> style) {
-        return tryCreateRope(
+    public static void tryCreateRope(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1, ResourceKey<RopeType> type, ResourceKey<RopeStyle> style, Consumer<RopeResult> resultCallback) {
+        tryCreateRope(
                 level, data0, data1,
                 level.registryAccess().registryOrThrow(VStuffRegistries.ROPE_TYPE).get(type),
-                style
+                style,
+                resultCallback
         );
     }
 
-    public static RopeResult tryCreateRope(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1, RopeType type, ResourceKey<RopeStyle> style) {
+    public static void tryCreateRope(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1, RopeType type, ResourceKey<RopeStyle> style, Consumer<RopeResult> resultCallback) {
         float length = (float) data0.getWorldPos(level).distance(data1.getWorldPos(level)) + 0.5f;
 
         if (length > VStuffConfigs.server().ropeMaxLength.get())
-            return RopeResult.withMessage("message.rope.too_long");
+            resultCallback.accept(RopeResult.withMessage("message.rope.too_long"));
 
         IRopeActor actor0 = IRopeActor.getAt(level, data0);
         IRopeActor actor1 = IRopeActor.getAt(level, data1);
         if (actor0 != null) {
             if (!actor0.canAttach()) {
-                return RopeResult.withMessage("vstuff.message.rope.actor_connected");
+                resultCallback.accept(RopeResult.withMessage("vstuff.message.rope.actor_connected"));
             }
         }
 
         if (actor1 != null) {
             if (!actor1.canAttach()) {
-                return RopeResult.withMessage("vstuff.message.rope.actor_connected");
+                 resultCallback.accept(RopeResult.withMessage("vstuff.message.rope.actor_connected"));
             }
         }
 
         RopeContext ctx = new RopeContext(level, data0, data1);
 
-        return RopeResult.validResult(createRope(
-                ctx, style, type
-        ));
+        createRope(ctx, style, type, resultCallback);
     }
 
-    public static Rope createRope(RopeContext ctx, ResourceKey<RopeStyle> styleKey, RopeType type) {
+    public static void createRope(RopeContext ctx, ResourceKey<RopeStyle> styleKey, RopeType type, Consumer<RopeResult> resultCallback) {
         LocalPosAndBodyId first = ctx.data0();
         LocalPosAndBodyId second = ctx.data1();
 
@@ -91,7 +91,7 @@ public class RopeFactory {
 
         if (worldStart.distance(worldEnd) < 0.01) {
             LOGGER.warn("Attachment points are too close, stopping phys rope creation.");
-            return null;
+            return;
         }
 
         Vector3d dir = new Vector3d(worldEnd).sub(worldStart).normalize();
@@ -108,9 +108,7 @@ public class RopeFactory {
 
         Rope physRope = new Rope(ctx.data0(), ctx.data1(), type, styleKey, segments, (float) (spacing * (1 + SAG_FACTOR) * segmentCount));
 
-        RopeManager.get(level).queue(physRope);
-
-        return physRope;
+        RopeManager.get(level).queue(physRope, resultCallback);
     }
 
     public static CopyOnWriteArrayList<RopeSegment> createSegmentBodies(RopeContext ctx, int segmentCount, Vector3d spawnStart, Vector3d spawnEnd, RopeType type) {

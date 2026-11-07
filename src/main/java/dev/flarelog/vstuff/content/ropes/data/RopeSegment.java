@@ -4,6 +4,7 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.EitherCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -18,6 +19,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 @Getter
 @Accessors(fluent = true)
+@EqualsAndHashCode
 @RequiredArgsConstructor
 public class RopeSegment {
     private final LocalPosAndBodyId pos0;

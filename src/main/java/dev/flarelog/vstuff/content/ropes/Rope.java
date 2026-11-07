@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.flarelog.vstuff.content.physics.VSUtil;
 import dev.flarelog.vstuff.content.ropes.type.JointValuesContext;
 import dev.flarelog.vstuff.content.ropes.type.RopeType;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.core.BlockPos;
@@ -35,6 +36,7 @@ import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
+@EqualsAndHashCode
 public class Rope {
     public static final Codec<Rope> FULL_CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.INT.fieldOf("ropeId").forGetter(Rope::getRopeId),
