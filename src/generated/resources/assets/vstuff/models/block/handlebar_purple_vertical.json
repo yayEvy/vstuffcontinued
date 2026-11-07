@@ -1,0 +1,7 @@
+{
+  "parent": "vstuff:block/handlebar_vertical",
+  "textures": {
+    "0": "vstuff:block/handlebar/purple",
+    "particle": "vstuff:block/handlebar/purple"
+  }
+}

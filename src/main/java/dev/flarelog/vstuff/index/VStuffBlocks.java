@@ -130,25 +130,69 @@ public class VStuffBlocks  {
                     .simpleItem()
                     .register();
 
+    public static final BlockEntry<HandlebarBlock> HANDLE_WHITE = registerHandlebar(DyeColor.WHITE);
+    public static final BlockEntry<HandlebarBlock> HANDLE_ORANGE = registerHandlebar(DyeColor.ORANGE);
+    public static final BlockEntry<HandlebarBlock> HANDLE_MAGENTA = registerHandlebar(DyeColor.MAGENTA);
+    public static final BlockEntry<HandlebarBlock> HANDLE_LIGHT_BLUE = registerHandlebar(DyeColor.LIGHT_BLUE);
+    public static final BlockEntry<HandlebarBlock> HANDLE_YELLOW = registerHandlebar(DyeColor.YELLOW);
+    public static final BlockEntry<HandlebarBlock> HANDLE_LIME = registerHandlebar(DyeColor.LIME);
+    public static final BlockEntry<HandlebarBlock> HANDLE_PINK = registerHandlebar(DyeColor.PINK);
+    public static final BlockEntry<HandlebarBlock> HANDLE_GRAY = registerHandlebar(DyeColor.GRAY);
+    public static final BlockEntry<HandlebarBlock> HANDLE_LIGHT_GRAY = registerHandlebar(DyeColor.LIGHT_GRAY);
+    public static final BlockEntry<HandlebarBlock> HANDLE_CYAN = registerHandlebar(DyeColor.CYAN);
+    public static final BlockEntry<HandlebarBlock> HANDLE_PURPLE = registerHandlebar(DyeColor.PURPLE);
+    public static final BlockEntry<HandlebarBlock> HANDLE_BLUE = registerHandlebar(DyeColor.BLUE);
+    public static final BlockEntry<HandlebarBlock> HANDLE_BROWN = registerHandlebar(DyeColor.BROWN);
+    public static final BlockEntry<HandlebarBlock> HANDLE_GREEN = registerHandlebar(DyeColor.GREEN);
+    public static final BlockEntry<HandlebarBlock> HANDLE_RED = registerHandlebar(DyeColor.RED);
+    public static final BlockEntry<HandlebarBlock> HANDLE_BLACK = registerHandlebar(DyeColor.BLACK);
 
-    public static final BlockEntry<HandlebarBlock> HANDLE =
-            REGISTRATE.block("handlebar", HandlebarBlock::new)
-                    .initialProperties(AllBlocks.ANDESITE_ALLOY_BLOCK)
-                    .transform(pickaxeOnly())
-                    .properties(BlockBehaviour.Properties::noOcclusion)
-                    .blockstate((ctx, prov) -> {
-                        prov.getVariantBuilder(ctx.get()).forAllStates(state -> {
-                            Direction facing = state.getValue(HandlebarBlock.FACING);
-                            DyeColor color = state.getValue(HandlebarBlock.COLOR);
-                            boolean rotated = state.getValue(HandlebarBlock.ROTATED);
 
-                            int xRot = switch (facing) {
+    private static BlockEntry<HandlebarBlock> registerHandlebar(DyeColor color) {
+        String name = "handlebar_" + color.getName();
+        String texture = "vstuff:block/handlebar/" + color.getName();
+
+        return REGISTRATE.block(name, properties -> new HandlebarBlock(properties, color))
+                .initialProperties(AllBlocks.ANDESITE_ALLOY_BLOCK)
+                .transform(pickaxeOnly())
+                .properties(BlockBehaviour.Properties::noOcclusion)
+                .blockstate((ctx, prov) -> {
+                    ModelFile horizontalModel = prov.models()
+                            .withExistingParent(name, prov.modLoc("block/handlebar"))
+                            .texture("0", texture)
+                            .texture("particle", texture);
+
+                    ModelFile verticalModel = prov.models()
+                            .withExistingParent(name + "_vertical", prov.modLoc("block/handlebar_vertical"))
+                            .texture("0", texture)
+                            .texture("particle", texture);
+
+                    prov.getVariantBuilder(ctx.get()).forAllStates(state -> {
+                        Direction facing = state.getValue(HandlebarBlock.FACING);
+                        boolean rotated = state.getValue(HandlebarBlock.ROTATED);
+
+                        ModelFile model;
+                        int xRot;
+                        int yRot;
+
+                        if (rotated && facing.getAxis().isHorizontal()) {
+                            model = verticalModel;
+                            xRot = 0;
+                            yRot = switch (facing) {
+                                case NORTH -> 90;
+                                case EAST -> 180;
+                                case SOUTH -> 270;
+                                default -> 0; // WEST
+                            };
+                        } else {
+                            model = horizontalModel;
+                            xRot = switch (facing) {
                                 case DOWN -> 180;
                                 case UP -> 0;
                                 default -> 90;
                             };
 
-                            int yRot = switch (facing) {
+                            yRot = switch (facing) {
                                 case SOUTH -> 180;
                                 case WEST -> 270;
                                 case EAST -> 90;
@@ -156,46 +200,23 @@ public class VStuffBlocks  {
                             };
 
                             if (rotated) {
-                                if (facing.getAxis().isVertical()) {
-                                    yRot = (yRot + 90) % 360;
-                                } else {
-                                    xRot = (xRot + 90) % 360;
-                                }
+                                yRot = (yRot + 90) % 360;
                             }
-
-                            return ConfiguredModel.builder()
-                                    .modelFile(prov.models()
-                                            .withExistingParent("handlebar_" + color.getName(),
-                                                    prov.modLoc("block/handlebar"))
-                                            .texture("0", "vstuff:block/handlebar/" + color.getName())
-                                            .texture("particle", "vstuff:block/handlebar/" + color.getName()))
-                                    .rotationX(xRot)
-                                    .rotationY(yRot)
-                                    .build();
-                        });
-                    })
-                    .loot((lt, block) -> lt.add(block, LootTable.lootTable()
-                            .withPool(LootPool.lootPool()
-                                    .setRolls(ConstantValue.exactly(1))
-                                    .when(ExplosionCondition.survivesExplosion())
-                                    .add(LootItem.lootTableItem(block)
-                                            .apply(CopyBlockState.copyState(block)
-                                                    .copy(HandlebarBlock.COLOR))))))
-                    .item()
-                    .model((ctx, prov) -> {
-                        ItemModelBuilder builder = prov.withExistingParent(ctx.getName(),
-                                prov.modLoc("block/handlebar_gray"));
-                        ResourceLocation colorPredicate = VStuff.asResource("handlebar_color");
-                        for (DyeColor dye : DyeColor.values()) {
-                            builder.override()
-                                    .predicate(colorPredicate, dye.getId() / 16f)
-                                    .model(new ModelFile.UncheckedModelFile(
-                                            prov.modLoc("block/handlebar_" + dye.getName())))
-                                    .end();
                         }
-                    })
-                    .build()
-                    .register();
+
+                        return ConfiguredModel.builder()
+                                .modelFile(model)
+                                .rotationX(xRot)
+                                .rotationY(yRot)
+                                .build();
+                    });
+                })
+                .item()
+                .model((ctx, prov) -> prov.withExistingParent(ctx.getName(), prov.modLoc("block/" + name)))
+                .build()
+                .register();
+    }
+
 
 
     public static final BlockEntry<WinchBlock> WINCH =

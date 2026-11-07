@@ -57,7 +57,6 @@ public class VStuff {
         VStuffCreativeModeTabs.register(modEventBus);
         VStuffBlockEntities.register();
         VStuffPackets.register();
-        VStuffRecipeSerializers.register(modEventBus);
 
         VStuffConfigs.register(modLoadingContext);
         MinecraftForge.EVENT_BUS.register(this);

@@ -2,11 +2,11 @@ package dev.flarelog.vstuff.index;
 
 import java.util.function.BiFunction;
 
-
 import net.createmod.catnip.math.VoxelShaper;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -34,13 +34,39 @@ public class VStuffShapes {
             .add(5, 2, 5, 11, 3, 11)
             .forDirectional();
 
-    public static final VoxelShaper HANDLE = Builder.withShape(1, 0, 6.5, 4, 2, 9.5)
-            .add(8, 3, 7, 14.5, 5, 9)
-            .add(12.5, 2, 7, 14.5, 3, 9)
-            .add(12, 0, 6.5, 15, 2, 9.5)
-            .add(1.5, 2, 7, 3.5, 3, 9)
-            .add(1.5, 3, 7, 8, 5, 9)
-            .forDirectional();
+    private static VoxelShape handleShape() {
+        return Builder.withShape(1, 0, 6.5, 4, 2, 9.5)
+                .add(8, 3, 7, 14.5, 5, 9)
+                .add(12.5, 2, 7, 14.5, 3, 9)
+                .add(12, 0, 6.5, 15, 2, 9.5)
+                .add(1.5, 2, 7, 3.5, 3, 9)
+                .add(1.5, 3, 7, 8, 5, 9)
+                .build();
+    }
+
+    public static final VoxelShaper HANDLE =
+            Builder.withShape(handleShape()).forDirectional();
+
+
+    public static final VoxelShaper HANDLE_ROTATED =
+            Builder.withShape(rotateY90(handleShape())).forDirectional();
+
+    private static VoxelShape rotateY90(VoxelShape shape) {
+        VoxelShape result = Shapes.empty();
+
+        for (AABB box : shape.toAabbs()) {
+            result = Shapes.or(result, Block.box(
+                    16 - box.maxZ * 16,
+                    box.minY * 16,
+                    box.minX * 16,
+                    16 - box.minZ * 16,
+                    box.maxY * 16,
+                    box.maxX * 16
+            ));
+        }
+
+        return result;
+    }
 
     private static Builder shape(VoxelShape shape) {
         return new Builder(shape);
@@ -115,4 +141,3 @@ public class VStuffShapes {
 
     }
 }
-
