@@ -204,27 +204,19 @@ public class RopeManager extends SavedData {
 
     private boolean createJoints(VsiPhysLevel level, Rope rope) {
         for (RopeSegment segment : rope.getSegments()) {
-            CopyOnWriteArrayList<Either<Integer, VSJoint>> list = new CopyOnWriteArrayList<>();
-            for (Either<Integer, VSJoint> either : segment.joints()) {
-                VSJoint joint = either.right().orElse(null);
-                if (joint != null) {
-                    int id = level.addJoint(joint);
-                    if (id == -1) {
-                        LOGGER.warn("Invalid joint id received when creating phys rope! Discarding it....");
-                        this.cleanupRope(rope, level);
-                        return false;
-                    } else {
-                        list.add(Either.left(id));
-                    }
-                } else {
-                    LOGGER.warn("Null joint when creating phys rope! Discarding it....");
-                    this.cleanupRope(rope, level);
+            List<Either<Integer, VSJoint>> js = segment.joints();
+            for (int k = 0; k < js.size(); k++) {
+                VSJoint pending = js.get(k).right().orElse(null);
+                if (pending == null) continue;
+                int id = level.addJoint(pending);
+                if (id == -1) {
+                    LOGGER.warn("Invalid joint id received when creating phys rope! Discarding it....");
+                    cleanupRope(rope, level);
                     return false;
                 }
+                js.set(k, Either.left(id));
             }
-            segment.joints(list);
         }
-
         return true;
     }
 
@@ -233,10 +225,7 @@ public class RopeManager extends SavedData {
             this.ropes.remove(rope.getRopeId());
         }
         for (RopeSegment segment : rope.getSegments()) {
-            segment.joints().forEach((joint) -> {
-                level.removeJoint(joint.left().get());
-            });
-
+            segment.joints().forEach(j -> j.left().ifPresent(level::removeJoint));
         }
     }
 

@@ -94,16 +94,10 @@ public class Rope {
     public void cleanup(ServerLevel level) {
         VsiServerShipWorld shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
 
-        for (RopeSegment seg : this.getSegments()) {
-            for (Either<Integer,VSJoint> v : seg.joints()) {
-                seg.joints().stream()
-                        .map((i) -> i.left().orElse(null))
-                        .forEach((j) -> {
-                            if (j != null) VSUtil.getGTPA(level).removeJoint(j);
-                        });
-            }
+        for (RopeSegment seg : getSegments()) {
+            seg.joints().forEach(j -> j.left()
+                    .ifPresent(id -> VSUtil.getGTPA(level).removeJoint(id)));
         }
-
         for (Long bodyId : this.getSegmentBodyIds()) {
             if (bodyId != null) {
                 ServerVsBody body = shipWorld.getAllBodies().getById(bodyId);
