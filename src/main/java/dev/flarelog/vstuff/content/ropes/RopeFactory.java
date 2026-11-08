@@ -31,6 +31,8 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class RopeFactory {
 
@@ -179,34 +181,33 @@ public class RopeFactory {
             throw new RuntimeException("WTF NULL ROPE TYPE??!!??? MEOW!! MEOW!! MEOW!!");
         }
 
-        VSJoint firstJoint = type.getEndJointWith(first.pos0().id(),
+        Stream<VSJoint> firstJoints = type.getEndJointsWith(first.pos0().id(),
                 new VSJointPose(first.pos0().pos(), new Quaterniond()),
                 first.pos1().id(),
                 new VSJointPose(first.pos1().pos(), new Quaterniond()),
-                jointContext).serialized();
+                jointContext).stream().map(VSJoint::serialized);
 
-        first.joint(Either.right(firstJoint));
+        first.joints(firstJoints.map(Either::<Integer,VSJoint>right).collect(Collectors.toCollection(CopyOnWriteArrayList::new)));
 
-        VSJoint lastJoint = type.getEndJointWith(last.pos0().id(),
+        Stream<VSJoint> lastJoints = type.getEndJointsWith(last.pos0().id(),
                 new VSJointPose(last.pos0().pos(), new Quaterniond()),
                 last.pos1().id(),
                 new VSJointPose(last.pos1().pos(), new Quaterniond()),
-                jointContext).serialized();
+                jointContext).stream().map(VSJoint::serialized);
 
 
 
         for (RopeSegment segment : segments) {
-            VSJoint joint = type.getConnectingJointWith(
+            Stream<VSJoint> joints = type.getConnectingJointsWith(
                     segment.pos0().id(), new VSJointPose(segment.pos0().pos(), new Quaterniond()),
                     segment.pos1().id(), new VSJointPose(segment.pos1().pos(), new Quaterniond()),
                     jointContext
-            );
-            joint.setShouldBeSerialized(true);
+            ).stream().map(VSJoint::serialized);
 
-            segment.joint(Either.right(joint));
+            segment.joints(joints.map(Either::<Integer,VSJoint>right).collect(Collectors.toCollection(CopyOnWriteArrayList::new)));
         }
 
-        last.joint(Either.right(lastJoint));
+        last.joints(lastJoints.map(Either::<Integer,VSJoint>right).collect(Collectors.toCollection(CopyOnWriteArrayList::new)));
 
         // Add ts back
         segments.add(0, first);

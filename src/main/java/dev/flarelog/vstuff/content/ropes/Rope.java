@@ -1,5 +1,6 @@
 package dev.flarelog.vstuff.content.ropes;
 
+import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.flarelog.vstuff.content.physics.VSUtil;
@@ -94,8 +95,12 @@ public class Rope {
         VsiServerShipWorld shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
 
         for (RopeSegment seg : this.getSegments()) {
-            if (seg.joint().left().isPresent()) {
-                VSUtil.getGTPA(level).removeJoint(seg.joint().left().get());
+            for (Either<Integer,VSJoint> v : seg.joints()) {
+                seg.joints().stream()
+                        .map((i) -> i.left().orElse(null))
+                        .forEach((j) -> {
+                            if (j != null) VSUtil.getGTPA(level).removeJoint(j);
+                        });
             }
         }
 
@@ -129,8 +134,10 @@ public class Rope {
 
     public boolean allJointsCreated() {
         for (RopeSegment segment : this.segments) {
-            if (segment.joint().left().isEmpty()) {
-                return false;
+            for (Either<Integer,VSJoint> s : segment.joints()) {
+                if (s.left().isEmpty()) {
+                    return false;
+                }
             }
         }
         return true;
@@ -172,33 +179,26 @@ public class Rope {
 
         this.setLengthDirty(false);
         int n = this.segments.size();
-        JointValuesContext jointContext = JointValuesContext.create(length / n, n);
+        JointValuesContext ctx = JointValuesContext.create(length / n, n);
 
-        RopeSegment first = this.segments.get(0);
-        RopeSegment last = this.segments.get(segments.size() - 1);
-
-        VSJoint firstJoint = this.getType().getEndJointWith(first.pos0().id(),
-                new VSJointPose(first.pos0().pos(), new Quaterniond()),
-                first.pos1().id(),
-                new VSJointPose(first.pos1().pos(), new Quaterniond()),
-                jointContext).serialized();
-        level.updateJoint(first.joint().orThrow(), firstJoint);
-
-        for (RopeSegment segment : this.segments.subList(1, this.segments.size() - 1)) {
-            VSJoint joint = this.getType().getConnectingJointWith(
-                    segment.pos0().id(), new VSJointPose(segment.pos0().pos(), new Quaterniond()),
-                    segment.pos1().id(), new VSJointPose(segment.pos1().pos(), new Quaterniond()),
-                    jointContext
-            ).serialized();
-            level.updateJoint(segment.joint().orThrow(), joint);
+        for (int i = 0; i < n; i++) {
+            RopeSegment s = segments.get(i);
+            updateSegmentJoints(level, s, buildJoints(s, i == 0 || i == n - 1, ctx));
         }
-
-        VSJoint lastJoint = this.getType().getEndJointWith(last.pos0().id(),
-                new VSJointPose(last.pos0().pos(), new Quaterniond()),
-                last.pos1().id(),
-                new VSJointPose(last.pos1().pos(), new Quaterniond()),
-                jointContext).serialized();
-        level.updateJoint(last.joint().orThrow(), lastJoint);
     }
 
+    private void updateSegmentJoints(VsiPhysLevel level, RopeSegment s, List<VSJoint> joints) {
+        for (int k = 0; k < joints.size(); k++) {
+            level.updateJoint(s.joints().get(k).orThrow(), joints.get(k));
+        }
+    }
+
+    private List<VSJoint> buildJoints(RopeSegment s, boolean end, JointValuesContext ctx) {
+        VSJointPose p0 = new VSJointPose(s.pos0().pos(), new Quaterniond());
+        VSJointPose p1 = new VSJointPose(s.pos1().pos(), new Quaterniond());
+        List<VSJoint> raw = end
+                ? type.getEndJointsWith(s.pos0().id(), p0, s.pos1().id(), p1, ctx)
+                : type.getConnectingJointsWith(s.pos0().id(), p0, s.pos1().id(), p1, ctx);
+        return raw.stream().map(VSJoint::serialized).toList();
+    }
 }

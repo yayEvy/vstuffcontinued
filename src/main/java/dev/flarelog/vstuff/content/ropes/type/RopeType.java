@@ -12,10 +12,11 @@ import org.valkyrienskies.core.api.bodies.shape.BodyShapeData;
 import org.valkyrienskies.core.internal.joints.VSJoint;
 import org.valkyrienskies.core.internal.joints.VSJointPose;
 
+import java.util.List;
 import java.util.function.Function;
 
 @SuppressWarnings("unused")
-public record RopeType(ObjectNode endJoint, ObjectNode connectingJoint, BodyData bodyData, boolean selfCollision) {
+public record RopeType(List<ObjectNode> endJoints, List<ObjectNode> connectingJoints, BodyData bodyData, boolean selfCollision) {
 
     public static RopeType create(Object joint, BodyData bodyData, boolean selfCollision) {
         return create(joint, joint, bodyData, selfCollision);
@@ -23,16 +24,18 @@ public record RopeType(ObjectNode endJoint, ObjectNode connectingJoint, BodyData
 
     public static RopeType create(Object endJoint, Object connectingJoint, BodyData bodyData, boolean selfCollision) {
         return new RopeType(
-                VStuff.getOrCreateMapper().valueToTree(endJoint),
-                VStuff.getOrCreateMapper().valueToTree(connectingJoint),
+                List.of(VStuff.getOrCreateMapper().valueToTree(endJoint)),
+                List.of(VStuff.getOrCreateMapper().valueToTree(connectingJoint)),
                 bodyData,
                 selfCollision
         );
     }
 
     public static final Codec<RopeType> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            CodecUtil.OBJECT_NODE.comapFlatMap(RopeType::validateJoint, Function.identity()).fieldOf("endJoint").forGetter(RopeType::endJoint),
-            CodecUtil.OBJECT_NODE.comapFlatMap(RopeType::validateJoint, Function.identity()).fieldOf("connectingJoint").forGetter(RopeType::connectingJoint),
+            CodecUtil.OBJECT_NODE.comapFlatMap(RopeType::validateJoint, Function.identity())
+                    .listOf().fieldOf("endJoints").forGetter(RopeType::endJoints),
+            CodecUtil.OBJECT_NODE.comapFlatMap(RopeType::validateJoint, Function.identity())
+                    .listOf().fieldOf("connectingJoints").forGetter(RopeType::connectingJoints),
             BodyData.CODEC.fieldOf("bodyData").forGetter(RopeType::bodyData),
             Codec.BOOL.fieldOf("selfCollision").forGetter(RopeType::selfCollision)
     ).apply(instance, RopeType::new));
@@ -46,12 +49,12 @@ public record RopeType(ObjectNode endJoint, ObjectNode connectingJoint, BodyData
         }
     }
 
-    public VSJoint getEndJointWith(Long shipId0, VSJointPose pose0, Long shipId1, VSJointPose pose1, JointValuesContext ctx){
-        return getJointWith(endJoint, shipId0, pose0, shipId1, pose1, ctx);
+    public List<VSJoint> getEndJointsWith(Long shipId0, VSJointPose pose0, Long shipId1, VSJointPose pose1, JointValuesContext ctx){
+        return endJoints.stream().map((o) -> getJointWith(o, shipId0, pose0, shipId1, pose1, ctx)).toList();
     }
 
-    public VSJoint getConnectingJointWith(Long shipId0, VSJointPose pose0, Long shipId1, VSJointPose pose1, JointValuesContext ctx){
-        return getJointWith(connectingJoint, shipId0, pose0, shipId1, pose1, ctx);
+    public List<VSJoint> getConnectingJointsWith(Long shipId0, VSJointPose pose0, Long shipId1, VSJointPose pose1, JointValuesContext ctx){
+        return connectingJoints.stream().map((o) -> getJointWith(o, shipId0, pose0, shipId1, pose1, ctx)).toList();
     }
 
     private static VSJoint getJointWith(ObjectNode value, Long shipId0, VSJointPose pose0, Long shipId1, VSJointPose pose1, JointValuesContext ctx){

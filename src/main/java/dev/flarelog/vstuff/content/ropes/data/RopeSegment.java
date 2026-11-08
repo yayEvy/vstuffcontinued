@@ -2,20 +2,21 @@ package dev.flarelog.vstuff.content.ropes.data;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.EitherCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.network.FriendlyByteBuf;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.bodies.ClientVsBody;
 import org.valkyrienskies.core.internal.joints.VSJoint;
 import org.valkyrienskies.core.internal.world.VsiClientShipWorld;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 @Getter
 @Accessors(fluent = true)
@@ -24,7 +25,7 @@ public class RopeSegment {
     private final LocalPosAndBodyId pos0;
     private final LocalPosAndBodyId pos1;
 
-    @Setter private Either<Integer, VSJoint> joint = null;
+    @Setter private List<Either<Integer, VSJoint>> joints = new CopyOnWriteArrayList<>();
 
     public Vector3d getRenderPos0(ClientLevel level) {
         return getRenderPos(level, pos0.id(), pos0.pos());
@@ -45,13 +46,17 @@ public class RopeSegment {
         return new Vector3d(shipOrBody.getRenderTransform().getToWorld().transformPosition(new Vector3d(pos)));
     }
 
-    public static final Codec<RopeSegment> CODEC = RecordCodecBuilder.create(i -> i.group( // codec of doom and despair part 2
+    public static final Codec<RopeSegment> CODEC = RecordCodecBuilder.create(i -> i.group(
             LocalPosAndBodyId.CODEC.fieldOf("pos0").forGetter(RopeSegment::pos0),
             LocalPosAndBodyId.CODEC.fieldOf("pos1").forGetter(RopeSegment::pos1),
-            Codec.INT.fieldOf("joint").forGetter((seg) -> seg.joint().orThrow())
-    ).apply(i, (pos0,pos1,joint) -> {
+            Codec.INT.listOf().fieldOf("joints").forGetter(seg -> seg.joints().stream()
+                    .map(e -> e.left().orElseThrow(() -> new IllegalStateException("joint not created yet")))
+                    .toList())
+    ).apply(i, (pos0, pos1, ids) -> {
         RopeSegment segment = new RopeSegment(pos0, pos1);
-        segment.joint(Either.left(joint));
+        segment.joints(ids.stream()
+                .map(Either::<Integer, VSJoint>left)
+                .collect(Collectors.toCollection(CopyOnWriteArrayList::new)));
         return segment;
     }));
 }
