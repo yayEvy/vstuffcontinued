@@ -68,14 +68,14 @@ public class RopeFactory {
         IRopeActor actor1 = IRopeActor.getAt(level, data1);
         if (actor0 != null) {
             if (!actor0.canAttach()) {
-                resultCallback.accept(RopeResult.withMessage("vstuff.message.rope.actor_connected"));
+                resultCallback.accept(RopeResult.withMessage("message.rope.actor_connected"));
                 return;
             }
         }
 
         if (actor1 != null) {
             if (!actor1.canAttach()) {
-                 resultCallback.accept(RopeResult.withMessage("vstuff.message.rope.actor_connected"));
+                 resultCallback.accept(RopeResult.withMessage("message.rope.actor_connected"));
                  return;
             }
         }

@@ -91,7 +91,7 @@ public class RopeManager extends SavedData {
         if (actor0 != null) {
             if (!actor0.canAttach()) {
                 RopeFactory.removeAndCleanupRope(rope, level);
-                resultConsumer.accept(RopeResult.withMessage("vstuff.message.rope.actor_connected"));
+                resultConsumer.accept(RopeResult.withMessage("message.rope.actor_connected"));
                 return;
             }
             actor0.connectRope(rope.getRopeId());
@@ -100,7 +100,7 @@ public class RopeManager extends SavedData {
         if (actor1 != null) {
             if (!actor1.canAttach()) {
                 RopeFactory.removeAndCleanupRope(rope, level);
-                resultConsumer.accept(RopeResult.withMessage("vstuff.message.rope.actor_connected"));
+                resultConsumer.accept(RopeResult.withMessage("message.rope.actor_connected"));
                 return;
             }
             actor1.connectRope(rope.getRopeId());
@@ -188,7 +188,7 @@ public class RopeManager extends SavedData {
                     }
                     this.level.getServer().execute(() -> this.addRope(rope, resultConsumer));
                 } else {
-                    resultConsumer.accept(RopeResult.withMessage("vstuff.message.rope.fail_unknown"));
+                    this.level.getServer().execute(() -> resultConsumer.accept(RopeResult.withMessage("message.rope.fail_unknown")));
                 }
                 this.queued.remove(index);
             }
@@ -204,15 +204,20 @@ public class RopeManager extends SavedData {
 
     private boolean createJoints(VsiPhysLevel level, Rope rope) {
         for (RopeSegment segment : rope.getSegments()) {
-            VSJoint joint = segment.joint().right().orElseThrow();
-
-            int id = level.addJoint(joint);
-            if (id == -1) {
-                LOGGER.warn("Invalid joint id received when creating phys rope! Discarding it....");
+            VSJoint joint = segment.joint().right().orElse(null);
+            if (joint != null) {
+                int id = level.addJoint(joint);
+                if (id == -1) {
+                    LOGGER.warn("Invalid joint id received when creating phys rope! Discarding it....");
+                    this.cleanupRope(rope, level);
+                    return false;
+                } else {
+                    segment.joint(Either.left(id));
+                }
+            } else {
+                LOGGER.warn("Null joint when creating phys rope! Discarding it....");
                 this.cleanupRope(rope, level);
                 return false;
-            } else {
-                segment.joint(Either.left(id));
             }
         }
 
