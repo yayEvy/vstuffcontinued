@@ -198,11 +198,11 @@ configurations {
     runtimeClasspath.extendsFrom runtimeOnly
 }
 
-minecraft.runs.all {
-    lazyToken('minecraft_classpath') {
-        configurations.minecraftLibrary.copyRecursive().resolve().collect { it.absolutePath }.join(File.pathSeparator)
-    }
-}
+//minecraft.runs.all {
+//    lazyToken('minecraft_classpath') {
+//        configurations.minecraftLibrary.copyRecursive().resolve().collect { it.absolutePath }.join(File.pathSeparator)
+//    }
+//}
 
 tasks.named('processResources', ProcessResources).configure {
     var replaceProperties = [
