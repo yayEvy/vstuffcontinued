@@ -1,4 +1,4 @@
-name: Compile and Upload Mod to Testers Channel
+Name: Compile and Upload Mod to Testers Channel
 
 on:
   workflow_dispatch:
@@ -39,22 +39,12 @@ jobs:
         JAR_LINK="${BASE_URL}/${VERSION_STR}/valkyrienskies-120-forge-${VERSION_STR}.jar"
         echo "VS JAR URL: $JAR_LINK"
 
-        # Mod version + commit hash for the filename
-        MOD_VERSION=$(get_prop mod_version)
-        MOD_VERSION="${MOD_VERSION:-unknown}"
-        SHORT_SHA="${GITHUB_SHA:0:7}"
-        
-        # Find the built jar file dynamically from the directory
-        JAR_FILE=$(ls build/libs/*.jar | head -n 1)
-        echo "Uploading jar: $JAR_FILE"
-
         {
           echo "VS_JAR=$JAR_LINK"
-          echo "JAR_NAME=$JAR_NAME"
-          echo "ARTIFACT_NAME=${JAR_NAME%.jar}"
         } >> "$GITHUB_ENV"
 
     - name: Upload build as artifact
+      id: upload
       uses: actions/upload-artifact@v7
       with:
         name: vstuff-reobf-builds
@@ -101,6 +91,7 @@ jobs:
               timestamp: $ts
             }]
           }' > payload.json
+
         CURL_ARGS=()
         for jar in build/libs/*.jar; do
           if [ -f "$jar" ]; then
@@ -108,7 +99,8 @@ jobs:
             CURL_ARGS+=("-F" "file=@${jar}")
           fi
         done
+
         curl -sS --fail \
           -F "payload_json=<payload.json" \
-          -F "${CURL_ARGS[@]}" \
+          "${CURL_ARGS[@]}" \
           "$WEBHOOK_URL"
