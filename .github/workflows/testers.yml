@@ -43,8 +43,10 @@ jobs:
         MOD_VERSION=$(get_prop mod_version)
         MOD_VERSION="${MOD_VERSION:-unknown}"
         SHORT_SHA="${GITHUB_SHA:0:7}"
-        JAR_NAME="vstuff-${MOD_VERSION}-testbuild-${SHORT_SHA}.jar"
-        echo "Jar name: $JAR_NAME"
+        
+        # Find the built jar file dynamically from the directory
+        JAR_FILE=$(ls build/libs/*.jar | head -n 1)
+        echo "Uploading jar: $JAR_FILE"
 
         {
           echo "VS_JAR=$JAR_LINK"
@@ -52,15 +54,11 @@ jobs:
           echo "ARTIFACT_NAME=${JAR_NAME%.jar}"
         } >> "$GITHUB_ENV"
 
-    - name: Rename jar
-      run: cp ./build/reobfJar/output.jar "./${JAR_NAME}"
-
-    - name: Upload jar as artifact
-      id: upload
+    - name: Upload build as artifact
       uses: actions/upload-artifact@v7
       with:
-        name: ${{ env.ARTIFACT_NAME }}
-        path: ./${{ env.JAR_NAME }}
+        name: vstuff-reobf-builds
+        path: ./build/libs/*.jar
         if-no-files-found: error
 
     - name: Send Mod to Discord
@@ -103,8 +101,14 @@ jobs:
               timestamp: $ts
             }]
           }' > payload.json
-
+        CURL_ARGS=()
+        for jar in build/libs/*.jar; do
+          if [ -f "$jar" ]; then
+            echo "Found jar to upload: $jar"
+            CURL_ARGS+=("-F" "file=@${jar}")
+          fi
+        done
         curl -sS --fail \
           -F "payload_json=<payload.json" \
-          -F "file=@./${JAR_NAME}" \
+          -F "${CURL_ARGS[@]}" \
           "$WEBHOOK_URL"
