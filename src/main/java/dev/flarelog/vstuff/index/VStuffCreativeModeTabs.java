@@ -4,6 +4,7 @@ import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.RegistryEntry;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.*;
@@ -74,8 +75,16 @@ public class VStuffCreativeModeTabs {
         @Override
         public void accept(CreativeModeTab.ItemDisplayParameters params, CreativeModeTab.Output output) {
             List<Item> items = new LinkedList<>();
-            items.addAll(collectBlocks(VSTUFF_MAIN, (item) -> item == VStuffBlocks.REFINED_LEVITUFF.get().asItem()));
-            items.addAll(collectItems(VSTUFF_MAIN, (item) -> item == VStuffItems.CREATIVE_ROPE_EDITOR.get()));
+
+            items.addAll(collectBlocks(VSTUFF_MAIN, (item) -> {
+                String path = BuiltInRegistries.ITEM.getKey(item).getPath();
+                return item == VStuffBlocks.REFINED_LEVITUFF.get().asItem()
+                        || (path.startsWith("handlebar_")
+                        && item != VStuffBlocks.HANDLE_GRAY.get().asItem());
+            }));
+
+            items.addAll(collectItems(VSTUFF_MAIN,
+                    (item) -> item == VStuffItems.CREATIVE_ROPE_EDITOR.get()));
 
             outputAll(output, items);
         }

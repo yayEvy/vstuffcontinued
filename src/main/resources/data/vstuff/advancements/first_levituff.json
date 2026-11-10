@@ -1,0 +1,23 @@
+{
+  "parent": "vstuff:first_rope",
+  "display": {
+    "icon": {
+      "item": "vstuff:levituff"
+    },
+    "title": {
+      "text": "Leviti- wait no wrong mod"
+    },
+    "description": {
+      "text": "Levituff. It floats, but where is it found?"
+    },
+    "frame" : "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtained_levituff": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

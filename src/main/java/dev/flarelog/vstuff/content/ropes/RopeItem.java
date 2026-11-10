@@ -3,6 +3,7 @@ package dev.flarelog.vstuff.content.ropes;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyleManager;
 import dev.flarelog.vstuff.content.ropes.data.LocalPosAndBodyId;
 import dev.flarelog.vstuff.content.ropes.util.IRopeActor;
+import dev.flarelog.vstuff.index.VStuffAdvancements;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -109,22 +110,14 @@ public class RopeItem extends Item {
                         player.displayClientMessage(VStuff.translate("message.rope.created").withStyle(ChatFormatting.GREEN), true);
 
                         RopeUtil.playSound(serverLevel, clickedPos, ropeResult.rope.getStyle(serverLevel.registryAccess()).placeSound());
-
+                        if (player instanceof ServerPlayer serverPlayer) {
+                            VStuffAdvancements.awardFirstRope(serverPlayer);
+                        }
                     } else {
                         player.displayClientMessage(VStuff.translate(ropeResult.message).withStyle(ChatFormatting.RED), true);
                     }
                 },
                 dimId);
-
-
-//        if (ropeResult.valid) {
-//            player.displayClientMessage(VStuff.translate("message.rope.created").withStyle(ChatFormatting.GREEN), true);
-//
-//            RopeUtil.playSound(serverLevel, clickedPos, ropeResult.rope.getStyle(serverLevel.registryAccess()).placeSound());
-//
-//        } else {
-//            player.displayClientMessage(VStuff.translate(ropeResult.message).withStyle(ChatFormatting.RED), true);
-//        }
 
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;

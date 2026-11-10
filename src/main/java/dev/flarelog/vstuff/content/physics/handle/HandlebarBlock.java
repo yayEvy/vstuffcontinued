@@ -29,22 +29,22 @@ import org.jetbrains.annotations.NotNull;
 
 public class HandlebarBlock extends DirectionalBlock implements IBE<HandlebarBlockEntity> {
 
-    public static final EnumProperty<DyeColor> COLOR =
-            EnumProperty.create("color", DyeColor.class);
+    private final DyeColor color;
 
     public static final BooleanProperty ROTATED = BooleanProperty.create("rotated");
 
-    public HandlebarBlock(Properties pProperties) {
-        super(pProperties);
-        this.registerDefaultState(this.stateDefinition.any()
-                .setValue(FACING, Direction.UP)
-                .setValue(COLOR, DyeColor.GRAY)
-                .setValue(ROTATED, false));
+    public HandlebarBlock(Properties properties, DyeColor color) {
+        super(properties);
+        this.color = color;
+    }
+
+    public DyeColor getColor() {
+        return color;
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, COLOR, ROTATED);
+        builder.add(FACING, ROTATED);
     }
 
     @Override
@@ -76,7 +76,6 @@ public class HandlebarBlock extends DirectionalBlock implements IBE<HandlebarBlo
     public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
         ItemStack stack = super.getCloneItemStack(level, pos, state);
         CompoundTag stateTag = new CompoundTag();
-        stateTag.putString("color", state.getValue(COLOR).getName());
         stack.getOrCreateTag().put("BlockStateTag", stateTag);
         return stack;
     }
@@ -84,17 +83,22 @@ public class HandlebarBlock extends DirectionalBlock implements IBE<HandlebarBlo
     @Override
     public BlockState rotate(BlockState state, Rotation rot) {
         Direction facing = state.getValue(FACING);
-        state = state.setValue(FACING, rot.rotate(facing));
-        if (facing.getAxis().isVertical()
-                && (rot == Rotation.CLOCKWISE_90 || rot == Rotation.COUNTERCLOCKWISE_90)) {
-            state = state.cycle(ROTATED);
+        boolean rotated = state.getValue(ROTATED);
+
+        if (facing.getAxis().isVertical()) {
+            if (rot == Rotation.CLOCKWISE_90 || rot == Rotation.COUNTERCLOCKWISE_90) {
+                rotated = !rotated;
+            }
         }
-        return state;
+
+        return state
+                .setValue(FACING, rot.rotate(facing))
+                .setValue(ROTATED, rotated);
     }
 
     @Override
     public BlockState mirror(BlockState state, Mirror mirror) {
-        return state.rotate(mirror.getRotation(state.getValue(FACING)));
+        return rotate(state, mirror.getRotation(state.getValue(FACING)));
     }
 
     @Override
@@ -109,6 +113,8 @@ public class HandlebarBlock extends DirectionalBlock implements IBE<HandlebarBlo
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return VStuffShapes.HANDLE.get(state.getValue(FACING));
+        return (state.getValue(ROTATED)
+                ? VStuffShapes.HANDLE_ROTATED
+                : VStuffShapes.HANDLE).get(state.getValue(FACING));
     }
 }

@@ -1,6 +1,9 @@
 package dev.flarelog.vstuff.content.physics.levituff;
 
+import dev.flarelog.vstuff.index.VStuffAdvancements;
+import dev.flarelog.vstuff.index.VStuffBlocks;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -8,6 +11,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import dev.flarelog.vstuff.content.physics.levituff.attachment.LevituffAttachment;
 import dev.flarelog.vstuff.content.physics.levituff.sound.LevituffSoundPlayer;
 import dev.flarelog.vstuff.internal.utility.AttachmentUtils;
+import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,6 +32,15 @@ public class LevituffBlockEntity extends BlockEntity {
     public void setRemoved() {
         AttachmentUtils.getAttachment(level, getBlockPos(), LevituffAttachment.class, a -> a.removeBlock(getBlockPos()), a -> a.levituffBlocks.isEmpty());
         super.setRemoved();
+    }
+
+    @SubscribeEvent
+    public static void onBreakBlock(BlockEvent.BreakEvent event) {
+        if (!(event.getPlayer() instanceof ServerPlayer player)) return;
+
+        if (event.getState().is(VStuffBlocks.LEVITUFF.get())) {
+            VStuffAdvancements.awardFirstLevituff(player);
+        }
     }
 
     private final LevituffSoundPlayer soundPlayer = new LevituffSoundPlayer();

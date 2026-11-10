@@ -61,9 +61,25 @@ public class VStuffBlockEntities {
 
     public static final BlockEntityEntry<HandlebarBlockEntity> HANDLEBAR_BE =
             REGISTRATE.blockEntity("handle", HandlebarBlockEntity::new)
-                    .validBlocks(VStuffBlocks.HANDLE)
+                    .validBlocks(
+                            VStuffBlocks.HANDLE_WHITE,
+                            VStuffBlocks.HANDLE_ORANGE,
+                            VStuffBlocks.HANDLE_MAGENTA,
+                            VStuffBlocks.HANDLE_LIGHT_BLUE,
+                            VStuffBlocks.HANDLE_YELLOW,
+                            VStuffBlocks.HANDLE_LIME,
+                            VStuffBlocks.HANDLE_PINK,
+                            VStuffBlocks.HANDLE_GRAY,
+                            VStuffBlocks.HANDLE_LIGHT_GRAY,
+                            VStuffBlocks.HANDLE_CYAN,
+                            VStuffBlocks.HANDLE_PURPLE,
+                            VStuffBlocks.HANDLE_BLUE,
+                            VStuffBlocks.HANDLE_BROWN,
+                            VStuffBlocks.HANDLE_GREEN,
+                            VStuffBlocks.HANDLE_RED,
+                            VStuffBlocks.HANDLE_BLACK
+                    )
                     .register();
-
 
 
 
