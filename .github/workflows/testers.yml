@@ -1,4 +1,4 @@
-name: Compile and Upload Mod to Testers Channel
+Name: Compile and Upload Mod to Testers Channel
 
 on:
   workflow_dispatch:
