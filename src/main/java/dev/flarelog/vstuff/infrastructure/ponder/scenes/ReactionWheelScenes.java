@@ -11,6 +11,8 @@ import dev.flarelog.vstuff.content.physics.ships.reactionwheel.ReactionWheelBloc
 
 public class ReactionWheelScenes {
 
+    // todo redo reaction wheel ponder because its ugly
+
     public static void reactionWheel(SceneBuilder scene, SceneBuildingUtil util) {
         CreateSceneBuilder cscene = new CreateSceneBuilder(scene);
 

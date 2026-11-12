@@ -69,7 +69,7 @@
 
 
   "vstuff.rope_cutter.tooltip.summary": "_Cuts the rope_ you are looking at.",
-  "vstuff.phys_grabber.tooltip.summary": "A method of _moving ships_ around!",
+  "vstuff.phys_grabber.tooltip.summary": "A method of _moving ships_ around! Scroll to change the _held distance_",
   "vstuff.tooltip.hold_for_details": "Hold [%s] for summary",
 
   "ropecategory.vstuff.uncategorized": "Uncategorized",

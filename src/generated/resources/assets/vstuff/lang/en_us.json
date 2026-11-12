@@ -1,5 +1,4 @@
 {
-  "block.vstuff.anchor": "Anchor",
   "block.vstuff.chiseled_levituff": "Chiseled Levituff",
   "block.vstuff.chiseled_levituff_bricks": "Chiseled Levituff Bricks",
   "block.vstuff.handlebar_black": "Handlebar Black",
@@ -25,6 +24,7 @@
   "block.vstuff.polished_levituff": "Polished Levituff",
   "block.vstuff.reaction_wheel": "Reaction Wheel",
   "block.vstuff.refined_levituff": "Refined Levituff",
+  "block.vstuff.rope_anchor": "Rope Anchor",
   "block.vstuff.winch": "Winch",
   "create.gui.goggles.thruster.efficiency": "Efficiency",
   "create.gui.goggles.thruster.obstructed": "Obstructed",

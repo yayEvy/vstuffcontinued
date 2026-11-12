@@ -21,9 +21,9 @@ import dev.flarelog.vstuff.index.VStuffShapes;
 
 import static dev.flarelog.vstuff.content.ropes.util.IRopeActor.CONNECTED;
 
-public class AnchorBlock extends DirectionalBlock implements IBE<AnchorBlockEntity> {
+public class RopeAnchorBlock extends DirectionalBlock implements IBE<RopeAnchorBlockEntity> {
 
-    public AnchorBlock(Properties pProperties) {
+    public RopeAnchorBlock(Properties pProperties) {
         super(pProperties);
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(FACING, Direction.UP)
@@ -64,12 +64,12 @@ public class AnchorBlock extends DirectionalBlock implements IBE<AnchorBlockEnti
 
 
     @Override
-    public Class<AnchorBlockEntity> getBlockEntityClass() {
-        return AnchorBlockEntity.class;
+    public Class<RopeAnchorBlockEntity> getBlockEntityClass() {
+        return RopeAnchorBlockEntity.class;
     }
 
     @Override
-    public BlockEntityType<? extends AnchorBlockEntity> getBlockEntityType() {
+    public BlockEntityType<? extends RopeAnchorBlockEntity> getBlockEntityType() {
         return VStuffBlockEntities.ANCHOR_BE.get();
     }
 }

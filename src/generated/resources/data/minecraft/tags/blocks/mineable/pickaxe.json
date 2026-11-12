@@ -9,8 +9,23 @@
     "vstuff:chiseled_levituff",
     "vstuff:chiseled_levituff_bricks",
     "vstuff:refined_levituff",
-    "vstuff:handlebar",
+    "vstuff:handlebar_white",
+    "vstuff:handlebar_orange",
+    "vstuff:handlebar_magenta",
+    "vstuff:handlebar_light_blue",
+    "vstuff:handlebar_yellow",
+    "vstuff:handlebar_lime",
+    "vstuff:handlebar_pink",
+    "vstuff:handlebar_gray",
+    "vstuff:handlebar_light_gray",
+    "vstuff:handlebar_cyan",
+    "vstuff:handlebar_purple",
+    "vstuff:handlebar_blue",
+    "vstuff:handlebar_brown",
+    "vstuff:handlebar_green",
+    "vstuff:handlebar_red",
+    "vstuff:handlebar_black",
     "vstuff:winch",
-    "vstuff:anchor"
+    "vstuff:rope_anchor"
   ]
 }

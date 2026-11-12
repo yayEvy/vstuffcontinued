@@ -9,12 +9,12 @@ import dev.flarelog.vstuff.content.ropes.util.IRopeActor;
 import dev.flarelog.vstuff.content.ropes.RopeManager;
 import dev.flarelog.vstuff.content.ropes.Rope;
 
-public class AnchorBlockEntity extends BlockEntity implements IRopeActor {
+public class RopeAnchorBlockEntity extends BlockEntity implements IRopeActor {
 
     private Integer ropeId = null;
     private Rope rope = null;
 
-    public AnchorBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
+    public RopeAnchorBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
     }
 

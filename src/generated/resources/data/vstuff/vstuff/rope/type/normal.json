@@ -1,5 +1,5 @@
 {
-  "connectingPhysBodyJoint": {
+  "connectingJoint": {
     "type": "distance",
     "compliance": 10000,
     "damping": 100000,
@@ -11,7 +11,6 @@
     "stiffness": 10000000,
     "tolerance": 1000
   },
-  "doTheVodiesCollideWithEachOther": false,
   "endJoint": {
     "type": "distance",
     "compliance": 10000,
@@ -23,5 +22,6 @@
     "minDistance": 0,
     "stiffness": 10000000,
     "tolerance": 1000
-  }
+  },
+  "selfCollision": false
 }

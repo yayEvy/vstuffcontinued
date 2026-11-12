@@ -11,9 +11,8 @@ import dev.flarelog.vstuff.content.physics.handle.HandlebarBlock;
 import dev.flarelog.vstuff.content.physics.ships.nails.NailBlock;
 import dev.flarelog.vstuff.content.physics.ships.nails.NailItem;
 import dev.flarelog.vstuff.content.ropes.winch.WinchBlock;
-import dev.flarelog.vstuff.content.ropes.winch.AnchorBlock;
+import dev.flarelog.vstuff.content.ropes.winch.RopeAnchorBlock;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Blocks;
@@ -25,14 +24,7 @@ import dev.flarelog.vstuff.content.physics.levituff.RefinedLevituffBlock;
 import dev.flarelog.vstuff.content.physics.ships.reactionwheel.ReactionWheelBlock;
 import dev.flarelog.vstuff.content.physics.ships.thrust.MechanicalThrusterBlock;
 import dev.flarelog.vstuff.infrastructure.config.VStress;
-import net.minecraft.world.level.storage.loot.LootPool;
-import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.entries.LootItem;
-import net.minecraft.world.level.storage.loot.functions.CopyBlockState;
-import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
-import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ModelFile;
 
 import static com.simibubi.create.foundation.data.TagGen.axeOrPickaxe;
@@ -231,8 +223,8 @@ public class VStuffBlocks  {
                     .register();
 
 
-    public static final BlockEntry<AnchorBlock> ANCHOR =
-            REGISTRATE.block("anchor", AnchorBlock::new)
+    public static final BlockEntry<RopeAnchorBlock> ROPE_ANCHOR =
+            REGISTRATE.block("rope_anchor", RopeAnchorBlock::new)
                     .initialProperties(AllBlocks.ZINC_BLOCK)
                     .transform(pickaxeOnly())
                     .blockstate(BlockStateGen.directionalBlockProvider(false))

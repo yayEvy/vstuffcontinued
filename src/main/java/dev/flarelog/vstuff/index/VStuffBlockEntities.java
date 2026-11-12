@@ -16,7 +16,7 @@ import dev.flarelog.vstuff.content.physics.ships.thrust.MechanicalThrusterVisual
 import dev.flarelog.vstuff.content.ropes.winch.WinchBlockEntity;
 import dev.flarelog.vstuff.content.ropes.winch.WinchRenderer;
 import dev.flarelog.vstuff.content.ropes.winch.WinchVisual;
-import dev.flarelog.vstuff.content.ropes.winch.AnchorBlockEntity;
+import dev.flarelog.vstuff.content.ropes.winch.RopeAnchorBlockEntity;
 
 public class VStuffBlockEntities {
 
@@ -53,9 +53,9 @@ public class VStuffBlockEntities {
                     .renderer(() -> WinchRenderer::new)
                     .register();
 
-    public static final BlockEntityEntry<AnchorBlockEntity> ANCHOR_BE =
-            REGISTRATE.blockEntity("anchor", AnchorBlockEntity::new)
-                    .validBlocks(VStuffBlocks.ANCHOR)
+    public static final BlockEntityEntry<RopeAnchorBlockEntity> ANCHOR_BE =
+            REGISTRATE.blockEntity("anchor", RopeAnchorBlockEntity::new)
+                    .validBlocks(VStuffBlocks.ROPE_ANCHOR)
                     .register();
 
 
