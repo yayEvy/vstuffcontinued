@@ -102,6 +102,12 @@ minecraft {
     }
 }
 
+configurations {
+    shade
+    implementation.extendsFrom shade
+    runtimeClasspath.extendsFrom runtimeOnly
+}
+
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
@@ -151,7 +157,7 @@ repositories {
         }
     }
 }
-
+jarJar.enable()
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
@@ -191,13 +197,6 @@ dependencies {
 
     runtimeOnly(fg.deobf("maven.modrinth:spark:1.10.53-forge"))
 }
-
-configurations {
-    shade
-    implementation.extendsFrom shade
-    runtimeClasspath.extendsFrom runtimeOnly
-}
-
 
 tasks.named('processResources', ProcessResources).configure {
     var replaceProperties = [
