@@ -213,6 +213,18 @@ afterEvaluate {
     }
 }
 
+configurations.configureEach {
+    resolutionStrategy.dependencySubstitution {
+        substitute(module('commons-logging:commons-logging'))
+            .using(module('org.slf4j:jcl-over-slf4j:2.0.7'))
+            .because('Replaces legacy commons-logging with the SLF4J bridge to prevent JPMS split-package module layer crashes.')
+        substitute(module('org.apache.commons:commons-logging'))
+            .using(module('org.slf4j:jcl-over-slf4j:2.0.7'))
+            .because('Prevents duplicate logging implementation module collisions.')
+    }
+}
+
+
 tasks.named('processResources', ProcessResources).configure {
     var replaceProperties = [
             minecraft_version: minecraft_version, forge_version: forge_version, forge_version_range: forge_version_range,
