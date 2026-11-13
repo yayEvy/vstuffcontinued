@@ -103,8 +103,11 @@ minecraft {
 }
 
 configurations {
-    shade
-    implementation.extendsFrom shade
+    embedLibrary {
+        transitive = true
+    }
+    minecraftLibrary.extendsFrom(embedLibrary)
+    
     runtimeClasspath.extendsFrom runtimeOnly
 }
 
@@ -168,10 +171,10 @@ dependencies {
     implementation fg.deobf("org.valkyrienskies:valkyrienskies-120-forge:${vs2_version}+${vs2_hash.substring(0, 10)}")
 
 
-    minecraftLibrary("org.apache.commons:commons-jexl3:3.7.1")
-    jarJar("org.apache.commons:commons-jexl3:3.7.1") {
-        jarJar.ranged(it, "[3.7.1,)")
-    }
+    embedLibrary("org.apache.commons:commons-jexl3:3.7.1")
+//    jarJar("org.apache.commons:commons-jexl3:3.7.1") {
+//        jarJar.ranged(it, "[3.7.1,)")
+//    }
 
 //    minecraftLibrary("org.mariuszgromada.math:MathParser.org-mXparser:6.1.2")
 
@@ -196,6 +199,18 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.48")
 
     runtimeOnly(fg.deobf("maven.modrinth:spark:1.10.53-forge"))
+}
+
+
+// Feed all resolved transitive dependencies into jarJar
+afterEvaluate {
+    configurations.embedLibrary.resolvedConfiguration.resolvedArtifacts.each { artifact ->
+        def id = artifact.moduleVersion.id
+        dependencies.add('jarJar', "${id.group}:${id.name}:[${id.version},)") {
+            jarJar.pin(it, id.version)
+            transitive = false
+        }
+    }
 }
 
 tasks.named('processResources', ProcessResources).configure {
