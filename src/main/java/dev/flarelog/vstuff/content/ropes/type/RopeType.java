@@ -33,7 +33,7 @@ public record RopeType(Map<String, Object> endJoint, Map<String, Object> connect
     public static final Codec<RopeType> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             CodecUtil.ANY_MAP_CODEC.fieldOf("endJoint").forGetter(RopeType::endJoint),
             CodecUtil.ANY_MAP_CODEC.fieldOf("connectingJoint").forGetter(RopeType::connectingJoint),
-            Codec.BOOL.fieldOf("selfCollision").forGetter(RopeType::selfCollision)
+            Codec.BOOL.optionalFieldOf("selfCollision", false).forGetter(RopeType::selfCollision)
     ).apply(instance, RopeType::new));
 
     public VSJoint getEndJointWith(Long shipId0, VSJointPose pose0, Long shipId1, VSJointPose pose1, Float maxDistance){
