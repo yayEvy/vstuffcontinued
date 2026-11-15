@@ -232,9 +232,9 @@ tasks.named('jar', Jar).configure {
 shadowJar {
     archiveClassifier = ''
     configurations = [project.configurations.shade]
-
-    relocate 'org.apache.commons.jexl3', "${project.group}.relocated.jexl3"
-    relocate 'org.apache.commons.commons-logging', "${project.group}.relocated.commons-logging"
+    
+    enableAutoRelocation = true
+    relocationPrefix = "dev.flarelog.vstuff"
     
     finalizedBy 'reobfShadowJar'
 }
