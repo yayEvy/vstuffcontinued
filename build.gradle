@@ -8,8 +8,6 @@ buildscript {
     }
     dependencies {
         classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-        classpath 'org.parchmentmc:librarian:1.+'
     }
 }
 
@@ -21,10 +19,8 @@ plugins {
     id 'com.gradleup.shadow' version '8.3.11'
 }
 
-apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
-apply plugin: 'org.parchmentmc.librarian.forgegradle'
 
 mixin {
     add sourceSets.main, "vstuff.refmap.json"
@@ -229,18 +225,31 @@ tasks.named('jar', Jar).configure {
     }
 }
 
-shadowJar {
+tasks.named('jarJar') {
     archiveClassifier = ''
+    dependsOn shadowJar
+
+    from(zipTree(shadowJar.archiveFile))
+
+    exclude { details ->
+        details.file.path.startsWith(sourceSets.main.output.classesDirs.singleFile.path)
+    }
+}
+
+shadowJar {
+    archiveClassifier = 'shadow'
     configurations = [project.configurations.shade]
     finalizedBy 'reobfShadowJar'
     relocate 'org.apache.commons', 'dev.flarelog.vstuff.relocated'
 }
 
-assemble.dependsOn shadowJar
-
 reobf {
     shadowJar {}
+    jarJar {}
 }
+
+tasks.jarJar.finalizedBy('reobfJarJar')
+tasks.build.dependsOn('reobfJarJar')
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
