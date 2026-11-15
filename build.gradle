@@ -233,10 +233,7 @@ shadowJar {
     archiveClassifier = ''
     configurations = [project.configurations.shade]
     finalizedBy 'reobfShadowJar'
-}
-tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-    enableAutoRelocation = true
-    relocationPrefix = "dev.flarelog.vstuff"
+    relocate 'org.apache.commons', 'dev.flarelog.vstuff.relocated'
 }
 
 assemble.dependsOn shadowJar
