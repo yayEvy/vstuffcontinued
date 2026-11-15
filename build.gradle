@@ -240,7 +240,8 @@ shadowJar {
     archiveClassifier = 'shadow'
     configurations = [project.configurations.shade]
     finalizedBy 'reobfShadowJar'
-    relocate 'org.apache.commons', 'dev.flarelog.vstuff.relocated'
+    relocate 'org.apache.commons.jexl3', 'dev.flarelog.vstuff.relocated.jexl3'
+    relocate 'org.apache.commons.logging', 'dev.flarelog.vstuff.relocated.logging'
 }
 
 reobf {
