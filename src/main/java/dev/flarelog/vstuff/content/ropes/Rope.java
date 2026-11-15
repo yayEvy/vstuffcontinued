@@ -4,6 +4,7 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.flarelog.vstuff.content.physics.VSUtil;
+import dev.flarelog.vstuff.content.ropes.type.JointValuesContext;
 import dev.flarelog.vstuff.content.ropes.type.RopeType;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +20,7 @@ import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
+import org.valkyrienskies.core.api.bodies.ServerVsBody;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.core.internal.joints.VSJoint;
@@ -92,22 +94,18 @@ public class Rope {
     public void cleanup(ServerLevel level) {
         VsiServerShipWorld shipWorld = VSGameUtilsKt.getShipObjectWorld(level);
 
-        for (RopeSegment seg : this.getSegments()) {
-            if (seg.joint().left().isPresent()) {
-                VSUtil.getGTPA(level).removeJoint(seg.joint().left().get());
+        for (RopeSegment seg : getSegments()) {
+            seg.joints().forEach(j -> j.left()
+                    .ifPresent(id -> VSUtil.getGTPA(level).removeJoint(id)));
+        }
+        for (Long bodyId : this.getSegmentBodyIds()) {
+            if (bodyId != null) {
+                ServerVsBody body = shipWorld.getAllBodies().getById(bodyId);
+                if (body != null && shipWorld.getAllBodies().contains(body)) {
+                    shipWorld.deleteBody(body);
+                }
             }
         }
-// commented out cuz no work rn
-//        todo:fix
-//        for (int i = 0; i < segments.size() - 1; i++) {
-//            Long bodyId = segments.get(i).id1();
-//            if (bodyId != null) {
-//                ServerVsBody body = shipWorld.getAllBodies().getById(bodyId);
-//                if (body != null && shipWorld.getAllBodies().contains(body)) {
-//                    shipWorld.deleteBody(body);
-//                }
-//            }
-//        }
         this.segments.clear();
     }
 
@@ -130,8 +128,10 @@ public class Rope {
 
     public boolean allJointsCreated() {
         for (RopeSegment segment : this.segments) {
-            if (segment.joint().left().isEmpty()) {
-                return false;
+            for (Either<Integer,VSJoint> s : segment.joints()) {
+                if (s.left().isEmpty()) {
+                    return false;
+                }
             }
         }
         return true;
@@ -172,32 +172,27 @@ public class Rope {
         if (!this.allJointsCreated()) return;
 
         this.setLengthDirty(false);
-        float spacing = (length / this.segments.size()); // actually spacing * (1+sag_factor) but whatever
-        RopeSegment first = this.segments.get(0);
-        RopeSegment last = this.segments.get(segments.size() - 1);
+        int n = this.segments.size();
+        JointValuesContext ctx = JointValuesContext.create(length / n, n);
 
-        VSJoint firstJoint = this.getType().getEndJointWith(first.pos0().id(),
-                new VSJointPose(first.pos0().pos(), new Quaterniond()),
-                first.pos1().id(),
-                new VSJointPose(first.pos1().pos(), new Quaterniond()),
-                spacing).serialized();
-        level.updateJoint(first.joint().orThrow(), firstJoint);
-
-        for (RopeSegment segment : this.segments.subList(1, this.segments.size() - 1)) {
-            VSJoint joint = this.getType().getConnectingPhysBodyJointWith(
-                    segment.pos0().id(), new VSJointPose(segment.pos0().pos(), new Quaterniond()),
-                    segment.pos1().id(), new VSJointPose(segment.pos1().pos(), new Quaterniond()),
-                    spacing
-            ).serialized();
-            level.updateJoint(segment.joint().orThrow(), joint);
+        for (int i = 0; i < n; i++) {
+            RopeSegment s = segments.get(i);
+            updateSegmentJoints(level, s, buildJoints(s, i == 0 || i == n - 1, ctx));
         }
-
-        VSJoint lastJoint = this.getType().getEndJointWith(last.pos0().id(),
-                new VSJointPose(last.pos0().pos(), new Quaterniond()),
-                last.pos1().id(),
-                new VSJointPose(last.pos1().pos(), new Quaterniond()),
-                spacing).serialized();
-        level.updateJoint(last.joint().orThrow(), lastJoint);
     }
 
+    private void updateSegmentJoints(VsiPhysLevel level, RopeSegment s, List<VSJoint> joints) {
+        for (int k = 0; k < joints.size(); k++) {
+            level.updateJoint(s.joints().get(k).orThrow(), joints.get(k));
+        }
+    }
+
+    private List<VSJoint> buildJoints(RopeSegment s, boolean end, JointValuesContext ctx) {
+        VSJointPose p0 = new VSJointPose(s.pos0().pos(), new Quaterniond());
+        VSJointPose p1 = new VSJointPose(s.pos1().pos(), new Quaterniond());
+        List<VSJoint> raw = end
+                ? type.getEndJointsWith(s.pos0().id(), p0, s.pos1().id(), p1, ctx)
+                : type.getConnectingJointsWith(s.pos0().id(), p0, s.pos1().id(), p1, ctx);
+        return raw.stream().map(VSJoint::serialized).toList();
+    }
 }

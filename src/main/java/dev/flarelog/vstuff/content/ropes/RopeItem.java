@@ -100,23 +100,24 @@ public class RopeItem extends Item {
 
         ResourceLocation dimId = ResourceLocation.parse(tag.getString("dim"));
 
-        RopeResult ropeResult = RopeFactory.tryCreateRope(serverLevel, LocalPosAndBodyId.from(firstClickedPos, serverLevel),  LocalPosAndBodyId.from(clickedPos, serverLevel), ResourceKey.create(VStuffRegistries.ROPE_TYPE, VStuff.asResource("normal")), RopeStyleManager.get(heldItem.getOrCreateTag()), dimId);
+        RopeFactory.tryCreateRope(serverLevel,
+                LocalPosAndBodyId.from(firstClickedPos, serverLevel),
+                LocalPosAndBodyId.from(clickedPos, serverLevel),
+                ResourceKey.create(VStuffRegistries.ROPE_TYPE, VStuff.asResource("normal")),
+                RopeStyleManager.get(heldItem.getOrCreateTag()),
+                (ropeResult) -> {
+                    if (ropeResult.valid) {
+                        player.displayClientMessage(VStuff.translate("message.rope.created").withStyle(ChatFormatting.GREEN), true);
 
-
-        if (ropeResult.valid) {
-            player.displayClientMessage(VStuff.translate("message.rope.created").withStyle(ChatFormatting.GREEN), true);
-
-            RopeUtil.playSound(serverLevel, clickedPos, ropeResult.rope.getStyle(serverLevel.registryAccess()).placeSound());
-
-            if (player instanceof ServerPlayer serverPlayer) {
-                VStuffAdvancements.awardFirstRope(serverPlayer);
-            }
-
-        } else {
-            player.displayClientMessage(VStuff.translate(ropeResult.message).withStyle(ChatFormatting.RED), true);
-
-            return InteractionResult.FAIL;
-        }
+                        RopeUtil.playSound(serverLevel, clickedPos, ropeResult.rope.getStyle(serverLevel.registryAccess()).placeSound());
+                        if (player instanceof ServerPlayer serverPlayer) {
+                            VStuffAdvancements.awardFirstRope(serverPlayer);
+                        }
+                    } else {
+                        player.displayClientMessage(VStuff.translate(ropeResult.message).withStyle(ChatFormatting.RED), true);
+                    }
+                },
+                dimId);
 
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;

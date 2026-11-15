@@ -31,6 +31,7 @@
   "vstuff.message.rope.interdimensional_fail": "Cannot create rope across dimensions!",
   "vstuff.message.rope.too_long": "Rope too long!",
   "vstuff.message.rope.actor_connected": "Actor connected",
+  "vstuff.message.rope.fail_unknown": "Rope creation failed. Check logs for details",
   "vstuff.message.rope.nonfullblock_fail": "Cannot create rope connected to a non-full block!",
   "vstuff.message.rope.first": "First position selected.",
   "vstuff.message.rope.break": "Rope broken!",

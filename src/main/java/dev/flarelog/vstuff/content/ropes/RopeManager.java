@@ -1,6 +1,7 @@
 package dev.flarelog.vstuff.content.ropes;
 
 import com.mojang.datafixers.util.Either;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.logging.LogUtils;
 import dev.flarelog.vstuff.content.ropes.data.RopeSegment;
 import dev.flarelog.vstuff.content.ropes.util.IRopeActor;
@@ -29,9 +30,9 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static dev.flarelog.vstuff.content.ropes.RopeFactory.removeAndCleanupRope;
+import java.util.function.Consumer;
 
 @RequiredArgsConstructor
 public class RopeManager extends SavedData {
@@ -45,7 +46,7 @@ public class RopeManager extends SavedData {
     private final AtomicInteger nextId = new AtomicInteger(0);
 
     private final ConcurrentHashMap<Integer, Rope> ropes = new ConcurrentHashMap<>();
-    private final Set<Rope> queued = ConcurrentHashMap.newKeySet();
+    private final List<Pair<Rope, Consumer<RopeResult>>> queued = new CopyOnWriteArrayList<>();
 
     public static RopeManager get(ServerLevel level) {
         DimensionDataStorage storage = level.getDataStorage();
@@ -80,7 +81,7 @@ public class RopeManager extends SavedData {
     }
 
 
-    private void addRope(Rope rope) {
+    private void addRope(Rope rope, Consumer<RopeResult> resultConsumer) {
         rope.setRopeId(nextId.incrementAndGet());
 
         ropes.put(rope.getRopeId(), rope);
@@ -90,6 +91,7 @@ public class RopeManager extends SavedData {
         if (actor0 != null) {
             if (!actor0.canAttach()) {
                 RopeFactory.removeAndCleanupRope(rope, level);
+                resultConsumer.accept(RopeResult.withMessage("message.rope.actor_connected"));
                 return;
             }
             actor0.connectRope(rope.getRopeId());
@@ -98,11 +100,12 @@ public class RopeManager extends SavedData {
         if (actor1 != null) {
             if (!actor1.canAttach()) {
                 RopeFactory.removeAndCleanupRope(rope, level);
+                resultConsumer.accept(RopeResult.withMessage("message.rope.actor_connected"));
                 return;
             }
             actor1.connectRope(rope.getRopeId());
         }
-
+        resultConsumer.accept(RopeResult.validResult(rope));
         VStuffPackets.channel().send(PacketDistributor.ALL.noArg(), new AddRopePacket(rope));
         setDirty();
     }
@@ -159,8 +162,8 @@ public class RopeManager extends SavedData {
         }
     }
 
-    public void queue(Rope rope) {
-        this.queued.add(rope);
+    public void queue(Rope rope, Consumer<RopeResult> resultCallback) {
+        this.queued.add(new Pair<>(rope, resultCallback));
     }
 
     public void physTick(PhysTickEvent event) {
@@ -170,7 +173,10 @@ public class RopeManager extends SavedData {
             rope.physTick(physLevel);
         }
 
-        for (Rope rope : new HashSet<>(this.queued)) {
+        for (Pair<Rope, Consumer<RopeResult>> value : this.queued) {
+            int index = this.queued.indexOf(value);
+            Rope rope = value.getFirst();
+            Consumer<RopeResult> resultConsumer = value.getSecond();
             if (rope.allBodiesCreated(physLevel)) {
                 if (createJoints(physLevel, rope)) {
                     if (!rope.getType().selfCollision()) {
@@ -180,9 +186,11 @@ public class RopeManager extends SavedData {
                             }
                         }
                     }
-                    this.level.getServer().execute(() -> this.addRope(rope));
+                    this.level.getServer().execute(() -> this.addRope(rope, resultConsumer));
+                } else {
+                    this.level.getServer().execute(() -> resultConsumer.accept(RopeResult.withMessage("message.rope.fail_unknown")));
                 }
-                this.queued.remove(rope);
+                this.queued.remove(index);
             }
         }
     }
@@ -196,18 +204,19 @@ public class RopeManager extends SavedData {
 
     private boolean createJoints(VsiPhysLevel level, Rope rope) {
         for (RopeSegment segment : rope.getSegments()) {
-            VSJoint joint = segment.joint().right().orElseThrow();
-
-            int id = level.addJoint(joint);
-            if (id == -1) {
-                LOGGER.warn("Invalid joint id received when creating phys rope! Discarding it....");
-                this.cleanupRope(rope, level);
-                return false;
-            } else {
-                segment.joint(Either.left(id));
+            List<Either<Integer, VSJoint>> js = segment.joints();
+            for (int k = 0; k < js.size(); k++) {
+                VSJoint pending = js.get(k).right().orElse(null);
+                if (pending == null) continue;
+                int id = level.addJoint(pending);
+                if (id == -1) {
+                    LOGGER.warn("Invalid joint id received when creating phys rope! Discarding it....");
+                    cleanupRope(rope, level);
+                    return false;
+                }
+                js.set(k, Either.left(id));
             }
         }
-
         return true;
     }
 
@@ -216,9 +225,7 @@ public class RopeManager extends SavedData {
             this.ropes.remove(rope.getRopeId());
         }
         for (RopeSegment segment : rope.getSegments()) {
-            if (segment.joint().left().isPresent()) {
-                level.removeJoint(segment.joint().left().get());
-            }
+            segment.joints().forEach(j -> j.left().ifPresent(level::removeJoint));
         }
     }
 

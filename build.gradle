@@ -8,27 +8,19 @@ buildscript {
     }
     dependencies {
         classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-        classpath 'org.parchmentmc:librarian:1.+'
-//        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.0'
-//        classpath "org.jlleitschuh.gradle:ktlint-gradle:12.1.1"
     }
 }
 
 plugins {
-//    id 'org.jetbrains.kotlin.jvm' version '1.9.22'
     id 'eclipse'
     id 'idea'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'com.gradleup.shadow' version '8.3.11'
 }
 
-//apply plugin: 'org.jlleitschuh.gradle.ktlint'
-apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
-apply plugin: 'org.parchmentmc.librarian.forgegradle'
-//apply plugin: "org.jetbrains.kotlin.jvm"
 
 mixin {
     add sourceSets.main, "vstuff.refmap.json"
@@ -102,6 +94,14 @@ minecraft {
     }
 }
 
+configurations {
+    shade
+    embedLibrary
+    minecraftLibrary.extendsFrom(embedLibrary)
+    shade.extendsFrom(embedLibrary)
+    runtimeClasspath.extendsFrom(runtimeOnly)
+}
+
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
@@ -113,7 +113,7 @@ repositories {
     }
 
     maven {
-        name= 'Parchment'
+        name = 'Parchment'
         url = 'https://maven.parchmentmc.org'
     }
 
@@ -151,7 +151,7 @@ repositories {
         }
     }
 }
-
+jarJar.enable()
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
@@ -160,6 +160,14 @@ dependencies {
     implementation("org.valkyrienskies.core:internal:${vs_core_version}")
     implementation("org.valkyrienskies.core:util:${vs_core_version}")
     implementation fg.deobf("org.valkyrienskies:valkyrienskies-120-forge:${vs2_version}+${vs2_hash.substring(0, 10)}")
+
+
+    embedLibrary("org.apache.commons:commons-jexl3:3.7.1")
+//    jarJar("org.apache.commons:commons-jexl3:3.7.1") {
+//        jarJar.ranged(it, "[3.7.1,)")
+//    }
+
+//    minecraftLibrary("org.mariuszgromada.math:MathParser.org-mXparser:6.1.2")
 
     implementation "org.joml:joml:1.10.5"
     implementation "com.fasterxml.jackson.core:jackson-annotations:2.13.3"
@@ -184,17 +192,6 @@ dependencies {
     runtimeOnly(fg.deobf("maven.modrinth:spark:1.10.53-forge"))
 }
 
-configurations {
-    shade
-    implementation.extendsFrom shade
-    runtimeClasspath.extendsFrom runtimeOnly
-}
-
-minecraft.runs.all {
-    lazyToken('minecraft_classpath') {
-        configurations.shade.copyRecursive().resolve().collect { it.absolutePath }.join(File.pathSeparator)
-    }
-}
 
 tasks.named('processResources', ProcessResources).configure {
     var replaceProperties = [
@@ -213,6 +210,7 @@ tasks.named('processResources', ProcessResources).configure {
     }}
 
 tasks.named('jar', Jar).configure {
+    archiveClassifier = 'slim'
     manifest {
         attributes([
                 "Specification-Title": mod_id,
@@ -226,6 +224,33 @@ tasks.named('jar', Jar).configure {
         ])
     }
 }
+
+tasks.named('jarJar') {
+    archiveClassifier = ''
+    dependsOn shadowJar
+
+    from(zipTree(shadowJar.archiveFile))
+
+    exclude { details ->
+        details.file.path.startsWith(sourceSets.main.output.classesDirs.singleFile.path)
+    }
+}
+
+shadowJar {
+    archiveClassifier = 'shadow'
+    configurations = [project.configurations.shade]
+    finalizedBy 'reobfShadowJar'
+    relocate 'org.apache.commons.jexl3', 'dev.flarelog.vstuff.relocated.jexl3'
+    relocate 'org.apache.commons.logging', 'dev.flarelog.vstuff.relocated.logging'
+}
+
+reobf {
+    shadowJar {}
+    jarJar {}
+}
+
+tasks.jarJar.finalizedBy('reobfJarJar')
+tasks.build.dependsOn('reobfJarJar')
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'

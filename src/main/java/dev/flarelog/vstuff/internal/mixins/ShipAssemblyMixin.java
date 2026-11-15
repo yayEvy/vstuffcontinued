@@ -101,7 +101,8 @@ public class ShipAssemblyMixin {
                     RopeFactory.createRope(
                             new RopeFactory.RopeContext(level, data0, data1),
                             styleKey,
-                            type
+                            type,
+                            (r) -> {}
                     );
 
                 } catch (Exception e) {

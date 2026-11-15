@@ -9,32 +9,21 @@ import net.minecraftforge.eventbus.api.IEventBus;
 
 public class VStuffAdvancements {
 
-    public static final ResourceLocation FIRST_ROPE =
-            new ResourceLocation(VStuff.MOD_ID, "first_rope");
+    public static final ResourceLocation FIRST_ROPE = VStuff.asResource("first_rope");
 
-    public static final ResourceLocation FIRST_LEVITUFF =
-            new ResourceLocation(VStuff.MOD_ID, "first_levituff");
+    public static final ResourceLocation FIRST_LEVITUFF = VStuff.asResource("first_levituff");
 
     public static void awardFirstRope(ServerPlayer player) {
-        Advancement advancement = player.server.getAdvancements()
-                .getAdvancement(FIRST_ROPE);
-
-        if (advancement == null) return;
-
-        AdvancementProgress progress = player.getAdvancements()
-                .getOrStartProgress(advancement);
-
-        if (!progress.isDone()) {
-            for (String criterion : progress.getRemainingCriteria()) {
-                player.getAdvancements().award(advancement, criterion);
-            }
-        }
-
+       award(player, FIRST_ROPE);
     }
 
     public static void awardFirstLevituff(ServerPlayer player) {
+        award(player, FIRST_LEVITUFF);
+    }
+
+    private static void award(ServerPlayer player, ResourceLocation location) {
         Advancement advancement = player.server.getAdvancements()
-                .getAdvancement(FIRST_LEVITUFF);
+                .getAdvancement(location);
 
         if (advancement == null) return;
 

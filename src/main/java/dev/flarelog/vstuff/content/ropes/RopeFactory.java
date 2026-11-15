@@ -2,13 +2,13 @@ package dev.flarelog.vstuff.content.ropes;
 
 import com.mojang.datafixers.util.Either;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
+import dev.flarelog.vstuff.content.ropes.type.JointValuesContext;
 import dev.flarelog.vstuff.content.ropes.type.RopeType;
 import dev.flarelog.vstuff.content.ropes.data.LocalPosAndBodyId;
 import dev.flarelog.vstuff.content.ropes.data.RopeSegment;
 import dev.flarelog.vstuff.content.ropes.util.IRopeActor;
 import dev.flarelog.vstuff.infrastructure.config.VStuffConfigs;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -21,7 +21,6 @@ import org.valkyrienskies.core.api.bodies.ServerVsBody;
 import org.valkyrienskies.core.api.bodies.VsBodyCreateData;
 import org.valkyrienskies.core.api.bodies.VsBodyDefaults;
 import org.valkyrienskies.core.api.bodies.shape.BodyShapeData;
-import org.valkyrienskies.core.api.bodies.shape.SphereBodyShapeData;
 import org.valkyrienskies.core.impl.bodies.properties.BodyKinematicsImpl;
 import org.valkyrienskies.core.impl.bodies.properties.BodyTransformImpl;
 import org.valkyrienskies.core.impl.game.bodies.BodyInertiaDataImpl;
@@ -29,67 +28,66 @@ import org.valkyrienskies.core.internal.joints.VSJoint;
 import org.valkyrienskies.core.internal.joints.VSJointPose;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class RopeFactory {
 
     public static float SEGMENT_LENGTH = 0.8f;
-    public static double SEGMENT_RADIUS = 0.125;
-    public static double SEGMENT_MASS = 50;
-    public static double JOINT_COMPLIANCE = 1e4f;
-    public static Float JOINT_TOLERANCE = 1e3f;
-    public static Float JOINT_STIFFNESS = 1e7f;
-    public static Float JOINT_DAMPING = 1e5f;
-    public static float JOINT_MAX_FORCE_TORQUE = 1e1f;
     private static final float ANCHOR_OFFSET = 0.1f;
     public static double SAG_FACTOR = 0.08; // higher = more sag
 
     public static final Logger LOGGER = LogManager.getLogger("VStuffRopeFactory");
 
-    public static RopeResult tryCreateRope(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1, ResourceKey<RopeType> type, ResourceKey<RopeStyle> style, ResourceLocation dimId) {
-        if (!dimId.equals(level.dimension().location()))
-            return RopeResult.withMessage("message.rope.interdimensional_fail");
-        return tryCreateRope(level, data0, data1, type, style);
+    public static void tryCreateRope(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1, ResourceKey<RopeType> type, ResourceKey<RopeStyle> style, Consumer<RopeResult> resultCallback, ResourceLocation dimId) {
+        if (!dimId.equals(level.dimension().location())) {
+            resultCallback.accept(RopeResult.withMessage("message.rope.interdimensional_fail"));
+            return;
+        }
+        tryCreateRope(level, data0, data1, type, style, resultCallback);
     }
 
-    public static RopeResult tryCreateRope(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1, ResourceKey<RopeType> type, ResourceKey<RopeStyle> style) {
-        return tryCreateRope(
+    public static void tryCreateRope(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1, ResourceKey<RopeType> type, ResourceKey<RopeStyle> style, Consumer<RopeResult> resultCallback) {
+        tryCreateRope(
                 level, data0, data1,
                 level.registryAccess().registryOrThrow(VStuffRegistries.ROPE_TYPE).get(type),
-                style
+                style,
+                resultCallback
         );
     }
 
-    public static RopeResult tryCreateRope(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1, RopeType type, ResourceKey<RopeStyle> style) {
+    public static void tryCreateRope(ServerLevel level, LocalPosAndBodyId data0, LocalPosAndBodyId data1, RopeType type, ResourceKey<RopeStyle> style, Consumer<RopeResult> resultCallback) {
         float length = (float) data0.getWorldPos(level).distance(data1.getWorldPos(level)) + 0.5f;
 
-        if (length > VStuffConfigs.server().ropeMaxLength.get())
-            return RopeResult.withMessage("message.rope.too_long");
-
+        if (length > VStuffConfigs.server().ropeMaxLength.get()) {
+            resultCallback.accept(RopeResult.withMessage("message.rope.too_long"));
+            return;
+        }
         IRopeActor actor0 = IRopeActor.getAt(level, data0);
         IRopeActor actor1 = IRopeActor.getAt(level, data1);
         if (actor0 != null) {
             if (!actor0.canAttach()) {
-                return RopeResult.withMessage("vstuff.message.rope.actor_connected");
+                resultCallback.accept(RopeResult.withMessage("message.rope.actor_connected"));
+                return;
             }
         }
 
         if (actor1 != null) {
             if (!actor1.canAttach()) {
-                return RopeResult.withMessage("vstuff.message.rope.actor_connected");
+                 resultCallback.accept(RopeResult.withMessage("message.rope.actor_connected"));
+                 return;
             }
         }
 
         RopeContext ctx = new RopeContext(level, data0, data1);
 
-        return RopeResult.validResult(createRope(
-                ctx, style, type
-        ));
+        createRope(ctx, style, type, resultCallback);
     }
 
-    public static Rope createRope(RopeContext ctx, ResourceKey<RopeStyle> styleKey, RopeType type) {
+    public static void createRope(RopeContext ctx, ResourceKey<RopeStyle> styleKey, RopeType type, Consumer<RopeResult> resultCallback) {
         LocalPosAndBodyId first = ctx.data0();
         LocalPosAndBodyId second = ctx.data1();
 
@@ -100,7 +98,7 @@ public class RopeFactory {
 
         if (worldStart.distance(worldEnd) < 0.01) {
             LOGGER.warn("Attachment points are too close, stopping phys rope creation.");
-            return null;
+            return;
         }
 
         Vector3d dir = new Vector3d(worldEnd).sub(worldStart).normalize();
@@ -111,17 +109,16 @@ public class RopeFactory {
         int segmentCount = Math.max(1, (int) Math.round(totalDistance / SEGMENT_LENGTH));
         double spacing = totalDistance / segmentCount;
 
-        CopyOnWriteArrayList<RopeSegment> segments = createSegmentBodies(ctx, segmentCount, spawnStart, spawnEnd);
-        makeJoints(segments, spacing, type);
+        CopyOnWriteArrayList<RopeSegment> segments = createSegmentBodies(ctx, segmentCount, spawnStart, spawnEnd, type);
+        JointValuesContext jointContext = JointValuesContext.create((float) (spacing * (1 + SAG_FACTOR)), segmentCount);
+        makeJoints(segments, type, jointContext);
 
         Rope physRope = new Rope(ctx.data0(), ctx.data1(), type, styleKey, segments, (float) (spacing * (1 + SAG_FACTOR) * segmentCount));
 
-        RopeManager.get(level).queue(physRope);
-
-        return physRope;
+        RopeManager.get(level).queue(physRope, resultCallback);
     }
 
-    public static CopyOnWriteArrayList<RopeSegment> createSegmentBodies(RopeContext ctx, int segmentCount, Vector3d spawnStart, Vector3d spawnEnd) {
+    public static CopyOnWriteArrayList<RopeSegment> createSegmentBodies(RopeContext ctx, int segmentCount, Vector3d spawnStart, Vector3d spawnEnd, RopeType type) {
         CopyOnWriteArrayList<RopeSegment> segments = new CopyOnWriteArrayList<>();
         Vector3d step = new Vector3d(spawnEnd).sub(spawnStart).div(segmentCount);
 
@@ -130,7 +127,7 @@ public class RopeFactory {
 
         for (int i = 0; i < segmentCount - 1; i++) {
             Vector3d bodyPos = new Vector3d(spawnStart).add(new Vector3d(step).mul(i + 1));
-            ServerVsBody body = createBody(ctx.level, bodyPos);
+            ServerVsBody body = createBody(ctx.level, bodyPos, type);
             if (body != null) {
                 Long id = body.getId();
                 Vector3d pos = new Vector3d();
@@ -147,8 +144,8 @@ public class RopeFactory {
         return segments;
     }
 
-    private static ServerVsBody createBody(ServerLevel level, Vector3d pos) {
-        VsBodyCreateData bodyCreateData = createRopeBodyData(level, pos);
+    private static ServerVsBody createBody(ServerLevel level, Vector3d pos, RopeType type) {
+        VsBodyCreateData bodyCreateData = createRopeBodyData(level, pos, type);
 
         try {
             return VSGameUtilsKt.getShipObjectWorld(level).createBody(bodyCreateData);
@@ -158,25 +155,25 @@ public class RopeFactory {
         }
     }
 
-    private static VsBodyCreateData createRopeBodyData(ServerLevel level, Vector3d pos) {
-        BodyShapeData shapeData = new SphereBodyShapeData(SEGMENT_RADIUS);
+    private static VsBodyCreateData createRopeBodyData(ServerLevel level, Vector3d pos, RopeType type) {
+        RopeType.BodyData data = type.bodyData();
+
+        BodyShapeData shapeData = data.getShape();
 
         return new VsBodyCreateData(
                 VSGameUtilsKt.getDimensionId(level),
-                new BodyInertiaDataImpl(shapeData.getAabb().center(new Vector3d()), SEGMENT_MASS, new Matrix3d()),
+                new BodyInertiaDataImpl(shapeData.getAabb().center(new Vector3d()), data.mass(), new Matrix3d()),
                 new BodyKinematicsImpl(new Vector3d(), new Vector3d(), new BodyTransformImpl(new Vector3d(pos), new Quaterniond(), new Vector3d(1), new Vector3d())),
                 shapeData,
                 false,
                 VsBodyDefaults.DEFAULT_COLLISION_MASK,
-                VsBodyDefaults.DEFAULT_STATIC_FRICTION_COEFFICIENT,
-                VsBodyDefaults.DEFAULT_DYNAMIC_FRICTION_COEFFICIENT,
-                VsBodyDefaults.DEFAULT_RESTITUTION_COEFFICIENT
+                data.staticFriction(),
+                data.dynamicFriction(),
+                data.restitution()
         );
     }
 
-    private static void makeJoints(List<RopeSegment> segments, double spacing, RopeType type) {
-        float maxLength = (float) (spacing * (1 + SAG_FACTOR));
-
+    private static void makeJoints(List<RopeSegment> segments, RopeType type, JointValuesContext jointContext) {
         RopeSegment first = segments.remove(0);
         RopeSegment last = segments.remove(segments.size() - 1);
 
@@ -184,34 +181,33 @@ public class RopeFactory {
             throw new RuntimeException("WTF NULL ROPE TYPE??!!??? MEOW!! MEOW!! MEOW!!");
         }
 
-        VSJoint firstJoint = type.getEndJointWith(first.pos0().id(),
+        Stream<VSJoint> firstJoints = type.getEndJointsWith(first.pos0().id(),
                 new VSJointPose(first.pos0().pos(), new Quaterniond()),
                 first.pos1().id(),
                 new VSJointPose(first.pos1().pos(), new Quaterniond()),
-                maxLength).serialized();
+                jointContext).stream().map(VSJoint::serialized);
 
-        first.joint(Either.right(firstJoint));
+        first.joints(firstJoints.map(Either::<Integer,VSJoint>right).collect(Collectors.toCollection(CopyOnWriteArrayList::new)));
 
-        VSJoint lastJoint = type.getEndJointWith(last.pos0().id(),
+        Stream<VSJoint> lastJoints = type.getEndJointsWith(last.pos0().id(),
                 new VSJointPose(last.pos0().pos(), new Quaterniond()),
                 last.pos1().id(),
                 new VSJointPose(last.pos1().pos(), new Quaterniond()),
-                maxLength).serialized();
+                jointContext).stream().map(VSJoint::serialized);
 
 
 
         for (RopeSegment segment : segments) {
-            VSJoint joint = type.getConnectingPhysBodyJointWith(
+            Stream<VSJoint> joints = type.getConnectingJointsWith(
                     segment.pos0().id(), new VSJointPose(segment.pos0().pos(), new Quaterniond()),
                     segment.pos1().id(), new VSJointPose(segment.pos1().pos(), new Quaterniond()),
-                    maxLength
-            );
-            joint.setShouldBeSerialized(true);
+                    jointContext
+            ).stream().map(VSJoint::serialized);
 
-            segment.joint(Either.right(joint));
+            segment.joints(joints.map(Either::<Integer,VSJoint>right).collect(Collectors.toCollection(CopyOnWriteArrayList::new)));
         }
 
-        last.joint(Either.right(lastJoint));
+        last.joints(lastJoints.map(Either::<Integer,VSJoint>right).collect(Collectors.toCollection(CopyOnWriteArrayList::new)));
 
         // Add ts back
         segments.add(0, first);
