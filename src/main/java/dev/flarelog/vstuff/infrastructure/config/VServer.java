@@ -14,7 +14,7 @@ public class VServer extends ConfigBase {
     public final ConfigBool ropeSounds = b(true, "ropeSounds", Comments.ropeSounds);
 
     public final ConfigGroup thruster = group(1, "thruster", Comments.thruster);
-    public final ConfigFloat thrustMultiplier = f(1, 0, "thrusterMultiplier", Comments.thrusterMultiplier);
+    public final ConfigFloat thrustMultiplier = f(4, 1, "thrusterMultiplier", Comments.thrusterMultiplier);
     public final ConfigInt thrusterMaxSpeed = i(10, 0, "thrusterMaxSpeed", "[in Blocks per second]", Comments.thrusterMaxSpeed);
     public final ConfigFloat thrusterMaxPushDistance = f(32, 0, 256, "thrusterMaxPushDistance", Comments.inBlocks, Comments.thrusterMaxPushDistance);
 

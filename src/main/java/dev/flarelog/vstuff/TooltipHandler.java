@@ -81,6 +81,18 @@ public class TooltipHandler {
 
         tooltipModifications.put(VStuffBlocks.LEVITUFF.asItem(),
                 (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
+
+        tooltipModifications.put(VStuffBlocks.LEVITUFF_BRICKS.asItem(),
+                (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
+
+        tooltipModifications.put(VStuffBlocks.POLISHED_LEVITUFF.asItem(),
+                (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
+
+        tooltipModifications.put(VStuffBlocks.CHISELED_LEVITUFF_BRICKS.asItem(),
+                (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
+
+        tooltipModifications.put(VStuffBlocks.CHISELED_LEVITUFF.asItem(),
+                (payload) -> Component.translatable(payload.path + ".tooltip.summary").getString());
     }
 
     private static class SummaryPayload {

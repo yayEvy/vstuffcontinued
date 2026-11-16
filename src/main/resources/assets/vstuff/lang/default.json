@@ -8,6 +8,10 @@
   "vstuff.pulley_anchor.tooltip.summary": "Acts as an _anchor point_ for _pulley_ rope connections",
 
   "vstuff.levituff.tooltip.summary": "Whimsical _floaty_ block that is found in patches _underground_ around the world, do _not_ eat with _salt._",
+  "vstuff.levituff_bricks.tooltip.summary": "Whimsical _floaty_ block that is found in patches _underground_ around the world, do _not_ eat with _salt._",
+  "vstuff.chiseled_levituff_bricks.tooltip.summary": "Whimsical _floaty_ block that is found in patches _underground_ around the world, do _not_ eat with _salt._",
+  "vstuff.chiseled_levituff.tooltip.summary": "Whimsical _floaty_ block that is found in patches _underground_ around the world, do _not_ eat with _salt._",
+  "vstuff.polished_levituff.tooltip.summary": "Whimsical _floaty_ block that is found in patches _underground_ around the world, do _not_ eat with _salt._",
 
   "creativetabs.main": "VStuff",
 
