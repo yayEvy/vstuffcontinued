@@ -55,12 +55,13 @@ public class VStuffBlocks  {
                     .initialProperties(AllBlocks.ANALOG_LEVER)
                     .properties(BlockBehaviour.Properties::noOcclusion)
                     .properties(properties -> properties.sound(nailSoundType))
-                    .blockstate((ctx, prov) -> {
-
-                        ModelFile model = new ModelFile.UncheckedModelFile(prov.modLoc("block/nail_block"));
-                        prov.directionalBlock(ctx.get(), model);
-
-                    })
+                    .blockstate(BlockStateGen.directionalBlockProvider(false))
+//                    .blockstate((ctx, prov) -> {
+//
+//                        ModelFile model = new ModelFile.UncheckedModelFile(prov.modLoc("block/nail_block"));
+//                        prov.directionalBlock(ctx.get(), model);
+//
+//                    })
                     .transform(axeOrPickaxe())
                     .item(NailItem::new)
                     .build()
