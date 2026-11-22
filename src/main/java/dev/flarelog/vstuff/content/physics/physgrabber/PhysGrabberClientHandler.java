@@ -39,10 +39,19 @@ public class PhysGrabberClientHandler{
 
             if (ship != null) {
                 Vec3 hitLocation = blockHit.getLocation();
-                grabDistance = (float) player.getEyePosition(1.0F).distanceTo(hitLocation);
+
 
                 org.joml.Vector3d jomlHit = new org.joml.Vector3d(hitLocation.x, hitLocation.y, hitLocation.z);
-                var localHit = ship.getWorldToShip().transformPosition(jomlHit);
+
+
+                boolean inShipyard = VSGameUtilsKt.isBlockInShipyard(level, hitLocation.x, hitLocation.y, hitLocation.z);
+
+                var localHit = inShipyard ? jomlHit : ship.getWorldToShip().transformPosition(jomlHit, new org.joml.Vector3d());
+
+                Vec3 worldHit = inShipyard ? VectorConversionsMCKt.toMinecraft(ship.getShipToWorld().transformPosition(jomlHit, new org.joml.Vector3d()))
+                                            : hitLocation;
+
+                grabDistance = (float) player.getEyePosition(1.0F).distanceTo(worldHit);
 
                 Vec3 target = player.getEyePosition(1.0F).add(player.getLookAngle().scale(grabDistance));
 
