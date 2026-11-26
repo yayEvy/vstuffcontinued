@@ -9,6 +9,7 @@ import dev.flarelog.vstuff.content.ropes.data.RopeSegment;
 import dev.flarelog.vstuff.content.ropes.util.IRopeActor;
 import dev.flarelog.vstuff.infrastructure.config.VStuffConfigs;
 import dev.flarelog.vstuff.infrastructure.registry.VStuffRegistries;
+import dev.flarelog.vstuff.internal.utility.RopeUtil;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -98,6 +99,7 @@ public class RopeFactory {
 
         if (worldStart.distance(worldEnd) < 0.01) {
             LOGGER.warn("Attachment points are too close, stopping phys rope creation.");
+            resultCallback.accept(RopeResult.withMessage("message.rope.too_close"));
             return;
         }
 
@@ -174,45 +176,21 @@ public class RopeFactory {
     }
 
     private static void makeJoints(List<RopeSegment> segments, RopeType type, JointValuesContext jointContext) {
-        RopeSegment first = segments.remove(0);
-        RopeSegment last = segments.remove(segments.size() - 1);
-
         if (type == null) {
             throw new RuntimeException("WTF NULL ROPE TYPE??!!??? MEOW!! MEOW!! MEOW!!");
         }
 
-        Stream<VSJoint> firstJoints = type.getEndJointsWith(first.pos0().id(),
-                new VSJointPose(first.pos0().pos(), new Quaterniond()),
-                first.pos1().id(),
-                new VSJointPose(first.pos1().pos(), new Quaterniond()),
-                jointContext).stream().map(VSJoint::serialized);
+        int n = segments.size();
 
-        first.joints(firstJoints.map(Either::<Integer,VSJoint>right).collect(Collectors.toCollection(CopyOnWriteArrayList::new)));
-
-        Stream<VSJoint> lastJoints = type.getEndJointsWith(last.pos0().id(),
-                new VSJointPose(last.pos0().pos(), new Quaterniond()),
-                last.pos1().id(),
-                new VSJointPose(last.pos1().pos(), new Quaterniond()),
-                jointContext).stream().map(VSJoint::serialized);
-
-
-
-        for (RopeSegment segment : segments) {
-            Stream<VSJoint> joints = type.getConnectingJointsWith(
-                    segment.pos0().id(), new VSJointPose(segment.pos0().pos(), new Quaterniond()),
-                    segment.pos1().id(), new VSJointPose(segment.pos1().pos(), new Quaterniond()),
-                    jointContext
-            ).stream().map(VSJoint::serialized);
-
-            segment.joints(joints.map(Either::<Integer,VSJoint>right).collect(Collectors.toCollection(CopyOnWriteArrayList::new)));
+        for (int seg = 0; seg < n; seg++) {
+            RopeSegment segment = segments.get(seg);
+            boolean end = seg == 0 || seg == n - 1;
+            segment.joints(
+                    RopeUtil.buildJoints(type,segment, end, jointContext)
+                    .stream().map(Either::<Integer,VSJoint>right)
+                    .collect(Collectors.toCollection(CopyOnWriteArrayList::new))
+            );
         }
-
-        last.joints(lastJoints.map(Either::<Integer,VSJoint>right).collect(Collectors.toCollection(CopyOnWriteArrayList::new)));
-
-        // Add ts back
-        segments.add(0, first);
-        segments.add(last);
-
     }
 
     public static void removeAndCleanupRope(Integer ropeId, ServerLevel level) {

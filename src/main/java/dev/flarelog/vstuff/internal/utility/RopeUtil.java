@@ -1,7 +1,10 @@
 package dev.flarelog.vstuff.internal.utility;
 
+import dev.flarelog.vstuff.content.ropes.data.RopeSegment;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyle;
 import dev.flarelog.vstuff.content.ropes.style.RopeStyleManager;
+import dev.flarelog.vstuff.content.ropes.type.JointValuesContext;
+import dev.flarelog.vstuff.content.ropes.type.RopeType;
 import dev.flarelog.vstuff.index.VStuffItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -17,11 +20,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import dev.flarelog.vstuff.content.ropes.Rope;
 import dev.flarelog.vstuff.content.ropes.RopeManager;
+import org.valkyrienskies.core.internal.joints.VSJoint;
+import org.valkyrienskies.core.internal.joints.VSJointPose;
+import org.valkyrienskies.core.internal.world.VsiPhysLevel;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class RopeUtil {
 
@@ -144,5 +152,20 @@ public class RopeUtil {
                 1.0f,
                 1.0f
         );
+    }
+
+    public static void updateSegmentJoints(VsiPhysLevel level, RopeSegment s, List<VSJoint> joints) {
+        for (int k = 0; k < joints.size(); k++) {
+            level.updateJoint(s.joints().get(k).orThrow(), joints.get(k));
+        }
+    }
+
+    public static List<VSJoint> buildJoints(RopeType type, RopeSegment s, boolean end, JointValuesContext ctx) {
+        VSJointPose p0 = new VSJointPose(s.pos0().pos(), new Quaterniond());
+        VSJointPose p1 = new VSJointPose(s.pos1().pos(), new Quaterniond());
+        List<VSJoint> raw = end
+                ? type.getEndJointsWith(s.pos0().id(), p0, s.pos1().id(), p1, ctx)
+                : type.getConnectingJointsWith(s.pos0().id(), p0, s.pos1().id(), p1, ctx);
+        return raw.stream().map(VSJoint::serialized).toList();
     }
 }

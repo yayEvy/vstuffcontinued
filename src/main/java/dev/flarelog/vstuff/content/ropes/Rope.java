@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.flarelog.vstuff.content.physics.VSUtil;
 import dev.flarelog.vstuff.content.ropes.type.JointValuesContext;
 import dev.flarelog.vstuff.content.ropes.type.RopeType;
+import dev.flarelog.vstuff.internal.utility.RopeUtil;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.core.BlockPos;
@@ -18,13 +19,11 @@ import dev.flarelog.vstuff.content.ropes.data.LocalPosAndBodyId;
 import dev.flarelog.vstuff.content.ropes.data.RopeSegment;
 import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.bodies.ServerVsBody;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.api.world.PhysLevel;
 import org.valkyrienskies.core.internal.joints.VSJoint;
-import org.valkyrienskies.core.internal.joints.VSJointPose;
 import org.valkyrienskies.core.internal.ships.VsiQueryableShipData;
 import org.valkyrienskies.core.internal.world.VsiPhysLevel;
 import org.valkyrienskies.core.internal.world.VsiServerShipWorld;
@@ -177,22 +176,8 @@ public class Rope {
 
         for (int i = 0; i < n; i++) {
             RopeSegment s = segments.get(i);
-            updateSegmentJoints(level, s, buildJoints(s, i == 0 || i == n - 1, ctx));
+            RopeUtil.updateSegmentJoints(level, s, RopeUtil.buildJoints(type, s, i == 0 || i == n - 1, ctx));
         }
     }
 
-    private void updateSegmentJoints(VsiPhysLevel level, RopeSegment s, List<VSJoint> joints) {
-        for (int k = 0; k < joints.size(); k++) {
-            level.updateJoint(s.joints().get(k).orThrow(), joints.get(k));
-        }
-    }
-
-    private List<VSJoint> buildJoints(RopeSegment s, boolean end, JointValuesContext ctx) {
-        VSJointPose p0 = new VSJointPose(s.pos0().pos(), new Quaterniond());
-        VSJointPose p1 = new VSJointPose(s.pos1().pos(), new Quaterniond());
-        List<VSJoint> raw = end
-                ? type.getEndJointsWith(s.pos0().id(), p0, s.pos1().id(), p1, ctx)
-                : type.getConnectingJointsWith(s.pos0().id(), p0, s.pos1().id(), p1, ctx);
-        return raw.stream().map(VSJoint::serialized).toList();
-    }
 }

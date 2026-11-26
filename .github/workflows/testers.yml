@@ -60,6 +60,7 @@ jobs:
           {
             echo "VS_JAR=$JAR_LINK"
             echo "ARTIFACT_NAME=$BASE_NAME"
+            echo "RELEASE_JAR=build/libs/${BASE_NAME}.jar"
           } >> "$GITHUB_ENV"
 
       - name: Upload jar as artifact
@@ -87,18 +88,12 @@ jobs:
           
           DESC="**Commit:** [\`${SHORT_SHA}\`](${COMMIT_URL}) ${COMMIT_MSG}"$'\n'"**Author:** ${AUTHOR}"$'\n'"**Build triggered by:** ${ACTOR}"$'\n'"**VS2 Jar Used For Build:** [Download](${VS_JAR})"$'\n'"**Workflow Artifact:** [Download](${ARTIFACT_URL})"
           
-          # Attach every jar (Discord allows at most 10 attachments per message)
-          shopt -s nullglob
-          FILE_ARGS=()
-          NAMES=""
-          i=0
-          for f in build/libs/*.jar; do
-            [ "$i" -ge 10 ] && break
-            FILE_ARGS+=(-F "files[$i]=@$f")
-            NAMES+="- \`$(basename "$f")\`"$'\n'
-            i=$((i + 1))
-          done
-          DESC+=$'\n'"**Files:**"$'\n'"${NAMES}"
+          # Discord gets only the release jar (the one without a classifier). The artifact link has every jar.
+          if [ ! -f "$RELEASE_JAR" ]; then
+            echo "::error::Release jar not found: $RELEASE_JAR"
+            ls -la build/libs || true
+            exit 1
+          fi
 
           jq -n \
             --arg desc "$DESC" \
@@ -126,5 +121,5 @@ jobs:
           
           curl -sS --fail \
             -F "payload_json=<payload.json" \
-            "${FILE_ARGS[@]}" \
+            -F "file=@${RELEASE_JAR}" \
             "$WEBHOOK_URL"

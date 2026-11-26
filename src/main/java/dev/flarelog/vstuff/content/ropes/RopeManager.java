@@ -188,7 +188,10 @@ public class RopeManager extends SavedData {
                     }
                     this.level.getServer().execute(() -> this.addRope(rope, resultConsumer));
                 } else {
-                    this.level.getServer().execute(() -> resultConsumer.accept(RopeResult.withMessage("message.rope.fail_unknown")));
+                    this.level.getServer().execute(() -> {
+                        rope.cleanup(this.level);
+                        resultConsumer.accept(RopeResult.withMessage("message.rope.fail_unknown"));
+                    });
                 }
                 this.queued.remove(index);
             }
@@ -211,7 +214,6 @@ public class RopeManager extends SavedData {
                 int id = level.addJoint(pending);
                 if (id == -1) {
                     LOGGER.warn("Invalid joint id received when creating phys rope! Discarding it....");
-                    cleanupRope(rope, level);
                     return false;
                 }
                 js.set(k, Either.left(id));

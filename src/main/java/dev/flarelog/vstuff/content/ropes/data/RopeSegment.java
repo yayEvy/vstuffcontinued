@@ -14,7 +14,6 @@ import org.valkyrienskies.core.internal.joints.VSJoint;
 import org.valkyrienskies.core.internal.world.VsiClientShipWorld;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
-import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -25,7 +24,7 @@ public class RopeSegment {
     private final LocalPosAndBodyId pos0;
     private final LocalPosAndBodyId pos1;
 
-    @Setter private List<Either<Integer, VSJoint>> joints = new CopyOnWriteArrayList<>();
+    @Setter private CopyOnWriteArrayList<Either<Integer, VSJoint>> joints = new CopyOnWriteArrayList<>();
 
     public Vector3d getRenderPos0(ClientLevel level) {
         return getRenderPos(level, pos0.id(), pos0.pos());
